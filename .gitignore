@@ -1,0 +1,26 @@
+# Compiled python files
+*.pyc
+
+#ignore IDE settings
+*.idea*
+
+#setup
+build/*
+dist/*
+*egg-info*
+
+#tmp files
+*.py~
+user.txt
+pass.txt
+logs.txt
+*.log
+results.*
+*.html
+*.htm
+*.DS_Store
+*.swp
+
+#codacy
+.coverage
+coverage.xml
