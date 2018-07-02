@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
-from core import compatible
-
-os_name = compatible.os_name()
 
 
 def finish():
     """
     reset the color of windows/terminal before exit
     """
-    if "linux" in os_name or os_name == "darwin":
+    from core.compatible import os_name
+    if "linux" in os_name() or os_name() == "darwin":
         sys.stdout.write("\033[0m")
     else:
         import ctypes
@@ -29,7 +27,8 @@ def color(color):
     Returns:
         color values or empty string
     """
-    if "linux" in os_name or os_name == "darwin":
+    from core.compatible import os_name
+    if "linux" in os_name() or os_name() == "darwin":
         if color == "reset":
             return "\033[0m"
         if color == "grey":
