@@ -1,5 +1,6 @@
 #!/bin/sh
 
+# removed \r
 ### BEGIN INIT INFO
 # Provides:		vsftpd
 # Required-Start:	$network $remote_fs $syslog
