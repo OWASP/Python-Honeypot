@@ -3,7 +3,6 @@
 
 import sys
 import os
-from core.alert import *
 from core._die import __die_failure
 
 __version__ = '0.0.1'
@@ -41,9 +40,7 @@ def logo():
                      | |  | | (_) | | | |  __/ |_| | |  | (_) | |_ 
                      |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
                                                __/ |
-                                              |___/    
- 
-    """)
+                                              |___/   \n\n""")
     finish()
 
 
