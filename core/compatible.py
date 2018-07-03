@@ -5,8 +5,8 @@ import sys
 import os
 from core._die import __die_failure
 
-__version__ = '0.0.1'
-__code_name__ = 'SAME'
+__version__ = "0.0.1"
+__code_name__ = "SAME"
 
 
 def _version_info():
@@ -36,7 +36,7 @@ def logo():
                       _    _                        _____      _   
                      | |  | |                      |  __ \    | |  
                      | |__| | ___  _ __   ___ _   _| |__) |__ | |_ 
-                     |  __  |/ _ \| '_ \ / _ \ | | |  ___/ _ \| __|
+                     |  __  |/ _ \| "_ \ / _ \ | | |  ___/ _ \| __|
                      | |  | | (_) | | | |  __/ |_| | |  | (_) | |_ 
                      |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
                                                __/ |
@@ -64,17 +64,18 @@ def check(language):
         True if compatible otherwise None
     """
     # from core.color import finish
-    if 'linux' in os_name() or 'darwin' in os_name():
+    from core.alert import messages
+    if "linux" in os_name() or "darwin" in os_name():
         pass
-        # os.system('clear')
-    elif 'win32' == os_name() or 'win64' == os_name():
-        # if language != 'en':
+        # os.system("clear")
+    elif "win32" == os_name() or "win64" == os_name():
+        # if language != "en":
         #    from core.color import finish
         #    from core.alert import error
-        #   error('please use english language on windows!')
+        #   error("please use english language on windows!")
         #    finish()
         #    sys.exit(1)
-        # os.system('cls')
+        # os.system("cls")
         pass
     else:
         __die_failure(messages(language, "error_platform"))
@@ -103,6 +104,24 @@ def is_windows():
     Returns:
         True if its running on windows otherwise False
     """
-    if 'win32' == os_name() or 'win64' == os_name():
+    if "win32" == os_name() or "win64" == os_name():
         return True
     return False
+
+
+def check_for_requirements():
+    """
+    check if requirements exist
+
+    Returns:
+        True if exist otherwise False
+    """
+    # first requirement is docker
+    from core.alert import messages
+    from core.alert import warn
+    from core.color import finish
+    if os.popen("docker info").read() == "":
+        warn(messages("en", "docker_error"))
+        finish()
+        return False
+    return True

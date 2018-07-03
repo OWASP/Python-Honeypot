@@ -1,17 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from core.get_modules import load_all_modules
-from core.alert import info
-from core.color import finish
-from core.alert import messages
-from core.compatible import logo
+from core.compatible import check_for_requirements
+from core.load import load_honeypot_engine
 
-# __check_external_modules created to check requirements before load the engine
-if __name__ == "__main__":  # and __check_external_modules():
-    logo()
-    info(messages("en", "honeypot_started"))
-    info(messages("en", "available_modules"))
-    for module in load_all_modules():
-        info(module)
-    finish()
+# check_for_requirements created to check requirements before load the engine
+if __name__ == "__main__" and check_for_requirements():
+    load_honeypot_engine()  # load the engine

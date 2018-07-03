@@ -13,5 +13,6 @@ def all_messages():
         {
             "honeypot_started": "OWASP Honeypot started ...",
             "available_modules": "list of available modules",
-            "module_not_available": "module {0} is not available"
+            "module_not_available": "module {0} is not available",
+            "docker_error": "cannot communicate with docker, please install and start the docker service!"
         }
