@@ -1,0 +1,5 @@
+services:
+  ftp:
+    build: .
+    ports:
+    - "80:80"
