@@ -2,4 +2,4 @@ services:
   ftp:
     build: .
     ports:
-    - "80:80"
+    - "{virtual_machine_port_number}:{real_machine_port_number}"

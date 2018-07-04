@@ -18,7 +18,7 @@ RUN apt-get install -y ftp
 RUN mkdir /etc/vsftpd && \
 #    chmod +x /etc/service/vsftpd/run && \
     chmod +x /etc/init.d/vsftpd && \
-    htpasswd -c -p -b /etc/vsftpd/ftpd.passwd admin $(openssl passwd -1 -noverify admin) && \
+    htpasswd -c -p -b /etc/vsftpd/ftpd.passwd {username} $(openssl passwd -1 -noverify {password}) && \
     useradd --home /home/vsftpd --gid nogroup -m --shell /bin/false vsftpd && \
     mkdir -p /var/www/html && \
     chown vsftpd:nogroup /var/www/html
@@ -26,4 +26,4 @@ RUN mkdir /etc/vsftpd && \
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-EXPOSE 21 20 30000-30009
+EXPOSE {virtual_machine_port_number}

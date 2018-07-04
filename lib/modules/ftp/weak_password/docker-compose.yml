@@ -3,6 +3,4 @@ services:
   ftp:
     build: .
     ports:
-    - "21:21"
-    - "20:20"
-    - "30000-30009:30000-30009"
+    - "{virtual_machine_port_number}:{real_machine_port_number}"
