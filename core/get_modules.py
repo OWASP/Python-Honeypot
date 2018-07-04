@@ -23,7 +23,8 @@ def load_all_modules():
     for module in glob(os.path.dirname(inspect.getfile(lib)) + '/modules/*/*/__init__.py'):
         module_name = module.rsplit('\\' if is_windows() else '/')[-3] + '_' + \
                       module.rsplit('\\' if is_windows() else '/')[-2]
-        if os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'Dockerfile'):
+        if os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'Dockerfile') \
+                and os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'docker-compose.yml'):
             if module_name not in module_names:
                 module_names.append(module_name)
         else:
