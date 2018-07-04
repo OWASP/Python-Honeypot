@@ -3,6 +3,8 @@
 
 import time
 import json
+import inspect
+import os
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -55,12 +57,17 @@ def honeypot_configuration_builder(selected_modules):
     for module in selected_modules:
         category_configuration = getattr(
             __import__("lib.modules.{0}".format(module.rsplit("/")[0]), fromlist=["category_configuration"]),
-            "category_configuration")()
+            "category_configuration")
         module_configuration = getattr(
             __import__("lib.modules.{0}".format(module.replace("/", ".")), fromlist=["module_configuration"]),
-            "module_configuration")()
-        module_configuration.update(category_configuration)
-        honeypot_configuration[module] = module_configuration
+            "module_configuration")
+        combined_module_configuration = module_configuration()
+        combined_module_configuration.update(category_configuration())
+        combined_module_configuration["dockerfile"] = open(
+            os.path.dirname(inspect.getfile(module_configuration)) + '/Dockerfile').read()
+        combined_module_configuration["docker_compose"] = open(
+            os.path.dirname(inspect.getfile(module_configuration)) + '/docker-compose.yml').read()
+        honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
 
