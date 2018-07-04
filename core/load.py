@@ -63,10 +63,13 @@ def honeypot_configuration_builder(selected_modules):
             "module_configuration")
         combined_module_configuration = module_configuration()
         combined_module_configuration.update(category_configuration())
+
         combined_module_configuration["dockerfile"] = open(
-            os.path.dirname(inspect.getfile(module_configuration)) + '/Dockerfile').read()
+            os.path.dirname(inspect.getfile(module_configuration)) +
+            '/Dockerfile').read().format(**combined_module_configuration)
         combined_module_configuration["docker_compose"] = open(
-            os.path.dirname(inspect.getfile(module_configuration)) + '/docker-compose.yml').read()
+            os.path.dirname(inspect.getfile(module_configuration)) +
+            '/docker-compose.yml').read().format(**combined_module_configuration)
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
