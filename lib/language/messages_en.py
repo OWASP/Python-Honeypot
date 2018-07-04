@@ -12,7 +12,7 @@ def all_messages():
     return \
         {
             "honeypot_started": "OWASP Honeypot started ...",
-            "available_modules": "list of available modules",
+            "loading_modules": "loading modules {0}",
             "module_not_available": "module {0} is not available",
             "docker_error": "cannot communicate with docker, please install and start the docker service!",
             "engine": "OHP Engine",
@@ -21,6 +21,7 @@ def all_messages():
             "exclude_module": "select modules(s) to exclude {0}",
             "vm_storage_limit": "virtual machine storage limit",
             "vm_reset_factory_time": "virtual machine reset factory time",
-
-
+            "show_help_menu": "print this help menu",
+            "zero_module_selected": "no module selected, please select one at least!",
+            "module_not_found": "module {0} not found!"
         }
