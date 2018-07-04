@@ -125,3 +125,16 @@ def check_for_requirements():
         finish()
         return False
     return True
+
+
+def hours(hours):
+    """
+    integer to hour(s)
+    Args:
+        hours: hours (integer)
+
+    Returns:
+        seconds equal to hours (integer)
+    """
+
+    return int(hours) * 60 * 60
