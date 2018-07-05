@@ -3,6 +3,8 @@
 
 import sys
 import os
+import random
+import string
 from core._die import __die_failure
 
 __version__ = "0.0.1"
@@ -118,12 +120,12 @@ def check_for_requirements():
     """
     # first requirement is docker
     from core.alert import messages
-    from core.alert import warn
-    from core.color import finish
     if os.popen("docker info").read() == "":
-        warn(messages("en", "docker_error"))
-        finish()
-        return False
+        __die_failure(messages("en", "docker_error"))
+    try:
+        import docker
+    except Exception as _:
+        __die_failure(messages("en", "python_docker_not_installed"))
     return True
 
 
@@ -138,3 +140,34 @@ def hours(hours):
     """
 
     return int(hours) * 60 * 60
+
+
+def make_tmp_thread_dir():
+    """
+    create random thread directory
+
+    Returns:
+        name of directory or False
+    """
+    return mkdir("tmp/thread_"
+                 + "".join([str(string.uppercase + string.lowercase + string.digits)[
+                                random.randint(0, len(str(string.uppercase + string.lowercase +
+                                                          string.digits)) - 1)] for i in range(15)]))
+
+
+def mkdir(dir):
+    """
+    create directory
+
+    Args:
+        dir: directory path
+
+    Returns:
+        Name of directory or False
+    """
+    if not os.path.exists(dir):
+        try:
+            os.makedirs(dir)
+        except Exception as _:
+            return False
+    return dir
