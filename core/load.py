@@ -5,6 +5,8 @@ import time
 import json
 import inspect
 import os
+import threading
+import docker
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -17,6 +19,7 @@ from config import user_configuration
 from config import docker_configuration
 from core._die import __die_success
 from core._die import __die_failure
+from core.compatible import make_tmp_thread_dir
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -41,6 +44,35 @@ def wait_until_interrupt():
         except KeyboardInterrupt:
             break
     return True
+
+
+def start_container(configuration):
+    """
+    start containers based on configuration and dockerfile
+
+    Args:
+        configuration: JSON container configuration
+
+    Returns:
+        threading.Thread
+    """
+    # go to tmp folder
+    os.chdir(make_tmp_thread_dir())
+
+    # create Dockerfile
+    dockerfile = open("Dockerfile", "w")
+    dockerfile.write(configuration["dockerfile"])
+    dockerfile.close()
+
+    # create docker-compose.yml file
+    dockerfile = open("docker-compose.yml", "w")
+    dockerfile.write(configuration["docker_compose"])
+    dockerfile.close()
+
+    # go back to home directory
+    os.chdir('../..')
+
+    return
 
 
 def honeypot_configuration_builder(selected_modules):
@@ -148,7 +180,15 @@ def load_honeypot_engine():
 
     info(messages("en", "honeypot_started"))
     info(messages("en", "loading_modules").format(", ".join(selected_modules)))
-    print(json.dumps(honeypot_configuration_builder(selected_modules), indent=4, sort_keys=True))
+    configuration = honeypot_configuration_builder(selected_modules)
+
+    # remove old containers/images
+    # setup new images
+    # start new containers
+    # for image in docker.from_env().images.list():
+    #     print image
+    
+
     # wait for honeypots modules and threads to keep them open
     # wait_until_interrupt()
     finish()

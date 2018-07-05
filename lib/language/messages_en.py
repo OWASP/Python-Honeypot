@@ -23,5 +23,7 @@ def all_messages():
             "vm_reset_factory_time": "virtual machine reset factory time",
             "show_help_menu": "print this help menu",
             "zero_module_selected": "no module selected, please select one at least!",
-            "module_not_found": "module {0} not found!"
+            "module_not_found": "module {0} not found!",
+            "python_docker_not_installed": "python docker library not installed, please run pip install "
+                                           "docker (docker==2.7.0 for python 2.7.x and docker for python 3.x)"
         }
