@@ -138,7 +138,7 @@ def remove_old_images(configuration):
     """
     for image in all_existing_images():
         if image in get_image_name_of_selected_modules(configuration):
-            info("removing image {0}".format(os.popen("docker rmi {0}".format(image)).read().rsplit()[0]))remove_old_images
+            info("removing image {0}".format(os.popen("docker rmi {0}".format(image)).read().rsplit()[0]))
     return True
 
 
