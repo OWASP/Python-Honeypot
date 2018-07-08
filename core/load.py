@@ -178,7 +178,7 @@ def create_new_images(configuration):
         if verbose_mode:
             os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
         else:
-            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
+            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
 
         # go back to home directory
         os.chdir("../..")
