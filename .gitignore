@@ -10,6 +10,7 @@ dist/*
 *egg-info*
 
 #tmp files
+tmp/thread_*
 *.py~
 user.txt
 pass.txt
