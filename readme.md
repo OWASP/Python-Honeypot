@@ -18,7 +18,7 @@
 * Multi Python Version Support
 * Secure Virtual Machine
 * Automated Setup Process
-* CLI~~/WebUI/API~~ Available
+* CLI ~~/WebUI/API~~ Available
 * ~~Network Packet Analyzer~~
 * ~~Supporting Web/Network based Attacks~~
 * ~~Hacker Activity Monitor~~
