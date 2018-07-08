@@ -156,18 +156,13 @@ def create_new_images(configuration):
     """
     for virtual_machine in configuration:
         # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
-        # go to tmp folder to create Dockerfile and docker-compose.yml
+        # go to tmp folder to create Dockerfile
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
 
         # create Dockerfile
         dockerfile = open("Dockerfile", "w")
         dockerfile.write(configuration[virtual_machine]["dockerfile"])
-        dockerfile.close()
-
-        # create docker-compose.yml file
-        dockerfile = open("docker-compose.yml", "w")
-        dockerfile.write(configuration[virtual_machine]["docker_compose"])
         dockerfile.close()
 
         # create docker image
@@ -202,14 +197,9 @@ def start_containers(configuration):
     """
     for virtual_machine in configuration:
         # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
-        # go to tmp folder to create Dockerfile and docker-compose.yml
+        # go to tmp folder to create Dockerfile
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
-
-        # create docker-compose.yml file
-        dockerfile = open("docker-compose.yml", "w")
-        dockerfile.write(configuration[virtual_machine]["docker_compose"])
-        dockerfile.close()
 
         # get the container name to start (organizing)
         # using pattern name will help us to remove/modify the images and modules
@@ -257,8 +247,8 @@ def honeypot_configuration_builder(selected_modules):
         JSON/Dict OHP configuration
     """
     # the modules are available in lib/modules/category_name/module_name (e.g. lib/modules/ftp/weak_password
-    # they will be listed based on the folder names and if "Dockerfile" and "docker-compose.yml" exist!
-    # the Dockerfile and docker-compose.yml will be read and add into JSON configuration (dockerfile, docker_compose)
+    # they will be listed based on the folder names and if "Dockerfile" exist!
+    # the Dockerfile will be read and add into JSON configuration (dockerfile)
     honeypot_configuration = {}
     for module in selected_modules:
         # read category configuration (e.g. ftp, ssh, http, etc..), they are located in lib/modules/category/__init__.py
@@ -290,15 +280,12 @@ def honeypot_configuration_builder(selected_modules):
         combined_module_configuration = module_configuration()
         combined_module_configuration.update(category_configuration())
 
-        # based on your configuration, the variables/values will be set into your Dockerfile and docker-compose.yml
+        # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = open(
             os.path.dirname(inspect.getfile(module_configuration)) +
             "/Dockerfile").read().format(**combined_module_configuration)
-        combined_module_configuration["docker_compose"] = open(
-            os.path.dirname(inspect.getfile(module_configuration)) +
-            "/docker-compose.yml").read().format(**combined_module_configuration)
-        # combine Dockerfile and docker-compose.yml configuration with module and category configuration
+        # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
