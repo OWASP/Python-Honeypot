@@ -15,6 +15,6 @@ RUN chown  www-data:www-data * .ht*
 
 RUN python -c "f=open(\"/etc/apache2/apache2.conf\").read().replace(\"AllowOverride None\", \"AllowOverride All\");z=open(\"/etc/apache2/apache2.conf\", \"w\"); z.write(f); z.close(); print \"apache config modified...\""
 
-RUN service apache2 restart
-
 EXPOSE {virtual_machine_port_number}
+
+ENTRYPOINT service apache2 restart

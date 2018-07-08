@@ -9,3 +9,5 @@ RUN python -c "f=open(\"/etc/ssh/sshd_config\").read().replace(\"#Port 22\",\"Po
 RUN ssh-keygen -f id_rsa -t rsa -N '' && service ssh restart
 
 EXPOSE {virtual_machine_port_number}
+
+ENTRYPOINT service ssh restart
