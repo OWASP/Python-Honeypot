@@ -59,4 +59,56 @@ start-stop-daemon --start --background \
 log_end_msg $?
 ```
 
+* Running Example (I sent `ctrl + c` to close and remove honeypot service correctly!)
+
+```
+C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>python ohp.py
+
+      ______          __      _____ _____
+     / __ \ \        / /\    / ____|  __ \
+    | |  | \ \  /\  / /  \  | (___ | |__) |
+    | |  | |\ \/  \/ / /\ \  \___ \|  ___/
+    | |__| | \  /\  / ____ \ ____) | |
+     \____/   \/  \/_/    \_\_____/|_|
+                      _    _                        _____      _
+                     | |  | |                      |  __ \    | |
+                     | |__| | ___  _ __   ___ _   _| |__) |__ | |_
+                     |  __  |/ _ \| "_ \ / _ \ | | |  ___/ _ \| __|
+                     | |  | | (_) | | | |  __/ |_| | |  | (_) | |_
+                     |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
+                                               __/ |
+                                              |___/
+
+[+] OWASP Honeypot started ...
+[+] loading modules ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
+[+] creating image ohp_ftpserver
+[+] image ohp_ftpserver created
+[+] creating image ohp_httpserver
+[+] image ohp_httpserver created
+[+] creating image ohp_sshserver
+[+] image ohp_sshserver created
+[+] starting container ohp_ftpserver_weak_password
+[+] container ohp_ftpserver_weak_password started
+[+] starting container ohp_httpserver_basic_auth_weak_password
+[+] container ohp_httpserver_basic_auth_weak_password started
+[+] starting container ohp_sshserver_weak_password
+[+] container ohp_sshserver_weak_password started
+[+] all selected modules started: ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
+[+] interrupted by user, please wait to stop the containers and remove the containers and images
+[+] stopping container ohp_ftpserver_weak_password
+[+] stopping container ohp_httpserver_basic_auth_weak_password
+[+] stopping container ohp_sshserver_weak_password
+[+] removing container ohp_ftpserver_weak_password
+[+] removing container ohp_httpserver_basic_auth_weak_password
+[+] removing container ohp_sshserver_weak_password
+[+] removing image ohp_sshserver
+[+] removing image ohp_httpserver
+[+] removing image ohp_ftpserver
+[+] finished.
+
+C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>
+```
+
+* Please notice, everytime you run the honeypot, it will remove and update the virtual machine, so internet access required for the host!
+
 We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org).

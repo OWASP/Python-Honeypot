@@ -175,7 +175,7 @@ def create_new_images(configuration):
             os.popen("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"])).read()
 
         # created
-        info("image {0} created!".format(configuration[selected_module]["virtual_machine_name"]))
+        info("image {0} created".format(configuration[selected_module]["virtual_machine_name"]))
 
         # go back to home directory
         os.chdir("../..")
