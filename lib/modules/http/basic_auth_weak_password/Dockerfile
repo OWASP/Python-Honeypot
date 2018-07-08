@@ -13,6 +13,4 @@ RUN echo -e "\x41\x75\x74\x68\x54\x79\x70\x65\x20\x42\x61\x73\x69\x63\x0A\x41\x7
 
 RUN python -c "f=open(\"/etc/apache2/apache2.conf\").read().replace(\"AllowOverride None\", \"AllowOverride All\");z=open(\"/etc/apache2/apache2.conf\", \"w\"); z.write(f); z.close(); print \"apache config modified...\""
 
-EXPOSE {virtual_machine_port_number}
-
 ENTRYPOINT service apache2 restart && tail

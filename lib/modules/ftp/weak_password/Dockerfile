@@ -48,6 +48,4 @@ RUN mkdir /etc/vsftpd && \
     mkdir -p /var/www/html && \
     chown vsftpd:nogroup /var/www/html
 
-EXPOSE {virtual_machine_port_number}
-
 ENTRYPOINT service vsftpd start && tail

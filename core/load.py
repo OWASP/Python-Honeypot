@@ -5,7 +5,6 @@ import time
 import json
 import inspect
 import os
-import threading
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -124,7 +123,7 @@ def get_image_name_of_selected_modules(configuration):
     Returns:
         list of virtual machine image name
     """
-    return [configuration[virtual_machine]["virtual_machine_name"] for virtual_machine in configuration]
+    return [configuration[selected_module]["virtual_machine_name"] for selected_module in configuration]
 
 
 def remove_old_images(configuration):
@@ -154,27 +153,26 @@ def create_new_images(configuration):
     Returns:
         True
     """
-    for virtual_machine in configuration:
-        # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
+    for selected_module in configuration:
         # go to tmp folder to create Dockerfile
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
 
         # create Dockerfile
         dockerfile = open("Dockerfile", "w")
-        dockerfile.write(configuration[virtual_machine]["dockerfile"])
+        dockerfile.write(configuration[selected_module]["dockerfile"])
         dockerfile.close()
 
         # create docker image
-        info("creating image {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
+        info("creating image {0}".format(configuration[selected_module]["virtual_machine_name"]))
 
         # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
         # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
         # to create new modules
         if verbose_mode:
-            os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
+            os.system("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"]))
         else:
-            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
+            os.popen("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"])).read()
 
         # go back to home directory
         os.chdir("../..")
@@ -195,21 +193,24 @@ def start_containers(configuration):
     Returns:
         True
     """
-    for virtual_machine in configuration:
-        # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
+    for selected_module in configuration:
         # go to tmp folder to create Dockerfile
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
 
         # get the container name to start (organizing)
         # using pattern name will help us to remove/modify the images and modules
-        container_name = virtual_machine_name_to_container_name(configuration[virtual_machine]["virtual_machine_name"],
-                                                                virtual_machine)
+        container_name = virtual_machine_name_to_container_name(configuration[selected_module]["virtual_machine_name"],
+                                                                selected_module)
         info("starting container {0}".format(container_name))
 
         # run the container
-        os.popen("docker run --name={0} -d -t {1}"
-                 .format(container_name, configuration[virtual_machine]["virtual_machine_name"])).read()
+        os.popen("docker run --name={0} -d -t -p {1}:{2} {3}"
+                 .format(container_name, configuration[selected_module]["real_machine_port_number"],
+                         configuration[selected_module]["virtual_machine_port_number"],
+                         configuration[selected_module]["virtual_machine_name"])).read()
+
+        info("container {0} started".format(container_name))
 
         # go back to home directory
         os.chdir("../..")
