@@ -15,4 +15,4 @@ before_install:
 - docker pull phusion/baseimage:0.9.19
 
 script:
- - python -c "from os import system; import threading; threading.Thread(target=system, args=(\"python ohp.py\",)).start(); import time; time.sleep(3 * 60); import sys; sys.exit(0)"
+ - python -c "from os import system; import threading; threading.Thread(target=system, args=(\"python ohp.py --verbose\",)).start(); import time; time.sleep(3 * 60); import sys; sys.exit(0)"
