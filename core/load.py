@@ -153,7 +153,8 @@ def create_new_images(configuration):
         True
     """
     for virtual_machine in configuration:
-        # go to tmp folder
+        # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
+        # go to tmp folder to create Dockerfile and docker-compose.yml
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
 
@@ -170,6 +171,9 @@ def create_new_images(configuration):
         # create docker image
         info("creating image {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
 
+        # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
+        # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
+        # to create new modules
         if configuration["verbose_mode"]:
             os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
         else:
@@ -195,7 +199,8 @@ def start_containers(configuration):
         True
     """
     for virtual_machine in configuration:
-        # go to tmp folder
+        # virtual_machine is the synonym with the module name in here, each module will be a virtual machine anyway
+        # go to tmp folder to create Dockerfile and docker-compose.yml
         tmp_dir_name = make_tmp_thread_dir()
         os.chdir(tmp_dir_name)
 
@@ -204,9 +209,13 @@ def start_containers(configuration):
         dockerfile.write(configuration[virtual_machine]["docker_compose"])
         dockerfile.close()
 
+        # get the container name to start (organizing)
+        # using pattern name will help us to remove/modify the images and modules
         container_name = virtual_machine_name_to_container_name(configuration[virtual_machine]["virtual_machine_name"],
                                                                 virtual_machine)
         info("starting container {0}".format(container_name))
+
+        # run the container
         os.popen("docker run -d {0} --name {1}".format(virtual_machine, container_name)).read()
 
         # go back to home directory
@@ -226,6 +235,7 @@ def wait_until_interrupt():
         True
     """
     while True:
+        # while True sleep until user send ctrl + c
         try:
             time.sleep(0.3)
         except KeyboardInterrupt:
@@ -243,23 +253,49 @@ def honeypot_configuration_builder(selected_modules):
     Returns:
         JSON/Dict OHP configuration
     """
+    # the modules are available in lib/modules/category_name/module_name (e.g. lib/modules/ftp/weak_password
+    # they will be listed based on the folder names and if "Dockerfile" and "docker-compose.yml" exist!
+    # the Dockerfile and docker-compose.yml will be read and add into JSON configuration (dockerfile, docker_compose)
     honeypot_configuration = {}
     for module in selected_modules:
+        # read category configuration (e.g. ftp, ssh, http, etc..), they are located in lib/modules/category/__init__.py
+        # in the __init__.py every category has same function as below!
+        # def category_configuration():
+        #     return {
+        #          "virtual_machine_name": "ohp_sshserver",
+        #          "virtual_machine_port_number": 22,
+        #          "virtual_machine_internet_access": False,
+        #          "real_machine_port_number": 22
+        #     }
+
         category_configuration = getattr(
             __import__("lib.modules.{0}".format(module.rsplit("/")[0]), fromlist=["category_configuration"]),
             "category_configuration")
+        # reading each module configuration (e.g. ftp/weak_password, etc..)
+        # they are located in lib/modules/category/module_name/__init__.py
+        # each module must have such a function (in case you can return {} if you don't have any configuration)
+        # def module_configuration():
+        #     return {
+        #         "username": "admin",
+        #         "password": "123456"
+        #      }
         module_configuration = getattr(
             __import__("lib.modules.{0}".format(module.replace("/", ".")), fromlist=["module_configuration"]),
             "module_configuration")
+
+        # combine category + module configuration into one Dict/JSON
         combined_module_configuration = module_configuration()
         combined_module_configuration.update(category_configuration())
 
+        # based on your configuration, the variables/values will be set into your Dockerfile and docker-compose.yml
+        # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = open(
             os.path.dirname(inspect.getfile(module_configuration)) +
             "/Dockerfile").read().format(**combined_module_configuration)
         combined_module_configuration["docker_compose"] = open(
             os.path.dirname(inspect.getfile(module_configuration)) +
             "/docker-compose.yml").read().format(**combined_module_configuration)
+        # combine Dockerfile and docker-compose.yml configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
@@ -271,24 +307,32 @@ def argv_parser():
     Returns:
         parser, parsed ARGVs
     """
+    # create parser
     parser = argparse.ArgumentParser(prog="Nettacker", add_help=False)
+    # create menu
     engineOpt = parser.add_argument_group(messages("en", "engine"), messages("en", "engine_input"))
+    # add select module options + list of available modules
     engineOpt.add_argument("-m", "--select-module", action="store",
                            dest="selected_modules", default=user_configuration()["default_selected_modules"],
                            help=messages("en", "select_module").format(load_all_modules()))
+    # by default all modules are selected, in case users can exclude one or some (separated with comma)
     engineOpt.add_argument("-x", "--exclude-module", action="store",
                            dest="excluded_modules", default=user_configuration()["default_excluded_modules"],
                            help=messages("en", "exclude_module").format(load_all_modules()))
+    # limit the virtual machine storage to avoid related abuse
     engineOpt.add_argument("-s", "--vm-storage-limit", action="store",
                            dest="virtual_machine_storage_limit", type=float,
                            default=docker_configuration()["virtual_machine_storage_limit"],
                            help=messages("en", "vm_storage_limit"))
+    # reset the containers once in a time to prevent being continues botnet zombie
     engineOpt.add_argument("-r", "--vm-reset-factory-time", action="store",
                            dest="virtual_machine_container_reset_factory_time", type=int,
                            default=docker_configuration()["virtual_machine_container_reset_factory_time"],
                            help=messages("en", "vm_reset_factory_time"))
+    # enable verbose mode (debug mode)
     engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
                            help="enable verbose mode")
+    # help menu
     engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
                            help=messages("en", "show_help_menu"))
     return parser, parser.parse_args()
@@ -301,8 +345,15 @@ def load_honeypot_engine():
     Returns:
         True
     """
+    # print logo
     logo()
+
+    # parse argv
     parser, argv_options = argv_parser()
+
+    #########################################
+    # argv rules apply
+    #########################################
     # check help menu
     if argv_options.show_help_menu:
         parser.print_help()
@@ -337,26 +388,40 @@ def load_honeypot_engine():
         # if selected modules are zero
         if not len(selected_modules):
             __die_failure(messages("en", "zero_module_selected"))
-
-    info(messages("en", "honeypot_started"))
-    info(messages("en", "loading_modules").format(", ".join(selected_modules)))
+    # build configuration based on selected modules
     configuration = honeypot_configuration_builder(selected_modules)
 
     # add verbose mode to configuration
     configuration["verbose_mode"] = argv_options.verbose_mode
+    #########################################
+    # argv rules apply
+    #########################################
 
+    info(messages("en", "honeypot_started"))
+    info(messages("en", "loading_modules").format(", ".join(selected_modules)))
+
+    # stop old containers (in case they are not stopped)
     stop_containers(configuration)
+    # remove old containers (in case they are not updated)
     remove_old_containers(configuration)
+    # remove old images (in case they are not updated)
     remove_old_images(configuration)
+    # create new images based on selected modules
     create_new_images(configuration)
+    # start containers based on selected modules
     start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
+    # wait forever! in case user can send ctrl + c to interrupt
     wait_until_interrupt()
     info("interrupted by user, please wait to stop the containers and remove the containers and images")
+    # stop created containers
     stop_containers(configuration)
+    # remove created containers
     remove_old_containers(configuration)
+    # remove created images
     remove_old_images(configuration)
     # remove_tmp_directories() error: access denied!
     info("finished.")
+    # reset cmd/terminal color
     finish()
     return True
