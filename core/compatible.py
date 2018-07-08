@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import sys
@@ -148,7 +148,7 @@ def make_tmp_thread_dir():
     """
     return mkdir("tmp/thread_"
                  + "".join([str(string.ascii_uppercase + string.ascii_lowercase + string.digits)[
-                                random.randint(0, len(str(string.ascii_uppercase + string.lowercase +
+                                random.randint(0, len(str(string.ascii_uppercase + string.ascii_lowercase +
                                                           string.digits)) - 1)] for i in range(15)]))
 
 
