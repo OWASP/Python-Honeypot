@@ -33,6 +33,7 @@ else:
 
 # tmp dirs
 tmp_directories = []
+verbose_mode = None
 
 
 def remove_tmp_directories():
@@ -174,7 +175,7 @@ def create_new_images(configuration):
         # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
         # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
         # to create new modules
-        if configuration["verbose_mode"]:
+        if verbose_mode:
             os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
         else:
             os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
@@ -388,17 +389,16 @@ def load_honeypot_engine():
         # if selected modules are zero
         if not len(selected_modules):
             __die_failure(messages("en", "zero_module_selected"))
-    # build configuration based on selected modules
-    configuration = honeypot_configuration_builder(selected_modules)
-
-    # add verbose mode to configuration
-    configuration["verbose_mode"] = argv_options.verbose_mode
+    global verbose_mode
+    verbose_mode = argv_options.verbose_mode
     #########################################
     # argv rules apply
     #########################################
 
     info(messages("en", "honeypot_started"))
     info(messages("en", "loading_modules").format(", ".join(selected_modules)))
+    # build configuration based on selected modules
+    configuration = honeypot_configuration_builder(selected_modules)
 
     # stop old containers (in case they are not stopped)
     stop_containers(configuration)
