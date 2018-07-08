@@ -139,7 +139,8 @@ def remove_old_images(configuration):
     """
     for image in all_existing_images():
         if image in get_image_name_of_selected_modules(configuration):
-            info("removing image {0}".format(os.popen("docker rmi {0}".format(image)).read().rsplit()[0]))
+            info("removing image {0}".format(image))
+            os.popen("docker rmi {0}".format(image)).read()
     return True
 
 
@@ -217,7 +218,8 @@ def start_containers(configuration):
         info("starting container {0}".format(container_name))
 
         # run the container
-        os.popen("docker run -d {0} --name {1}".format(virtual_machine, container_name)).read()
+        os.popen("docker run --name={0} -d -t {1}"
+                 .format(container_name, configuration[virtual_machine]["virtual_machine_name"])).read()
 
         # go back to home directory
         os.chdir("../..")
