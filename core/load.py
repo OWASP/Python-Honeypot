@@ -174,6 +174,9 @@ def create_new_images(configuration):
         else:
             os.popen("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"])).read()
 
+        # created
+        info("image {0} created!".format(configuration[selected_module]["virtual_machine_name"]))
+
         # go back to home directory
         os.chdir("../..")
 
@@ -194,10 +197,6 @@ def start_containers(configuration):
         True
     """
     for selected_module in configuration:
-        # go to tmp folder to create Dockerfile
-        tmp_dir_name = make_tmp_thread_dir()
-        os.chdir(tmp_dir_name)
-
         # get the container name to start (organizing)
         # using pattern name will help us to remove/modify the images and modules
         container_name = virtual_machine_name_to_container_name(configuration[selected_module]["virtual_machine_name"],
@@ -211,13 +210,6 @@ def start_containers(configuration):
                          configuration[selected_module]["virtual_machine_name"])).read()
 
         info("container {0} started".format(container_name))
-
-        # go back to home directory
-        os.chdir("../..")
-
-        # submit tmp dir name
-        tmp_directories.append(tmp_dir_name)
-
     return True
 
 
