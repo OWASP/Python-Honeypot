@@ -1,5 +1,7 @@
 # OWASP Honeypot
 
+[![Build Status](https://travis-ci.org/zdresearch/OWASPHoneyPot.svg?branch=master)](https://travis-ci.org/zdresearch/OWASPHoneyPot)
+
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
 ##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
