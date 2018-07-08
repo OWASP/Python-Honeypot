@@ -122,10 +122,6 @@ def check_for_requirements():
     from core.alert import messages
     if os.popen("docker info").read() == "":
         __die_failure(messages("en", "docker_error"))
-    try:
-        import docker
-    except Exception as _:
-        __die_failure(messages("en", "python_docker_not_installed"))
     return True
 
 
