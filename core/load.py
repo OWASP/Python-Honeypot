@@ -176,9 +176,9 @@ def create_new_images(configuration):
         # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
         # to create new modules
         if verbose_mode:
-            os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
+            os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
         else:
-            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
+            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
 
         # go back to home directory
         os.chdir("../..")
