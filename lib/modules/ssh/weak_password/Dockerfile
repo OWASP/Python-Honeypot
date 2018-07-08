@@ -10,4 +10,4 @@ RUN ssh-keygen -f id_rsa -t rsa -N '' && service ssh restart
 
 EXPOSE {virtual_machine_port_number}
 
-ENTRYPOINT service ssh restart
+ENTRYPOINT service ssh restart && tail

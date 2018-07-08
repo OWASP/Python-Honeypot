@@ -50,4 +50,4 @@ RUN mkdir /etc/vsftpd && \
 
 EXPOSE {virtual_machine_port_number}
 
-ENTRYPOINT service vsftpd start
+ENTRYPOINT service vsftpd start && tail
