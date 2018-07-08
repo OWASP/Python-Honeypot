@@ -146,7 +146,7 @@ def make_tmp_thread_dir():
         name of directory or False
     """
     return mkdir("tmp/thread_"
-                 + "".join([str(string.string.ascii_uppercase + string.string.ascii_lowercase + string.digits)[
+                 + "".join([str(string.ascii_uppercase + string.ascii_lowercase + string.digits)[
                                 random.randint(0, len(str(string.uppercase + string.lowercase +
                                                           string.digits)) - 1)] for i in range(15)]))
 
