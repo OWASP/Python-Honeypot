@@ -169,7 +169,11 @@ def create_new_images(configuration):
 
         # create docker image
         info("creating image {0}".format(configuration[virtual_machine]["virtual_machine_name"]))
-        os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
+
+        if configuration["verbose_mode"]:
+            os.system("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
+        else:
+            os.popen("docker build . -t {0}".format(configuration[virtual_machine]["virtual_machine_name"])).read()
 
         # go back to home directory
         os.chdir("../..")
@@ -283,6 +287,8 @@ def argv_parser():
                            dest="virtual_machine_container_reset_factory_time", type=int,
                            default=docker_configuration()["virtual_machine_container_reset_factory_time"],
                            help=messages("en", "vm_reset_factory_time"))
+    engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
+                           help="enable verbose mode")
     engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
                            help=messages("en", "show_help_menu"))
     return parser, parser.parse_args()
@@ -327,7 +333,7 @@ def load_honeypot_engine():
             try:
                 selected_modules.remove(module)
             except Exception as _:
-                _
+                del _
         # if selected modules are zero
         if not len(selected_modules):
             __die_failure(messages("en", "zero_module_selected"))
@@ -335,6 +341,9 @@ def load_honeypot_engine():
     info(messages("en", "honeypot_started"))
     info(messages("en", "loading_modules").format(", ".join(selected_modules)))
     configuration = honeypot_configuration_builder(selected_modules)
+
+    # add verbose mode to configuration
+    configuration["verbose_mode"] = argv_options.verbose_mode
 
     stop_containers(configuration)
     remove_old_containers(configuration)
