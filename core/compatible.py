@@ -27,7 +27,6 @@ def logo():
     OWASP HoneyPot Logo
     """
     from core.alert import write_to_api_console
-    from core import color
     from core.color import finish
     write_to_api_console("""
       ______          __      _____ _____  
