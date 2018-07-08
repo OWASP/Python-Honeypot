@@ -2,12 +2,8 @@
 
 Simple ftp server with docker
 
-### usage
-
-```docker build . -t ftpserver
-docker run -d ftpserver
-docker exec -it 7f121dcaecca /bin/bash -c "service vsftpd start"```
-
+* C-Styled files
+* `/etc/init.d/vsftpd`
 ```bash
 
 #!/bin/sh
@@ -115,6 +111,28 @@ case "${1}" in
 esac
 
 exit 0
+```
+
+* `/etc/vsftpd.conf`
+```bash
+listen=YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+local_umask=022
+local_root=/var/www
+chroot_local_user=YES
+allow_writeable_chroot=YES
+hide_ids=YES
+listen_address=0.0.0.0
+
+#virtual user settings
+user_config_dir=/etc/vsftpd_user_conf
+guest_enable=YES
+virtual_use_local_privs=YES
+pam_service_name=vsftpd
+nopriv_user=vsftpd
+guest_username=vsftpd
 ```
 
 * Ref: https://github.com/lrkwz/docker-vsftp
