@@ -35,6 +35,60 @@ tmp_directories = []
 verbose_mode = None
 
 
+def all_existing_networks():
+    """
+    list of all existing networks
+
+    Returns:
+        an array with list of all existing networks name
+    """
+    return [network_name.rsplit()[1] for network_name in os.popen("docker network ls").read().rsplit("\n")[1:-1]]
+
+
+def create_ohp_networks():
+    """
+    create docker internet and internal network for OWASP Honeypot
+
+    Returns:
+        True
+    """
+    if "ohp_internet" not in all_existing_networks():
+        info("creating ohp_internet network")
+        os.popen("docker network create ohp_internet  --opt com.docker.network.bridge.enable_icc=true "
+                 "--opt com.docker.network.bridge.enable_ip_masquerade=true "
+                 "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
+                 "com.docker.network.driver.mtu=1500").read()
+        network_json = json.loads(os.popen("docker network inspect ohp_internet").read())[0]["IPAM"]["Config"][0]
+        info("ohp_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
+                                                                          network_json["Gateway"]))
+    if "ohp_no_internet" not in all_existing_networks():
+        info("creating ohp_no_internet network")
+        os.popen("docker network create --internal ohp_no_internet  --opt com.docker.network.bridge.enable_icc=true "
+                 "--opt com.docker.network.bridge.enable_ip_masquerade=true "
+                 "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
+                 "com.docker.network.driver.mtu=1500").read()
+        network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[0]["IPAM"]["Config"]
+        info("ohp_no_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
+                                                                             network_json["Gateway"]))
+    return True
+
+
+def disconnect_all_networks(virtual_machine_network_json, container_name):
+    """
+    disconnect all networks connected to a container
+
+    Args:
+        virtual_machine_network_json: virtual_machine_network_json["Networks"] containing networks name
+        container_name: the container name
+
+    Returns:
+        True
+    """
+    for network_name in virtual_machine_network_json:
+        os.popen("docker network disconnect {0} {1}".format(network_name, container_name))
+    return True
+
+
 def remove_tmp_directories():
     """
     remove tmp directories submitted in tmp_directories
@@ -207,9 +261,20 @@ def start_containers(configuration):
         os.popen("docker run --name={0} -d -t -p {1}:{2} {3}"
                  .format(container_name, real_machine_port, virtual_machine_port,
                          configuration[selected_module]["virtual_machine_name"])).read()
-        # get docker container IP address
-        virtual_machine_ip_address = \
-            json.loads(os.popen("docker inspect {0}".format(container_name)).read())[0]["NetworkSettings"]["IPAddress"]
+        # get container network setting
+        virtual_machine_network_json = json.loads(os.popen("docker inspect {0}".format(container_name)).read())[0][
+            "NetworkSettings"]
+        # disconnect from default networks
+        disconnect_all_networks(virtual_machine_network_json["Networks"], container_name)
+        # connect to owasp nettacker networks!
+        if configuration[selected_module]["virtual_machine_internet_access"]:
+            os.popen("docker network connect ohp_internet {0}".format(container_name)).read()
+        else:
+            # Bug! details: https://github.com/zdresearch/OWASP-Honeypot/issues/2
+            # os.popen("docker network connect ohp_no_internet {0}".format(container_name)).read()
+            os.popen("docker network connect ohp_internet {0}".format(container_name)).read()
+        virtual_machine_ip_address = os.popen("docker inspect -f '{{range.NetworkSettings.Networks}}"
+                                              "{{.IPAddress}}{{end}}' %s" % container_name).read().rsplit()[0][1:-1]
         # print started container information
         info("container {0} started,"
              " forwarding 0.0.0.0:{1} to {2}:{3}".format(container_name, real_machine_port, virtual_machine_ip_address,
@@ -243,6 +308,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 # start containers based on selected modules
                 start_containers(configuration)
         except KeyboardInterrupt:
+            # break and return for stopping and removing containers/images
             info("interrupted by user, please wait to stop the containers and remove the containers and images")
             break
     return True
@@ -393,7 +459,7 @@ def load_honeypot_engine():
         # if selected modules are zero
         if not len(selected_modules):
             __die_failure(messages("en", "zero_module_selected"))
-    virtual_machine_container_reset_factory_time_seconds = argv_options.\
+    virtual_machine_container_reset_factory_time_seconds = argv_options. \
         virtual_machine_container_reset_factory_time_seconds
     global verbose_mode
     verbose_mode = argv_options.verbose_mode
@@ -414,6 +480,8 @@ def load_honeypot_engine():
     remove_old_images(configuration)
     # create new images based on selected modules
     create_new_images(configuration)
+    # create OWASP Honeypot networks in case not exist
+    create_ohp_networks()
     # start containers based on selected modules
     start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
