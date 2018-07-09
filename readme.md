@@ -88,11 +88,11 @@ C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>python ohp.py
 [+] creating image ohp_sshserver
 [+] image ohp_sshserver created
 [+] starting container ohp_ftpserver_weak_password
-[+] container ohp_ftpserver_weak_password started
+[+] container ohp_ftpserver_weak_password started, forwarding 0.0.0.0:21 to 172.17.0.2:21
 [+] starting container ohp_httpserver_basic_auth_weak_password
-[+] container ohp_httpserver_basic_auth_weak_password started
+[+] container ohp_httpserver_basic_auth_weak_password started, forwarding 0.0.0.0:80 to 172.17.0.3:80
 [+] starting container ohp_sshserver_weak_password
-[+] container ohp_sshserver_weak_password started
+[+] container ohp_sshserver_weak_password started, forwarding 0.0.0.0:22 to 172.17.0.3:22
 [+] all selected modules started: ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
 [+] interrupted by user, please wait to stop the containers and remove the containers and images
 [+] stopping container ohp_ftpserver_weak_password
