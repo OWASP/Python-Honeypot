@@ -125,19 +125,6 @@ def check_for_requirements():
     return True
 
 
-def hours(hours):
-    """
-    integer to hour(s)
-    Args:
-        hours: hours (integer)
-
-    Returns:
-        seconds equal to hours (integer)
-    """
-
-    return int(hours) * 60 * 60
-
-
 def make_tmp_thread_dir():
     """
     create random thread directory

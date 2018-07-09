@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from core.compatible import hours
+from core._time import hours
 
 
 def docker_configuration():
