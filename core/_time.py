@@ -26,4 +26,4 @@ def hours(hour_to_seconds):
         seconds equal to hours (integer)
     """
 
-    return int(hour_to_seconds) * 60 * 60
+    return int(hour_to_seconds * 60 * 60)

@@ -13,7 +13,7 @@ def docker_configuration():
     """
     return {
         "virtual_machine_storage_limit": 0.5,  # Gigabyte
-        "virtual_machine_container_reset_factory_time": hours(1),  # hours
+        "virtual_machine_container_reset_factory_time_seconds": hours(-1),  # -1 is equals to never reset!
 
     }
 

@@ -217,18 +217,33 @@ def start_containers(configuration):
     return True
 
 
-def wait_until_interrupt():
+def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration):
     """
     wait for opened threads/honeypots modules
 
     Returns:
         True
     """
+    # running_time variable will be use to check if its need to reset the container after a while
+    # if virtual_machine_container_reset_factory_time_seconds < 0, it will keep containers until user interruption
+    running_time = 0
     while True:
         # while True sleep until user send ctrl + c
         try:
-            time.sleep(0.3)
+            time.sleep(1)
+            running_time += 1
+            # check if running_time is equal to reset factory time
+            if running_time is virtual_machine_container_reset_factory_time_seconds:
+                # reset the run time
+                running_time = 0
+                # stop old containers (in case they are not stopped)
+                stop_containers(configuration)
+                # remove old containers (in case they are not updated)
+                remove_old_containers(configuration)
+                # start containers based on selected modules
+                start_containers(configuration)
         except KeyboardInterrupt:
+            info("interrupted by user, please wait to stop the containers and remove the containers and images")
             break
     return True
 
@@ -313,8 +328,8 @@ def argv_parser():
                            help=messages("en", "vm_storage_limit"))
     # reset the containers once in a time to prevent being continues botnet zombie
     engineOpt.add_argument("-r", "--vm-reset-factory-time", action="store",
-                           dest="virtual_machine_container_reset_factory_time", type=int,
-                           default=docker_configuration()["virtual_machine_container_reset_factory_time"],
+                           dest="virtual_machine_container_reset_factory_time_seconds", type=int,
+                           default=docker_configuration()["virtual_machine_container_reset_factory_time_seconds"],
                            help=messages("en", "vm_reset_factory_time"))
     # enable verbose mode (debug mode)
     engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
@@ -378,6 +393,8 @@ def load_honeypot_engine():
         # if selected modules are zero
         if not len(selected_modules):
             __die_failure(messages("en", "zero_module_selected"))
+    virtual_machine_container_reset_factory_time_seconds = argv_options.\
+        virtual_machine_container_reset_factory_time_seconds
     global verbose_mode
     verbose_mode = argv_options.verbose_mode
     #########################################
@@ -401,8 +418,7 @@ def load_honeypot_engine():
     start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
     # wait forever! in case user can send ctrl + c to interrupt
-    wait_until_interrupt()
-    info("interrupted by user, please wait to stop the containers and remove the containers and images")
+    wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
     # stop created containers
     stop_containers(configuration)
     # remove created containers
