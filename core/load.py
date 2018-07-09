@@ -63,29 +63,14 @@ def create_ohp_networks():
                                                                           network_json["Gateway"]))
     if "ohp_no_internet" not in all_existing_networks():
         info("creating ohp_no_internet network")
-        os.popen("docker network create --internal ohp_no_internet  --opt com.docker.network.bridge.enable_icc=true "
+        os.popen("docker network create --attachable --internal ohp_no_internet  "
+                 "--opt com.docker.network.bridge.enable_icc=true "
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
-                 "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
-                 "com.docker.network.driver.mtu=1500").read()
+                 "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 "
+                 "--opt com.docker.network.driver.mtu=1500").read()
         network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[0]["IPAM"]["Config"][0]
         info("ohp_no_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
                                                                              network_json["Gateway"]))
-    return True
-
-
-def disconnect_all_networks(virtual_machine_network_json, container_name):
-    """
-    disconnect all networks connected to a container
-
-    Args:
-        virtual_machine_network_json: virtual_machine_network_json["Networks"] containing networks name
-        container_name: the container name
-
-    Returns:
-        True
-    """
-    for network_name in virtual_machine_network_json:
-        os.popen("docker network disconnect {0} {1}".format(network_name, container_name))
     return True
 
 
@@ -257,22 +242,18 @@ def start_containers(configuration):
                                                                 selected_module)
         real_machine_port = configuration[selected_module]["real_machine_port_number"]
         virtual_machine_port = configuration[selected_module]["virtual_machine_port_number"]
-        # run the container
-        os.popen("docker run --name={0} -d -t -p {1}:{2} {3}"
-                 .format(container_name, real_machine_port, virtual_machine_port,
-                         configuration[selected_module]["virtual_machine_name"])).read()
-        # get container network setting
-        virtual_machine_network_json = json.loads(os.popen("docker inspect {0}".format(container_name)).read())[0][
-            "NetworkSettings"]
-        # disconnect from default networks
-        disconnect_all_networks(virtual_machine_network_json["Networks"], container_name)
         # connect to owasp nettacker networks!
         if configuration[selected_module]["virtual_machine_internet_access"]:
-            os.popen("docker network connect ohp_internet {0}".format(container_name)).read()
+            # run the container with internet access
+            os.popen("docker run --net ohp_internet --name={0} -d -t -p {1}:{2} {3}"
+                     .format(container_name, real_machine_port, virtual_machine_port,
+                             configuration[selected_module]["virtual_machine_name"])).read()
         else:
-            # Bug! details: https://github.com/zdresearch/OWASP-Honeypot/issues/2
-            # os.popen("docker network connect ohp_no_internet {0}".format(container_name)).read()
-            os.popen("docker network connect ohp_internet {0}".format(container_name)).read()
+            # run the container without internet access
+            os.popen("docker run --net ohp_no_internet --name={0} -d -t -p {1}:{2} {3}"
+                     .format(container_name, real_machine_port, virtual_machine_port,
+                             configuration[selected_module]["virtual_machine_name"])).read()
+
         virtual_machine_ip_address = os.popen("docker inspect -f '{{range.NetworkSettings.Networks}}"
                                               "{{.IPAddress}}{{end}}' %s" % container_name).read().rsplit()[0][1:-1]
         # print started container information
