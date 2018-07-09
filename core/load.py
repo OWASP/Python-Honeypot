@@ -4,6 +4,7 @@
 import time
 import inspect
 import os
+import json
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -200,15 +201,19 @@ def start_containers(configuration):
         # using pattern name will help us to remove/modify the images and modules
         container_name = virtual_machine_name_to_container_name(configuration[selected_module]["virtual_machine_name"],
                                                                 selected_module)
-        info("starting container {0}".format(container_name))
-
+        real_machine_port = configuration[selected_module]["real_machine_port_number"]
+        virtual_machine_port = configuration[selected_module]["virtual_machine_port_number"]
         # run the container
         os.popen("docker run --name={0} -d -t -p {1}:{2} {3}"
-                 .format(container_name, configuration[selected_module]["real_machine_port_number"],
-                         configuration[selected_module]["virtual_machine_port_number"],
+                 .format(container_name, real_machine_port, virtual_machine_port,
                          configuration[selected_module]["virtual_machine_name"])).read()
-
-        info("container {0} started".format(container_name))
+        # get docker container IP address
+        virtual_machine_ip_address = \
+            json.loads(os.popen("docker inspect {0}".format(container_name)).read())[0]["NetworkSettings"]["IPAddress"]
+        # print started container information
+        info("container {0} started,"
+             " forwarding 0.0.0.0:{1} to {2}:{3}".format(container_name, real_machine_port, virtual_machine_ip_address,
+                                                         virtual_machine_port))
     return True
 
 
