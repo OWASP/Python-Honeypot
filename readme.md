@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/zdresearch/OWASP-Honeypot.svg?branch=master)](https://travis-ci.org/zdresearch/OWASP-Honeypot) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
 
+We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org).
+
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
 ##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
@@ -110,5 +112,3 @@ C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>
 ```
 
 * Please notice, everytime you run the honeypot, it will remove and update the virtual machine, so internet access required for the host!
-
-We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org).
