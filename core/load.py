@@ -319,6 +319,9 @@ def argv_parser():
     # enable verbose mode (debug mode)
     engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
                            help="enable verbose mode")
+    # disable color CLI
+    engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
+                           help="disable colors in CLI")
     # help menu
     engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
                            help=messages("en", "show_help_menu"))

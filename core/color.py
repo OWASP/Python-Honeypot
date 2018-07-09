@@ -27,6 +27,8 @@ def color(color):
     Returns:
         color values or empty string
     """
+    if "--disable-colors" in sys.argv:
+        return ""
     from core.compatible import os_name
     if "linux" in os_name() or os_name() == "darwin":
         if color == "reset":
