@@ -8,10 +8,10 @@ We appreciate any contribution, ideas, feedback. feel free to contact us by crea
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
 ##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
 
-
 ### Run
 #### Install Dependencies
-* Install `Docker` on your OS, check `docker info` if it's working and enable!
+* Install `Docker` on your OS (Linux), check `docker info` if it's working and enable!
+* Blocking virtual machines internet is not working on Windows (Didn't test on Mac!)
 #### Start
 * use `python ohp.py` to start the containers and default modules.
 
@@ -81,32 +81,32 @@ C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>python ohp.py
                                                __/ |
                                               |___/
 
-[+] OWASP Honeypot started ...
-[+] loading modules ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
-[+] creating image ohp_ftpserver
-[+] image ohp_ftpserver created
-[+] creating image ohp_httpserver
-[+] image ohp_httpserver created
-[+] creating image ohp_sshserver
-[+] image ohp_sshserver created
-[+] starting container ohp_ftpserver_weak_password
-[+] container ohp_ftpserver_weak_password started, forwarding 0.0.0.0:21 to 172.17.0.2:21
-[+] starting container ohp_httpserver_basic_auth_weak_password
-[+] container ohp_httpserver_basic_auth_weak_password started, forwarding 0.0.0.0:80 to 172.17.0.3:80
-[+] starting container ohp_sshserver_weak_password
-[+] container ohp_sshserver_weak_password started, forwarding 0.0.0.0:22 to 172.17.0.3:22
-[+] all selected modules started: ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
-[+] interrupted by user, please wait to stop the containers and remove the containers and images
-[+] stopping container ohp_ftpserver_weak_password
-[+] stopping container ohp_httpserver_basic_auth_weak_password
-[+] stopping container ohp_sshserver_weak_password
-[+] removing container ohp_ftpserver_weak_password
-[+] removing container ohp_httpserver_basic_auth_weak_password
-[+] removing container ohp_sshserver_weak_password
-[+] removing image ohp_sshserver
-[+] removing image ohp_httpserver
-[+] removing image ohp_ftpserver
-[+] finished.
+[+] [2018-07-09 23:56:06] OWASP Honeypot started ...
+[+] [2018-07-09 23:56:06] loading modules ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
+[+] [2018-07-09 23:56:06] creating image ohp_ftpserver
+[+] [2018-07-09 23:56:35] image ohp_ftpserver created
+[+] [2018-07-09 23:56:35] creating image ohp_httpserver
+[+] [2018-07-09 23:57:00] image ohp_httpserver created
+[+] [2018-07-09 23:57:00] creating image ohp_sshserver
+[+] [2018-07-09 23:57:17] image ohp_sshserver created
+[+] [2018-07-09 23:57:17] creating ohp_internet network
+[+] [2018-07-09 23:57:17] ohp_internet network created subnet:172.19.0.0/16 gateway:172.19.0.1
+[+] [2018-07-09 23:57:17] creating ohp_no_internet network
+[+] [2018-07-09 23:57:18] ohp_no_internet network created subnet:172.20.0.0/16 gateway:172.20.0.1
+[+] [2018-07-09 23:57:18] container ohp_ftpserver_weak_password started, forwarding 0.0.0.0:21 to 72.20.0.:21
+[+] [2018-07-09 23:57:18] container ohp_httpserver_basic_auth_weak_password started, forwarding 0.0.0.0:80 to 72.20.0.:80
+[+] [2018-07-09 23:57:19] container ohp_sshserver_weak_password started, forwarding 0.0.0.0:22 to 72.19.0.:22
+[+] [2018-07-09 23:57:19] all selected modules started: ftp/weak_password, http/basic_auth_weak_password, ssh/weak_password
+[+] [2018-07-09 23:57:29] interrupted by user, please wait to stop the containers and remove the containers and images
+[+] [2018-07-09 23:57:39] stopping container ohp_httpserver_basic_auth_weak_password
+[+] [2018-07-09 23:57:49] stopping container ohp_sshserver_weak_password
+[+] [2018-07-09 23:57:49] removing container ohp_ftpserver_weak_password
+[+] [2018-07-09 23:57:49] removing container ohp_httpserver_basic_auth_weak_password
+[+] [2018-07-09 23:57:49] removing container ohp_sshserver_weak_password
+[+] [2018-07-09 23:57:49] removing image ohp_sshserver
+[+] [2018-07-09 23:57:49] removing image ohp_httpserver
+[+] [2018-07-09 23:57:49] removing image ohp_ftpserver
+[+] [2018-07-09 23:57:49] finished.
 
 C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>
 ```
