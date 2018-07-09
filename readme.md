@@ -1,6 +1,6 @@
 # OWASP Honeypot
 
-[![Build Status](https://travis-ci.org/zdresearch/OWASPHoneyPot.svg?branch=master)](https://travis-ci.org/zdresearch/OWASPHoneyPot) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/zdresearch/OWASP-Honeypot.svg?branch=master)](https://travis-ci.org/zdresearch/OWASP-Honeypot) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
 
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***

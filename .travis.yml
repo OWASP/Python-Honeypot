@@ -6,7 +6,6 @@ python:
  - "3.4"
  - "3.5"
  - "3.6"
- - "3.6-dev"
 
 os:
  - "linux"
@@ -20,4 +19,4 @@ before_install:
 - docker pull phusion/baseimage:0.9.19
 
 script:
- - python -c "import subprocess; pid = subprocess.Popen(\"python ohp.py\", shell=True).pid; import time; time.sleep(2 * 60); import os; os.system(\"kill -9 {0}\".format(pid))"
+ - python -c "import subprocess; pid = subprocess.Popen(\"python ohp.py --verbose\", shell=True).pid; import time; time.sleep(90); import os; os.system(\"kill -9 {0}\".format(pid))"
