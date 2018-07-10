@@ -19,5 +19,5 @@ before_install:
 - docker pull phusion/baseimage:0.9.19
 
 script:
- - service ssh stop
+ - systemctl stop ssh
  - python -c "from core.get_modules import load_all_modules; import subprocess; import os;import time; pids = [subprocess.Popen(\"python ohp.py -m {0} --verbose > {1}\".format(module_name, module_name.replace(\"/\", \"_\")), shell=True).pid for module_name in load_all_modules()];  time.sleep(90); [os.system(\"kill -9 {0}\".format(pid)) for pid in pids]; [os.system(\"\echo -e \\\"\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a{0}\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\\\"; cat {1}\".format(module_name, module_name.replace(\"/\", \"_\"))) for module_name in load_all_modules()]"
