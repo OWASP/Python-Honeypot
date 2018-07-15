@@ -26,10 +26,9 @@ def new_network_events(configuration):
     info("new_network_events thread started")
     # start tshark as
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
-    process = subprocess.Popen([network_configuration()["tshark_path"], "-Y",
-                                "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
-                                "fields", "-e", "ip.dst",
-                                "-e", "tcp.srcport"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        ["tshark", "-Y", "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
+         "fields", "-e", "ip.dst", "-e", "tcp.srcport"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
     pull_object = select.poll()
     pull_object.register(process.stdout, select.POLLIN)

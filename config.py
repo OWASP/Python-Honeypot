@@ -40,7 +40,6 @@ def network_configuration():
         JSON/Dict network configuration
     """
     return {
-        "tshark_path": "/usr/bin/tshark",
         "store_network_captured_files": False,
         "real_machine_ip_address": socket.gethostbyname(socket.gethostname())
     }
