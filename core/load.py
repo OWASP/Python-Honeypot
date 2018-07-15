@@ -468,7 +468,8 @@ def load_honeypot_engine():
     create_ohp_networks()
     # start network monitoring thread
     new_network_events_thread = threading.Thread(target=new_network_events, args=(configuration,),
-                                                 name="new_network_events_thread").start()
+                                                 name="new_network_events_thread")
+    new_network_events_thread.start()
     # start containers based on selected modules
     start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
