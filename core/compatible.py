@@ -112,7 +112,7 @@ def is_windows():
     return False
 
 
-def check_for_requirements():
+def check_for_requirements(start_api_server):
     """
     check if requirements exist
 
@@ -121,11 +121,11 @@ def check_for_requirements():
     """
     from core.alert import messages
     from config import api_configuration
-
     # check external required modules
     try:
         import pymongo
         import netaddr
+        import flask
         del netaddr
     except Exception as _:
         __die_failure("pip install -r requirements.txt")
@@ -137,16 +137,18 @@ def check_for_requirements():
         connection.list_database_names()
     except Exception as _:
         __die_failure("cannot connect to mongodb")
-    # check docker
-    try:
-        subprocess.check_output(["docker", "--help"], stderr=subprocess.PIPE)
-    except Exception as _:
-        __die_failure(messages("en", "docker_error"))
-    # check tshark
-    try:
-        subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
-    except Exception as _:
-        __die_failure("please install tshark fist!")
+    # check if its honeypot server not api server
+    if not start_api_server:
+        # check docker
+        try:
+            subprocess.check_output(["docker", "--help"], stderr=subprocess.PIPE)
+        except Exception as _:
+            __die_failure(messages("en", "docker_error"))
+        # check tshark
+        try:
+            subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
+        except Exception as _:
+            __die_failure("please install tshark fist!")
 
     return True
 

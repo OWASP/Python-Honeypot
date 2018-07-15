@@ -23,6 +23,8 @@ from core.get_modules import virtual_machine_names_to_container_names
 from core.get_modules import virtual_machine_name_to_container_name
 from core.network import new_network_events
 from core._die import terminate_thread
+from api.server import start_api_server
+from core.compatible import check_for_requirements
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -381,6 +383,9 @@ def argv_parser():
                            dest="virtual_machine_container_reset_factory_time_seconds", type=int,
                            default=docker_configuration()["virtual_machine_container_reset_factory_time_seconds"],
                            help=messages("en", "vm_reset_factory_time"))
+    # start api
+    engineOpt.add_argument("--start-api-server", action="store_true", dest="start_api_server", default=False,
+                           help="start API server")
     # enable verbose mode (debug mode)
     engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
                            help="enable verbose mode")
@@ -412,7 +417,13 @@ def load_honeypot_engine():
     # check help menu
     if argv_options.show_help_menu:
         parser.print_help()
-        finish()
+        __die_success()
+    # check for requirements before start
+    check_for_requirements(argv_options.start_api_server)
+    # check api server flag
+    if argv_options.start_api_server:
+        from api.server import start_api_server
+        start_api_server()
         __die_success()
     # check selected modules
     if argv_options.selected_modules:
