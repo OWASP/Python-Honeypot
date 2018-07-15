@@ -126,6 +126,7 @@ def check_for_requirements():
     try:
         import pymongo
         import netaddr
+        del netaddr
     except Exception as _:
         __die_failure("pip install -r requirements.txt")
     # check mongodb
