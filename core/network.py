@@ -23,7 +23,7 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
-    # start tshark as
+    # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
     process = subprocess.Popen(
         ["tshark", "-Y", "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
