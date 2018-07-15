@@ -467,15 +467,15 @@ def load_honeypot_engine():
     # create OWASP Honeypot networks in case not exist
     create_ohp_networks()
     # start network monitoring thread
-    new_events_thread = threading.Thread(target=new_network_events, args=(configuration,)).start()
+    new_network_events_thread = threading.Thread(target=new_network_events, args=(configuration,),
+                                                 name="new_network_events_thread").start()
     # start containers based on selected modules
     start_containers(configuration)
-    info("killing the events thread")
-    terminate_thread(new_events_thread)
-    info("killed the events thread")
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
     # wait forever! in case user can send ctrl + c to interrupt
     wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
+    # kill the network events thread
+    terminate_thread(new_network_events_thread)
     # stop created containers
     stop_containers(configuration)
     # remove created containers

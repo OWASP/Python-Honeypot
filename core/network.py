@@ -20,6 +20,7 @@ def new_network_events(configuration):
     Returns:
         True
     """
+    info("new_network_events thread started")
     # start tshark as subprocess
     process = subprocess.Popen("tshark -Y \"ip.dst != {0}\" -T fields -e ip.dst -e tcp.srcport".format(
         socket.gethostbyname(socket.gethostname())), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
