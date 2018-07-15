@@ -120,8 +120,12 @@ def check_for_requirements():
     """
     # first requirement is docker
     from core.alert import messages
+    # check docker
     if os.popen("docker info").read() == "":
         __die_failure(messages("en", "docker_error"))
+    # check tshark
+    if os.popen("tshark --help").read() == "":
+        __die_failure("please install tshark fist!")
     return True
 
 
