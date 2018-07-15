@@ -4,6 +4,8 @@
 import subprocess
 import socket
 import netaddr
+import select
+import time
 
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
@@ -28,29 +30,34 @@ def new_network_events(configuration):
                                 "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
                                 "fields", "-e", "ip.dst",
                                 "-e", "tcp.srcport"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # readline timeout bug fix: https://stackoverflow.com/a/10759061
+    pull_object = select.poll()
+    pull_object.register(process.stdout, select.POLLIN)
     # while True, read tshark output
     try:
         while True:
-            line = process.stdout.readline()
-            # check if new IP and Port printed
-            if len(line) > 0:
-                # split the IP and Port
-                try:
-                    ip, port = line.rsplit()[0], int(line.rsplit()[1])
-                except Exception as _:
-                    ip, port = None, None
-                # check if event shows an IP
-                if netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip):
-                    # check if the port is in selected module
-                    inserted_flag = True
-                    for selected_module in configuration:
-                        if port is configuration[selected_module]["real_machine_port_number"]:
-                            # insert honeypot event (selected module)
-                            insert_selected_modules_network_event(ip, port, selected_module)
-                            inserted_flag = False
-                    if inserted_flag:
-                        # insert common network event
-                        insert_other_network_event(ip, port)
+            if pull_object.poll(0):
+                line = process.stdout.readline()
+                # check if new IP and Port printed
+                if len(line) > 0:
+                    # split the IP and Port
+                    try:
+                        ip, port = line.rsplit()[0], int(line.rsplit()[1])
+                    except Exception as _:
+                        ip, port = None, None
+                    # check if event shows an IP
+                    if netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip):
+                        # check if the port is in selected module
+                        inserted_flag = True
+                        for selected_module in configuration:
+                            if port is configuration[selected_module]["real_machine_port_number"]:
+                                # insert honeypot event (selected module)
+                                insert_selected_modules_network_event(ip, port, selected_module)
+                                inserted_flag = False
+                        if inserted_flag:
+                            # insert common network event
+                            insert_other_network_event(ip, port)
+            time.sleep(0.2)
     except Exception as _:
-        info(_)
+        del _
     return True
