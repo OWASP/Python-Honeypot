@@ -5,6 +5,7 @@ import time
 import inspect
 import os
 import json
+import threading
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -20,6 +21,7 @@ from core._die import __die_failure
 from core.compatible import make_tmp_thread_dir
 from core.get_modules import virtual_machine_names_to_container_names
 from core.get_modules import virtual_machine_name_to_container_name
+from core.network import new_network_events
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -463,6 +465,8 @@ def load_honeypot_engine():
     create_new_images(configuration)
     # create OWASP Honeypot networks in case not exist
     create_ohp_networks()
+    # start network monitoring thread
+    threading.Thread(target=new_network_events, args=(configuration,)).start()
     # start containers based on selected modules
     start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
