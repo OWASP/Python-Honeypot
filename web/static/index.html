@@ -2,13 +2,233 @@
 <head>
     <title>OWASP Honeypot</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/Chart.min.js"></script>
+    <script src="/js/main.js"></script>
 </head>
 <body>
 <div class="container">
+    <br>
     <p class="text-center">Welcome to <b>OWASP Honeypot</b> WebUI</p>
+    <center>
+        <small>Total Events: <b><a id="count_all_events">x</a></b></small>
+        <small>Total HoneypotEvents: <b><a id="count_ohp_events">x</a></b></small>
+        <small>Total Network Events: <b><a id="count_network_events">x</a></b></small>
+        <script>
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_all_events",
+            }).done(function (res) {
+                console.log(res);
+                document.getElementById('count_all_events').innerHTML = res["count_all_events"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_ohp_events",
+            }).done(function (res) {
+                console.log(res);
+                document.getElementById('count_ohp_events').innerHTML = res["count_ohp_events"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_network_events",
+            }).done(function (res) {
+                console.log(res);
+                document.getElementById('count_network_events').innerHTML = res["count_network_events"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+        </script>
+    </center>
+
+    <script>
+        var dates_network_events_json = {};
+        var dates_honeypot_events_json = {};
+        var dates_all_events_json = {};
+        var week_dates_array = [];
+
+        for (var days = 6; days >= 0; days--) {
+            var date = new Date();
+            var last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+            week_dates_array.push(last.getFullYear() + (((last.getMonth() + 1) <= 9) ?
+                ("-0" + (last.getMonth() + 1)) : "-" + (last.getMonth() + 1)) + ((last.getDate() <= 9) ?
+                ("-0" + last.getDate()) : "-" + last.getDate()));
+        }
+        for (var counter = 0; counter < week_dates_array.length; counter++) {
+
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_network_events_by_date?date=" + week_dates_array[counter],
+            }).done(function (res) {
+                console.log(res);
+                dates_network_events_json[res["date"]] = res["count_network_events_by_date"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+        }
+
+        for (var counter = 0; counter < week_dates_array.length; counter++) {
+
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_honeypot_events_by_date?date=" + week_dates_array[counter],
+            }).done(function (res) {
+                console.log(res);
+                dates_honeypot_events_json[res["date"]] = res["count_honeypot_events_by_date"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+        }
+
+        for (var counter = 0; counter < week_dates_array.length; counter++) {
+
+            $.ajax({
+                type: "GET",
+                url: "/api/events/count_all_events_by_date?date=" + week_dates_array[counter],
+            }).done(function (res) {
+                console.log(res);
+                dates_all_events_json[res["date"]] = res["count_all_events_by_date"];
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
+                }
+                if (errorThrown == "UNAUTHORIZED") {
+                }
+            });
+        }
+
+    </script>
+    <center>
+        <div style="width:70%; text-align:center;">
+            <canvas class="align-content-center text-center modal-dialog-centered" style="text-align:center"
+                    id="canvas"></canvas>
+        </div>
+    </center>
+
+    <script>
+
+        setTimeout(function () {
+            var MONTHS = week_dates_array;
+            var config = {
+                type: 'line',
+                data: {
+                    labels: week_dates_array,
+                    datasets: [{
+                        label: 'All Events',
+                        backgroundColor: window.chartColors.red,
+                        borderColor: window.chartColors.red,
+                        data: [
+                            dates_all_events_json[week_dates_array[0]],
+                            dates_all_events_json[week_dates_array[1]],
+                            dates_all_events_json[week_dates_array[2]],
+                            dates_all_events_json[week_dates_array[3]],
+                            dates_all_events_json[week_dates_array[4]],
+                            dates_all_events_json[week_dates_array[5]],
+                            dates_all_events_json[week_dates_array[6]]
+                        ],
+                        fill: false,
+                    }, {
+                        label: 'Honeypot Events',
+                        fill: false,
+                        backgroundColor: window.chartColors.blue,
+                        borderColor: window.chartColors.blue,
+                        data: [
+                            dates_honeypot_events_json[week_dates_array[0]],
+                            dates_honeypot_events_json[week_dates_array[1]],
+                            dates_honeypot_events_json[week_dates_array[2]],
+                            dates_honeypot_events_json[week_dates_array[3]],
+                            dates_honeypot_events_json[week_dates_array[4]],
+                            dates_honeypot_events_json[week_dates_array[5]],
+                            dates_honeypot_events_json[week_dates_array[6]]
+                        ],
+                    }, {
+                        label: 'Network Events',
+                        fill: false,
+                        backgroundColor: window.chartColors.yellow,
+                        borderColor: window.chartColors.yellow,
+                        data: [
+                            dates_network_events_json[week_dates_array[0]],
+                            dates_network_events_json[week_dates_array[1]],
+                            dates_network_events_json[week_dates_array[2]],
+                            dates_network_events_json[week_dates_array[3]],
+                            dates_network_events_json[week_dates_array[4]],
+                            dates_network_events_json[week_dates_array[5]],
+                            dates_network_events_json[week_dates_array[6]]
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'OHP Events'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Past Weeks'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Events Number'
+                            }
+                        }]
+                    }
+                }
+            };
+
+
+            var ctx = document.getElementById('canvas').getContext('2d');
+            window.myLine = new Chart(ctx, config);
+
+        }, 2000);
+
+    </script>
+    <br>
+    <div class="align-content-center text-center">
+        <a class="" href="/"><img am-TopLogo alt="SECUREVIEW" src="/img/owasp.png" class="img-responsive"></a><br>
+        <a class="align-content-center">By <a href="https://www.owasp.org">OWASP</a></a>
+    </div>
+    <br>
 </div>
 </body>
 </html>
