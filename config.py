@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from core._time import hours
 import random
+import socket
+
+from core._time import hours
 
 
 def api_configuration():
@@ -27,6 +29,20 @@ def api_configuration():
         },
         "api_database": "mongodb://127.0.0.1:27017/",  # mongodb://user:password@127.0.0.1:27017/
         "database_name": "ohp_events"
+    }
+
+
+def network_configuration():
+    """
+    network configuration
+
+    Returns:
+        JSON/Dict network configuration
+    """
+    return {
+        "tshark_path": "/usr/bin/tshark",
+        "store_network_captured_files": False,
+        "real_machine_ip_address": socket.gethostbyname(socket.gethostname())
     }
 
 

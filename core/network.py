@@ -8,6 +8,7 @@ import netaddr
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
 from core.alert import info
+from config import network_configuration
 
 
 def new_network_events(configuration):
@@ -21,9 +22,12 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
-    # start tshark as subprocess
-    process = subprocess.Popen("tshark -Y \"ip.dst != {0}\" -T fields -e ip.dst -e tcp.srcport".format(
-        socket.gethostbyname(socket.gethostname())), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # start tshark as
+    # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
+    process = subprocess.Popen([network_configuration()["tshark_path"], "-Y",
+                                "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
+                                "fields", "-e", "ip.dst",
+                                "-e", "tcp.srcport"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # while True, read tshark output
     try:
         while True:
