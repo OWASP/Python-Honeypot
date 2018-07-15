@@ -12,13 +12,8 @@ dist/*
 #tmp files
 tmp/thread_*
 *.py~
-user.txt
-pass.txt
-logs.txt
 *.log
 results.*
-*.html
-*.htm
 *.DS_Store
 *.swp
 
