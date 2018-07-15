@@ -22,6 +22,7 @@ from core.compatible import make_tmp_thread_dir
 from core.get_modules import virtual_machine_names_to_container_names
 from core.get_modules import virtual_machine_name_to_container_name
 from core.network import new_network_events
+from core._die import terminate_thread
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -466,9 +467,12 @@ def load_honeypot_engine():
     # create OWASP Honeypot networks in case not exist
     create_ohp_networks()
     # start network monitoring thread
-    threading.Thread(target=new_network_events, args=(configuration,)).start()
+    new_events_thread = threading.Thread(target=new_network_events, args=(configuration,)).start()
     # start containers based on selected modules
     start_containers(configuration)
+    info("killing the events thread")
+    terminate_thread(new_events_thread)
+    info("killed the events thread")
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
     # wait forever! in case user can send ctrl + c to interrupt
     wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
