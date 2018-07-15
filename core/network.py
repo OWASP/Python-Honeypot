@@ -21,7 +21,7 @@ def new_network_events(configuration):
     """
     # start tshark as subprocess
     process = subprocess.Popen("tshark -Y \"ip.dst != {0}\" -T fields -e ip.dst -e tcp.srcport".format(
-        socket.gethostbyname(socket.gethostname())), shell=True, stdout=subprocess.PIPE)
+        socket.gethostbyname(socket.gethostname())), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # while True, read tshark output
     try:
         while True:
