@@ -11,6 +11,7 @@ We appreciate any contribution, ideas, feedback. feel free to contact us by crea
 ### Run
 #### Install Dependencies
 * Install `Docker` on your OS (Linux), check `docker info` if it's working and enable!
+* Install `libpcap-dev`, `libnet-dev`, `tshark`, `pip install -r requirements.txt`
 * Blocking virtual machines internet is not working on Windows (Didn't test on Mac!)
 #### Start
 * use `python ohp.py` to start the containers and default modules.
