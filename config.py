@@ -18,6 +18,7 @@ def api_configuration():
         "api_host": "127.0.0.1",
         "api_port": 5000,
         "api_debug_mode": False,
+        "api_access_without_key": True,
         "api_access_key": "".join(random.choice("0123456789abcdef") for _ in range(32)),
         "api_client_white_list": {
             "enabled": False,

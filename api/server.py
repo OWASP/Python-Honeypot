@@ -252,7 +252,8 @@ def authorization_check():
     if app.config["OWASP_NETTACKER_CONFIG"]["api_client_white_list"]:
         if flask_request.remote_addr not in app.config["OWASP_NETTACKER_CONFIG"]["api_client_white_list_ips"]:
             abort(403, "unauthorized IP")
-    is_authorized()
+    if not app.config["OWASP_NETTACKER_CONFIG"]["api_access_without_key"]:
+        is_authorized()
     return
 
 
@@ -326,7 +327,9 @@ def start_api_server():
     """
     # Starting the API
     my_api_configuration = api_configuration()
-    write_to_api_console(" * API access key: {0}\n".format(my_api_configuration["api_access_key"]))
+    write_to_api_console(" * API access key: {0}\n".format(
+        my_api_configuration["api_access_key"] if not my_api_configuration[
+            "api_access_without_key"] else "NOT REQUIRED!"))
     global app
     app.config["OWASP_NETTACKER_CONFIG"] = {
         "api_access_key": my_api_configuration["api_access_key"],
@@ -334,6 +337,7 @@ def start_api_server():
         "api_client_white_list_ips": my_api_configuration["api_client_white_list"]["ips"],
         "api_access_log": my_api_configuration["api_access_log"]["enabled"],
         "api_access_log_filename": my_api_configuration["api_access_log"]["filename"],
+        "api_access_without_key": my_api_configuration["api_access_without_key"],
         "language": "en"
     }
     app.run(host=my_api_configuration["api_host"], port=my_api_configuration["api_port"],
