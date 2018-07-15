@@ -119,16 +119,34 @@ def check_for_requirements():
     Returns:
         True if exist otherwise False
     """
-    # first requirement is docker
     from core.alert import messages
+    from config import api_configuration
+
+    # check external required modules
+    try:
+        import pymongo
+        import netaddr
+    except Exception as _:
+        __die_failure("pip install -r requirements.txt")
+    # check mongodb
+    try:
+        connection = pymongo.MongoClient(api_configuration()["api_database"],
+                                         serverSelectionTimeoutMS=api_configuration()[
+                                             "api_database_connection_timeout"])
+        connection.list_database_names()
+    except Exception as _:
+        __die_failure("cannot connect to mongodb")
+    # check docker
     try:
         subprocess.check_output(["docker", "--help"], stderr=subprocess.PIPE)
     except Exception as _:
         __die_failure(messages("en", "docker_error"))
+    # check tshark
     try:
         subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
     except Exception as _:
         __die_failure("please install tshark fist!")
+
     return True
 
 

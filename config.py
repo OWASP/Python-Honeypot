@@ -28,7 +28,8 @@ def api_configuration():
             "filename": "ohp_api_access.log"
         },
         "api_database": "mongodb://127.0.0.1:27017/",  # mongodb://user:password@127.0.0.1:27017/
-        "database_name": "ohp_events"
+        "api_database_connection_timeout": 2000,  # miliseconds
+        "api_database_name": "ohp_events"
     }
 
 

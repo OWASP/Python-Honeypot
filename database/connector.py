@@ -6,8 +6,9 @@ import pymongo
 from core._time import now
 from config import api_configuration
 
-client = pymongo.MongoClient(api_configuration()["api_database"])
-database = client[api_configuration()["database_name"]]
+client = pymongo.MongoClient(api_configuration()["api_database"], serverSelectionTimeoutMS=api_configuration()[
+    "api_database_connection_timeout"])
+database = client[api_configuration()["api_database_name"]]
 ohp_events = database.ohp_events
 network_events = database.network_events
 
