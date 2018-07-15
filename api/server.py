@@ -155,13 +155,13 @@ def get_value_from_request(_key):
     global flask_request
     try:
         key = flask_request.args[_key]
-    except:
+    except Exception as _:
         try:
             key = flask_request.form[_key]
-        except:
+        except Exception as _:
             try:
                 key = flask_request.cookies[_key]
-            except:
+            except Exception as _:
                 key = None
     if key:
         # fix it later
@@ -296,7 +296,7 @@ def count_all_events():
 
 
 @app.route("/api/events/count_ohp_events", methods=["GET", "POST"])
-def count_all_events():
+def count_ohp_events():
     """
     Get total number of ohp events
 
@@ -307,7 +307,7 @@ def count_all_events():
 
 
 @app.route("/api/events/count_network_events", methods=["GET", "POST"])
-def count_all_events():
+def count_network_events():
     """
     Get total number of network events
 
