@@ -39,7 +39,7 @@ def terminate_thread(thread):
         True
     """
     from core.alert import info
-    info("killing {0}".format(t.name))
+    info("killing {0}".format(thread.name))
     if not thread.isAlive():
         return
 
