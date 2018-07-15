@@ -270,7 +270,7 @@ def index():
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def get_statics(path):
+def get_static_files(path):
     """
     getting static files and return content mime types
 
@@ -293,7 +293,8 @@ def count_all_events():
     Returns:
         JSON/Dict number of all events
     """
-    return jsonify({"count_all_events": connector.ohp_events.count() + connector.network_events.count()}), 200
+    return jsonify({"count_all_events": (connector.ohp_events.estimated_document_count() +
+                                         connector.network_events.estimated_document_count())}), 200
 
 
 @app.route("/api/events/count_ohp_events", methods=["GET", "POST"])
@@ -304,7 +305,7 @@ def count_ohp_events():
     Returns:
         JSON/Dict number of ohp events
     """
-    return jsonify({"count_ohp_events": connector.ohp_events.count()}), 200
+    return jsonify({"count_ohp_events": connector.ohp_events.estimated_document_count()}), 200
 
 
 @app.route("/api/events/count_network_events", methods=["GET", "POST"])
@@ -315,7 +316,57 @@ def count_network_events():
     Returns:
         JSON/Dict number of network events
     """
-    return jsonify({"count_network_events": connector.network_events.count()}), 200
+    return jsonify({"count_network_events": connector.network_events.estimated_document_count()}), 200
+
+
+@app.route("/api/events/count_network_events_by_date", methods=["GET", "POST"])
+def count_network_events_by_date():
+    """
+    Get total number of network events by date
+
+    Returns:
+        JSON/Dict number of network events
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify({"count_network_events_by_date": connector.network_events.count_documents(
+            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+    else:
+        return jsonify({"count_network_events_by_date": 0, "date": date}), 200
+
+
+@app.route("/api/events/count_honeypot_events_by_date", methods=["GET", "POST"])
+def count_honeypot_events_by_date():
+    """
+    Get total number of honeypot events by date
+
+    Returns:
+        JSON/Dict number of network events
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify({"count_honeypot_events_by_date": connector.ohp_events.count_documents(
+            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+    else:
+        return jsonify({"count_honeypot_events_by_date": 0, "date": date}), 200
+
+
+@app.route("/api/events/count_all_events_by_date", methods=["GET", "POST"])
+def count_all_events_by_date():
+    """
+    Get total number of all events by date
+
+    Returns:
+        JSON/Dict number of network events
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify({"count_all_events_by_date": connector.ohp_events.count_documents(
+            {"date": {"$gt": "{0} 00:00:00".format(date),
+                      "$lt": "{0} 23:59:59".format(date)}}) + connector.network_events.count_documents(
+            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+    else:
+        return jsonify({"count_all_events_by_date": 0, "date": date}), 200
 
 
 def start_api_server():
