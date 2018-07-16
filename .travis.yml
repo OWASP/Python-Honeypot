@@ -18,6 +18,7 @@ services:
 
 before_install:
 - docker pull phusion/baseimage:0.9.19
+- yes | apt install libpcap-dev libnet-dev tshark
 
 script:
  - pip install -r requirements.txt
