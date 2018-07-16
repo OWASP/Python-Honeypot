@@ -1,260 +1,60 @@
 <html>
 <head>
+    <!-- header -->
     <title>OWASP Honeypot</title>
+    <!-- import css files -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- style.css used as general css file for index.html -->
     <link rel="stylesheet" href="/css/style.css">
+    <!-- import js files -->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/Chart.min.js"></script>
+    <!-- main.js used as general js file for index.html -->
     <script src="/js/main.js"></script>
+    <!-- end of header header -->
 </head>
 <body>
+<!-- start body -->
 <div class="container">
     <br>
+    <!-- welcoming message, probably should replace with navbar later -->
     <p class="text-center">Welcome to <b>OWASP Honeypot</b> WebUI</p>
     <center>
+        <!-- body analytics-->
+        <!-- using API (main.js) to show some analytics -->
+        <!-- number of all events from the beginning -->
         <small>Total Events: <b><a id="count_all_events">x</a></b></small>
+        <!-- number of all honeypot related events from the beginning -->
         <small>Total HoneypotEvents: <b><a id="count_ohp_events">x</a></b></small>
+        <!-- number of all network related events from the beginning -->
         <small>Total Network Events: <b><a id="count_network_events">x</a></b></small>
-    </center>
-
-    <script>
-        var old_data;
-        var new_data;
-
-        function engine() {
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count_all_events",
-            }).done(function (res) {
-                console.log(res);
-                new_data = res["count_all_events"];
-                document.getElementById('count_all_events').innerHTML = res["count_all_events"];
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count_ohp_events",
-            }).done(function (res) {
-                console.log(res);
-                document.getElementById('count_ohp_events').innerHTML = res["count_ohp_events"];
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count_network_events",
-            }).done(function (res) {
-                console.log(res);
-                document.getElementById('count_network_events').innerHTML = res["count_network_events"];
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
-
-            var dates_network_events_json = {};
-            var dates_honeypot_events_json = {};
-            var dates_all_events_json = {};
-            var week_dates_array = [];
-
-            for (var days = 6; days >= 0; days--) {
-                var date = new Date();
-                var last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
-                week_dates_array.push(last.getFullYear() + (((last.getMonth() + 1) <= 9) ?
-                    ("-0" + (last.getMonth() + 1)) : "-" + (last.getMonth() + 1)) + ((last.getDate() <= 9) ?
-                    ("-0" + last.getDate()) : "-" + last.getDate()));
-            }
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count_network_events_by_date?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    console.log(res);
-                    dates_network_events_json[res["date"]] = res["count_network_events_by_date"];
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
-
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count_honeypot_events_by_date?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    console.log(res);
-                    dates_honeypot_events_json[res["date"]] = res["count_honeypot_events_by_date"];
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
-
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count_all_events_by_date?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    console.log(res);
-                    dates_all_events_json[res["date"]] = res["count_all_events_by_date"];
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
-
-
-            setTimeout(function () {
-                var MONTHS = week_dates_array;
-                var config = {
-                    type: 'line',
-                    data: {
-                        labels: week_dates_array,
-                        datasets: [{
-                            label: 'All Events',
-                            backgroundColor: window.chartColors.red,
-                            borderColor: window.chartColors.red,
-                            data: [
-                                dates_all_events_json[week_dates_array[0]],
-                                dates_all_events_json[week_dates_array[1]],
-                                dates_all_events_json[week_dates_array[2]],
-                                dates_all_events_json[week_dates_array[3]],
-                                dates_all_events_json[week_dates_array[4]],
-                                dates_all_events_json[week_dates_array[5]],
-                                dates_all_events_json[week_dates_array[6]]
-                            ],
-                            fill: false,
-                        }, {
-                            label: 'Honeypot Events',
-                            fill: false,
-                            backgroundColor: window.chartColors.blue,
-                            borderColor: window.chartColors.blue,
-                            data: [
-                                dates_honeypot_events_json[week_dates_array[0]],
-                                dates_honeypot_events_json[week_dates_array[1]],
-                                dates_honeypot_events_json[week_dates_array[2]],
-                                dates_honeypot_events_json[week_dates_array[3]],
-                                dates_honeypot_events_json[week_dates_array[4]],
-                                dates_honeypot_events_json[week_dates_array[5]],
-                                dates_honeypot_events_json[week_dates_array[6]]
-                            ],
-                        }, {
-                            label: 'Network Events',
-                            fill: false,
-                            backgroundColor: window.chartColors.yellow,
-                            borderColor: window.chartColors.yellow,
-                            data: [
-                                dates_network_events_json[week_dates_array[0]],
-                                dates_network_events_json[week_dates_array[1]],
-                                dates_network_events_json[week_dates_array[2]],
-                                dates_network_events_json[week_dates_array[3]],
-                                dates_network_events_json[week_dates_array[4]],
-                                dates_network_events_json[week_dates_array[5]],
-                                dates_network_events_json[week_dates_array[6]]
-                            ],
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        title: {
-                            display: true,
-                            text: 'OHP Events'
-                        },
-                        tooltips: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        hover: {
-                            mode: 'nearest',
-                            intersect: true
-                        },
-                        scales: {
-                            xAxes: [{
-                                display: true,
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Past Week Events Graph (update 30 seconds)'
-                                }
-                            }],
-                            yAxes: [{
-                                display: true,
-                                scaleLabel: {
-                                    display: true,
-                                    labelString: 'Events Number'
-                                }
-                            }]
-                        }
-                    }
-                };
-                document.getElementById("blink_loading_graph").hidden = true;
-                if (old_data != new_data) {
-                    console.log(old_data + ":" + new_data);
-                    old_data = new_data;
-                    var ctx = document.getElementById('canvas').getContext('2d');
-                    window.myLine = new Chart(ctx, config);
-                }
-
-
-            }, 5000);
-        }
-
-        function keep_update() {
-            setTimeout(function () {
-                engine();
-                keep_update();
-            }, 30000);
-        }
-
-        engine();
-        keep_update();
-
-
-    </script>
-    <center>
         <div style="width:70%; text-align:center;">
+            <!-- graph takes 5 seconds to load, we need to wait all requests get responded before showing them -->
             <blink id="blink_loading_graph">
-                <small>loading live graph, please wait <b>5</b> seconds!</small>
+                <!-- this will disappear after graph appears -->
+                <small>loading live graph, please wait <b>10</b> seconds!</small>
             </blink>
+            <!-- graph will be locate in here and it shows 1-past week all events 2-honeypot events 3-network events -->
+            <!-- graph will get automatically updated if anything changes in network every 30 seconds -->
+            <!-- its using main.js to communicating with API -->
             <canvas class="align-content-center text-center modal-dialog-centered" style="text-align:center"
-                    id="canvas"></canvas>
+                    id="past_week_events_graph"></canvas>
         </div>
+        <!-- end of analytics-->
     </center>
-
-    <script>
-
-
-    </script>
     <br>
     <div class="align-content-center text-center">
+        <!-- footer -->
+        <!-- OWASP Logo -->
         <a class="" href="/"><img am-TopLogo alt="SECUREVIEW" src="/img/owasp.png" class="img-responsive"></a><br>
-        <a href="https://www.owasp.org">OWASP Honeypot</a> - <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
+        <!-- Links -->
+        <a href="https://www.owasp.org">OWASP Honeypot</a> -
+        <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
+        <!-- end of footer -->
     </div>
     <br>
 </div>
+<!-- end of body -->
 </body>
 </html>
