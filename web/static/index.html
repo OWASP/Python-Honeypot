@@ -41,9 +41,98 @@
             <canvas class="align-content-center text-center modal-dialog-centered" style="text-align:center"
                     id="past_week_events_graph"></canvas>
         </div>
-        <!-- end of analytics-->
+        <br>
+        <div class="row">
+            <div class="col-md-6" style="">
+                <canvas id="top_ten_ips_in_honeypot_events_graph" width="400" height="450">
+                </canvas>
+            </div>
+            <div class="col-md-6" style="">
+                <canvas id="top_ten_ips_in_network_events_graph" width="400" height="450">
+                </canvas>
+            </div>
+            <br>
+            <div class="col-md-6" style="">
+                <canvas id="top_ten_ports_in_honeypot_events_graph" width="400" height="450">
+                </canvas>
+            </div>
+            <div class="col-md-6" style="">
+                <canvas id="top_ten_ports_in_network_events_graph" width="400" height="450">
+                </canvas>
+            </div>
+            <!-- end of analytics-->
+        </div>
     </center>
-    <br>
+
+    <script>
+        var randomScalingFactor = function () {
+            return Math.round(Math.random() * 100);
+        };
+
+        var chartColors = window.chartColors;
+        var color = Chart.helpers.color;
+        var config = {
+            data: {
+                datasets: [{
+                    data: [
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                        randomScalingFactor(),
+                    ],
+                    backgroundColor: [
+                        color(chartColors.red).alpha(0.5).rgbString(),
+                        color(chartColors.orange).alpha(0.5).rgbString(),
+                        color(chartColors.yellow).alpha(0.5).rgbString(),
+                        color(chartColors.green).alpha(0.5).rgbString(),
+                        color(chartColors.blue).alpha(0.5).rgbString(),
+                    ],
+                    label: 'My dataset' // for legend
+                }],
+                labels: [
+                    'Red',
+                    'Orange',
+                    'Yellow',
+                    'Green',
+                    'Blue'
+                ]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Chart.js Polar Area Chart'
+                },
+                scale: {
+                    ticks: {
+                        beginAtZero: true
+                    },
+                    reverse: false
+                },
+                animation: {
+                    animateRotate: false,
+                    animateScale: true
+                }
+            }
+        };
+        // console.log(config);
+        // window.onload = function () {
+        //     var ctx = document.getElementById('top_ten_ips_in_honeypots_events_graph');
+        //     window.myPolarArea = Chart.PolarArea(ctx, config);
+        //     var ctx = document.getElementById('top_ten_ips_in_network_events_graph');
+        //     window.myPolarArea = Chart.PolarArea(ctx, config);
+        //     var ctx = document.getElementById('top_ten_ports_in_honeypots_events_graph');
+        //     window.myPolarArea = Chart.PolarArea(ctx, config);
+        //     var ctx = document.getElementById('top_ten_ports_in_network_events_graph');
+        //     window.myPolarArea = Chart.PolarArea(ctx, config);
+        // };
+
+
+    </script>
     <div class="align-content-center text-center">
         <!-- footer -->
         <!-- OWASP Logo -->
