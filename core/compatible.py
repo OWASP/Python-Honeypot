@@ -127,6 +127,7 @@ def check_for_requirements(start_api_server):
         import netaddr
         import flask
         del netaddr
+        del flask
     except Exception as _:
         __die_failure("pip install -r requirements.txt")
     # check mongodb
