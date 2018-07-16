@@ -422,7 +422,6 @@ def load_honeypot_engine():
     check_for_requirements(argv_options.start_api_server)
     # check api server flag
     if argv_options.start_api_server:
-        from api.server import start_api_server
         start_api_server()
         __die_success()
     # check selected modules
