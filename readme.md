@@ -113,3 +113,49 @@ C:\Users\Zombie\Documents\GitHub\OWASP-Honeypot>
 ```
 
 * Please notice, everytime you run the honeypot, it will remove and update the virtual machine, so internet access required for the host!
+
+#### API Actions
+
+![image_2018-07-17_01-48-26](https://user-images.githubusercontent.com/7676267/42784742-63f95a2e-8965-11e8-8d64-435f6182dcf2.png)
+
+```python
+action: "http://127.0.0.1:5000/api/events/count_all_events" 
+time: 0.010449
+response: count_all_events":2045253}
+
+action: "http://127.0.0.1:5000/api/events/count_ohp_events" 
+time: 0.010053
+response: count_ohp_events":948302}
+
+action: "http://127.0.0.1:5000/api/events/count_network_events" 
+time: 0.009567
+response: count_network_events":1096951}
+
+action: "http://127.0.0.1:5000/api/events/count_network_events_by_date" 
+time: 0.009215
+response: count_network_events_by_date":0,"date":null}
+
+action: "http://127.0.0.1:5000/api/events/count_honeypot_events_by_date" 
+time: 0.008931
+response: count_honeypot_events_by_date":0,"date":null}
+
+action: "http://127.0.0.1:5000/api/events/count_all_events_by_date" 
+time: 0.009389
+response: count_all_events_by_date":0,"date":null}
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_honeypot_events" 
+time: 3.239441 
+response: [{"_id":"192.168.1.6","count":805},{"_id":"192.168.1.3","count":795},{"_id":"192.168.1.9","count":779},{"_id":"192.168.1.5","count":747},{"_id":"192.168.1.2","count":693},{"_id":"192.168.1.7","count":687},{"_id":"192.168.1.4","count":677},{"_id":"192.168.1.8","count":642},{"_id":"192.168.1.77","count":642},{"_id":"192.168.1.82","count":636}]
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_network_events" 
+time: 3.503781 
+response:  [{"_id":"192.168.1.5","count":1423},{"_id":"192.168.1.7","count":1369},{"_id":"192.168.1.4","count":1364},{"_id":"192.168.1.6","count":1313},{"_id":"192.168.1.9","count":1307},{"_id":"192.168.1.3","count":1303},{"_id":"192.168.1.2","count":1284},{"_id":"192.168.1.8","count":1276},{"_id":"192.168.1.66","count":1261},{"_id":"192.168.1.85","count":1242}]
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_honeypot_events" 
+time: 1.747325 
+response:  [{"_id":80,"count":1140},{"_id":21,"count":71},{"_id":56017,"count":32},{"_id":64712,"count":31},{"_id":43518,"count":31},{"_id":39985,"count":31},{"_id":3518,"count":31},{"_id":1061,"count":31},{"_id":50774,"count":30},{"_id":43363,"count":30}]
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_network_events" 
+time: 1.957787 
+response:  [{"_id":80,"count":462},{"_id":443,"count":444},{"_id":22,"count":48},{"_id":45952,"count":35},{"_id":50106,"count":34},{"_id":24622,"count":34},{"_id":61266,"count":33},{"_id":59598,"count":33},{"_id":57242,"count":33},{"_id":50799,"count":33}]
+```
