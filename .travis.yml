@@ -18,7 +18,7 @@ services:
 
 before_install:
 - docker pull phusion/baseimage:0.9.19
-- sudo yes | apt-get install libpcap-dev libnet-dev tshark
+- sudo yes | sudo apt-get install libpcap-dev libnet-dev tshark
 
 script:
  - sudo service docker restart
