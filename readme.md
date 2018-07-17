@@ -131,17 +131,17 @@ action: "http://127.0.0.1:5000/api/events/count_network_events"
 time: 0.009567
 response: {"count_network_events":1096951}
 
-action: "http://127.0.0.1:5000/api/events/count_network_events_by_date" 
-time: 0.009215
-response: {"count_network_events_by_date":0,"date":null}
+action: "http://127.0.0.1:5000/api/events/count_network_events_by_date?date=2018-07-16" 
+time: 1.135807
+response: {"count_network_events_by_date":817746,"date":"2018-07-16"}
 
-action: "http://127.0.0.1:5000/api/events/count_honeypot_events_by_date" 
-time: 0.008931
-response: {"count_honeypot_events_by_date":0,"date":null}
+action: "http://127.0.0.1:5000/api/events/count_honeypot_events_by_date?date=2018-07-16" 
+time: 1.142324
+response: {"count_honeypot_events_by_date":815897,"date":"2018-07-16"}
 
-action: "http://127.0.0.1:5000/api/events/count_all_events_by_date" 
-time: 0.009389
-response: {"count_all_events_by_date":0,"date":null}
+action: "http://127.0.0.1:5000/api/events/count_all_events_by_date?date=2018-07-16" 
+time: 2.158874
+response: {"count_all_events_by_date":1633643,"date":"2018-07-16"}
 
 action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_honeypot_events" 
 time: 3.239441 
