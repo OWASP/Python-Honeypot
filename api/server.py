@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 from flask import Flask
 from flask import render_template
 from flask import Response
@@ -294,8 +295,14 @@ def count_all_events():
     Returns:
         JSON/Dict number of all events
     """
-    return jsonify({"count_all_events": (connector.ohp_events.estimated_document_count() +
-                                         connector.network_events.estimated_document_count())}), 200
+    return jsonify(
+        {
+            "count_all_events": (
+                    connector.ohp_events.estimated_document_count() +
+                    connector.network_events.estimated_document_count()
+            )
+        }
+    ), 200
 
 
 @app.route("/api/events/count_ohp_events", methods=["GET", "POST"])
@@ -306,7 +313,11 @@ def count_ohp_events():
     Returns:
         JSON/Dict number of ohp events
     """
-    return jsonify({"count_ohp_events": connector.ohp_events.estimated_document_count()}), 200
+    return jsonify(
+        {
+            "count_ohp_events": connector.ohp_events.estimated_document_count()
+        }
+    ), 200
 
 
 @app.route("/api/events/count_network_events", methods=["GET", "POST"])
@@ -317,7 +328,11 @@ def count_network_events():
     Returns:
         JSON/Dict number of network events
     """
-    return jsonify({"count_network_events": connector.network_events.estimated_document_count()}), 200
+    return jsonify(
+        {
+            "count_network_events": connector.network_events.estimated_document_count()
+        }
+    ), 200
 
 
 @app.route("/api/events/count_network_events_by_date", methods=["GET", "POST"])
@@ -330,10 +345,27 @@ def count_network_events_by_date():
     """
     date = get_value_from_request("date")
     if date:
-        return jsonify({"count_network_events_by_date": connector.network_events.count_documents(
-            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+        return jsonify(
+            {
+                "count_network_events_by_date": connector.network_events.count_documents(
+                    {
+                        "date":
+                            {
+                                "$gte": "{0} 00:00:00".format(date),
+                                "$lte": "{0} 23:59:59".format(date)
+                            }
+                    }
+                ),
+                "date": date
+            }
+        ), 200
     else:
-        return jsonify({"count_network_events_by_date": 0, "date": date}), 200
+        return jsonify(
+            {
+                "count_network_events_by_date": 0,
+                "date": date
+            }
+        ), 200
 
 
 @app.route("/api/events/count_honeypot_events_by_date", methods=["GET", "POST"])
@@ -346,10 +378,26 @@ def count_honeypot_events_by_date():
     """
     date = get_value_from_request("date")
     if date:
-        return jsonify({"count_honeypot_events_by_date": connector.ohp_events.count_documents(
-            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+        return jsonify(
+            {
+                "count_honeypot_events_by_date": connector.ohp_events.count_documents(
+                    {
+                        "date": {
+                            "$gte": "{0} 00:00:00".format(date),
+                            "$lte": "{0} 23:59:59".format(date)
+                        }
+                    }
+                ),
+                "date": date
+            }
+        ), 200
     else:
-        return jsonify({"count_honeypot_events_by_date": 0, "date": date}), 200
+        return jsonify(
+            {
+                "count_honeypot_events_by_date": 0,
+                "date": date
+            }
+        ), 200
 
 
 @app.route("/api/events/count_all_events_by_date", methods=["GET", "POST"])
@@ -362,12 +410,34 @@ def count_all_events_by_date():
     """
     date = get_value_from_request("date")
     if date:
-        return jsonify({"count_all_events_by_date": connector.ohp_events.count_documents(
-            {"date": {"$gt": "{0} 00:00:00".format(date),
-                      "$lt": "{0} 23:59:59".format(date)}}) + connector.network_events.count_documents(
-            {"date": {"$gt": "{0} 00:00:00".format(date), "$lt": "{0} 23:59:59".format(date)}}), "date": date}), 200
+        return jsonify(
+            {
+                "count_all_events_by_date":
+                    connector.ohp_events.count_documents(
+                        {
+                            "date": {
+                                "$gte": "{0} 00:00:00".format(date),
+                                "$lte": "{0} 23:59:59".format(date)
+                            }
+                        }
+                    ) + connector.network_events.count_documents(
+                        {
+                            "date": {
+                                "$gte": "{0} 00:00:00".format(date),
+                                "$lte": "{0} 23:59:59".format(date)
+                            }
+                        }
+                    ),
+                "date": date
+            }
+        ), 200
     else:
-        return jsonify({"count_all_events_by_date": 0, "date": date}), 200
+        return jsonify(
+            {
+                "count_all_events_by_date": 0,
+                "date": date
+            }
+        ), 200
 
 
 @app.route("/api/events/top_ten_ips_in_honeypot_events", methods=["GET", "POST"])
@@ -378,9 +448,90 @@ def top_ten_ips_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ips in events
     """
-    return jsonify([i for i in connector.ohp_events.aggregate(
-        [{"$unwind": "$ip"}, {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
-         {"$sort": SON([("count", -1), ("_id", -1)])}, {"$limit": 10}])]), 200
+    return jsonify(
+        [
+            i for i in
+            connector.ohp_events.aggregate(
+                [
+                    {
+                        "$group":
+                            {
+                                "_id": "$ip",
+                                "count":
+                                    {
+                                        "$sum": 1
+                                    }
+                            }
+                    },
+                    {
+                        "$sort": SON(
+                            [
+                                ("count", -1)
+                            ]
+                        )
+                    },
+                    {
+                        "$limit": 10
+                    }
+                ]
+            )
+        ]
+    ), 200
+
+
+@app.route("/api/events/top_ten_ips_in_honeypot_events_by_date", methods=["GET", "POST"])
+def top_ten_ips_in_honeypot_events_by_date():
+    """
+    get top ten repeated ips in honeypot events by date
+
+    Returns:
+        JSON/Dict top ten repeated ips in events by date
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify(
+            [
+                i for i in
+                connector.ohp_events.aggregate(
+                    [
+                        {
+                            "$match": {
+                                "date": {
+                                    "$gte": "{0} 00:00:00".format(date),
+                                    "$lte": "{0} 23:59:59".format(date)
+                                }
+                            }
+                        },
+                        {
+                            "$group":
+                                {
+                                    "_id": "$ip",
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1)
+                                    ]
+                                )
+                        },
+                        {
+                            "$limit": 10
+                        }
+                    ]
+                )
+            ]
+        ), 200
+
+    else:
+        return jsonify(
+            []
+        ), 200
 
 
 @app.route("/api/events/top_ten_ips_in_network_events", methods=["GET", "POST"])
@@ -391,9 +542,90 @@ def top_ten_ips_in_network_events():
     Returns:
         JSON/Dict top ten repeated ips in events
     """
-    return jsonify([i for i in connector.network_events.aggregate(
-        [{"$unwind": "$ip"}, {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
-         {"$sort": SON([("count", -1), ("_id", -1)])}, {"$limit": 10}])]), 200
+    return jsonify(
+        [
+            i for i in
+            connector.network_events.aggregate(
+                [
+                    {
+                        "$group":
+                            {
+                                "_id": "$ip",
+                                "count":
+                                    {
+                                        "$sum": 1
+                                    }
+                            }
+                    },
+                    {
+                        "$sort":
+                            SON(
+                                [
+                                    ("count", -1),
+                                    ("_id", -1)]
+                            )
+                    },
+                    {
+                        "$limit": 10
+                    }
+                ]
+            )
+        ]
+    ), 200
+
+
+@app.route("/api/events/top_ten_ips_in_network_events_by_date", methods=["GET", "POST"])
+def top_ten_ips_in_network_events_by_date():
+    """
+    get top ten repeated ips in network events by date
+
+    Returns:
+        JSON/Dict top ten repeated ips in events by date
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify(
+            [
+                i for i in
+                connector.network_events.aggregate(
+                    [
+                        {
+                            "$match": {
+                                "date": {
+                                    "$gte": "{0} 00:00:00".format(date),
+                                    "$lte": "{0} 23:59:59".format(date)
+                                }
+                            }
+                        },
+                        {
+                            "$group":
+                                {
+                                    "_id": "$ip",
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)]
+                                )
+                        },
+                        {
+                            "$limit": 10
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    else:
+        return jsonify(
+            []
+        ), 200
 
 
 @app.route("/api/events/top_ten_ports_in_honeypot_events", methods=["GET", "POST"])
@@ -404,9 +636,90 @@ def top_ten_ports_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ports in events
     """
-    return jsonify([i for i in connector.ohp_events.aggregate(
-        [{"$unwind": "$port"}, {"$group": {"_id": "$port", "count": {"$sum": 1}}},
-         {"$sort": SON([("count", -1), ("_id", -1)])}, {"$limit": 10}])]), 200
+    return jsonify(
+        [
+            i for i in
+            connector.ohp_events.aggregate(
+                [
+                    {
+                        "$group":
+                            {
+                                "_id": "$port",
+                                "count": {
+                                    "$sum": 1
+                                }
+                            }
+                    },
+                    {
+                        "$sort":
+                            SON(
+                                [
+                                    ("count", -1),
+                                    ("_id", -1)
+                                ]
+                            )
+                    },
+                    {
+                        "$limit": 10
+                    }
+                ]
+            )
+        ]
+    ), 200
+
+
+@app.route("/api/events/top_ten_ports_in_honeypot_events_by_date", methods=["GET", "POST"])
+def top_ten_ports_in_honeypot_events_by_date():
+    """
+    get top ten repeated ports in honeypot events by date
+
+    Returns:
+        JSON/Dict top ten repeated ports in events by date
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify(
+            [
+                i for i in
+                connector.ohp_events.aggregate(
+                    [
+                        {
+                            "$match": {
+                                "date": {
+                                    "$gte": "{0} 00:00:00".format(date),
+                                    "$lte": "{0} 23:59:59".format(date)
+                                }
+                            }
+                        },
+                        {
+                            "$group":
+                                {
+                                    "_id": "$port",
+                                    "count": {
+                                        "$sum": 1
+                                    }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                        },
+                        {
+                            "$limit": 10
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    else:
+        return jsonify(
+            []
+        ), 200
 
 
 @app.route("/api/events/top_ten_ports_in_network_events", methods=["GET", "POST"])
@@ -417,9 +730,92 @@ def top_ten_ports_in_network_events():
     Returns:
         JSON/Dict top ten repeated ports in events
     """
-    return jsonify([i for i in connector.network_events.aggregate(
-        [{"$unwind": "$port"}, {"$group": {"_id": "$port", "count": {"$sum": 1}}},
-         {"$sort": SON([("count", -1), ("_id", -1)])}, {"$limit": 10}])]), 200
+    return jsonify(
+        [
+            i for i in
+            connector.network_events.aggregate(
+                [
+                    {
+                        "$group":
+                            {
+                                "_id": "$port",
+                                "count":
+                                    {
+                                        "$sum": 1
+                                    }
+                            }
+                    },
+                    {
+                        "$sort":
+                            SON(
+                                [
+                                    ("count", -1),
+                                    ("_id", -1)
+                                ]
+                            )
+                    },
+                    {
+                        "$limit": 10
+                    }
+                ]
+            )
+        ]
+    ), 200
+
+
+@app.route("/api/events/top_ten_ports_in_network_events_by_date", methods=["GET", "POST"])
+def top_ten_ports_in_network_events_by_date():
+    """
+    get top ten repeated ports in network events by date
+
+    Returns:
+        JSON/Dict top ten repeated ports in events by date
+    """
+    date = get_value_from_request("date")
+    if date:
+        return jsonify(
+            [
+                i for i in
+                connector.network_events.aggregate(
+                    [
+                        {
+                            "$match": {
+                                "date": {
+                                    "$gte": "{0} 00:00:00".format(date),
+                                    "$lte": "{0} 23:59:59".format(date)
+                                }
+                            }
+                        },
+                        {
+                            "$group":
+                                {
+                                    "_id": "$port",
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                        },
+                        {
+                            "$limit": 10
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    else:
+        return jsonify(
+            []
+        ), 200
 
 
 def start_api_server():

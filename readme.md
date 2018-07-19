@@ -23,11 +23,10 @@ We appreciate any contribution, ideas, feedback. feel free to contact us by crea
 * Multi Python Version Support
 * Secure Virtual Machine
 * Automated Setup Process
-* CLI ~~/WebUI/API~~ Available
-* ~~Network Packet Analyzer~~
-* ~~Supporting Web/Network based Attacks~~
+* CLI/WebUI/API Available + Live Reporting
+* Supporting Web/Network based Attacks
+* Network Packet Analyzer (Basic/ ~~Advance~~ )
 * ~~Hacker Activity Monitor~~
-* ~~Live Reporting System~~
 
 
 
@@ -147,15 +146,32 @@ action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_honeypot_events"
 time: 3.239441 
 response: [{"_id":"192.168.1.6","count":805},{"_id":"192.168.1.3","count":795},{"_id":"192.168.1.9","count":779},{"_id":"192.168.1.5","count":747},{"_id":"192.168.1.2","count":693},{"_id":"192.168.1.7","count":687},{"_id":"192.168.1.4","count":677},{"_id":"192.168.1.8","count":642},{"_id":"192.168.1.77","count":642},{"_id":"192.168.1.82","count":636}]
 
+action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_honeypot_events_by_date?date=2018-07-19"
+time: 1.353922
+response: [{"_id":"192.168.1.103","count":120},{"_id":"192.168.1.168","count":117},{"_id":"192.168.1.72","count":116},{"_id":"192.168.1.160","count":114},{"_id":"192.168.1.166","count":113},{"_id":"192.168.1.57","count":113},{"_id":"192.168.1.170","count":113},{"_id":"192.168.1.105","count":112},{"_id":"192.168.1.107","count":112},{"_id":"192.168.1.131","count":111}]
+
 action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_network_events" 
-time: 3.503781 
+time: 3.003781 
 response:  [{"_id":"192.168.1.5","count":1423},{"_id":"192.168.1.7","count":1369},{"_id":"192.168.1.4","count":1364},{"_id":"192.168.1.6","count":1313},{"_id":"192.168.1.9","count":1307},{"_id":"192.168.1.3","count":1303},{"_id":"192.168.1.2","count":1284},{"_id":"192.168.1.8","count":1276},{"_id":"192.168.1.66","count":1261},{"_id":"192.168.1.85","count":1242}]
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ips_in_network_events_by_date?date=2018-07-16" 
+time: 3.562481
+response:  [{"_id":"192.168.1.4","count":286},{"_id":"192.168.1.5","count":284},{"_id":"192.168.1.7","count":260},{"_id":"192.168.1.6","count":217},{"_id":"192.168.1.2","count":210},{"_id":"192.168.1.3","count":208},{"_id":"192.168.1.8","count":198},{"_id":"192.168.1.9","count":177},{"_id":"192.168.1.118","count":78},{"_id":"192.168.1.249","count":77}]
 
 action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_honeypot_events" 
 time: 1.747325 
 response:  [{"_id":80,"count":1140},{"_id":21,"count":71},{"_id":56017,"count":32},{"_id":64712,"count":31},{"_id":43518,"count":31},{"_id":39985,"count":31},{"_id":3518,"count":31},{"_id":1061,"count":31},{"_id":50774,"count":30},{"_id":43363,"count":30}]
 
+action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_honeypot_events_by_date?date=2018-07-16" 
+time: 1.975338
+response:  [{"_id":80,"count":1138},{"_id":21,"count":68},{"_id":56017,"count":30},{"_id":64712,"count":29},{"_id":61573,"count":28},{"_id":43518,"count":28},{"_id":21471,"count":28},{"_id":47751,"count":27},{"_id":43363,"count":27},{"_id":35116,"count":27}]
+
 action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_network_events" 
 time: 1.957787 
 response:  [{"_id":80,"count":462},{"_id":443,"count":444},{"_id":22,"count":48},{"_id":45952,"count":35},{"_id":50106,"count":34},{"_id":24622,"count":34},{"_id":61266,"count":33},{"_id":59598,"count":33},{"_id":57242,"count":33},{"_id":50799,"count":33}]
+
+action: "http://127.0.0.1:5000/api/events/top_ten_ports_in_network_events_by_date?date=2018-07-16" 
+time: 2.120127
+response:  [{"_id":80,"count":459},{"_id":443,"count":441},{"_id":22,"count":42},{"_id":16735,"count":30},{"_id":24157,"count":29},{"_id":35982,"count":28},{"_id":31376,"count":28},{"_id":16355,"count":28},{"_id":60840,"count":27},{"_id":51046,"count":27}]
+
 ```
