@@ -13,117 +13,14 @@ from bson.son import SON
 from config import api_configuration
 from core.alert import write_to_api_console
 from database import connector
+from api.utility import msg_structure
+from api.utility import all_mime_types
+from api.utility import root_dir
 
 template_dir = os.path.join(os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "web"), "static")
 app = Flask(__name__, template_folder=template_dir)
 app.config.from_object(__name__)
-
-
-def msg_structure(status="", msg=""):
-    """
-    basic JSON message structure
-
-    Args:
-        status: status (ok, failed)
-        msg: the message content
-
-    Returns:
-        a JSON message
-    """
-    return {
-        "status": status,
-        "msg": msg
-    }
-
-
-def all_mime_types():
-    """
-    contains all mime types for HTTP request
-
-    Returns:
-        all mime types in json
-    """
-    return {
-        ".aac": "audio/aac",
-        ".abw": "application/x-abiword",
-        ".arc": "application/octet-stream",
-        ".avi": "video/x-msvideo",
-        ".azw": "application/vnd.amazon.ebook",
-        ".bin": "application/octet-stream",
-        ".bz": "application/x-bzip",
-        ".bz2": "application/x-bzip2",
-        ".csh": "application/x-csh",
-        ".css": "text/css",
-        ".csv": "text/csv",
-        ".doc": "application/msword",
-        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        ".eot": "application/vnd.ms-fontobject",
-        ".epub": "application/epub+zip",
-        ".gif": "image/gif",
-        ".htm": ".htm",
-        ".html": "text/html",
-        ".ico": "image/x-icon",
-        ".ics": "text/calendar",
-        ".jar": "application/java-archive",
-        ".jpeg": ".jpeg",
-        ".jpg": "image/jpeg",
-        ".js": "application/javascript",
-        ".json": "application/json",
-        ".mid": ".mid",
-        ".midi": "audio/midi",
-        ".mpeg": "video/mpeg",
-        ".mpkg": "application/vnd.apple.installer+xml",
-        ".odp": "application/vnd.oasis.opendocument.presentation",
-        ".ods": "application/vnd.oasis.opendocument.spreadsheet",
-        ".odt": "application/vnd.oasis.opendocument.text",
-        ".oga": "audio/ogg",
-        ".ogv": "video/ogg",
-        ".ogx": "application/ogg",
-        ".otf": "font/otf",
-        ".png": "image/png",
-        ".pdf": "application/pdf",
-        ".ppt": "application/vnd.ms-powerpoint",
-        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-        ".rar": "application/x-rar-compressed",
-        ".rtf": "application/rtf",
-        ".sh": "application/x-sh",
-        ".svg": "image/svg+xml",
-        ".swf": "application/x-shockwave-flash",
-        ".tar": "application/x-tar",
-        ".tif": ".tif",
-        ".tiff": "image/tiff",
-        ".ts": "application/typescript",
-        ".ttf": "font/ttf",
-        ".vsd": "application/vnd.visio",
-        ".wav": "audio/x-wav",
-        ".weba": "audio/webm",
-        ".webm": "video/webm",
-        ".webp": "image/webp",
-        ".woff": "font/woff",
-        ".woff2": "font/woff2",
-        ".xhtml": "application/xhtml+xml",
-        ".xls": "application/vnd.ms-excel",
-        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        ".xml": "application/xml",
-        ".xul": "application/vnd.mozilla.xul+xml",
-        ".zip": "application/zip",
-        ".3gp": "video/3gpp",
-        "audio/3gpp": "video",
-        ".3g2": "video/3gpp2",
-        "audio/3gpp2": "video",
-        ".7z": "application/x-7z-compressed"
-    }
-
-
-def root_dir():
-    """
-    find the root directory for web static files
-
-    Returns:
-        root path for static files
-    """
-    return os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), "web"), "static")
 
 
 def get_file(filename):
@@ -179,7 +76,7 @@ def is_authorized():
 
     """
     global app
-    if app.config["OWASP_NETTACKER_CONFIG"]["api_access_key"] != get_value_from_request("key"):
+    if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != get_value_from_request("key"):
         abort(401, "invalid API key")
     return True
 
@@ -250,10 +147,10 @@ def authorization_check():
         None or Abort(403) or Abort(401)
     """
     # IP Limitation
-    if app.config["OWASP_NETTACKER_CONFIG"]["api_client_white_list"]:
-        if flask_request.remote_addr not in app.config["OWASP_NETTACKER_CONFIG"]["api_client_white_list_ips"]:
+    if app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]:
+        if flask_request.remote_addr not in app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]:
             abort(403, "unauthorized IP")
-    if not app.config["OWASP_NETTACKER_CONFIG"]["api_access_without_key"]:
+    if not app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]:
         is_authorized()
     return
 
@@ -830,7 +727,7 @@ def start_api_server():
         my_api_configuration["api_access_key"] if not my_api_configuration[
             "api_access_without_key"] else "NOT REQUIRED!"))
     global app
-    app.config["OWASP_NETTACKER_CONFIG"] = {
+    app.config["OWASP_HONEYPOT_CONFIG"] = {
         "api_access_key": my_api_configuration["api_access_key"],
         "api_client_white_list": my_api_configuration["api_client_white_list"]["enabled"],
         "api_client_white_list_ips": my_api_configuration["api_client_white_list"]["ips"],
