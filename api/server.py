@@ -17,6 +17,7 @@ from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
 from api.utility import fix_date
+from api.utility import fix_limit
 
 template_dir = os.path.join(os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "web"), "static")
@@ -368,7 +369,7 @@ def top_ten_ips_in_honeypot_events():
                         )
                     },
                     {
-                        "$limit": 10
+                        "$limit": fix_limit(get_value_from_request("limit"))
                     }
                 ]
             )
@@ -418,7 +419,7 @@ def top_ten_ips_in_honeypot_events_by_date():
                                 )
                         },
                         {
-                            "$limit": 10
+                            "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
                 )
@@ -463,7 +464,7 @@ def top_ten_ips_in_network_events():
                             )
                     },
                     {
-                        "$limit": 10
+                        "$limit": fix_limit(get_value_from_request("limit"))
                     }
                 ]
             )
@@ -513,7 +514,7 @@ def top_ten_ips_in_network_events_by_date():
                                 )
                         },
                         {
-                            "$limit": 10
+                            "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
                 )
@@ -557,7 +558,7 @@ def top_ten_ports_in_honeypot_events():
                             )
                     },
                     {
-                        "$limit": 10
+                        "$limit": fix_limit(get_value_from_request("limit"))
                     }
                 ]
             )
@@ -607,7 +608,7 @@ def top_ten_ports_in_honeypot_events_by_date():
                                 )
                         },
                         {
-                            "$limit": 10
+                            "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
                 )
@@ -652,7 +653,7 @@ def top_ten_ports_in_network_events():
                             )
                     },
                     {
-                        "$limit": 10
+                        "$limit": fix_limit(get_value_from_request("limit"))
                     }
                 ]
             )
@@ -703,7 +704,7 @@ def top_ten_ports_in_network_events_by_date():
                                 )
                         },
                         {
-                            "$limit": 10
+                            "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
                 )

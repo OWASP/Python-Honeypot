@@ -130,3 +130,22 @@ def fix_date(date):
         else:
             return "{0} 00:00:00|{0} 23:59:59".format(date).rsplit("|")
     return date
+
+
+def fix_limit(limit):
+    """
+    fix limit integer from user
+
+    Args:
+        limit: limit integer - default 10
+
+    Returns:
+        limit integer or 10
+    """
+    if limit:
+        try:
+            return int(limit)
+        except Exception as _:
+            
+            del _
+    return 10
