@@ -2,64 +2,10 @@
 
 [![Build Status](https://travis-ci.org/zdresearch/OWASP-Honeypot.svg?branch=master)](https://travis-ci.org/zdresearch/OWASP-Honeypot) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
 
-We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org).
-
+We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org). Please visit [Wiki](https://github.com/zdresearch/OWASP-Honeypot/wiki) page for more information.
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
 ##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
-
-### Run
-#### Install Dependencies
-* Install `Docker` on your OS (Linux), check `docker info` if it's working and enable!
-* Install `libpcap-dev`, `libnet-dev`, `tshark`, `pip install -r requirements.txt`
-* Blocking virtual machines internet is not working on Windows (Didn't test on Mac!)
-#### Start
-* use `python ohp.py` to start the containers and default modules.
-
-### Features
-
-* Emulator (DOCKER/LXC)
-* Multi OS Support
-* Multi Python Version Support
-* Secure Virtual Machine
-* Automated Setup Process
-* CLI/WebUI/API Available + Live Reporting
-* Supporting Web/Network based Attacks
-* Network Packet Analyzer (Basic/ ~~Advance~~ )
-* ~~Hacker Activity Monitor~~
-
-
-
-* for now to limit VM storage sizes change `/etc/init.d/docker` 
-```bash
-log_begin_msg "Starting $DOCKER_DESC: $BASE"
-start-stop-daemon --start --background \
-	--no-close \
-	--exec "$DOCKERD" \
-	--pidfile "$DOCKER_SSD_PIDFILE" \
-	--make-pidfile \
-	-- \
-		-p "$DOCKER_PIDFILE" \
-		$DOCKER_OPTS \
-			>> "$DOCKER_LOGFILE" 2>&1
-log_end_msg $?
-```
-
-* to (add `--storage-opt dm.basesize=0.5G`)
-
-```bash
-log_begin_msg "Starting $DOCKER_DESC: $BASE"
-start-stop-daemon --start --background \
-	--no-close \
-	--exec "$DOCKERD" --storage-opt dm.basesize=0.5G \
-	--pidfile "$DOCKER_SSD_PIDFILE" \
-	--make-pidfile \
-	-- \
-		-p "$DOCKER_PIDFILE" \
-		$DOCKER_OPTS \
-			>> "$DOCKER_LOGFILE" 2>&1
-log_end_msg $?
-```
 
 * Running Example (I sent `ctrl + c` to close and remove honeypot service correctly!)
 
@@ -108,8 +54,6 @@ log_end_msg $?
 [+] [2018-07-09 23:57:49] finished.
 
 ```
-
-* Please notice, everytime you run the honeypot, it will remove and update the virtual machine, so internet access required for the host!
 
 ### API Actions & WebUI
 
