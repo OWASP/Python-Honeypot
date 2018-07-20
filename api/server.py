@@ -16,6 +16,7 @@ from database import connector
 from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
+from api.utility import fix_date
 
 template_dir = os.path.join(os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "web"), "static")
@@ -239,7 +240,7 @@ def count_network_events_by_date():
     Returns:
         JSON/Dict number of network events
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             {
@@ -247,8 +248,8 @@ def count_network_events_by_date():
                     {
                         "date":
                             {
-                                "$gte": "{0} 00:00:00".format(date),
-                                "$lte": "{0} 23:59:59".format(date)
+                                "$gte": date[0],
+                                "$lte": date[1]
                             }
                     }
                 ),
@@ -272,15 +273,15 @@ def count_honeypot_events_by_date():
     Returns:
         JSON/Dict number of network events
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             {
                 "count_honeypot_events_by_date": connector.ohp_events.count_documents(
                     {
                         "date": {
-                            "$gte": "{0} 00:00:00".format(date),
-                            "$lte": "{0} 23:59:59".format(date)
+                            "$gte": date[0],
+                            "$lte": date[1]
                         }
                     }
                 ),
@@ -304,7 +305,7 @@ def count_all_events_by_date():
     Returns:
         JSON/Dict number of network events
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             {
@@ -312,15 +313,15 @@ def count_all_events_by_date():
                     connector.ohp_events.count_documents(
                         {
                             "date": {
-                                "$gte": "{0} 00:00:00".format(date),
-                                "$lte": "{0} 23:59:59".format(date)
+                                "$gte": date[0],
+                                "$lte": date[1]
                             }
                         }
                     ) + connector.network_events.count_documents(
                         {
                             "date": {
-                                "$gte": "{0} 00:00:00".format(date),
-                                "$lte": "{0} 23:59:59".format(date)
+                                "$gte": date[0],
+                                "$lte": date[1]
                             }
                         }
                     ),
@@ -383,7 +384,7 @@ def top_ten_ips_in_honeypot_events_by_date():
     Returns:
         JSON/Dict top ten repeated ips in events by date
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             [
@@ -393,8 +394,8 @@ def top_ten_ips_in_honeypot_events_by_date():
                         {
                             "$match": {
                                 "date": {
-                                    "$gte": "{0} 00:00:00".format(date),
-                                    "$lte": "{0} 23:59:59".format(date)
+                                    "$gte": date[0],
+                                    "$lte": date[1]
                                 }
                             }
                         },
@@ -478,7 +479,7 @@ def top_ten_ips_in_network_events_by_date():
     Returns:
         JSON/Dict top ten repeated ips in events by date
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             [
@@ -488,8 +489,8 @@ def top_ten_ips_in_network_events_by_date():
                         {
                             "$match": {
                                 "date": {
-                                    "$gte": "{0} 00:00:00".format(date),
-                                    "$lte": "{0} 23:59:59".format(date)
+                                    "$gte": date[0],
+                                    "$lte": date[1]
                                 }
                             }
                         },
@@ -572,7 +573,7 @@ def top_ten_ports_in_honeypot_events_by_date():
     Returns:
         JSON/Dict top ten repeated ports in events by date
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             [
@@ -582,8 +583,8 @@ def top_ten_ports_in_honeypot_events_by_date():
                         {
                             "$match": {
                                 "date": {
-                                    "$gte": "{0} 00:00:00".format(date),
-                                    "$lte": "{0} 23:59:59".format(date)
+                                    "$gte": date[0],
+                                    "$lte": date[1]
                                 }
                             }
                         },
@@ -667,7 +668,7 @@ def top_ten_ports_in_network_events_by_date():
     Returns:
         JSON/Dict top ten repeated ports in events by date
     """
-    date = get_value_from_request("date")
+    date = fix_date(get_value_from_request("date"))
     if date:
         return jsonify(
             [
@@ -677,8 +678,8 @@ def top_ten_ports_in_network_events_by_date():
                         {
                             "$match": {
                                 "date": {
-                                    "$gte": "{0} 00:00:00".format(date),
-                                    "$lte": "{0} 23:59:59".format(date)
+                                    "$gte": date[0],
+                                    "$lte": date[1]
                                 }
                             }
                         },

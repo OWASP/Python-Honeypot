@@ -323,7 +323,7 @@ function load_graphs() {
                     type: "GET",
                     url: "/api/events/count_all_events_by_date?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_all_events_json[res["date"]] = res["count_all_events_by_date"];
+                    dates_all_events_json[res["date"].toString().split(" ")[0]] = res["count_all_events_by_date"];
 
                     var past_week_events_graph_config = {
                         type: 'line',
@@ -428,7 +428,7 @@ function load_graphs() {
                     type: "GET",
                     url: "/api/events/count_network_events_by_date?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_network_events_json[res["date"]] = res["count_network_events_by_date"];
+                    dates_network_events_json[res["date"].toString().split(" ")[0]] = res["count_network_events_by_date"];
                     var past_week_events_graph_config = {
                         type: 'line',
                         data: {
@@ -532,7 +532,7 @@ function load_graphs() {
                     type: "GET",
                     url: "/api/events/count_honeypot_events_by_date?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_honeypot_events_json[res["date"]] = res["count_honeypot_events_by_date"];
+                    dates_honeypot_events_json[res["date"].toString().split(" ")[0]] = res["count_honeypot_events_by_date"];
                     var past_week_events_graph_config = {
                         type: 'line',
                         data: {

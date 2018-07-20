@@ -108,3 +108,25 @@ def root_dir():
         root path for static files
     """
     return os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), "web"), "static")
+
+
+def fix_date(date):
+    """
+    fix date value from user input
+
+    Args:
+        date: date value - user input
+
+    Returns:
+        an array with fixed date value or original date
+    """
+    if date:
+        if date.count(":") is 2:
+            return [date, "{0} 23:59:59".format(date.rsplit()[0])]
+        elif date.count("|") is 1 and date.count(":") is 4:
+            return date.rsplit("|")
+        elif date.count("|") is 1 and date.count(":") is 0:
+            return ["{0} 00:00:00".format(date.rsplit("|")[0]), "{0} 23:59:59".format(date.rsplit("|")[1])]
+        else:
+            return "{0} 00:00:00|{0} 23:59:59".format(date).rsplit("|")
+    return date
