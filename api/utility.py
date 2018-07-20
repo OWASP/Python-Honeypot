@@ -146,6 +146,5 @@ def fix_limit(limit):
         try:
             return int(limit)
         except Exception as _:
-            
             del _
     return 10
