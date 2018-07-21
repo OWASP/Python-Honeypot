@@ -144,7 +144,7 @@ def fix_limit(limit):
     """
     if limit:
         try:
-            return int(limit) if int(limit) <= 1000 else 1000
+            return int(limit)
         except Exception as _:
             del _
     return 10
