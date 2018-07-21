@@ -197,7 +197,7 @@ def count_all_events():
     return jsonify(
         {
             "count_all_events": (
-                    connector.ohp_events.estimated_document_count() +
+                    connector.honeypot_events.estimated_document_count() +
                     connector.network_events.estimated_document_count()
             )
         }
@@ -214,7 +214,7 @@ def count_honeypot_events():
     """
     return jsonify(
         {
-            "count_honeypot_events": connector.ohp_events.estimated_document_count()
+            "count_honeypot_events": connector.honeypot_events.estimated_document_count()
         }
     ), 200
 
@@ -279,7 +279,7 @@ def count_honeypot_events_by_date():
     if date:
         return jsonify(
             {
-                "count_honeypot_events_by_date": connector.ohp_events.count_documents(
+                "count_honeypot_events_by_date": connector.honeypot_events.count_documents(
                     {
                         "date": {
                             "$gte": date[0],
@@ -312,7 +312,7 @@ def count_all_events_by_date():
         return jsonify(
             {
                 "count_all_events_by_date":
-                    connector.ohp_events.count_documents(
+                    connector.honeypot_events.count_documents(
                         {
                             "date": {
                                 "$gte": date[0],
@@ -350,7 +350,7 @@ def top_ten_ips_in_honeypot_events():
     return jsonify(
         [
             i for i in
-            connector.ohp_events.aggregate(
+            connector.honeypot_events.aggregate(
                 [
                     {
                         "$group":
@@ -394,7 +394,7 @@ def top_ten_ips_in_honeypot_events_by_date():
         return jsonify(
             [
                 i for i in
-                connector.ohp_events.aggregate(
+                connector.honeypot_events.aggregate(
                     [
                         {
                             "$match": {
@@ -550,7 +550,7 @@ def top_ten_ports_in_honeypot_events():
     return jsonify(
         [
             i for i in
-            connector.ohp_events.aggregate(
+            connector.honeypot_events.aggregate(
                 [
                     {
                         "$group":
@@ -595,7 +595,7 @@ def top_ten_ports_in_honeypot_events_by_date():
         return jsonify(
             [
                 i for i in
-                connector.ohp_events.aggregate(
+                connector.honeypot_events.aggregate(
                     [
                         {
                             "$match": {
@@ -753,7 +753,7 @@ def get_honeypot_events():
         return jsonify(
             [
                 i for i in
-                connector.ohp_events.find(
+                connector.honeypot_events.find(
                     {},
                     {
                         "_id": 0

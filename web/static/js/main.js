@@ -75,9 +75,9 @@ function load_graphs() {
             // request honeypot related events number
             $.ajax({
                 type: "GET",
-                url: "/api/events/count_ohp_events",
+                url: "/api/events/count_honeypot_events",
             }).done(function (res) {
-                document.getElementById('count_ohp_events').innerHTML = res["count_ohp_events"];
+                document.getElementById('count_honeypot_events').innerHTML = res["count_honeypot_events"];
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 document.getElementById('error_msg').innerHTML = jqXHR.responseText;
                 if (errorThrown == "BAD REQUEST") {

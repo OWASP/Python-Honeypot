@@ -9,13 +9,13 @@ from config import api_configuration
 client = pymongo.MongoClient(api_configuration()["api_database"], serverSelectionTimeoutMS=api_configuration()[
     "api_database_connection_timeout"])
 database = client[api_configuration()["api_database_name"]]
-ohp_events = database.ohp_events
+honeypot_events = database.honeypot_events
 network_events = database.network_events
 
 
 def insert_selected_modules_network_event(ip, port, module_name):
     """
-    insert selected modules event to ohp_events collection
+    insert selected modules event to honeypot_events collection
 
     Args:
         ip: connected ip
@@ -25,7 +25,7 @@ def insert_selected_modules_network_event(ip, port, module_name):
     Returns:
         ObjectId(inserted_id)
     """
-    return ohp_events.insert_one({"ip": ip, "port": int(port),
+    return honeypot_events.insert_one({"ip": ip, "port": int(port),
                                   "module_name": module_name, "date": now()}).inserted_id
 
 
