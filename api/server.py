@@ -204,17 +204,17 @@ def count_all_events():
     ), 200
 
 
-@app.route("/api/events/count_ohp_events", methods=["GET", "POST"])
-def count_ohp_events():
+@app.route("/api/events/count_honeypot_events", methods=["GET", "POST"])
+def count_honeypot_events():
     """
-    Get total number of ohp events
+    Get total number of honeypot events
 
     Returns:
-        JSON/Dict number of ohp events
+        JSON/Dict number of honeypot events
     """
     return jsonify(
         {
-            "count_ohp_events": connector.ohp_events.estimated_document_count()
+            "count_honeypot_events": connector.ohp_events.estimated_document_count()
         }
     ), 200
 
