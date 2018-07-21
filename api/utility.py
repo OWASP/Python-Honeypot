@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from flask import jsonify
 
 
 def msg_structure(status="", msg=""):
@@ -166,3 +167,15 @@ def fix_skip(skip):
         except Exception as _:
             del _
     return 0
+
+
+def flask_null_array_response():
+    """
+    null array response for flask
+
+    Returns:
+         null array with 200 status, ([], 200)
+    """
+    return jsonify(
+        []
+    ), 200
