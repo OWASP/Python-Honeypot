@@ -144,7 +144,25 @@ def fix_limit(limit):
     """
     if limit:
         try:
-            return int(limit)
+            return int(limit) if limit <= 1000 else 1000
         except Exception as _:
             del _
     return 10
+
+
+def fix_skip(skip):
+    """
+    fix skip integer from user
+
+    Args:
+        skip: skip integer - default 0
+
+    Returns:
+        skip integer or 0
+    """
+    if skip:
+        try:
+            return int(skip)
+        except Exception as _:
+            del _
+    return 0

@@ -18,6 +18,7 @@ from api.utility import all_mime_types
 from api.utility import root_dir
 from api.utility import fix_date
 from api.utility import fix_limit
+from api.utility import fix_skip
 
 template_dir = os.path.join(os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "web"), "static")
@@ -369,6 +370,9 @@ def top_ten_ips_in_honeypot_events():
                         )
                     },
                     {
+                        "$skip": fix_skip(get_value_from_request("skip"))
+                    },
+                    {
                         "$limit": fix_limit(get_value_from_request("limit"))
                     }
                 ]
@@ -419,6 +423,9 @@ def top_ten_ips_in_honeypot_events_by_date():
                                 )
                         },
                         {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
                             "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
@@ -462,6 +469,9 @@ def top_ten_ips_in_network_events():
                                     ("count", -1),
                                     ("_id", -1)]
                             )
+                    },
+                    {
+                        "$skip": fix_skip(get_value_from_request("skip"))
                     },
                     {
                         "$limit": fix_limit(get_value_from_request("limit"))
@@ -514,6 +524,9 @@ def top_ten_ips_in_network_events_by_date():
                                 )
                         },
                         {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
                             "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
@@ -556,6 +569,9 @@ def top_ten_ports_in_honeypot_events():
                                     ("_id", -1)
                                 ]
                             )
+                    },
+                    {
+                        "$skip": fix_skip(get_value_from_request("skip"))
                     },
                     {
                         "$limit": fix_limit(get_value_from_request("limit"))
@@ -608,6 +624,9 @@ def top_ten_ports_in_honeypot_events_by_date():
                                 )
                         },
                         {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
                             "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
@@ -651,6 +670,9 @@ def top_ten_ports_in_network_events():
                                     ("_id", -1)
                                 ]
                             )
+                    },
+                    {
+                        "$skip": fix_skip(get_value_from_request("skip"))
                     },
                     {
                         "$limit": fix_limit(get_value_from_request("limit"))
@@ -704,6 +726,9 @@ def top_ten_ports_in_network_events_by_date():
                                 )
                         },
                         {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
                             "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
@@ -711,6 +736,74 @@ def top_ten_ports_in_network_events_by_date():
             ]
         ), 200
     else:
+        return jsonify(
+            []
+        ), 200
+
+
+@app.route("/api/events/get_honeypot_events", methods=["GET", "POST"])
+def get_honeypot_events():
+    """
+    get honeypot events
+
+    Returns:
+        an array contain honeypot events
+    """
+    try:
+        return jsonify(
+            [
+                i for i in
+                connector.ohp_events.find(
+                    {},
+                    {
+                        "_id": 0
+                    }
+                ).skip(
+                    fix_skip(
+                        get_value_from_request("skip")
+                    )
+                ).limit(
+                    fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )
+            ]
+        ), 200
+    except Exception as _:
+        return jsonify(
+            []
+        ), 200
+
+
+@app.route("/api/events/get_network_events", methods=["GET", "POST"])
+def get_network_events():
+    """
+    get network events
+
+    Returns:
+        an array contain network events
+    """
+    try:
+        return jsonify(
+            [
+                i for i in
+                connector.network_events.find(
+                    {},
+                    {
+                        "_id": 0
+                    }
+                ).skip(
+                    fix_skip(
+                        get_value_from_request("skip")
+                    )
+                ).limit(
+                    fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )
+            ]
+        ), 200
+    except Exception as _:
         return jsonify(
             []
         ), 200
