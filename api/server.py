@@ -775,6 +775,52 @@ def get_honeypot_events():
         ), 200
 
 
+@app.route("/api/events/get_honeypot_events_by_date", methods=["GET", "POST"])
+def get_honeypot_events_by_date():
+    """
+    get honeypot events by date
+
+    Returns:
+        an array contain honeypot events by date
+    """
+    date = fix_date(get_value_from_request("date"))
+    if date:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.honeypot_events.find(
+                        {
+                            "date":
+                                {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                        },
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            return jsonify(
+                []
+            ), 200
+    else:
+        return jsonify(
+            []
+        ), 200
+
+
 @app.route("/api/events/get_network_events", methods=["GET", "POST"])
 def get_network_events():
     """
@@ -804,6 +850,52 @@ def get_network_events():
             ]
         ), 200
     except Exception as _:
+        return jsonify(
+            []
+        ), 200
+
+
+@app.route("/api/events/get_network_events_by_date", methods=["GET", "POST"])
+def get_network_events_by_date():
+    """
+    get network events by date
+
+    Returns:
+        an array contain network events by date
+    """
+    date = fix_date(get_value_from_request("date"))
+    if date:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.network_events.find(
+                        {
+                            "date":
+                                {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                        },
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            return jsonify(
+                []
+            ), 200
+    else:
         return jsonify(
             []
         ), 200

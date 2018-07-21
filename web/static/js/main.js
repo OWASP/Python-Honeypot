@@ -41,15 +41,7 @@ function load_graphs() {
     var dates_network_events_json = {};
     var dates_honeypot_events_json = {};
     var dates_all_events_json = {};
-    var week_dates_array = [];
-    // generate days (7 days ago until now)
-    for (var days = 6; days >= 0; days--) {
-        var date = new Date();
-        var last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
-        week_dates_array.push(last.getFullYear() + (((last.getMonth() + 1) <= 9) ?
-            ("-0" + (last.getMonth() + 1)) : "-" + (last.getMonth() + 1)) + ((last.getDate() <= 9) ?
-            ("-0" + last.getDate()) : "-" + last.getDate()));
-    }
+
 
     // get number of all events
     $.ajax({
@@ -70,6 +62,15 @@ function load_graphs() {
     setTimeout(function () {
         // if events number updated or its first time to load the graph
         if (old_number_of_total_events != new_number_of_total_events) {
+            var week_dates_array = [];
+            // generate days (7 days ago until now)
+            for (var days = 6; days >= 0; days--) {
+                var date = new Date();
+                var last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+                week_dates_array.push(last.getFullYear() + (((last.getMonth() + 1) <= 9) ?
+                    ("-0" + (last.getMonth() + 1)) : "-" + (last.getMonth() + 1)) + ((last.getDate() <= 9) ?
+                    ("-0" + last.getDate()) : "-" + last.getDate()));
+            }
             // set old events num as new to prevent repeating requests
             old_number_of_total_events = new_number_of_total_events;
             // request honeypot related events number
