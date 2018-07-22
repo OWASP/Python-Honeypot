@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import random
 import socket
 
 from core._time import hours
+from core.compatible import generate_token
 
 
 def api_configuration():
@@ -19,7 +19,7 @@ def api_configuration():
         "api_port": 5000,
         "api_debug_mode": False,
         "api_access_without_key": True,
-        "api_access_key": "".join(random.choice("0123456789abcdef") for _ in range(32)),
+        "api_access_key": generate_token(),
         "api_client_white_list": {
             "enabled": False,
             "ips": ["127.0.0.1", "10.0.0.1", "192.168.1.1"]
