@@ -72,6 +72,6 @@ def user_configuration():
     """
     return {
         "language": "en",
-        "default_selected_modules": "ftp/weak_password,ssh/weak_password,http/basic_auth_weak_password",
+        "default_selected_modules": "ftp/strong_password,ssh/strong_password,http/basic_auth_strong_password",
         "default_excluded_modules": None,
     }
