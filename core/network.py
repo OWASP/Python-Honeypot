@@ -44,7 +44,8 @@ def new_network_events(configuration):
                     except Exception as _:
                         ip, port = None, None
                     # check if event shows an IP
-                    if netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip):
+                    if (netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip)) \
+                            and port not in network_configuration()["ignore_real_machine_ports"]:
                         # check if the port is in selected module
                         inserted_flag = True
                         for selected_module in configuration:
@@ -52,6 +53,7 @@ def new_network_events(configuration):
                                 # insert honeypot event (selected module)
                                 insert_selected_modules_network_event(ip, port, selected_module)
                                 inserted_flag = False
+                                break
                         if inserted_flag:
                             # insert common network event
                             insert_other_network_event(ip, port)
