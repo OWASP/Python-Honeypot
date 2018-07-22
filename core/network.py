@@ -58,7 +58,7 @@ def new_network_events(configuration):
                         if inserted_flag:
                             # insert common network event
                             insert_other_network_event(ip, port)
-            time.sleep(0.2)
+            time.sleep(0.001)
     except Exception as _:
         del _
     return True
