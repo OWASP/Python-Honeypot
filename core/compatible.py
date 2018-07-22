@@ -150,7 +150,6 @@ def check_for_requirements(start_api_server):
             subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
         except Exception as _:
             __die_failure("please install tshark fist!")
-
     return True
 
 
