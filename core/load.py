@@ -354,6 +354,25 @@ def honeypot_configuration_builder(selected_modules):
     return honeypot_configuration
 
 
+def conflict_ports(configuration):
+    """
+    check conflict ports in configuration
+
+    Args:
+        configuration: user final configuration
+
+    Returns:
+        an array with conflicted module [module_name1, module_name2] or []
+    """
+    for selected_module in configuration:
+        port = configuration[selected_module]["real_machine_port_number"]
+        for find_module in configuration:
+            find_port = configuration[find_module]["real_machine_port_number"]
+            if port is find_port and find_module != selected_module:
+                return [find_module, selected_module]
+    return []
+
+
 def argv_parser():
     """
     parse ARGVs using argparse
@@ -460,11 +479,16 @@ def load_honeypot_engine():
     #########################################
     # argv rules apply
     #########################################
+    # build configuration based on selected modules
+    configuration = honeypot_configuration_builder(selected_modules)
+
+    # check for conflict in real machine ports
+    conflict = conflict_ports(configuration)
+    if conflict:
+        __die_failure("conflict ports between {0}, {1}".format(conflict[0], conflict[1]))
 
     info(messages("en", "honeypot_started"))
     info(messages("en", "loading_modules").format(", ".join(selected_modules)))
-    # build configuration based on selected modules
-    configuration = honeypot_configuration_builder(selected_modules)
 
     # stop old containers (in case they are not stopped)
     stop_containers(configuration)
