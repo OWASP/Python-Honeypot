@@ -50,7 +50,7 @@ def new_network_events(configuration):
                         # check if the port is in selected module
                         inserted_flag = True
                         for selected_module in configuration:
-                            if port is configuration[selected_module]["real_machine_port_number"]:
+                            if port == configuration[selected_module]["real_machine_port_number"]:
                                 # insert honeypot event (selected module)
                                 insert_selected_modules_network_event(ip, port, selected_module)
                                 inserted_flag = False
