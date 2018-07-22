@@ -45,6 +45,7 @@ def new_network_events(configuration):
                         ip, port = None, None
                     # check if event shows an IP
                     if (netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip)) \
+                            and ip not in network_configuration()["ignore_real_machine_ip_addresses"] \
                             and port not in network_configuration()["ignore_real_machine_ports"]:
                         # check if the port is in selected module
                         inserted_flag = True
