@@ -31,4 +31,4 @@ RUN mkdir /etc/vsftpd && \
     chown vsftpd:nogroup /var/www/html
 
 # start the service + wait for container
-ENTRYPOINT service vsftpd restart && tail
+ENTRYPOINT service vsftpd restart & tail
