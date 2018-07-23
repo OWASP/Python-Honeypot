@@ -238,7 +238,7 @@ def start_containers(configuration):
         configuration: JSON container configuration
 
     Returns:
-        True
+        configuration containing IP Addresses
     """
     for selected_module in configuration:
         # get the container name to start (organizing)
@@ -258,14 +258,18 @@ def start_containers(configuration):
             os.popen("docker run --net ohp_no_internet --name={0} -d -t -p {1}:{2} {3}"
                      .format(container_name, real_machine_port, virtual_machine_port,
                              configuration[selected_module]["virtual_machine_name"])).read()
-
-        virtual_machine_ip_address = os.popen("docker inspect -f '{{range.NetworkSettings.Networks}}"
-                                              "{{.IPAddress}}{{end}}' %s" % container_name).read().rsplit()[0][1:-1]
+        try:
+            virtual_machine_ip_address = os.popen("docker inspect -f '{{range.NetworkSettings.Networks}}"
+                                                  "{{.IPAddress}}{{end}}' %s" % container_name).read().rsplit()[0][1:-1]
+        except Exception as _:
+            virtual_machine_ip_address = "127.0.0.1"
+        # add virtual machine IP Address to configuration
+        configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
         info("container {0} started,"
              " forwarding 0.0.0.0:{1} to {2}:{3}".format(container_name, real_machine_port, virtual_machine_ip_address,
                                                          virtual_machine_port))
-    return True
+    return configuration
 
 
 def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration):
@@ -500,12 +504,12 @@ def load_honeypot_engine():
     create_new_images(configuration)
     # create OWASP Honeypot networks in case not exist
     create_ohp_networks()
+    # start containers based on selected modules
+    configuration = start_containers(configuration)
     # start network monitoring thread
     new_network_events_thread = threading.Thread(target=new_network_events, args=(configuration,),
                                                  name="new_network_events_thread")
     new_network_events_thread.start()
-    # start containers based on selected modules
-    start_containers(configuration)
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
     # wait forever! in case user can send ctrl + c to interrupt
     wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)

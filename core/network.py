@@ -12,6 +12,22 @@ from core.alert import info
 from config import network_configuration
 
 
+def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
+    """
+    generate tshark rule to ignore ip addresses
+
+    Args:
+        ignore_ip_addresses: list of ip addresses
+
+    Returns:
+        rule string
+    """
+    rule = ""
+    for ip_address in ignore_ip_addresses:
+        rule += "ip.dst != {0} and ".format(ip_address)
+    return rule[:-5]
+
+
 def new_network_events(configuration):
     """
     get and submit new network events
@@ -23,11 +39,22 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
+    # get ip addresses
+    virtual_machine_ip_addresses = [configuration[selected_module]["ip_address"] for selected_module in configuration]
+    # ignore vm ips + ips in config.py
+    ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] + virtual_machine_ip_addresses
+    ignore_ip_addresses.append(network_configuration()["real_machine_ip_address"])
+    # ignore ports
+    ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
     process = subprocess.Popen(
-        ["tshark", "-Y", "ip.dst != {0}".format(network_configuration()["real_machine_ip_address"]), "-T",
-         "fields", "-e", "ip.dst", "-e", "tcp.srcport", "-ni", "any"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        [
+            "tshark", "-Y", ignore_ip_addresses_rule_generator(ignore_ip_addresses), "-T",
+            "fields", "-e", "ip.dst", "-e", "tcp.srcport", "-ni", "any"
+        ],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
     pull_object = select.poll()
     pull_object.register(process.stdout, select.POLLIN)
@@ -45,8 +72,8 @@ def new_network_events(configuration):
                         ip, port = None, None
                     # check if event shows an IP
                     if (netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip)) \
-                            and ip not in network_configuration()["ignore_real_machine_ip_addresses"] \
-                            and port not in network_configuration()["ignore_real_machine_ports"]:
+                            and ip not in ignore_ip_addresses \
+                            and port not in ignore_ports:  # ignored ip addresses and ports in python
                         # check if the port is in selected module
                         inserted_flag = True
                         for selected_module in configuration:
