@@ -22,10 +22,10 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     Returns:
         rule string
     """
-    rule = ""
+    rules = []
     for ip_address in ignore_ip_addresses:
-        rule += "ip.dst != {0} and ".format(ip_address)
-    return rule[:-5]
+        rules.append("-Y ip.dst != {0}".format(ip_address))
+    return rules
 
 
 def new_network_events(configuration):
@@ -48,11 +48,15 @@ def new_network_events(configuration):
     ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
-    process = subprocess.Popen(
+    run_tshark = ["tshark"]
+    run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
+    run_tshark.extend(
         [
-            "tshark", "-Y", ignore_ip_addresses_rule_generator(ignore_ip_addresses), "-T",
-            "fields", "-e", "ip.dst", "-e", "tcp.srcport", "-ni", "any"
-        ],
+            "-T", "fields", "-e", "ip.dst", "-e", "tcp.srcport", "-ni", "any"
+        ]
+    )
+    process = subprocess.Popen(
+        run_tshark,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
@@ -73,7 +77,7 @@ def new_network_events(configuration):
                     # check if event shows an IP
                     if (netaddr.valid_ipv4(ip) or netaddr.valid_ipv6(ip)) \
                             and ip not in ignore_ip_addresses \
-                            and port not in ignore_ports:  # ignored ip addresses and ports in python
+                            and port not in ignore_ports:  # ignored ip addresses and ports in python - fix later
                         # check if the port is in selected module
                         inserted_flag = True
                         for selected_module in configuration:
