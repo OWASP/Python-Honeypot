@@ -340,6 +340,16 @@ def honeypot_configuration_builder(selected_modules):
         #         "username": "admin",
         #         "password": "123456"
         #      }
+        # to replace the category default port for individual modules, you have to add "real_machine_port_number"
+        # key to module configuration to replace it.
+        #
+        # for instance:
+        # def module_configuration():
+        #     return {
+        #         "username": "admin",
+        #         "password": "123456"
+        #         "real_machine_port_number": 2121
+        #      }
         module_configuration = getattr(
             __import__("lib.modules.{0}".format(module.replace("/", ".")), fromlist=["module_configuration"]),
             "module_configuration")
@@ -371,7 +381,6 @@ def conflict_ports(configuration):
     Returns:
         an array with conflicted module [module_name1, module_name2] or []
     """
-    # todo: every individual modules must be able to rewrite the default port
     for selected_module in configuration:
         port = configuration[selected_module]["real_machine_port_number"]
         for find_module in configuration:
