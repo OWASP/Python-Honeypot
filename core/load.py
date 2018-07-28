@@ -355,6 +355,9 @@ def honeypot_configuration_builder(selected_modules):
             "/Dockerfile").read().format(**combined_module_configuration)
         # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
+        # todo: implement loading files in Dockerfile
+        # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
+        # a function to implement and add it easy
     return honeypot_configuration
 
 
@@ -368,6 +371,7 @@ def conflict_ports(configuration):
     Returns:
         an array with conflicted module [module_name1, module_name2] or []
     """
+    # todo: every individual modules must be able to rewrite the default port
     for selected_module in configuration:
         port = configuration[selected_module]["real_machine_port_number"]
         for find_module in configuration:

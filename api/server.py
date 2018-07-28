@@ -904,6 +904,20 @@ def get_network_events_by_date():
     return flask_null_array_response()
 
 
+# todo: top honeypot countries
+# todo: top honeypot countries by date
+# todo: top network countries by date
+# todo: top network countries by date
+# todo: top honeypot ip by country
+# todo: top honeypot ip by country by date
+# todo: top network ip by country
+# todo: top network ip by country by date
+# todo: top honeypot ports by country
+# todo: top honeypot ports by country by date
+# todo: top network ports by country
+# todo: top network ports by country by date
+
+
 def start_api_server():
     """
     start API server
