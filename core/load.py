@@ -404,6 +404,17 @@ def honeypot_configuration_builder(selected_modules):
         combined_module_configuration = category_configuration()
         combined_module_configuration.update(module_configuration())
 
+        # write file to docker image check
+        # explore the dockerfile to find something like {write_file_by_to_docker_image(filename,path/file)}
+        # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
+        # a function to implement and add it easy
+        for word in combined_module_configuration["dockerfile"].rsplit():
+            if word.startswith("{write_file_by_to_docker_image("):
+                combined_module_configuration[word] = write_file_by_dockerfile(
+                    module_configuration,
+                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
+                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1].rsplit(")")[0]
+                )
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = open(
@@ -412,22 +423,6 @@ def honeypot_configuration_builder(selected_modules):
             ) + "/Dockerfile"
         ).read().format(
             **combined_module_configuration
-        )
-        # write file to docker image check
-        json_find_writefile_tags = {}
-        # explore the dockerfile to find something like {write_file_by_to_docker_image(filename,path/file)}
-        # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
-        # a function to implement and add it easy
-        for word in combined_module_configuration["dockerfile"].rsplit():
-            if word.startswith("{write_file_by_to_docker_image("):
-                json_find_writefile_tags[word] = write_file_by_dockerfile(
-                    module_configuration,
-                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
-                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1].rsplit(")")[0]
-                )
-        # apply the tags
-        combined_module_configuration["dockerfile"] = combined_module_configuration["dockerfile"].format(
-            **json_find_writefile_tags
         )
         # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
