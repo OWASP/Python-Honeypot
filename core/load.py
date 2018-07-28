@@ -305,10 +305,12 @@ def start_containers(configuration):
                      .format(container_name, real_machine_port, virtual_machine_port,
                              configuration[selected_module]["virtual_machine_name"])).read()
         try:
-            virtual_machine_ip_address = os.popen("docker inspect -f '{{range.NetworkSettings.Networks}}"
-                                                  "{{.IPAddress}}{{end}}' %s" % container_name).read().rsplit()[0][1:-1]
+            virtual_machine_ip_address = os.popen(
+                "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
+                "{{{{.IPAddress}}}}{{{{end}}}}' {0}".format(container_name)
+            ).read().rsplit()[0].replace("\'", "")  # single quotes needs to be removed in windows
         except Exception as _:
-            virtual_machine_ip_address = "127.0.0.1"
+            virtual_machine_ip_address = "CANNOT_FIND_IP_ADDRESS"
         # add virtual machine IP Address to configuration
         configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
