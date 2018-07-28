@@ -415,7 +415,7 @@ def honeypot_configuration_builder(selected_modules):
         # a function to implement and add it easy
         for word in dockerfile.rsplit():
             if word.startswith("{write_file_by_to_docker_image("):
-                combined_module_configuration[word] = write_file_by_dockerfile(
+                combined_module_configuration[word[1:-1]] = write_file_by_dockerfile(
                     module_configuration,
                     word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
                     word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1].rsplit(")")[0]
