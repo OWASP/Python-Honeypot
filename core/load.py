@@ -71,7 +71,10 @@ def write_file_by_dockerfile(module_configuration, file_to_read, file_to_write):
                     os.path.join(
                         os.path.dirname(
                             inspect.getfile(module_configuration)
-                        ), file_to_read
+                        ), os.path.join(
+                            "files",
+                            file_to_read
+                        )
                     )
                 ), "rb"
             ).read()
