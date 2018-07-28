@@ -91,7 +91,7 @@ def write_file_by_dockerfile(module_configuration, file_to_read, file_to_write):
             )
         )
         # return command (e.g. echo "\x41\x41" > /tmp/file
-        return "echo -e \"{0}\" > {1}".format(c_style_file, file_to_write.replace("(dot)", "."))
+        return "bash -c \"echo -e \\\"{0}\\\" > {1}\"".format(c_style_file, file_to_write.replace("(dot)", "."))
     except Exception as _:
         return _
 
@@ -418,7 +418,7 @@ def honeypot_configuration_builder(selected_modules):
                 combined_module_configuration[word[1:-1]] = write_file_by_dockerfile(
                     module_configuration,
                     word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
-                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1].rsplit(")")[0]
+                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1][:-2]
                 )
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
