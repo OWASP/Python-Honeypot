@@ -5,11 +5,37 @@ import subprocess
 import netaddr
 import select
 import time
+import os
 
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
 from core.alert import info
 from config import network_configuration
+from core.get_modules import virtual_machine_name_to_container_name
+
+
+def get_gateway_ip_addresses(configuration):
+    """
+    get gateway ip addresses
+
+    Args:
+        configuration: user final configuration
+
+    Returns:
+        list of gateway's IPs
+    """
+    gateway_ips = []
+    for selected_module in configuration:
+        container_name = virtual_machine_name_to_container_name(
+            configuration[selected_module]["virtual_machine_name"],
+            selected_module
+        )
+        gateway_ip = os.popen(
+            "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
+            "{{{{.Gateway}}}}{{{{end}}}}' {0}".format(container_name)
+        ).read().rsplit()[0].replace("\'", "")
+        gateway_ips.append(gateway_ip)
+    return gateway_ips
 
 
 def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
@@ -44,6 +70,7 @@ def new_network_events(configuration):
     # ignore vm ips + ips in config.py
     ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] + virtual_machine_ip_addresses
     ignore_ip_addresses.append(network_configuration()["real_machine_ip_address"])
+    ignore_ip_addresses.append(get_gateway_ip_addresses(configuration))
     # ignore ports
     ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
