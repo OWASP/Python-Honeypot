@@ -403,12 +403,17 @@ def honeypot_configuration_builder(selected_modules):
         # combine category + module configuration into one Dict/JSON
         combined_module_configuration = category_configuration()
         combined_module_configuration.update(module_configuration())
-
+        # dockerfile
+        dockerfile = open(
+            os.path.dirname(
+                inspect.getfile(module_configuration)
+            ) + "/Dockerfile"
+        ).read()
         # write file to docker image check
         # explore the dockerfile to find something like {write_file_by_to_docker_image(filename,path/file)}
         # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
         # a function to implement and add it easy
-        for word in combined_module_configuration["dockerfile"].rsplit():
+        for word in dockerfile.rsplit():
             if word.startswith("{write_file_by_to_docker_image("):
                 combined_module_configuration[word] = write_file_by_dockerfile(
                     module_configuration,
@@ -417,11 +422,7 @@ def honeypot_configuration_builder(selected_modules):
                 )
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
-        combined_module_configuration["dockerfile"] = open(
-            os.path.dirname(
-                inspect.getfile(module_configuration)
-            ) + "/Dockerfile"
-        ).read().format(
+        combined_module_configuration["dockerfile"] = dockerfile.format(
             **combined_module_configuration
         )
         # combine Dockerfile configuration with module and category configuration
