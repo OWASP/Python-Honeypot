@@ -6,6 +6,7 @@ import inspect
 import os
 import json
 import threading
+import binascii
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -48,6 +49,48 @@ def all_existing_networks():
         an array with list of all existing networks name
     """
     return [network_name.rsplit()[1] for network_name in os.popen("docker network ls").read().rsplit("\n")[1:-1]]
+
+
+def write_file_by_dockerfile(module_configuration, file_to_read, file_to_write):
+    """
+    write a file to by Dockerfile using command: echo -e "content" > /path/filename
+
+    Args:
+        module_configuration: module configuration (imported __init__)
+        file_to_read: filename (files must be stored in category/module/files/filename
+        file_to_write: path/filename to write in image
+
+    Returns:
+        command (string) if success otherwise return the error
+    """
+    try:
+        # hex the file first
+        hex_content_file = binascii.b2a_hex(
+            open(
+                "{0}".format(
+                    os.path.join(
+                        os.path.dirname(
+                            inspect.getfile(module_configuration)
+                        ), file_to_read
+                    )
+                ), "rb"
+            ).read()
+        )
+        # convert file to c-style (e.g. \x41\x41)
+        c_style_file = "\\x{0}".format(
+            "\\x".join(
+                "{0}{1}".format(
+                    char1,
+                    char2
+                ) for char1, char2 in zip(
+                    hex_content_file[::2].decode(), hex_content_file[1::2].decode()
+                )
+            )
+        )
+        # return command (e.g. echo "\x41\x41" > /tmp/file
+        return "echo -e \"{0}\" > {1}".format(c_style_file, file_to_write)
+    except Exception as _:
+        return _
 
 
 def create_ohp_networks():
@@ -355,19 +398,36 @@ def honeypot_configuration_builder(selected_modules):
             "module_configuration")
 
         # combine category + module configuration into one Dict/JSON
-        combined_module_configuration = module_configuration()
-        combined_module_configuration.update(category_configuration())
+        combined_module_configuration = category_configuration()
+        combined_module_configuration.update(module_configuration())
 
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = open(
-            os.path.dirname(inspect.getfile(module_configuration)) +
-            "/Dockerfile").read().format(**combined_module_configuration)
-        # combine Dockerfile configuration with module and category configuration
-        honeypot_configuration[module] = combined_module_configuration
-        # todo: implement loading files in Dockerfile
+            os.path.dirname(
+                inspect.getfile(module_configuration)
+            ) + "/Dockerfile"
+        ).read().format(
+            **combined_module_configuration
+        )
+        # write file to docker image check
+        json_find_writefile_tags = {}
+        # explore the dockerfile to find something like {write_file_by_to_docker_image(filename,path/file)}
         # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
         # a function to implement and add it easy
+        for word in combined_module_configuration["dockerfile"].rsplit():
+            if word.startswith("{write_file_by_to_docker_image("):
+                json_find_writefile_tags[word] = write_file_by_dockerfile(
+                    module_configuration,
+                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
+                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1].rsplit(")")[0]
+                )
+        # apply the tags
+        combined_module_configuration["dockerfile"] = combined_module_configuration["dockerfile"].format(
+            **json_find_writefile_tags
+        )
+        # combine Dockerfile configuration with module and category configuration
+        honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
 
