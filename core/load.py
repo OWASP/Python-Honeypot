@@ -259,7 +259,7 @@ def create_new_images(configuration):
         dockerfile.close()
 
         # copy files
-        copy_dir_tree(configuration[selected_module]["dockerfile"], files_dir_path)
+        copy_dir_tree(configuration[selected_module]["files"], files_dir_path)
 
         # create docker image
         info("creating image {0}".format(configuration[selected_module]["virtual_machine_name"]))
