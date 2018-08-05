@@ -203,10 +203,9 @@ def create_new_images(configuration):
     for selected_module in configuration:
         # go to tmp folder to create Dockerfile and files dir
         tmp_dir_name = make_tmp_thread_dir()
-        files_dir_path = os.path.join(tmp_dir_name, "files")
         os.chdir(tmp_dir_name)
         # create files dir
-        mkdir(files_dir_path)
+        mkdir("files")
 
         # create Dockerfile
         dockerfile = open("Dockerfile", "w")
@@ -214,7 +213,7 @@ def create_new_images(configuration):
         dockerfile.close()
 
         # copy files
-        copy_dir_tree(configuration[selected_module]["files"], files_dir_path)
+        copy_dir_tree(configuration[selected_module]["files"], "files")
 
         # create docker image
         info("creating image {0}".format(configuration[selected_module]["virtual_machine_name"]))
