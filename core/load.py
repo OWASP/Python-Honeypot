@@ -374,21 +374,11 @@ def honeypot_configuration_builder(selected_modules):
                 "Dockerfile"
             )
         ).read()
-        # module files
-        module_files = os.path.join(
-            get_module_dir_path(module_configuration),
-            "files"
-        )
-        # check if {module_path} in Dockerfile, replace path
-        if "{module_path}" in dockerfile:
-            combined_module_configuration["module_path"] = get_module_dir_path(module_configuration)
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = dockerfile.format(
             **combined_module_configuration
         )
-        # add module files
-        combined_module_configuration["files"] = module_files
         # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
