@@ -9,4 +9,4 @@ COPY files/veeder_root_guardian_ast_service.py /root/veeder_root_guardian_ast_se
 COPY files/config.ini /root/config.ini
 
 # run service
-ENTRYPOINT cd /root; nohup python /root/veeder_root_guardian_ast_service(dot)py &> /root/log.txt & tail
+ENTRYPOINT cd /root; nohup python veeder_root_guardian_ast_service.py &> log.txt & tail
