@@ -8,7 +8,7 @@ CMD ["/sbin/my_init"]
 RUN apt-get update && apt-get install -y vsftpd libpam-pwdfile apache2-utils
 
 # copy vsftpd.conf to /etc/vsftpd.conf
-COPY files/vsftpd.conf /etc/vsftpd.conf
+COPY {module_path}/files/vsftpd.conf /etc/vsftpd.conf
 
 # create user config
 RUN mkdir -p /etc/vsftpd_user_conf && echo "local_root=/var/www/html" > /etc/vsftpd_user_conf/{username}
@@ -16,7 +16,7 @@ RUN mkdir -p /etc/vsftpd_user_conf && echo "local_root=/var/www/html" > /etc/vsf
 RUN mkdir -p /etc/pam.d/ && echo -e "auth required pam_pwdfile.so pwdfile /etc/vsftpd/ftpd.passwd\x0aaccount required pam_permit.so" > /etc/pam.d/vsftpd
 
 # create /etc/init.d/vsftpd
-COPY files/vsftpd.sh /etc/init.d/vsftpd
+COPY {module_path}/files/vsftpd.sh /etc/init.d/vsftpd
 
 # install ftp (not necessary)
 RUN apt-get install -y ftp

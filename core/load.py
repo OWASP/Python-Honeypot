@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-import inspect
 import os
 import json
 import threading
@@ -28,6 +27,7 @@ from api.server import start_api_server
 from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
 from core.compatible import mkdir
+from core.compatible import get_module_dir_path
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -51,51 +51,6 @@ def all_existing_networks():
         an array with list of all existing networks name
     """
     return [network_name.rsplit()[1] for network_name in os.popen("docker network ls").read().rsplit("\n")[1:-1]]
-
-
-def write_file_by_dockerfile(module_configuration, file_to_read, file_to_write):
-    """
-    write a file to by Dockerfile using command: echo -e "content" > /path/filename
-
-    Args:
-        module_configuration: module configuration (imported __init__)
-        file_to_read: filename (files must be stored in category/module/files/filename
-        file_to_write: path/filename to write in image
-
-    Returns:
-        command (string) if success otherwise return the error
-    """
-    try:
-        # hex the file first
-        hex_content_file = binascii.b2a_hex(
-            open(
-                "{0}".format(
-                    os.path.join(
-                        os.path.dirname(
-                            inspect.getfile(module_configuration)
-                        ), os.path.join(
-                            "files",
-                            file_to_read.replace("(dot)", ".")
-                        )
-                    )
-                ), "rb"
-            ).read()
-        )
-        # convert file to c-style (e.g. \x41\x41)
-        c_style_file = "\\x{0}".format(
-            "\\x".join(
-                "{0}{1}".format(
-                    char1,
-                    char2
-                ) for char1, char2 in zip(
-                    hex_content_file[::2].decode(), hex_content_file[1::2].decode()
-                )
-            )
-        )
-        # return command (e.g. echo "\x41\x41" > /tmp/file
-        return "bash -c \"echo -e \\\"{0}\\\" > {1}\"".format(c_style_file, file_to_write.replace("(dot)", "."))
-    except Exception as _:
-        return _
 
 
 def create_ohp_networks():
@@ -415,14 +370,19 @@ def honeypot_configuration_builder(selected_modules):
         combined_module_configuration.update(module_configuration())
         # dockerfile
         dockerfile = open(
-            os.path.dirname(
-                inspect.getfile(module_configuration)
-            ) + "/Dockerfile"
+            os.path.join(
+                get_module_dir_path(module_configuration),
+                "Dockerfile"
+            )
         ).read()
         # module files
-        module_files = os.path.dirname(
-            inspect.getfile(module_configuration)
-        ) + "/files"
+        module_files = os.path.join(
+            get_module_dir_path(module_configuration),
+            "files"
+        )
+        # check if {module_path} in Dockerfile, replace path
+        if "{module_path}" in dockerfile:
+            combined_module_configuration["module_path"] = get_module_dir_path(module_configuration)
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = dockerfile.format(

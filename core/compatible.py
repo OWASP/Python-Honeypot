@@ -8,6 +8,7 @@ import subprocess
 import random
 import string
 import shutil
+import inspect
 
 from core._die import __die_failure
 
@@ -208,6 +209,21 @@ def copy_dir_tree(src, dst, symlinks=False, ignore=None):
         else:
             shutil.copy2(s, d)
     return True
+
+
+def get_module_dir_path(module):
+    """
+    get a module path
+
+    Args:
+        module: module
+
+    Returns:
+        path
+    """
+    return os.path.dirname(
+        inspect.getfile(module)
+    )
 
 
 def generate_token(length=32):
