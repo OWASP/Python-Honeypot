@@ -379,6 +379,11 @@ def honeypot_configuration_builder(selected_modules):
         combined_module_configuration["dockerfile"] = dockerfile.format(
             **combined_module_configuration
         )
+        # add module files
+        combined_module_configuration["files"] = os.path.join(
+            get_module_dir_path(module_configuration),
+            "files"
+        )
         # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
