@@ -7,6 +7,8 @@ import os
 import subprocess
 import random
 import string
+import shutil
+
 from core._die import __die_failure
 
 __version__ = "0.0.1"
@@ -182,6 +184,30 @@ def mkdir(dir):
         except Exception as _:
             return False
     return dir
+
+
+def copy_dir_tree(src, dst, symlinks=False, ignore=None):
+    """
+    copytree a directory
+
+    Args:
+        src: source directory
+        dst: destination directory
+        symlinks: copy symlinks
+        ignore: ignore
+
+    Returns:
+        True
+    """
+    # https://stackoverflow.com/a/12514470
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+    return True
 
 
 def generate_token(length=32):

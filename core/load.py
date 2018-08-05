@@ -26,6 +26,8 @@ from core.network import new_network_events
 from core._die import terminate_thread
 from api.server import start_api_server
 from core.compatible import check_for_requirements
+from core.compatible import copy_dir_tree
+from core.compatible import mkdir
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -244,14 +246,20 @@ def create_new_images(configuration):
         True
     """
     for selected_module in configuration:
-        # go to tmp folder to create Dockerfile
+        # go to tmp folder to create Dockerfile and files dir
         tmp_dir_name = make_tmp_thread_dir()
+        files_dir_path = os.path.join(tmp_dir_name, "files")
         os.chdir(tmp_dir_name)
+        # create files dir
+        mkdir(files_dir_path)
 
         # create Dockerfile
         dockerfile = open("Dockerfile", "w")
         dockerfile.write(configuration[selected_module]["dockerfile"])
         dockerfile.close()
+
+        # copy files
+        copy_dir_tree(configuration[selected_module]["dockerfile"], files_dir_path)
 
         # create docker image
         info("creating image {0}".format(configuration[selected_module]["virtual_machine_name"]))
@@ -411,22 +419,17 @@ def honeypot_configuration_builder(selected_modules):
                 inspect.getfile(module_configuration)
             ) + "/Dockerfile"
         ).read()
-        # write file to docker image check
-        # explore the dockerfile to find something like {write_file_by_to_docker_image(filename,path/file)}
-        # I used echo -e "content" > /path/file to create files in Docker images, to automate this we need to create
-        # a function to implement and add it easy
-        for word in dockerfile.rsplit():
-            if word.startswith("{write_file_by_to_docker_image("):
-                combined_module_configuration[word[1:-1]] = write_file_by_dockerfile(
-                    module_configuration,
-                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[0],
-                    word.rsplit("{write_file_by_to_docker_image(")[1].rsplit(",")[1][:-2]
-                )
+        # module files
+        module_files = os.path.dirname(
+            inspect.getfile(module_configuration)
+        ) + "/files"
         # based on your configuration, the variables/values will be set into your Dockerfile
         # e.g. username will be replaced by {username} in Dockerfile
         combined_module_configuration["dockerfile"] = dockerfile.format(
             **combined_module_configuration
         )
+        # add module files
+        combined_module_configuration["files"] = module_files
         # combine Dockerfile configuration with module and category configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
