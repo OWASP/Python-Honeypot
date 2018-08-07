@@ -3,6 +3,8 @@
 
 import datetime
 
+from config import module_configuration
+
 
 def now(model):
     return datetime.datetime.now().strftime(model)
@@ -14,7 +16,7 @@ def I20100():
             "\x01\r\nI20100\r\n",
             now("%b  %d, %Y %I:%M %p"),
             "\r\n\r\n",
-            "284606 SS OIL 28256\r\n9336 GEORGIA AVE.\r\nSILVER SPRING, MD",
+            module_configuration()["company_name_address"],
             "\r\n\r\n\r\n",
             "IN-TANK INVENTORY       \r\n\r\n",
             "TANK PRODUCT             VOLUME TC VOLUME   ULLAGE   HEIGHT    WATER     TEMP\r\n",

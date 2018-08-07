@@ -9,13 +9,19 @@ import socket
 import select
 import datetime
 
+# import all commands
 from commands import *
 
+# import configuration
+from config import module_configuration
+
+# bind socket use configuration
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setblocking(0)
-server_socket.bind(("0.0.0.0", 10001))
+server_socket.bind(("0.0.0.0", module_configuration()["virtual_machine_port_number"]))
 server_socket.listen(10)
 
+# list of all commands
 commands = {
     "I10100": "",
     "I10200": "",
@@ -139,6 +145,7 @@ commands = {
     "S05300": ""
 }
 
+# while True, keep accepting connections
 while True:
     active_sockets = [server_socket]
     while True:
