@@ -158,6 +158,7 @@ while True:
                 active_sockets.append(new_con)
             else:
                 addr = conn.getpeername()
+                print addr[0], "connected"
                 try:
                     TIME = datetime.datetime.utcnow()
                     response = conn.recv(4096)
@@ -178,6 +179,7 @@ while True:
                     cmd = response[1:7]
                     if cmd in commands:
                         conn.send(commands[cmd]())
+                        print addr[0], cmd, "responded"
                 except Exception, e:
                     print "Unknown Error: {}".format(str(e))
                     raise
