@@ -12,5 +12,5 @@ def module_configuration():
     return {
         "virtual_machine_port_number": 10001,
         "real_machine_port_number": 10001,
-        "company_name_address": "284606 SS OIL 28256\r\n9336 GEORGIA AVE.\r\nSILVER SPRING, MD",
+        "company_name_address": "3356234 SL OIL 433234\r\n9346 GLODEN AVE.\r\nQUEEN SPRING, MD\r\n"
     }
