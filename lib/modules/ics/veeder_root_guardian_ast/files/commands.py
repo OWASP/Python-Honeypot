@@ -6,6 +6,9 @@ import datetime
 from config import module_configuration
 
 
+# todo: dynamic numbers
+# todo add delay
+
 def now(model="%b  %d, %Y %I:%M %p"):
     return datetime.datetime.now().strftime(model)
 
@@ -1209,6 +1212,1744 @@ def I60900():
             ' 2     PLUS                      0.000700\r\n',
             ' 3     SUPREME                   0.000700\r\n',
             ' 4     DIESEL                    0.000450',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I60A00():
+    return "".join(
+        [
+            '\x01\r\nI60A00\r\n',
+            now(),
+            '\r\n\r\n'
+            'TANK FULL VOLUME',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          TANK PROFILE   GALLONS\r\r\n',
+            ' 1     REGULAR                     4 PTS      11682\r\r\n',
+            ' 2     PLUS                        4 PTS       7950\r\r\n',
+            ' 3     SUPREME                     4 PTS       9816\r\r\n',
+            ' 4     DIESEL                      4 PTS       9816\r\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I60B00():
+    return "".join(
+        [
+
+        ]
+    )
+
+
+def I60C00():
+    return "".join(
+        [
+            '\x01\r\nI60B00\r\n',
+            now(),
+            '\r\n\r\n',
+            'STICK HEIGHT OFFSET ENABLE STATUS\r\n',
+            'DISABLED\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61000():
+    return "".join(
+        [
+            '\x01\r\nI61000\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK DELIVERY DELAY',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          \r\n',
+            ' 1     REGULAR                   3\r\n',
+            ' 2     PLUS                      3\r\n',
+            ' 3     SUPREME                   3\r\n',
+            ' 4     DIESEL                    3',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61100():
+    return "".join(
+        [
+            '\x01\r\nI61100\r\n',
+            now(),
+            '\r\n\r\n',
+            'LEAK TEST METHOD',
+            '\r\n',
+            '- - - - - -  - - - - - -\r\n',
+            'TEST ON DATE : ALL TANK\r\n',
+            'FEB  4, 2005\r\n',
+            'START TIME : DISABLED\r\n',
+            'TEST RATE  :0.20 GAL/HR\r\n',
+            'DURATION   : 2  HOURS\r\n\r\n',
+            'TST EARLY STOP:DISABLED\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61200():
+    return "".join(
+        [
+            '\x01\r\nI61200\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK MANIFOLDED PARTNERS',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          SIPHON MANIFOLDED TANKS   LINE MANIFOLDED TANKS   \r\n',
+            ' 1     REGULAR                   NONE                      NONE                \r\n',
+            ' 2     PLUS                      NONE                      NONE                \r\n',
+            ' 3     SUPREME                   NONE                      NONE                \r\n',
+            ' 4     DIESEL                    NONE                      NONE                ',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61300():
+    return "".join(
+        [
+            '\x01\r\nI61300\r\n',
+            now(),
+            '\r\n',
+            'CSLD PROBABLITY OF DETECTION\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61400():
+    return "".join(
+        [
+            '\x01\r\nI61400\r\n',
+            now(),
+            '\r\n',
+            'CSLD CLIMATE FACTOR\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61500():
+    return "".join(
+        [
+            '\x01\r\nI61500\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          METER DATA      \r\n',
+            ' 1     REGULAR                   YES\r\n',
+            ' 2     PLUS                      YES\r\n',
+            ' 3     SUPREME                   YES\r\n',
+            ' 4     DIESEL                    YES\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61600():
+    return "".join(
+        [
+            '\x01\r\nI61600\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          CAL UPDATE\r\n',
+            ' 1     REGULAR                   NEVER\r\n',
+            ' 2     PLUS                      NEVER\r\n',
+            ' 3     SUPREME                   NEVER\r\n',
+            ' 4     DIESEL                    NEVER\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61700():
+    return "".join(
+        [
+            '\x01\r\nI61700\r\n',
+            now(),
+            '\r\n',
+            'CSLD CUSTOM PROBABLITY OF DETECTION\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61800():
+    return "".join(
+        [
+            '\x01\r\nI61800\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61900():
+    return "".join(
+        [
+            '\x01\r\nI61900\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61A00():
+    return "".join(
+        [
+            '\x01\r\nI61A00\r\n',
+            now(),
+            '\r\n\r\n',
+            'IN-TANK LEAK TEST EARLY STOP',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          TST EARLY STOP:\r\n',
+            ' 1     REGULAR                   DISABLED\r\n',
+            ' 2     PLUS                      DISABLED\r\n',
+            ' 3     SUPREME                   DISABLED\r\n',
+            ' 4     DIESEL                    DISABLED',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61B00():
+    return "".join(
+        [
+            '\x01\r\nI61B00\r\n',
+            now(),
+            '\r\n\r\n',
+            'IN-TANK LEAK GROSS TEST AUTO-CONFIRM\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61C00():
+    return "".join(
+        [
+            '\x01\r\nI61C00\r\n',
+            now(),
+            '\r\n\r\n',
+            'CSLD REPORT ONLY\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I61D00():
+    return "".join(
+        [
+            '\x01\r\nI61D00\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK MANIFOLDED PARTNERS',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          SIPHON MANIFOLDED TANKS   LINE MANIFOLDED TANKS   \r\n',
+            ' 1     REGULAR                   NONE                      NONE                \r\n',
+            ' 2     PLUS                      NONE                      NONE                \r\n',
+            ' 3     SUPREME                   NONE                      NONE                \r\n',
+            ' 4     DIESEL                    NONE                      NONE                ',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62100():
+    return "".join(
+        [
+            '\x01\r\nI62100\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK LOW PRODUCT LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                      600\r\n',
+            ' 2     PLUS                         450\r\n',
+            ' 3     SUPREME                      600\r\n',
+            ' 4     DIESEL                       600',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62200():
+    return "".join(
+        [
+            '\x01\r\nI62200\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK HIGH PRODUCT LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                    11097\r\n',
+            ' 2     PLUS                        7552\r\n',
+            ' 3     SUPREME                     9325\r\n',
+            ' 4     DIESEL                      9325',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62300():
+    return "".join(
+        [
+            '\x01\r\nI62300\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK OVERFILL LEVEL LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                    10513\r\n',
+            ' 2     PLUS                        7155\r\n',
+            ' 3     SUPREME                     8834\r\n',
+            ' 4     DIESEL                      8834',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62400():
+    return "".join(
+        [
+            '\x01\r\nI62400\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK HIGH WATER LEVEL LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             INCHES\r\n',
+            ' 1     REGULAR                    2.0\r\n',
+            ' 2     PLUS                       2.0\r\n',
+            ' 3     SUPREME                    2.0\r\n',
+            ' 4     DIESEL                     2.0',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62500():
+    return "".join(
+        [
+            '\x01\r\nI62500\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK SUDDEN LOSS LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                       99\r\n',
+            ' 2     PLUS                          99\r\n',
+            ' 3     SUPREME                       99\r\n',
+            ' 4     DIESEL                        99',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62600():
+    return "".join(
+        [
+            '\x01\r\nI62600\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK LEAK ALARM LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                       15\r\n',
+            ' 2     PLUS                          15\r\n',
+            ' 3     SUPREME                       15\r\n',
+            ' 4     DIESEL                        15',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62700():
+    return "".join(
+        [
+            '\x01\r\nI62700\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK HIGH WATER WARNING LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             INCHES\r\n',
+            ' 1     REGULAR                    1.5\r\n',
+            ' 2     PLUS                       1.5\r\n'
+            ' 3     SUPREME                    1.5\r\n',
+            ' 4     DIESEL                     1.5',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62800():
+    return "".join(
+        [
+            '\x01\r\nI62800\r\n',
+            'AUG  7, 2018  6:08 AM',
+            '\r\n\r\n',
+            'TANK MAXIMUM VOLUME LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                    11448\r\n',
+            ' 2     PLUS                        7791\r\n',
+            ' 3     SUPREME                     9619\r\n',
+            ' 4     DIESEL                      9619',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62900():
+    return "".join(
+        [
+            '\x01\r\nI62900\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK DELIVERY REQUIRED LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                     1141\r\n',
+            ' 2     PLUS                         803\r\n',
+            ' 3     SUPREME                      981\r\n',
+            ' 4     DIESEL                       988',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62A00():
+    return "".join(
+        [
+            '\x01\r\nI62A00\r\n',
+            now(),
+            '\r\n\r\n',
+            'ANNUAL LEAK TEST MIN VOLUME',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                        0\r\n',
+            ' 2     PLUS                           0\r\n',
+            ' 3     SUPREME                        0\r\n',
+            ' 4     DIESEL                         0',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62B00():
+    return "".join(
+        [
+            '\x01\r\nI62B00\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK LAST ANNUAL TEST',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             DATE \r\n',
+            ' 1     REGULAR                   ???  0,    0\r\n',
+            ' 2     PLUS                      ???  0,    0\r\n',
+            ' 3     SUPREME                   ???  0,    0\r\n',
+            ' 4     DIESEL                    ???  0,    0\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62C00():
+    return "".join(
+        [
+            '\x01\r\nI62C00\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK PERIODIC TEST TYPE',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          PERIODIC TEST TYPE\r\n',
+            ' 1     REGULAR                   STANDARD\r\n',
+            ' 2     PLUS                      STANDARD\r\n',
+            ' 3     SUPREME                   STANDARD\r\n',
+            ' 4     DIESEL                    STANDARD\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62D00():
+    return "".join(
+        [
+            '\x01\r\nI62D00\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK LEAK TEST FAIL ALARMS',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          \r\n',
+            ' 1     REGULAR                   GROSS TEST FAIL        ALARM ENABLED\r\n',
+            '                                 PERIODIC TEST FAIL     ALARM DISABLED\r\n',
+            '                                 ANNUAL TEST FAIL       ALARM DISABLED\r\n\r\n',
+            ' 2     PLUS                      GROSS TEST FAIL        ALARM ENABLED\r\n',
+            '                                 PERIODIC TEST FAIL     ALARM DISABLED\r\n',
+            '                                 ANNUAL TEST FAIL       ALARM DISABLED\r\n\r\n',
+            ' 3     SUPREME                   GROSS TEST FAIL        ALARM ENABLED\r\n',
+            '                                 PERIODIC TEST FAIL     ALARM DISABLED\r\n',
+            '                                 ANNUAL TEST FAIL       ALARM DISABLED\r\n\r\n',
+            ' 4     DIESEL                    GROSS TEST FAIL        ALARM ENABLED\r\n',
+            '                                 PERIODIC TEST FAIL     ALARM DISABLED\r\n',
+            '                                 ANNUAL TEST FAIL       ALARM DISABLED\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62E00():
+    return "".join(
+        [
+            '\x01\r\nI62E00\r\n',
+            now(),
+            '\r\n\r\n',
+            'CAP0 PROBE CONDUCTIVE BOOT FLAG',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          CAP0 CONDUCTIVE BOOT:\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I62F00():
+    return "".join(
+        [
+            '\x01\r\nI62F00\r\n',
+            now(),
+            '\r\n\r\n',
+            'MAG PROBE FLOAT SIZE',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL                FLOAT SIZE:\r\n',
+            ' 1     REGULAR                      4.0 INCHES\r\n',
+            ' 2     PLUS                         4.0 INCHES\r\n',
+            ' 3     SUPREME                      4.0 INCHES\r\n',
+            ' 4     DIESEL                       4.0 INCHES\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63100():
+    return "".join(
+        [
+            '\x01\r\nI63100\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK LEAK TEST AVERAGING',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL           ANNUAL    PERIODIC\r\n',
+            ' 1     REGULAR                   OFF        OFF\r\n',
+            ' 2     PLUS                      OFF        OFF\r\n',
+            ' 3     SUPREME                   OFF        OFF\r\n',
+            ' 4     DIESEL                    OFF        OFF\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63200():
+    return "".join(
+        [
+            '\x01\r\nI63200\r\n',
+            now(),
+            '\r\n\r\n',
+            'TANK TEST SIPHON BREAK',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL          SIPHON BREAK\r\n',
+            ' 1     REGULAR                     OFF\r\n',
+            ' 2     PLUS                        OFF\r\n',
+            ' 3     SUPREME                     OFF\r\n',
+            ' 4     DIESEL                      OFF\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63300():
+    return "".join(
+        [
+            '\x01\r\nI63300\r\n',
+            now(),
+            '\r\n\r\n',
+            'LEAK TEST REPORT FORMAT: NORMAL\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63400():
+    return "".join(
+        [
+            '\x01\r\nI63400\r\n',
+            now(),
+            '\r\n\r\n',
+            'RECONCILIATION WARNING LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                        0\r\n',
+            ' 2     PLUS                           0\r\n',
+            ' 3     SUPREME                        0\r\n',
+            ' 4     DIESEL                         0',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63500():
+    return "".join(
+        [
+            '\x01\r\nI63500\r\n',
+            now(),
+            '\r\n\r\n',
+            'RECONCILIATION ALARM LIMIT',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                        1\r\n',
+            ' 2     PLUS                           1\r\n',
+            ' 3     SUPREME                        1\r\n',
+            ' 4     DIESEL                         1',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I63600():
+    return "".join(
+        [
+            '\x01\r\nI63600\r\n',
+            now(),
+            '\r\n\r\n',
+            'PERIODIC LEAK TEST MIN VOLUME',
+            '\r\n\r\n',
+            'TANK   PRODUCT LABEL             GALLONS\r\n',
+            ' 1     REGULAR                        0\r\n',
+            ' 2     PLUS                           0\r\n',
+            ' 3     SUPREME                        0\r\n',
+            ' 4     DIESEL                         0',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I77100():
+    return "".join(
+        [
+            '\x01\r\nI77100\r\n',
+            now(),
+            '\r\n\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I85100():
+    return "".join(
+        [
+            '\x01\r\nI85100\r\n',
+            now(),
+            '\r\n\r\n',
+            'RESTORE SETUP DATA: DISABLED\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I85200():
+    return "".join(
+        [
+            '\x01\r\nI85200\r\n',
+            'AUG  7, 2018  6:05 AM',
+            '\r\n\r\n',
+            'SAVE SETUP DATA: DISABLED\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I85300():
+    return "".join(
+        [
+            '\x01\r\nI85300\r\n',
+            'AUG  7, 2018  6:02 AM',
+            '\r\n\r\n',
+            'CLEAR SETUP DATA: DISABLED\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I88100():
+    return "".join(
+        [
+            '\x01\r\nI88100\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I88200():
+    return "".join(
+        [
+            '\x01\r\nI88200\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I90100():
+    return "".join(
+        [
+            '\x01\r\nI90100\r\n',
+            now(),
+            '\r\n\r\n',
+            '                       I/O      RAM     PROM\r\n',
+            'SYSTEM BOARD          PASS     PASS     PASS',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I90200():
+    return "".join(
+        [
+            '\x01\r\nI90200\r\n',
+            now(),
+            '\r\n',
+            'SOFTWARE REVISION LEVEL\r\n',
+            'VERSION 324.02\r\n',
+            'SOFTWARE# 346324-100-C  \r\n',
+            'CREATED - 05.02.04.13.57\r\n\r\n',
+            'S-MODULE# 330160-160-A\r\n',
+            'SYSTEM FEATURES:\r\n',
+            '  PERIODIC IN-TANK TESTS\r\n',
+            '  ANNUAL IN-TANK TESTS\r\n',
+            '  BIR\r\n',
+            'PLLD \r\n',
+            '  0.10 AUTO\r\n',
+            '  0.20 REPETITIV\r\n',
+            'WPLLD \r\n',
+            '  0.10 AUTO\r\n',
+            '  0.20 REPETITIV\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I90300():
+    return "".join(
+        [
+            '\x01\r\nI90300\r\n',
+            now(),
+            '\r\n',
+            '   PC DIAGNOSTIC DATA   \r\n',
+            '  PERIPHERAL CONTROLLER \r\n',
+            '- - - - - -  - - - - - -\r\n\r\n',
+            'PC SWARE# 330269-002-B  \r\n',
+            'CREATED - 94.12.16.13.26\r\n',
+            'PC ROM CHECKSUM = PASSED\r\n\r\n',
+            'PC RESET COUNTS =     29\r\n',
+            'PC COMM ERRORS  =     12\r\n',
+            'MC CKSUM ERRS   =      1\r\n',
+            'MC->PC COMMS = 456404704\r\n',
+            'MC<-PC COMMS = 456410994',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I90400():
+    return "".join(
+        [
+            '\x01\r\nI90400\r\n',
+            now(),
+            '\r\n',
+            ' WPLLD DIAGNOSTIC DATA  \r\n',
+            '- - - - - -  - - - - - -\r\n',
+            '#: \r\n\r\n',
+            'PC COMM ERRORS  =      0\r\n\r\n\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def I90500():
+    return "".join(
+        [
+            '\x01\r\nI90500\r\n',
+            now(),
+            '\r\n',
+            'SOFTWARE REVISION LEVEL\r\n',
+            'VERSION 324.02\r\n',
+            'SOFTWARE# 346324-100-C  \r\n',
+            'CREATED - 05.02.04.13.57\r\n\r\n',
+            'S-MODULE# 330160-160-A\r\n',
+            'SYSTEM FEATURES:\r\n',
+            '  PERIODIC IN-TANK TESTS\r\n',
+            '  ANNUAL IN-TANK TESTS\r\n',
+            '  BIR\r\n',
+            'PLLD \r\n',
+            '  0.10 AUTO\r\n',
+            '  0.20 REPETITIV\r\n',
+            'WPLLD \r\n',
+            '  0.10 AUTO\r\n',
+            '  0.20 REPETITIV\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0100():
+    return "".join(
+        [
+            '\x01\r\nIA0100\r\n',
+            now(),
+            '\r\n',
+            '                               TYPE   CODE   LENGTH   SERIAL NO.  D/CODE\r\n',
+            'TANK  1  REGULAR               MAG    C000    96.00     817402     2354\r\n',
+            'TANK  2  PLUS                  MAG    C000    96.00     817403     2354\r\n',
+            'TANK  3  SUPREME               MAG    C000    96.00     817404     2354\r\n',
+            'TANK  4  DIESEL                MAG    C000    96.00     817401     2354\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0200():
+    return "".join(
+        [
+            '\x01\r\nIA0200\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    GRADIENT =  350.9800\r\n',
+            'TANK  2  PLUS                  MAG    GRADIENT =  350.7600\r\n',
+            'TANK  3  SUPREME               MAG    GRADIENT =  350.4000\r\n',
+            'TANK  4  DIESEL                MAG    GRADIENT =  350.9000\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0300():
+    return "".join(
+        [
+            '\x01\r\nIA0300\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    GRADIENT =  350.9800\r\n',
+            'TANK  2  PLUS                  MAG    GRADIENT =  350.7600\r\n',
+            'TANK  3  SUPREME               MAG    GRADIENT =  350.4000\r\n',
+            'TANK  4  DIESEL                MAG    GRADIENT =  350.9000\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0400():
+    return "".join(
+        [
+            '\x01\r\nIA0400\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    \r\n',
+            'TANK  2  PLUS                  MAG    \r\n',
+            'TANK  3  SUPREME               MAG    \r\n',
+            'TANK  4  DIESEL                MAG    \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0500():
+    return "".join(
+        [
+            '\x01\r\nIA0500\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    \r\n',
+            'TANK  2  PLUS                  MAG    \r\n',
+            'TANK  3  SUPREME               MAG    \r\n',
+            'TANK  4  DIESEL                MAG    \r\n',
+            '\r\n',
+            '\x03',
+        ]
+    )
+
+
+def IA0600():
+    return "".join(
+        [
+            '\x01\r\nIA0600\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    \r\n',
+            'TANK  2  PLUS                  MAG    \r\n',
+            'TANK  3  SUPREME               MAG    \r\n',
+            'TANK  4  DIESEL                MAG    \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA0700():
+    return "".join(
+        [
+            '\x01\r\nIA0700\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    \r\n',
+            'ORIG REF DISTANCE  JAN  5, 2017      103.53\r\n',
+            'CURR REF DISTANCE  AUG  6, 2018      103.57\r\n',
+            'TANK  2  PLUS                  MAG    \r\n',
+            'ORIG REF DISTANCE  JAN  5, 2017      103.64\r\n',
+            'CURR REF DISTANCE  AUG  6, 2018      103.68\r\n',
+            'TANK  3  SUPREME               MAG    \r\n',
+            'ORIG REF DISTANCE  JAN  5, 2017      103.71\r\n',
+            'CURR REF DISTANCE  AUG  6, 2018      103.74\r\n',
+            'TANK  4  DIESEL                MAG    \r\n',
+            'ORIG REF DISTANCE  JAN  5, 2017      103.68\r\n',
+            'CURR REF DISTANCE  AUG  6, 2018      103.73\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1000():
+    return "".join(
+        [
+            '\x01\r\nIA1000\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    NUMBER OF SAMPLES = 21472\r\n',
+            ' 1311.000 22713.000 22712.000 22712.000 22712.000 22712.000 22713.000 22712.000\r\n',
+            '22712.000 22711.000 22712.000 44113.000 12960.000 15817.000 17370.000 17497.000\r\n',
+            '17402.000 17389.000 44118.000 \r\n'
+            'TANK  2  PLUS                  MAG    NUMBER OF SAMPLES = 35905\r\n',
+            ' 1419.000  8868.000  8868.000  8868.000  8869.000  8869.000  8864.000  8864.000\r\n',
+            ' 8865.000  8865.000  8866.000 44250.000 13937.000 14943.000 15675.000 16002.000\r\n',
+            '16468.000 17777.000 44254.000 \r\n',
+            'TANK  3  SUPREME               MAG    NUMBER OF SAMPLES = 33548\r\n',
+            ' 1375.000 10990.000 10989.000 10990.000 10990.000 10990.000 10990.000 10990.000\r\n',
+            '10990.000 10989.000 10990.000 44554.000 13429.000 14972.000 15683.000 16084.000\r\n',
+            '17042.000 17368.000 44554.000 \r\n',
+            'TANK  4  DIESEL                MAG    NUMBER OF SAMPLES = 14929\r\n',
+            ' 1347.000  8691.000  8692.000  8692.000  8692.000  8692.000  8692.000  8692.000\r\n',
+            ' 8692.000  8692.000  8692.000 43826.000 12441.000 14140.000 14504.000 14709.000\r\n',
+            '15049.000 16946.000 43831.000 \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1100():
+    return "".join(
+        [
+            '\x01\r\nIA1100\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    NUMBER OF SAMPLES =     5\r\n',
+            ' 1310.000 22715.199 22715.199 22714.801 22714.801 22714.801 22715.199 22715.199\r\n',
+            '22715.000 22715.199 22715.400 44114.801 12961.200 15817.800 17372.000 17498.600\r\n',
+            '17403.000 17390.400 44118.199 \r\n',
+            'TANK  2  PLUS                  MAG    NUMBER OF SAMPLES =     5\r\n',
+            ' 1419.000  8868.200  8868.200  8868.400  8868.200  8868.200  8872.200  8872.400\r\n',
+            ' 8872.400  8872.000  8872.000 44249.398 13937.000 14943.600 15676.000 16003.000\r\n',
+            '16466.000 17774.801 44252.801 \r\n',
+            'TANK  3  SUPREME               MAG    NUMBER OF SAMPLES =     5\r\n',
+            ' 1375.000 10989.800 10989.600 10989.800 10989.400 10989.000 10990.000 10989.800\r\n',
+            '10990.000 10989.800 10989.800 44552.199 13431.000 14974.600 15684.000 16082.400\r\n',
+            '17044.600 17366.400 44555.602 \r\n',
+            'TANK  4  DIESEL                MAG    NUMBER OF SAMPLES =     5\r\n',
+            ' 1346.000  8692.000  8692.000  8692.200  8692.000  8692.000  8692.000  8692.000\r\n',
+            ' 8692.000  8692.000  8692.200 43827.398 12443.000 14139.000 14506.600 14710.199\r\n',
+            '15049.400 16948.000 43830.398 \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1200():
+    return "".join(
+        [
+            '\x01\r\nIA1200\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    NUMBER OF SAMPLES =    20\r\n',
+            ' 1310.050 22689.100 22689.100 22689.301 22689.500 22689.699 22689.400 22689.449\r\n',
+            '22689.350 22689.250 22689.350 44115.250 12965.850 15803.250 17387.949 17499.900\r\n',
+            '17402.150 17390.500 44119.102 \r\n',
+            'TANK  2  PLUS                  MAG    NUMBER OF SAMPLES =    20',
+            '\r\n',
+            ' 1419.000  8868.000  8868.000  8868.000  8868.150  8868.200  8868.150  8868.050\r\n',
+            ' 8868.000  8868.050  8868.450 44249.500 13939.350 14941.100 15671.350 16000.199\r\n',
+            '16459.199 17764.699 44252.500 \r\n',
+            'TANK  3  SUPREME               MAG    NUMBER OF SAMPLES =    20\r\n',
+            ' 1375.000 10966.000 10966.150 10966.300 10966.000 10966.300 10968.300 10968.250\r\n',
+            '10968.300 10968.100 10968.450 44552.949 13434.800 14971.900 15678.500 16077.300\r\n',
+            '17038.801 17370.650 44556.250 \r\n',
+            'TANK  4  DIESEL                MAG    NUMBER OF SAMPLES =    20\r\n',
+            ' 1346.850  8569.400  8569.050  8569.550  8569.450  8569.350  8607.650  8607.500\r\n',
+            ' 8607.450  8607.850  8607.700 43828.000 12394.300 14136.650 14506.800 14711.050\r\n',
+            '15048.199 16941.000 43830.801 \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1300():
+    return "".join(
+        [
+            '\x01\r\nIA1300\r\n',
+            now(),
+            'TANK  1  REGULAR               MAG    NUMBER OF SAMPLES = 22000\r\n',
+            ' 1309.544  8495.360  8495.391  8495.426  8495.444  8495.459  8141.306  8141.313\r\n',
+            ' 8141.318  8141.329  8141.326 44130.418 12982.622 14662.228 15316.570 15745.305\r\n',
+            '16043.447 16734.730 44134.391 \r\n',
+            'TANK  2  PLUS                  MAG    NUMBER OF SAMPLES = 36406\r\n',
+            ' 1419.385  8963.937  8963.943  8963.941  8963.942  8963.945  9702.666  9702.666\r\n',
+            ' 9702.664  9702.662  9702.665 44249.879 14269.152 14997.830 15690.572 16061.698\r\n',
+            '16677.355 17736.182 44253.391 \r\n',
+            'TANK  3  SUPREME               MAG    NUMBER OF SAMPLES = 34028\r\n',
+            ' 1374.816  7891.065  7891.068  7891.069  7891.076  7891.079  7752.301  7752.302\r\n',
+            ' 7752.299  7752.303  7752.297 44553.336 13913.104 14784.168 15222.324 15357.686\r\n',
+            '15891.219 16851.512 44556.688 \r\n',
+            'TANK  4  DIESEL                MAG    NUMBER OF SAMPLES = 15394\r\n',
+            ' 1346.628  8690.236  8690.261  8690.289  8690.277  8690.271  8710.821  8710.803\r\n',
+            ' 8710.777  8710.807  8710.799 43987.930 12486.401 14191.391 14560.227 14764.843\r\n',
+            '15104.500 17004.602 43990.926 \r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1400():
+    return "".join(
+        [
+            '\x01\r\nIA1400\r\n',
+            now(),
+            '\r\n\r\n',
+            'MAG PROBE OPTIONS TABLE',
+            '\r\n\r\n',
+            'TNK   LOW\r\n',
+            'NUM  TEMP\r\n\r\n',
+            '   1   NO \r\n',
+            '   2   NO \r\n',
+            '   3   NO \r\n',
+            '   4   NO ',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA1500():
+    return "".join(
+        [
+            '\x01\r\nIA1500\r\n',
+            now(),
+            '\r\n',
+            'IN-TANK DIAGNOSTIC      \r\n',
+            '- - - - - -  - - - - - -\r\n',
+            'PROBE DIAGNOSTICS\r\n',
+            'T 1: PROBE TYPE MAG1\r\n',
+            'SERIAL NUMBER    817402\r\n',
+            'LENGTH            96.00\r\n',
+            'DATE CODE = 9044\r\n',
+            'ID CHAN = 0xC000\r\n',
+            'GRADIENT =  350.9800\r\n',
+            'PROBE INIT:\r\n',
+            '  FEB 21,2017 11:26AM\r\n\r\n',
+            'NUM SAMPLES =    20\r\n\r\n',
+            'C00  1310.0  C01 22687.8\r\n',
+            'C02 22687.7  C03 22687.8\r\n',
+            'C04 22687.8  C05 22687.9\r\n',
+            'C06 22697.3  C07 22697.2\r\n',
+            'C08 22697.3  C09 22697.3\r\n',
+            'C10 22697.4  C11 44115.0\r\n',
+            'C12 12963.5  C13 15812.9\r\n',
+            'C14 17375.7  C15 17497.8\r\n',
+            'C16 17402.3  C17 17390.3\r\n',
+            'C18 44118.0\r\n\r\n',
+            'SAMPLES READ =39406095\r\n',
+            'SAMPLES USED =39229006\r\n',
+            'LAST ERROR   =39400891\r\n',
+            'LAST SAMPLE ERROR TIME:\r\n',
+            '  AUG  7,2018  4:09AM\r\n\r\n',
+            'TEMP SENSOR DATA\r\n',
+            'T6:    84.886 F\r\n',
+            'T5:    78.259 F\r\n',
+            'T4:    74.755 F\r\n',
+            'T3:    74.484 F\r\n',
+            'T2:    74.696 F\r\n',
+            'T1:    74.723 F\r\n\r\n'
+            'ORIG REF DISTANCE  \r\n',
+            'JAN  5, 2017      103.53\r\n',
+            'CURR REF DISTANCE  \r\n',
+            'AUG  6, 2018      103.57\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n',
+            'IN-TANK DIAGNOSTIC      \r\n',
+            '- - - - - -  - - - - - -\r\n',
+            'PROBE DIAGNOSTICS\r\n',
+            'T 2: PROBE TYPE MAG1\r\n',
+            'SERIAL NUMBER    817403\r\n',
+            'LENGTH            96.00\r\n',
+            'DATE CODE = 9044\r\n',
+            'ID CHAN = 0xC000\r\n',
+            'GRADIENT =  350.7600\r\n',
+            'PROBE INIT:\r\n',
+            '  APR 20,2017  2:33PM\r\n\r\n',
+            'NUM SAMPLES =    20\r\n\r\n',
+            'C00  1419.0  C01  8868.3\r\n',
+            'C02  8868.0  C03  8868.0\r\n',
+            'C04  8868.2  C05  8868.0\r\n',
+            'C06  8868.8  C07  8869.3\r\n',
+            'C08  8868.7  C09  8868.8\r\n',
+            'C10  8868.7  C11 44249.1\r\n',
+            'C12 13937.4  C13 14943.4\r\n',
+            'C14 15675.3  C15 16003.3\r\n',
+            'C16 16464.2  C17 17767.3\r\n',
+            'C18 44252.4\r\n\r\n',
+            'SAMPLES READ =38281632\r\n',
+            'SAMPLES USED =38122605\r\n',
+            'LAST ERROR   =38278301\r\n',
+            'LAST SAMPLE ERROR TIME:\r\n',
+            '  AUG  7,2018  4:45AM\r\n\r\n',
+            'TEMP SENSOR DATA\r\n',
+            'T6:    82.681 F\r\n',
+            'T5:    80.349 F\r\n',
+            'T4:    78.679 F\r\n',
+            'T3:    77.937 F\r\n',
+            'T2:    76.901 F\r\n',
+            'T1:    74.008 F\r\n\r\n',
+            'ORIG REF DISTANCE  \r\n',
+            'JAN  5, 2017      103.64\r\n',
+            'CURR REF DISTANCE  \r\n',
+            'AUG  6, 2018      103.68\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n',
+            'IN-TANK DIAGNOSTIC      \r\n',
+            '- - - - - -  - - - - - -\r\n',
+            'PROBE DIAGNOSTICS\r\n',
+            'T 3: PROBE TYPE MAG1\r\n',
+            'SERIAL NUMBER    817404\r\n',
+            'LENGTH            96.00\r\n',
+            'DATE CODE = 9044\r\n',
+            'ID CHAN = 0xC000\r\n',
+            'GRADIENT =  350.4000\r\n',
+            'PROBE INIT:\r\n',
+            '  APR 20,2017  2:31PM\r\n\r\n',
+            'NUM SAMPLES =    20\r\n\r\n',
+            'C00  1375.0  C01 10972.0\r\n',
+            'C02 10972.0  C03 10972.0\r\n',
+            'C04 10971.8  C05 10972.0\r\n',
+            'C06 10987.1  C07 10987.3\r\n',
+            'C08 10986.7  C09 10987.3\r\n',
+            'C10 10987.1  C11 44552.3\r\n',
+            'C12 13432.9  C13 14973.3\r\n',
+            'C14 15682.0  C15 16082.4\r\n',
+            'C16 17043.2  C17 17367.3\r\n',
+            'C18 44555.9\r\n\r\n',
+            'SAMPLES READ =37315717\r\n',
+            'SAMPLES USED =37080015\r\n',
+            'LAST ERROR   =37301681\r\n',
+            'LAST SAMPLE ERROR TIME:\r\n',
+            '  AUG  7,2018 12:55AM\r\n\r\n',
+            'TEMP SENSOR DATA\r\n',
+            'T6:    84.082 F\r\n',
+            'T5:    80.515 F\r\n',
+            'T4:    78.907 F\r\n',
+            'T3:    78.006 F\r\n',
+            'T2:    75.867 F\r\n',
+            'T1:    75.152 F\r\n\r\n',
+            'ORIG REF DISTANCE  \r\n',
+            'JAN  5, 2017      103.71\r\n',
+            'CURR REF DISTANCE  \r\n',
+            'AUG  6, 2018      103.74',
+            '\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n',
+            'IN-TANK DIAGNOSTIC      \r\n',
+            '- - - - - -  - - - - - -\r\n',
+            'PROBE DIAGNOSTICS\r\n',
+            'T 4: PROBE TYPE MAG1\r\n',
+            'SERIAL NUMBER    817401\r\n',
+            'LENGTH            96.00\r\n',
+            'DATE CODE = 9044\r\n',
+            'ID CHAN = 0xC000\r\n',
+            'GRADIENT =  350.9000\r\n',
+            'PROBE INIT:\r\n',
+            '  AUG 11,2017  9:00AM\r\n\r\n',
+            'NUM SAMPLES =    20\r\n\r\n',
+            'C00  1347.0  C01  8641.9\r\n',
+            'C02  8642.3  C03  8642.3\r\n',
+            'C04  8642.0  C05  8642.2\r\n',
+            'C06  8673.7  C07  8673.5\r\n',
+            'C08  8673.7  C09  8673.4\r\n',
+            'C10  8673.5  C11 43828.0\r\n',
+            'C12 12438.9  C13 14138.4\r\n',
+            'C14 14505.9  C15 14710.0\r\n',
+            'C16 15050.5  C17 16948.8\r\n',
+            'C18 43831.1\r\n\r\n',
+            'SAMPLES READ =35758710\r\n',
+            'SAMPLES USED =35301496\r\n',
+            'LAST ERROR   =35756651\r\n',
+            'LAST SAMPLE ERROR TIME:\r\n',
+            '  AUG  7,2018  5:09AM\r\n\r\n',
+            'TEMP SENSOR DATA\r\n',
+            'T6:    85.950 F\r\n',
+            'T5:    81.895 F\r\n',
+            'T4:    81.036 F\r\n',
+            'T3:    80.561 F\r\n',
+            'T2:    79.773 F\r\n',
+            'T1:    75.457 F\r\n\r\n',
+            'ORIG REF DISTANCE  \r\n',
+            'JAN  5, 2017      103.68\r\n',
+            'CURR REF DISTANCE  \r\n',
+            'AUG  6, 2018      103.73',
+            '\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA2000():
+    return "".join(
+        [
+            '\x01\r\nIA2000\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    PRESENT LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  2  PLUS                  MAG    PRESENT LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  3  SUPREME               MAG    PRESENT LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  4  DIESEL                MAG    PRESENT LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA2100():
+    return "".join(
+        [
+            '\x01\r\nIA2100\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    STORED LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  2  PLUS                  MAG    STORED LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  3  SUPREME               MAG    STORED LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            'TANK  4  DIESEL                MAG    STORED LEAK TEST ANALYSIS REPORT\r\n',
+            '   0.10 GAL/HR FLAGS:\r\n',
+            '   0.20 GAL/HR FLAGS:\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA2200():
+    return "".join(
+        [
+            '\x01\r\nIA2200\r\n',
+            now(),
+            '\r\n',
+            'TANK  1  REGULAR               MAG    GROSS LEAK TEST ANALYSIS REPORT\r\n\r\n',
+            '   GROSS LEAK TEST FLAGS:\r\n\r\n\r\n\r\n',
+            'TANK  2  PLUS                  MAG    GROSS LEAK TEST ANALYSIS REPORT\r\n\r\n',
+            '   GROSS LEAK TEST FLAGS:\r\n\r\n\r\n\r\n',
+            'TANK  3  SUPREME               MAG    GROSS LEAK TEST ANALYSIS REPORT\r\n\r\n',
+            '   GROSS LEAK TEST FLAGS:\r\n\r\n\r\n\r\n',
+            'TANK  4  DIESEL                MAG    GROSS LEAK TEST ANALYSIS REPORT\r\n\r\n',
+            '   GROSS LEAK TEST FLAGS:\r\n\r\n\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA5100():
+    return "".join(
+        [
+            '\x01\r\nIA5100\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA5200():
+    return "".join(
+        [
+            '\x01\r\nIA5200\r\n',
+            now(),
+            '\r\n\r\n\r\n',
+            'CSLD DIAGNOSTICS: RATE TEST\r\n\r\n',
+            'TK        DATE  LRATE INTVL ST  AVLRTE    VOL  C1  C3 FDBK ACPT THPUT  EVAP RJT\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA5300():
+    return "".join(
+        [
+            '\x01\r\nIA5300\r\n',
+            now(),
+            '\r\n\r\n\r\n',
+            'CSLD DIAGNOSTICS: VOLUME TABLE\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA5400():
+    return "".join(
+        [
+            '\x01\r\nIA5400\r\n',
+            now(),
+            '\r\n\r\n\r\n',
+            'CSLD DIAGNOSTICS: MOVING AVERAGE TABLE\r\n\r\n',
+            'T 1:REGULAR             \r\n',
+            '        TIME  SMPLS     TCVOL    HEIGHT   AVGTEMP   TOPTEMP    BDTEMP\r\n',
+            '180807054001     24   8901.49    64.999     74.64     78.17     84.91 \r\n',
+            '180807054031     27   8900.02    64.989     74.64     78.17     84.91 \r\n',
+            '180807054101     22   8900.14    64.990     74.64     78.18     84.91 \r\n',
+            '180807054131     23   8900.21    64.990     74.63     78.18     84.91 \r\n',
+            '180807054201     26   8901.06    64.996     74.63     78.18     84.91 \r\n',
+            '180807054231     22   8900.76    64.994     74.63     78.18     84.91 \r\n',
+            '180807054301     22   8900.63    64.993     74.63     78.18     84.91 \r\n',
+            '180807054331     20   8900.25    64.990     74.63     78.18     84.91 \r\n',
+            '180807054401     26   8901.30    64.998     74.63     78.19     84.90 \r\n',
+            '180807054431     26   8900.70    64.993     74.63     78.19     84.90 \r\n',
+            '180807054501     24   8900.04    64.989     74.63     78.19     84.90 \r\n',
+            '180807054531     26   8899.87    64.988     74.63     78.19     84.90 \r\n',
+            '180807054601     24   8900.89    64.995     74.63     78.20     84.90 \r\n',
+            '180807054631     25   8901.07    64.996     74.63     78.20     84.90 \r\n',
+            '180807054701     24   8899.83    64.988     74.63     78.20     84.90 \r\n',
+            '180807054731     24   8899.98    64.989     74.63     78.20     84.90 \r\n',
+            '180807054801     23   8898.95    64.982     74.63     78.20     84.90 \r\n',
+            '180807054831     24   8900.29    64.991     74.63     78.21     84.90 \r\n',
+            '180807054901     23   8900.07    64.989     74.63     78.21     84.90 \r\n',
+            '180807054931     28   8900.87    64.995     74.64     78.21     84.90 \r\n',
+            '180807055001     25   8901.14    64.997     74.64     78.22     84.90 \r\n',
+            '180807055031     23   8900.46    64.992     74.64     78.22     84.90 \r\n',
+            '180807055101     24   8899.82    64.988     74.64     78.22     84.90 \r\n',
+            '180807055131     24   8900.34    64.992     74.65     78.22     84.90 \r\n',
+            '180807055201     24   8900.93    64.996     74.65     78.23     84.90 \r\n',
+            '180807055231     23   8899.65    64.987     74.65     78.23     84.90 \r\n',
+            '180807055301     20   8900.50    64.993     74.65     78.23     84.89 \r\n',
+            '180807055331     22   8900.23    64.991     74.65     78.24     84.89 \r\n',
+            '180807055401     23   8899.99    64.990     74.66     78.24     84.89 \r\n',
+            '180807055431     22   8900.11    64.991     74.66     78.24     84.89 \r\n',
+            '180807055501     24   8896.92    64.969     74.66     78.25     84.89 \r\n',
+            '180807055531     19   8893.25    64.944     74.66     78.25     84.89 \r\n',
+            '180807055601     24   8889.86    64.921     74.66     78.25     84.89 \r\n',
+            '180807055631     21   8889.15    64.916     74.66     78.25     84.89 \r\n',
+            '180807055701     23   8888.83    64.914     74.66     78.26     84.89 \r\n',
+            '180807055731     23   8888.67    64.913     74.66     78.26     84.89 \r\n',
+            '180807055801     20   8888.80    64.914     74.66     78.26     84.88 \r\n',
+            '180807055831     24   8889.11    64.916     74.66     78.26     84.88 \r\n',
+            '180807055901     25   8889.56    64.919     74.66     78.27     84.88 \r\n',
+            '180807055931     24   8888.95    64.915     74.65     78.27     84.89 \r\n',
+            '180807060010     17   8889.54    64.919     74.65     78.28     84.88 \r\n',
+            '180807060040     23   8888.88    64.914     74.65     78.28     84.88 \r\n',
+            '180807060110     24   8889.36    64.917     74.65     78.28     84.88 \r\n',
+            '180807060140     15   8888.98    64.915     74.65     78.28     84.88 \r\n',
+            '180807060210     17   8889.41    64.918     74.65     78.29     84.88 \r\n',
+            '180807060240     13   8888.86    64.914     74.65     78.29     84.88 \r\n',
+            'MOVING AVERAGE:      0.00\r\n\r\n',
+            'DISPENSE STATE: ACTIVE *  411.329926\r\n\r\n',
+            'T 2:PLUS                \r\n',
+            '        TIME  SMPLS     TCVOL    HEIGHT   AVGTEMP   TOPTEMP    BDTEMP\r\n',
+            '180807054001     23   1770.50    25.654     73.99     80.30     82.68 \r\n',
+            '180807054031     25   1770.51    25.654     73.99     80.30     82.68 \r\n',
+            '180807054101     22   1770.51    25.654     73.99     80.30     82.68 \r\n',
+            '180807054131     21   1770.53    25.654     73.99     80.30     82.68 \r\n',
+            '180807054201     24   1770.53    25.654     73.99     80.31     82.68 \r\n',
+            '180807054231     22   1770.51    25.654     73.99     80.31     82.68 \r\n',
+            '180807054301     22   1770.51    25.654     73.99     80.31     82.68 \r\n',
+            '180807054331     20   1770.51    25.654     73.99     80.31     82.68 \r\n',
+            '180807054401     23   1770.52    25.654     73.99     80.31     82.68 \r\n',
+            '180807054431     27   1770.54    25.654     73.99     80.32     82.68 \r\n',
+            '180807054501     23   1770.50    25.654     73.99     80.32     82.68 \r\n',
+            '180807054531     24   1770.52    25.654     73.99     80.32     82.68 \r\n',
+            '180807054601     24   1770.54    25.654     73.99     80.32     82.68 \r\n',
+            '180807054631     25   1770.49    25.654     73.99     80.32     82.68 \r\n',
+            '180807054701     24   1770.51    25.654     73.99     80.33     82.68 \r\n',
+            '180807054731     25   1770.54    25.654     73.99     80.33     82.68 \r\n',
+            '180807054801     22   1770.51    25.654     73.99     80.33     82.68 \r\n',
+            '180807054831     23   1770.52    25.654     73.99     80.33     82.68 \r\n',
+            '180807054901     24   1770.50    25.654     73.99     80.33     82.68 \r\n',
+            '180807054931     27   1770.52    25.654     73.99     80.34     82.68 \r\n',
+            '180807055001     24   1770.50    25.654     73.99     80.34     82.68 \r\n',
+            '180807055031     23   1770.50    25.654     73.99     80.34     82.68 \r\n',
+            '180807055101     23   1770.53    25.654     73.99     80.34     82.68 \r\n',
+            '180807055131     22   1769.20    25.641     73.99     80.34     82.68 \r\n',
+            '180807055201     23   1765.00    25.599     73.99     80.34     82.68 \r\n',
+            '180807055231     23   1761.32    25.562     73.99     80.34     82.68 \r\n',
+            '180807055301     20   1760.49    25.553     73.99     80.35     82.68 \r\n',
+            '180807055331     22   1760.33    25.552     73.99     80.35     82.68 \r\n',
+            '180807055401     21   1760.53    25.554     73.99     80.35     82.68 \r\n',
+            '180807055431     21   1760.41    25.553     73.99     80.35     82.68 \r\n',
+            '180807055501     22   1760.46    25.553     73.99     80.35     82.68 \r\n',
+            '180807055531     21   1760.49    25.553     74.00     80.35     82.68 \r\n',
+            '180807055601     22   1760.46    25.553     74.00     80.35     82.68 \r\n',
+            '180807055631     20   1760.41    25.553     74.00     80.35     82.68 \r\n',
+            '180807055701     22   1760.34    25.552     74.00     80.35     82.68 \r\n',
+            '180807055731     21   1760.45    25.553     74.01     80.35     82.68 \r\n',
+            '180807055801     20   1760.40    25.553     74.01     80.35     82.68 \r\n',
+            '180807055831     22   1760.37    25.552     74.01     80.35     82.68 \r\n',
+            '180807055901     22   1760.39    25.553     74.01     80.35     82.68 \r\n',
+            '180807055931     22   1760.42    25.553     74.01     80.35     82.68 \r\n',
+            '180807060010     17   1760.40    25.553     74.01     80.35     82.68 \r\n',
+            '180807060040     23   1760.44    25.553     74.01     80.35     82.68 \r\n',
+            '180807060110     23   1760.43    25.553     74.01     80.36     82.68 \r\n',
+            '180807060140     14   1760.40    25.553     74.01     80.36     82.68 \r\n',
+            '180807060210     17   1760.41    25.553     74.02     80.36     82.68 \r\n',
+            '180807060240     13   1760.42    25.553     74.02     80.36     82.67 \r\n',
+            'MOVING AVERAGE:      0.00\r\n\r\n',
+            'DISPENSE STATE: ACTIVE *  0.046480\r\n\r\n',
+            'T 3:SUPREME             \r\n',
+            '        TIME  SMPLS     TCVOL    HEIGHT   AVGTEMP   TOPTEMP    BDTEMP\r\n',
+            '180807054001     19   2960.48    31.632     75.54     80.47     84.09 \r\n',
+            '180807054031     24   2960.51    31.632     75.54     80.47     84.08 \r\n',
+            '180807054101     22   2960.53    31.633     75.54     80.47     84.08 \r\n',
+            '180807054131     22   2960.54    31.633     75.54     80.47     84.08 \r\n',
+            '180807054201     24   2960.48    31.632     75.54     80.47     84.08 \r\n',
+            '180807054231     22   2960.55    31.633     75.54     80.47     84.08 \r\n',
+            '180807054301     21   2960.50    31.632     75.54     80.48     84.08 \r\n',
+            '180807054331     21   2960.46    31.632     75.54     80.48     84.08 \r\n',
+            '180807054401     24   2960.51    31.632     75.54     80.48     84.08 \r\n',
+            '180807054431     25   2960.49    31.632     75.54     80.48     84.08 \r\n',
+            '180807054501     22   2960.39    31.632     75.55     80.48     84.08 \r\n',
+            '180807054531     24   2960.42    31.632     75.55     80.48     84.08 \r\n',
+            '180807054601     23   2960.56    31.633     75.55     80.49     84.08 \r\n',
+            '180807054631     24   2960.49    31.632     75.55     80.49     84.08 \r\n',
+            '180807054701     24   2960.44    31.632     75.55     80.49     84.08 \r\n',
+            '180807054731     24   2960.44    31.632     75.55     80.49     84.09 \r\n',
+            '180807054801     21   2960.55    31.633     75.55     80.49     84.09 \r\n',
+            '180807054831     24   2960.59    31.633     75.55     80.49     84.09 \r\n',
+            '180807054901     24   2960.43    31.632     75.55     80.50     84.09 \r\n',
+            '180807054931     24   2960.48    31.632     75.55     80.50     84.09 \r\n',
+            '180807055001     23   2960.47    31.632     75.55     80.50     84.09 \r\n',
+            '180807055031     21   2960.50    31.632     75.55     80.50     84.09 \r\n',
+            '180807055101     23   2960.48    31.632     75.55     80.50     84.09 \r\n',
+            '180807055131     21   2960.44    31.632     75.55     80.51     84.09 \r\n',
+            '180807055201     23   2960.49    31.632     75.55     80.51     84.09 \r\n',
+            '180807055231     23   2960.52    31.633     75.55     80.51     84.09 \r\n',
+            '180807055301     20   2960.56    31.633     75.55     80.51     84.09 \r\n',
+            '180807055331     23   2960.53    31.633     75.55     80.51     84.09 \r\n',
+            '180807055401     23   2960.54    31.633     75.55     80.51     84.09 \r\n',
+            '180807055431     20   2960.52    31.633     75.55     80.51     84.09 \r\n',
+            '180807055501     22   2960.49    31.632     75.55     80.51     84.09 \r\n',
+            '180807055531     19   2960.50    31.632     75.55     80.51     84.09 \r\n',
+            '180807055601     21   2960.46    31.632     75.55     80.51     84.08 \r\n',
+            '180807055631     21   2959.22    31.623     75.55     80.51     84.08 \r\n',
+            '180807055701     18   2956.04    31.598     75.55     80.51     84.08 \r\n',
+            '180807055731     20   2953.59    31.580     75.55     80.52     84.08 \r\n',
+            '180807055801     18   2951.81    31.566     75.55     80.52     84.08 \r\n',
+            '180807055831     22   2951.83    31.566     75.55     80.52     84.08 \r\n',
+            '180807055901     22   2951.78    31.566     75.55     80.52     84.08 \r\n',
+            '180807055931     20   2951.86    31.567     75.55     80.52     84.08 \r\n',
+            '180807060010     17   2951.76    31.566     75.55     80.52     84.08 \r\n',
+            '180807060040     20   2951.79    31.566     75.55     80.52     84.08 \r\n',
+            '180807060110     24   2951.74    31.566     75.55     80.52     84.08 \r\n',
+            '180807060140     12   2951.85    31.567     75.55     80.52     84.08 \r\n',
+            '180807060210     15   2951.85    31.567     75.55     80.52     84.08 \r\n',
+            '180807060240     11   2951.85    31.567     75.55     80.52     84.08 \r\n',
+            'MOVING AVERAGE:      0.00\r\n\r\n',
+            'DISPENSE STATE: ACTIVE *  329.783142\r\n\r\n',
+            'T 4:DIESEL              \r\n',
+            '        TIME  SMPLS     TCVOL    HEIGHT   AVGTEMP   TOPTEMP    BDTEMP\r\n',
+            '180807054001     21   2132.36    25.041     75.46     81.89     85.91 \r\n',
+            '180807054031     23   2132.39    25.041     75.46     81.89     85.91 \r\n',
+            '180807054101     21   2132.38    25.041     75.46     81.89     85.92 \r\n',
+            '180807054131     21   2132.37    25.041     75.46     81.89     85.92 \r\n',
+            '180807054201     23   2132.38    25.041     75.46     81.89     85.92 \r\n',
+            '180807054231     19   2132.38    25.041     75.46     81.89     85.92 \r\n',
+            '180807054301     22   2132.34    25.040     75.46     81.89     85.92 \r\n',
+            '180807054331     20   2132.36    25.041     75.46     81.89     85.92 \r\n',
+            '180807054401     23   2132.36    25.040     75.46     81.89     85.92 \r\n',
+            '180807054431     21   2132.35    25.040     75.46     81.89     85.92 \r\n',
+            '180807054501     21   2132.36    25.041     75.46     81.89     85.92 \r\n',
+            '180807054531     23   2132.38    25.041     75.46     81.89     85.92 \r\n',
+            '180807054601     21   2132.39    25.041     75.46     81.89     85.93 \r\n',
+            '180807054631     24   2132.36    25.041     75.46     81.89     85.93 \r\n',
+            '180807054701     20   2132.37    25.041     75.46     81.89     85.93 \r\n',
+            '180807054731     23   2132.35    25.040     75.46     81.89     85.93 \r\n',
+            '180807054801     20   2132.36    25.041     75.46     81.89     85.93 \r\n',
+            '180807054831     26   2132.36    25.040     75.46     81.90     85.93 \r\n',
+            '180807054901     21   2132.37    25.041     75.46     81.89     85.93 \r\n',
+            '180807054931     21   2132.36    25.041     75.46     81.89     85.93 \r\n',
+            '180807055001     21   2132.39    25.041     75.46     81.89     85.93 \r\n',
+            '180807055031     22   2132.36    25.041     75.46     81.89     85.93 \r\n',
+            '180807055101     22   2132.38    25.041     75.46     81.89     85.93 \r\n',
+            '180807055131     19   2132.38    25.041     75.46     81.89     85.94 \r\n',
+            '180807055201     22   2132.37    25.041     75.46     81.89     85.94 \r\n',
+            '180807055231     22   2132.35    25.040     75.46     81.89     85.94 \r\n',
+            '180807055301     20   2132.33    25.040     75.46     81.89     85.94 \r\n',
+            '180807055331     20   2132.38    25.041     75.46     81.89     85.94 \r\n',
+            '180807055401     23   2132.35    25.040     75.46     81.89     85.94 \r\n',
+            '180807055431     20   2132.38    25.041     75.46     81.89     85.94 \r\n',
+            '180807055501     21   2132.15    25.039     75.46     81.89     85.94 \r\n',
+            '180807055531     21   2129.29    25.015     75.46     81.89     85.94 \r\n',
+            '180807055601     19   2125.52    24.985     75.46     81.89     85.94 \r\n',
+            '180807055631     18   2121.54    24.952     75.46     81.90     85.94 \r\n',
+            '180807055701     18   2117.87    24.922     75.46     81.90     85.95 \r\n',
+            '180807055731     21   2114.96    24.898     75.46     81.90     85.95 \r\n',
+            '180807055801     18   2114.18    24.892     75.46     81.89     85.96 \r\n',
+            '180807055831     21   2110.73    24.863     75.46     81.89     85.97 \r\n',
+            '180807055901     22   2107.05    24.833     75.46     81.90     85.99 \r\n',
+            '180807055931     20   2103.34    24.803     75.46     81.90     86.00 \r\n',
+            '180807060010     16   2099.66    24.772     75.46     81.90     86.01 \r\n',
+            '180807060040     20   2095.21    24.736     75.47     81.90     86.03 \r\n',
+            '180807060140     11   2088.59    24.682     75.47     81.90     86.07 \r\n',
+            '180807060210     15   2088.25    24.679     75.48     81.90     86.09 \r\n',
+            '180807060240     11   2088.22    24.679     75.49     81.90     86.10 \r\n',
+            '180807060310     15   2088.25    24.679     75.49     81.90     86.12 \r\n',
+            'MOVING AVERAGE:      0.00\r\n\r\nDISPENSE STATE: ACTIVE *  5436.755859\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA5500():
+    return "".join(
+        [
+            '\x01\r\nIA5500\r\n',
+            now(),
+            '\r\n\r\n\r\n',
+            'CSLD DIAGNOSTICS: LEAK TEST STATUS',
+            '\r\n\r\n',
+            'TANK          TEST STATUS  DURATION\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def IA9100():
+    return "".join(
+        [
+            '\x01\r\nIA9100\r\n',
+            now(),
+            '\r\n\r\n',
+            module_configuration()["company_name_address"],
+            '\r\n\r\n',
+            'POWER OUTAGE REPORT\r\n\r\n',
+            'T 1:REGULAR             \r\n',
+            'INCREASE  DATE / TIME                  FUEL VOLUME    WATER VOLUME   TEMP DEG F\r\n\r\n',
+            'POWER REMOVED:  MAY 18, 2017  8:53:15 AM     3960           0            70.3\r\n',
+            'POWER RESTORED: MAY 18, 2017  9:36:15 AM     3960           0            70.2\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'POWER REMOVED:  JAN  1, 1970 12:00:00 AM        0           0             0.0\r\n',
+            'POWER RESTORED: JAN  5, 2017  9:57:15 AM        0           0            52.0\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'T 2:PLUS                \r\n',
+            'INCREASE  DATE / TIME                  FUEL VOLUME    WATER VOLUME   TEMP DEG F\r\n\r\n',
+            'POWER REMOVED:  MAY 18, 2017  8:53:15 AM     2055           0            65.3\r\n',
+            'POWER RESTORED: MAY 18, 2017  9:36:15 AM     2055           0            65.3\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'POWER REMOVED:  JAN  1, 1970 12:00:00 AM        0           0             0.0\r\n',
+            'POWER RESTORED: JAN  5, 2017  9:57:15 AM        0           0            54.3\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'T 3:SUPREME             \r\n',
+            'INCREASE  DATE / TIME                  FUEL VOLUME    WATER VOLUME   TEMP DEG F\r\n\r\n',
+            'POWER REMOVED:  MAY 18, 2017  8:53:15 AM     1967          14            66.5\r\n',
+            'POWER RESTORED: MAY 18, 2017  9:36:15 AM     1967          15            66.5\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'POWER REMOVED:  JAN  1, 1970 12:00:00 AM        0           0             0.0\r\n',
+            'POWER RESTORED: JAN  5, 2017  9:57:15 AM        0           0            53.2\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'T 4:DIESEL              \r\n',
+            'INCREASE  DATE / TIME                  FUEL VOLUME    WATER VOLUME   TEMP DEG F\r\n\r\n',
+            'POWER REMOVED:  MAY 18, 2017  8:53:15 AM     3661           0            69.9\r\n',
+            'POWER RESTORED: MAY 18, 2017  9:36:15 AM     3661           0            69.9\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            'POWER REMOVED:  JAN  1, 1970 12:00:00 AM        0           0             0.0\r\n',
+            'POWER RESTORED: JAN  5, 2017  9:57:15 AM        0           0            55.0\r\n',
+            'GROSS VOLUME CHANGE:                            0\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S00100():
+    return "".join(
+        [
+            '\x01\r\nS00100\r\n',
+            now(),
+            '\r\n',
+            '\x03'  # todo: must re-check \x03 not exist?
+        ]
+    )
+
+
+def S00200():
+    return "".join(
+        [
+            '\x01\r\nS00200\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S00300():
+    return "".join(
+        [
+            '\x01\r\nS00300\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S01000():
+    return "".join(
+        [
+            '\x01\r\nS01000\r\n',
+            now(),
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S05100():
+    return "".join(
+        [
+            '\x01\r\nS05100\r\n',
+            now(),
+            '\r\n\r\n',
+            'DELIVERY REPORTS ERASED',
+            '\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S05200():
+    return "".join(
+        [
+            '\x01\r\nS05200\r\n',
+            now(),
+            '\r\n',
+            'TANK   PRODUCT LABEL          \r\n',
+            '  1  REGULAR                LEAK TEST START\r\n',
+            '                            TEST BY EXTERN INTERFACE\r\n\r\n',
+            '  2  PLUS                   LEAK TEST START\r\n',
+            '                            TEST BY EXTERN INTERFACE\r\n\r\n',
+            '  3  SUPREME                LEAK TEST START\r\n',
+            '                            TEST BY EXTERN INTERFACE\r\n\r\n',
+            '  4  DIESEL                 LEAK TEST START\r\n',
+            '                            TEST BY EXTERN INTERFACE\r\n\r\n',
+            '\r\n',
+            '\x03'
+        ]
+    )
+
+
+def S05300():
+    return "".join(
+        [
+            '\x01\r\nS05300\r\n',
+            now(),
+            '\r\n',
+            'TANK   PRODUCT LABEL          \r\n',
+            '  1  REGULAR                LEAK TEST WAS NOT IN PROGRESS\r\n',
+            '  2  PLUS                   LEAK TEST WAS NOT IN PROGRESS\r\n',
+            '  3  SUPREME                LEAK TEST WAS NOT IN PROGRESS\r\n'
+            '  4  DIESEL                 LEAK TEST WAS NOT IN PROGRESS\r\n',
             '\r\n',
             '\x03'
         ]
