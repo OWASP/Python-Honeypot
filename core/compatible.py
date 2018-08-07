@@ -152,7 +152,7 @@ def check_for_requirements(start_api_server):
         try:
             subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
         except Exception as _:
-            __die_failure("please install tshark fist!")
+            __die_failure("please install tshark first!")
     return True
 
 
@@ -187,7 +187,7 @@ def mkdir(dir):
     return dir
 
 
-def copy_dir_tree(src, dst, symlinks=False, ignore=None):
+def copy_dir_tree(src, dst, symlinks=True, ignore=None):
     """
     copytree a directory
 
