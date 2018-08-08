@@ -8,6 +8,8 @@
 import socket
 import select
 import datetime
+import time
+import random
 
 # import all commands
 from commands import *
@@ -178,7 +180,10 @@ while True:
                         continue
                     cmd = response[1:7]
                     if cmd in commands:
-                        conn.send(commands[cmd]())
+                        for data in commands[cmd]().rsplit("\r\n"):
+                            data += "\r\n"
+                            conn.send(data)
+                            time.sleep(random.choice(([0.01] * 10) + ([0.1] * 10) + ([1] * 3)))
                         print addr[0], cmd, "responded"
                 except Exception, e:
                     print "Unknown Error: {}".format(str(e))
