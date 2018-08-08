@@ -2863,7 +2863,7 @@ def S00100():
             '\x01\r\nS00100\r\n',
             now(),
             '\r\n',
-            '\x03'  # todo: must re-check \x03 not exist?
+            # '\x03'  # todo: must re-check \x03 not exist?
         ]
     )
 
