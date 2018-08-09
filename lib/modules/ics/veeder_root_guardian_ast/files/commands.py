@@ -464,7 +464,10 @@ def I20200():
                 generate_randomize_float(76.24, 23.50, -14.50),
                 generate_randomize_float(18.75, 26.50, -8.50)
             ),
-            '   AMOUNT:                            {0}       {1}\r\n\r\n',
+            '   AMOUNT:                            {0}       {1}\r\n\r\n'.format(
+                generate_randomize_int(7308, 1000, -1000),
+                generate_randomize_int(7234, 1000, -1000),
+            ),
             '      END: JUL 24, 2018  4:29 PM      {0}       {1}  0.00       {2}   {3}\r\n'.format(
                 generate_randomize_int(9001, 500, -1000),
                 generate_randomize_int(8908, 500, -1000),
