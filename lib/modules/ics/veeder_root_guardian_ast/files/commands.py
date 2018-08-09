@@ -8,7 +8,24 @@ from config import module_configuration
 
 
 # todo: dynamic numbers
-# todo add delay
+# todo: add docs
+
+# Ref: http://docs.veeder.com/gold/download.cfm?doc_id=4438
+# S00100 Reset
+# S00200 Clear Reset Flag
+# S00300 Remote Alarm Reset
+# I10100 System Status Report
+# I20100 Inventory
+# I20200 Delivery
+# I20400 Shift Inventory
+# I20500 Tank Status
+# I20600 Tank Alarm History
+# I30100 Sensor Status
+# I30200 Sensor Alarm History
+# I40600 Relay Status
+# S50100 Set Time of Day
+# IA0100 Tank Diagnostics
+# IB0100 Sensor Diagnostics
 
 def now(model="%b  %d, %Y %I:%M %p"):
     return datetime.datetime.now().strftime(model)

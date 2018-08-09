@@ -86,6 +86,7 @@ def new_network_events(configuration):
         run_tshark,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
+    # todo: replace tshark with python port forwarding
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
     pull_object = select.poll()
     pull_object.register(process.stdout, select.POLLIN)
@@ -117,6 +118,7 @@ def new_network_events(configuration):
                             # insert common network event
                             insert_other_network_event(ip, port)
             time.sleep(0.001)
+            # todo: is sleep(0.001) fastest/best?
     except Exception as _:
         del _
     return True
