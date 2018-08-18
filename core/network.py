@@ -86,7 +86,10 @@ def new_network_events(configuration):
         run_tshark,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
-    # todo: replace tshark with python port forwarding
+    # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
+    # it will be easier to apply filters and analysis packets with python
+    # if it requires to be run as root, please add a uid checker in framework startup
+
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
     pull_object = select.poll()
     pull_object.register(process.stdout, select.POLLIN)
@@ -118,7 +121,8 @@ def new_network_events(configuration):
                             # insert common network event
                             insert_other_network_event(ip, port)
             time.sleep(0.001)
-            # todo: is sleep(0.001) fastest/best?
+            # todo: is sleep(0.001) fastest/best? it means it could get 1000 packets per second (maximum) from tshark
+            # how could we prevent the DDoS attacks in here and avoid submitting in MongoDB? should we?
     except Exception as _:
         del _
     return True

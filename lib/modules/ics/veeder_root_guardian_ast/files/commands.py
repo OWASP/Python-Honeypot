@@ -7,9 +7,10 @@ import random
 from config import module_configuration
 
 
-# todo: dynamic numbers
-# todo: add docs
+# todo: (dynamic && logical) numbers - output numbers must change randomly and logically, we need to analysis a real
+# device to figure out the logic for each command.
 
+# todo: add docs - add docs to functions
 # Ref: http://docs.veeder.com/gold/download.cfm?doc_id=4438
 # S00100 Reset
 # S00200 Clear Reset Flag
