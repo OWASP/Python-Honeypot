@@ -70,7 +70,7 @@ def new_network_events(configuration):
     # ignore vm ips + ips in config.py
     ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] + virtual_machine_ip_addresses
     ignore_ip_addresses.append(network_configuration()["real_machine_ip_address"])
-    ignore_ip_addresses.append(get_gateway_ip_addresses(configuration))
+    ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
     # ignore ports
     ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
