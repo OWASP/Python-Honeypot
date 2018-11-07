@@ -106,7 +106,9 @@ function load_graphs() {
                 url: "/api/events/top_ten_ips_in_honeypot_events",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ips_in_honeypot_events_graph_data_keys.push(res[i]["_id"]);
+                    top_ten_ips_in_honeypot_events_graph_data_keys.push(
+                        res[i]["_id"]["ip"] + " (" + res[i]["_id"]["country"] + ")"
+                    );
                     top_ten_ips_in_honeypot_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ips_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
@@ -160,7 +162,9 @@ function load_graphs() {
                 url: "/api/events/top_ten_ips_in_network_events",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ips_in_network_events_graph_data_keys.push(res[i]["_id"]);
+                    top_ten_ips_in_network_events_graph_data_keys.push(
+                        res[i]["_id"]["ip"] + " (" + res[i]["_id"]["country"] + ")"
+                       );
                     top_ten_ips_in_network_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ips_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
