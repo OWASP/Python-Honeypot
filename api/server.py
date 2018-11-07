@@ -357,7 +357,11 @@ def top_ten_ips_in_honeypot_events():
                         {
                             "$group":
                                 {
-                                    "_id": "$ip",
+                                    "_id":
+                                        {
+                                            "ip": "$ip",
+                                            "country": "$country"
+                                        },
                                     "count":
                                         {
                                             "$sum": 1
@@ -412,7 +416,11 @@ def top_ten_ips_in_honeypot_events_by_date():
                             {
                                 "$group":
                                     {
-                                        "_id": "$ip",
+                                        "_id":
+                                            {
+                                                "ip": "$ip",
+                                                "country": "$country"
+                                            },
                                         "count":
                                             {
                                                 "$sum": 1
@@ -459,7 +467,11 @@ def top_ten_ips_in_network_events():
                         {
                             "$group":
                                 {
-                                    "_id": "$ip",
+                                    "_id":
+                                        {
+                                            "ip": "$ip",
+                                            "country": "$country"
+                                        },
                                     "count":
                                         {
                                             "$sum": 1
@@ -516,7 +528,11 @@ def top_ten_ips_in_network_events_by_date():
                             {
                                 "$group":
                                     {
-                                        "_id": "$ip",
+                                        "_id":
+                                            {
+                                                "ip": "$ip",
+                                                "country": "$country"
+                                            },
                                         "count":
                                             {
                                                 "$sum": 1
