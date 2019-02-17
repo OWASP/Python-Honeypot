@@ -12,6 +12,7 @@ from database.connector import insert_other_network_event
 from core.alert import info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
+from core.alert import warn
 
 
 def get_gateway_ip_addresses(configuration):
@@ -30,12 +31,15 @@ def get_gateway_ip_addresses(configuration):
             configuration[selected_module]["virtual_machine_name"],
             selected_module
         )
-        gateway_ip = os.popen(
-            "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
-            "{{{{.Gateway}}}}{{{{end}}}}' {0}".format(container_name)
-        ).read().rsplit()[0].replace("\'", "")
-        gateway_ips.append(gateway_ip)
-    return gateway_ips
+        try:
+            gateway_ip = os.popen(
+                "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
+                "{{{{.Gateway}}}}{{{{end}}}}' {0}".format(container_name)
+            ).read().rsplit()[0].replace("\'", "")
+            gateway_ips.append(gateway_ip)
+        except IndexError as _:
+            warn("unable to get container {0} IP address".format(container_name))
+    return list(set(gateway_ips))
 
 
 def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
