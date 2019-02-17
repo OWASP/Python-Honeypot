@@ -69,6 +69,8 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
+    # set machine name
+    machine_name = network_configuration()["real_machine_identifier_name"]
     # get ip addresses
     virtual_machine_ip_addresses = [configuration[selected_module]["ip_address"] for selected_module in configuration]
     # ignore vm ips + ips in config.py
@@ -118,12 +120,21 @@ def new_network_events(configuration):
                         for selected_module in configuration:
                             if port == configuration[selected_module]["real_machine_port_number"]:
                                 # insert honeypot event (selected module)
-                                insert_selected_modules_network_event(ip, port, selected_module)
+                                insert_selected_modules_network_event(
+                                    ip,
+                                    port,
+                                    selected_module,
+                                    machine_name
+                                )
                                 inserted_flag = False
                                 break
                         if inserted_flag:
                             # insert common network event
-                            insert_other_network_event(ip, port)
+                            insert_other_network_event(
+                                ip,
+                                port,
+                                machine_name
+                            )
             time.sleep(0.001)
             # todo: is sleep(0.001) fastest/best? it means it could get 1000 packets per second (maximum) from tshark
             # how could we prevent the DDoS attacks in here and avoid submitting in MongoDB? should we?

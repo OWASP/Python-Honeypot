@@ -1152,6 +1152,10 @@ def top_ten_countries_in_network_events_by_date():
 # todo: top honeypot ports by country by date
 # todo: top network ports by country
 # todo: top network ports by country by date
+# todo: combine api calls with date support
+# todo: rename API calls from top_ten
+# todo: top honeypot machine_name
+# todo: top network machine_name
 
 
 def start_api_server():
