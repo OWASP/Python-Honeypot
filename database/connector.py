@@ -25,7 +25,9 @@ IP2Location = IP2Location.IP2Location(
 )
 
 
-def insert_selected_modules_network_event(ip, port, module_name):
+# todo: write documentation about machine_name
+
+def insert_selected_modules_network_event(ip, port, module_name, machine_name):
     """
     insert selected modules event to honeypot_events collection
 
@@ -33,6 +35,7 @@ def insert_selected_modules_network_event(ip, port, module_name):
         ip: connected ip
         port: connected port
         module_name: module name ran on the port
+        machine_name: real machine name
 
     Returns:
         ObjectId(inserted_id)
@@ -43,18 +46,20 @@ def insert_selected_modules_network_event(ip, port, module_name):
             "port": int(port),
             "module_name": module_name,
             "date": now(),
-            "country": IP2Location.get_country_short(ip)
+            "country": IP2Location.get_country_short(ip),
+            "machine_name": machine_name
         }
     ).inserted_id
 
 
-def insert_other_network_event(ip, port):
+def insert_other_network_event(ip, port, machine_name):
     """
     insert other network events (port scan, etc..) to network_events collection
 
     Args:
         ip: connected ip
         port: connected port
+        machine_name: real machine name
 
     Returns:
         ObjectId(inserted_id)
@@ -64,6 +69,7 @@ def insert_other_network_event(ip, port):
             "ip": ip,
             "port": int(port),
             "date": now(),
-            "country": IP2Location.get_country_short(ip)
+            "country": IP2Location.get_country_short(ip),
+            "machine_name": machine_name
         }
     ).inserted_id

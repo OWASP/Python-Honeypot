@@ -6,6 +6,8 @@ import socket
 from core._time import hours
 from core.compatible import generate_token
 
+real_machine_ip_address = socket.gethostbyname(socket.gethostname())
+
 
 def api_configuration():
     """
@@ -43,7 +45,8 @@ def network_configuration():
     """
     return {
         "store_network_captured_files": False,
-        "real_machine_ip_address": socket.gethostbyname(socket.gethostname()),
+        "real_machine_ip_address": real_machine_ip_address,
+        "real_machine_identifier_name": "stockholm_server_1", # can be anything e.g. real_machine_ip_address, name, etc
         "ignore_real_machine_ip_addresses": ["127.0.0.1"],  # e.g. ["10.0.0.1", "192.168.1.1"]
         "ignore_real_machine_ports": []  # e.g. [22, 80, 5000]
     }
