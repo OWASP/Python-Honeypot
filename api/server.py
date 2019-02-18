@@ -66,7 +66,7 @@ def get_value_from_request(_key):
             except Exception as _:
                 key = None
     if key:
-        # fix it later
+        # todo: fix it later
         key = key.replace("\\\"", "\"").replace("\\\'", "\'")
     return key
 
@@ -96,7 +96,9 @@ def error_400(error):
     Returns:
         400 JSON error
     """
-    return jsonify(msg_structure(status="error", msg=error.description)), 400
+    return jsonify(
+        msg_structure(status="error", msg=error.description)
+    ), 400
 
 
 @app.errorhandler(401)
@@ -110,7 +112,9 @@ def error_401(error):
     Returns:
         401 JSON error
     """
-    return jsonify(msg_structure(status="error", msg=error.description)), 401
+    return jsonify(
+        msg_structure(status="error", msg=error.description)
+    ), 401
 
 
 @app.errorhandler(403)
@@ -124,7 +128,9 @@ def error_403(error):
     Returns:
         403 JSON error
     """
-    return jsonify(msg_structure(status="error", msg=error.description)), 403
+    return jsonify(
+        msg_structure(status="error", msg=error.description)
+    ), 403
 
 
 @app.errorhandler(404)
@@ -139,7 +145,9 @@ def error_404(error):
         404 JSON error
     """
     del error
-    return jsonify(msg_structure(status="error", msg="file/path not found!")), 404
+    return jsonify(
+        msg_structure(status="error", msg="file/path not found!")
+    ), 404
 
 
 @app.before_request
@@ -183,8 +191,17 @@ def get_static_files(path):
         file content and content type if file found otherwise abort(404)
     """
     static_types = all_mime_types()
-    return Response(get_file(os.path.join(root_dir(), path)),
-                    mimetype=static_types.get(os.path.splitext(path)[1], "text/html"))
+    return Response(
+        get_file(
+            os.path.join(
+                root_dir(), path
+            )
+        ),
+        mimetype=static_types.get(
+            os.path.splitext(path)[1],
+            "text/html"
+        )
+    )
 
 
 @app.route("/api/events/count_all_events", methods=["GET", "POST"])
@@ -483,7 +500,8 @@ def top_ten_ips_in_network_events():
                                 SON(
                                     [
                                         ("count", -1),
-                                        ("_id", -1)]
+                                        ("_id", -1)
+                                    ]
                                 )
                         },
                         {
@@ -544,7 +562,8 @@ def top_ten_ips_in_network_events_by_date():
                                     SON(
                                         [
                                             ("count", -1),
-                                            ("_id", -1)]
+                                            ("_id", -1)
+                                        ]
                                     )
                             },
                             {
@@ -1082,6 +1101,7 @@ def top_ten_countries_in_network_events():
         ), 200
     except Exception as _:
         del _
+    return flask_null_array_response()
 
 
 @app.route("/api/events/top_ten_countries_in_network_events_by_date", methods=["GET", "POST"])
@@ -1176,6 +1196,10 @@ def start_api_server():
         "api_access_without_key": my_api_configuration["api_access_without_key"],
         "language": "en"
     }
-    app.run(host=my_api_configuration["api_host"], port=my_api_configuration["api_port"],
-            debug=my_api_configuration["api_debug_mode"], threaded=True)
+    app.run(
+        host=my_api_configuration["api_host"],
+        port=my_api_configuration["api_port"],
+        debug=my_api_configuration["api_debug_mode"],
+        threaded=True
+    )
     return True
