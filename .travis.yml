@@ -25,4 +25,4 @@ script:
  - sudo docker info
  - sudo pip install -r requirements.txt
  - sleep 15 # wait for mongodb
- - sudo python -c "from core.get_modules import load_all_modules; import subprocess; import os;import time; pids = [subprocess.Popen(\"python ohp.py -m {0} --verbose > {1}\".format(module_name, module_name.replace(\"/\", \"_\")), shell=True).pid for module_name in load_all_modules()];  time.sleep(90); [os.system(\"kill -9 {0}\".format(pid)) for pid in pids]; [os.system(\"\echo -e \\\"\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a{0}\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\\\"; cat {1}\".format(module_name, module_name.replace(\"/\", \"_\"))) for module_name in load_all_modules()]"
+ - sudo python -c "import subprocess, os, time; pid = subprocess.Popen(\"python ohp.py -m all\", shell=True).pid; time.sleep(300); os.system(\"kill -9 {0}\".format(pid))"

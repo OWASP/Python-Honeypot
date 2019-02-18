@@ -5,7 +5,7 @@ import time
 import os
 import json
 import threading
-import binascii
+import socket
 
 from core.get_modules import load_all_modules
 from core.alert import info
@@ -16,6 +16,7 @@ from core.compatible import version
 from core.compatible import os_name
 from config import user_configuration
 from config import docker_configuration
+from config import network_configuration
 from core._die import __die_success
 from core._die import __die_failure
 from core.compatible import make_tmp_thread_dir
@@ -234,7 +235,6 @@ def create_new_images(configuration):
 
         # submit tmp dir name
         tmp_directories.append(tmp_dir_name)
-
     return True
 
 
@@ -389,6 +389,54 @@ def honeypot_configuration_builder(selected_modules):
     return honeypot_configuration
 
 
+def port_is_reserved(real_machine_port):
+    """
+    check if port is reserved
+
+    Args:
+        real_machine_port: port number
+
+    Returns:
+        True or False
+    """
+    try:
+        tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        tcp.bind((network_configuration()["real_machine_ip_address"], real_machine_port))
+        tcp.close()
+        return False
+    except Exception as _:
+        return True
+
+
+def reserve_tcp_port(real_machine_port, module_name, configuration):
+    """
+    pick a free port
+
+    Args:
+        real_machine_port: port number
+        module_name: selected module
+        configuration: fixed configuration
+
+    Returns:
+        port number
+    """
+    while True:
+        try:
+            if not port_is_reserved(real_machine_port):
+                unique_port = True
+                configuration[module_name]["real_machine_port_number"] = real_machine_port
+                for selected_module in configuration:
+                    if real_machine_port is configuration[selected_module]["real_machine_port_number"] and module_name \
+                            != selected_module:
+                        unique_port = False
+                if unique_port:
+                    info("port {0} selected for {1}".format(real_machine_port, module_name))
+                    return real_machine_port
+        except Exception as _:
+            del _
+        real_machine_port += 1
+
+
 def conflict_ports(configuration):
     """
     check conflict ports in configuration
@@ -397,15 +445,18 @@ def conflict_ports(configuration):
         configuration: user final configuration
 
     Returns:
-        an array with conflicted module [module_name1, module_name2] or []
+        new fixed configuration
     """
+    # todo: write documentation
+    fixed_configuration = configuration.copy()
     for selected_module in configuration:
-        port = configuration[selected_module]["real_machine_port_number"]
-        for find_module in configuration:
-            find_port = configuration[find_module]["real_machine_port_number"]
-            if port is find_port and find_module != selected_module:
-                return [find_module, selected_module]
-    return []
+        port = reserve_tcp_port(
+            configuration[selected_module]["real_machine_port_number"],
+            selected_module,
+            fixed_configuration
+        )
+        fixed_configuration[selected_module]["real_machine_port_number"] = port
+    return fixed_configuration
 
 
 def argv_parser():
@@ -481,6 +532,8 @@ def load_honeypot_engine():
     # check selected modules
     if argv_options.selected_modules:
         selected_modules = list(set(argv_options.selected_modules.rsplit(",")))
+        if "all" in selected_modules:
+            selected_modules = load_all_modules()
         if "" in selected_modules:
             selected_modules.remove("")
         # if selected modules are zero
@@ -493,6 +546,8 @@ def load_honeypot_engine():
     # check excluded modules
     if argv_options.excluded_modules:
         excluded_modules = list(set(argv_options.excluded_modules.rsplit(",")))
+        if "all" in excluded_modules:
+            __die_failure("you cannot exclude all modules")
         if "" in excluded_modules:
             excluded_modules.remove("")
         # remove excluded modules
@@ -517,14 +572,11 @@ def load_honeypot_engine():
     # build configuration based on selected modules
     configuration = honeypot_configuration_builder(selected_modules)
 
-    # check for conflict in real machine ports
-    conflict = conflict_ports(configuration)
-    if conflict:
-        __die_failure("conflict ports between {0}, {1}".format(conflict[0], conflict[1]))
-
     info(messages("en", "honeypot_started"))
     info(messages("en", "loading_modules").format(", ".join(selected_modules)))
-
+    # check for conflict in real machine ports and pick new ports
+    info("checking for conflicts in ports")
+    configuration = conflict_ports(configuration)
     # stop old containers (in case they are not stopped)
     stop_containers(configuration)
     # remove old containers (in case they are not updated)
