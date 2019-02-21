@@ -21,7 +21,7 @@ def api_configuration():
         "api_port": 5000,
         "api_debug_mode": False,
         "api_access_without_key": True,
-        "api_access_key": generate_token(),
+        "api_access_key": generate_token(),  # or any string, or None
         "api_client_white_list": {
             "enabled": False,
             "ips": ["127.0.0.1", "10.0.0.1", "192.168.1.1"]
@@ -46,7 +46,7 @@ def network_configuration():
     return {
         "store_network_captured_files": False,
         "real_machine_ip_address": real_machine_ip_address,
-        "real_machine_identifier_name": "stockholm_server_1", # can be anything e.g. real_machine_ip_address, name, etc
+        "real_machine_identifier_name": "stockholm_server_1",  # can be anything e.g. real_machine_ip_address, name, etc
         "ignore_real_machine_ip_addresses": ["127.0.0.1"],  # e.g. ["10.0.0.1", "192.168.1.1"]
         "ignore_real_machine_ports": []  # e.g. [22, 80, 5000]
     }
