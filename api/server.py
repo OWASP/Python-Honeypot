@@ -80,7 +80,8 @@ def is_authorized():
 
     """
     global app
-    if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != get_value_from_request("key"):
+    if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] is not None \
+            and app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != get_value_from_request("key"):
         abort(401, "invalid API key")
     return True
 
