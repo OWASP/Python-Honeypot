@@ -473,7 +473,7 @@ def argv_parser():
     # add select module options + list of available modules
     engineOpt.add_argument("-m", "--select-module", action="store",
                            dest="selected_modules", default=user_configuration()["default_selected_modules"],
-                           help=messages("en", "select_module").format(load_all_modules()))
+                           help=messages("en", "select_module").format(load_all_modules() + ["all"]))
     # by default all modules are selected, in case users can exclude one or some (separated with comma)
     engineOpt.add_argument("-x", "--exclude-module", action="store",
                            dest="excluded_modules", default=user_configuration()["default_excluded_modules"],
@@ -497,6 +497,8 @@ def argv_parser():
     # disable color CLI
     engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
                            help="disable colors in CLI")
+    # test CI/ETC
+    engineOpt.add_argument("--test", action="store_true", dest="run_as_test", default=False, help="run a test and exit")
     # help menu
     engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
                            help=messages("en", "show_help_menu"))
@@ -566,6 +568,7 @@ def load_honeypot_engine():
         virtual_machine_container_reset_factory_time_seconds
     global verbose_mode
     verbose_mode = argv_options.verbose_mode
+    run_as_test = argv_options.run_as_test
     #########################################
     # argv rules apply
     #########################################
@@ -594,8 +597,11 @@ def load_honeypot_engine():
                                                  name="new_network_events_thread")
     new_network_events_thread.start()
     info("all selected modules started: {0}".format(", ".join(selected_modules)))
-    # wait forever! in case user can send ctrl + c to interrupt
-    wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
+
+    # check if it's not a test
+    if not run_as_test:
+        # wait forever! in case user can send ctrl + c to interrupt
+        wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     # stop created containers

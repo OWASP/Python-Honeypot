@@ -6,6 +6,7 @@ python:
  - "3.4"
  - "3.5"
  - "3.6"
+ - "3.7-dev"
 
 os:
  - "linux"
@@ -25,4 +26,4 @@ script:
  - sudo docker info
  - sudo pip install -r requirements.txt
  - sleep 15 # wait for mongodb
- - sudo python -c "import subprocess, os, time; pid = subprocess.Popen(\"python ohp.py -m all\", shell=True).pid; time.sleep(300); os.system(\"kill -9 {0}\".format(pid))"
+ - sudo python ohp.py -m all --test
