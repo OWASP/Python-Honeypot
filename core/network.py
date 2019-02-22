@@ -108,7 +108,7 @@ def new_network_events(configuration):
                 if len(line) > 0:
                     # split the IP and Port
                     try:
-                        ip, port = line.rsplit()[0], int(line.rsplit()[1])
+                        ip, port = str(line.rsplit()[0].decode()), int(line.rsplit()[1])
                     except Exception as _:
                         ip, port = None, None
                     # check if event shows an IP
