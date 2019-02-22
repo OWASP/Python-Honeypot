@@ -1165,6 +1165,108 @@ def top_ten_countries_in_network_events_by_date():
     return flask_null_array_response()
 
 
+@app.route("/api/events/top_network_machine_names", methods=["GET", "POST"])
+def top_network_machine_names():
+    """
+    get top network machine names in network events
+
+    Returns:
+        JSON/Dict top network machine names in network events
+    """
+    try:
+        return jsonify(
+            [
+                i for i in
+                connector.network_events.aggregate(
+                    [
+                        {
+                            "$group":
+                                {
+                                    "_id":
+                                        {
+                                            "machine_name": "$machine_name"
+                                        },
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                        },
+                        {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
+                            "$limit": fix_limit(get_value_from_request("limit"))
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    except Exception as _:
+        del _
+    return flask_null_array_response()
+
+
+@app.route("/api/events/top_honeypot_machine_names", methods=["GET", "POST"])
+def top_honeypot_machine_names():
+    """
+    get top honeypot machine names in honeypot events
+
+    Returns:
+        JSON/Dict top honeypot machine names
+    """
+    try:
+        return jsonify(
+            [
+                i for i in
+                connector.honeypot_events.aggregate(
+                    [
+                        {
+                            "$group":
+                                {
+                                    "_id":
+                                        {
+                                            "machine_name": "$machine_name"
+                                        },
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
+                                }
+                        },
+                        {
+                            "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                        },
+                        {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
+                            "$limit": fix_limit(get_value_from_request("limit"))
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    except Exception as _:
+        del _
+    return flask_null_array_response()
+
+
 # todo: top honeypot ip by country
 # todo: top honeypot ip by country by date
 # todo: top network ip by country
