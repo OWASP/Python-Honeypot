@@ -1152,6 +1152,7 @@ def top_ten_network_ips_by_country():
     Returns:
         JSON/Dict top ten repeated ips in network events by country
     """
+    country = get_value_from_request("country")
     try:
         return jsonify(
             [
@@ -1159,12 +1160,18 @@ def top_ten_network_ips_by_country():
                 connector.network_events.aggregate(
                     [
                         {
+                            "$match":
+                            {
+                                "country" : bytes(country,'utf-8'),
+                            }
+                        },
+                        {
                             "$group":
                             {
                                 "_id":
                                 {
                                     "ip": "$ip",
-                                    "country": "$country"
+                                    "country": "$country",
                                 },
                                 "count":
                                 {
@@ -1175,8 +1182,65 @@ def top_ten_network_ips_by_country():
                         {
                             "$sort":
                             SON(
-                                [   ("country", 1),
-                                    ("count", -1),
+                                [   ("count", -1),
+                                    ("_id", -1)
+                                ]
+                            )
+                        },
+                        {
+                            "$skip": fix_skip(get_value_from_request("skip"))
+                        },
+                        {
+                            "$limit": fix_limit(get_value_from_request("limit"))
+                        }
+                    ]
+                )
+            ]
+        ), 200
+    except Exception as _:
+        del _
+    return flask_null_array_response()
+
+
+@app.route("/api/events/top_honeypot_ips_by_country", methods=["GET", "POST"])
+def top_ten_network_ips_by_country():
+    """
+    get top ten repeated ips in network events by country
+
+    Returns:
+        JSON/Dict top ten repeated ips in network events by country
+    """
+    country = get_value_from_request("country")
+    try:
+        return jsonify(
+            [
+                i for i in
+                connector.honeypot_events.aggregate(
+                    [
+                        {
+                            "$match":
+                            {
+                                "country" : bytes(country,'utf-8'),
+                            }
+                        },
+                        {
+                            "$group":
+                            {
+                                "_id":
+                                {
+                                    "ip": "$ip",
+                                    "country": "$country",
+                                },
+                                "count":
+                                {
+                                    "$sum": 1
+                                }
+                            }
+                        },
+                        {
+                            "$sort":
+                            SON(
+                                [   ("count", -1),
                                     ("_id", -1)
                                 ]
                             )
