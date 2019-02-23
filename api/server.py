@@ -1203,7 +1203,7 @@ def top_ten_network_ips_by_country():
 
 
 @app.route("/api/events/top_honeypot_ips_by_country", methods=["GET", "POST"])
-def top_ten_network_ips_by_country():
+def top_ten_honeypot_ips_by_country():
     """
     get top ten repeated ips in network events by country
 
