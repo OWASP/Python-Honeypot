@@ -1164,6 +1164,7 @@ def top_ten_countries_in_network_events_by_date():
     return flask_null_array_response()
 
 
+# todo: add docs to wiki
 @app.route("/api/events/top_network_machine_names", methods=["GET", "POST"])
 def top_network_machine_names():
     """
@@ -1215,6 +1216,7 @@ def top_network_machine_names():
     return flask_null_array_response()
 
 
+# todo: add docs to wiki
 @app.route("/api/events/top_honeypot_machine_names", methods=["GET", "POST"])
 def top_honeypot_machine_names():
     """
@@ -1276,8 +1278,6 @@ def top_honeypot_machine_names():
 # todo: top network ports by country by date
 # todo: combine api calls with date support
 # todo: rename API calls from top_ten
-# todo: top honeypot machine_name
-# todo: top network machine_name
 
 
 def start_api_server():
