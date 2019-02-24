@@ -43,7 +43,7 @@ def insert_selected_modules_network_event(ip, port, module_name):
             "port": int(port),
             "module_name": module_name,
             "date": now(),
-            "country": IP2Location.get_country_short(ip)
+            "country": str(IP2Location.get_country_short(ip).decode())
         }
     ).inserted_id
 
@@ -64,6 +64,6 @@ def insert_other_network_event(ip, port):
             "ip": ip,
             "port": int(port),
             "date": now(),
-            "country": IP2Location.get_country_short(ip)
+            "country": str(IP2Location.get_country_short(ip).decode())
         }
     ).inserted_id

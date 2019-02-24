@@ -1262,9 +1262,7 @@ def top_ten_honeypot_ips_by_country():
     return flask_null_array_response()
 
 
-# todo: top honeypot ip by country
 # todo: top honeypot ip by country by date
-# todo: top network ip by country
 # todo: top network ip by country by date
 # todo: top honeypot ports by country
 # todo: top honeypot ports by country by date
