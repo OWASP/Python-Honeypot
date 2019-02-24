@@ -1161,31 +1161,32 @@ def top_ten_network_ips_by_country():
                     [
                         {
                             "$match":
-                            {
-                                "country" : bytes(country,'utf-8'),
-                            }
+                                {
+                                    "country": country,
+                                }
                         },
                         {
                             "$group":
-                            {
-                                "_id":
                                 {
-                                    "ip": "$ip",
-                                    "country": "$country",
-                                },
-                                "count":
-                                {
-                                    "$sum": 1
+                                    "_id":
+                                        {
+                                            "ip": "$ip",
+                                            "country": "$country",
+                                        },
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
                                 }
-                            }
                         },
                         {
                             "$sort":
-                            SON(
-                                [   ("count", -1),
-                                    ("_id", -1)
-                                ]
-                            )
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
                         },
                         {
                             "$skip": fix_skip(get_value_from_request("skip"))
@@ -1219,31 +1220,32 @@ def top_ten_honeypot_ips_by_country():
                     [
                         {
                             "$match":
-                            {
-                                "country" : bytes(country,'utf-8'),
-                            }
+                                {
+                                    "country": country,
+                                }
                         },
                         {
                             "$group":
-                            {
-                                "_id":
                                 {
-                                    "ip": "$ip",
-                                    "country": "$country",
-                                },
-                                "count":
-                                {
-                                    "$sum": 1
+                                    "_id":
+                                        {
+                                            "ip": "$ip",
+                                            "country": "$country",
+                                        },
+                                    "count":
+                                        {
+                                            "$sum": 1
+                                        }
                                 }
-                            }
                         },
                         {
                             "$sort":
-                            SON(
-                                [   ("count", -1),
-                                    ("_id", -1)
-                                ]
-                            )
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
                         },
                         {
                             "$skip": fix_skip(get_value_from_request("skip"))
