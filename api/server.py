@@ -1391,7 +1391,9 @@ def top_ten_honeypot_ips_by_country():
 
 # todo: top honeypot ip by country by date
 # todo: top network ip by country by date
+# todo: top honeypot ports by country
 # todo: top honeypot ports by country by date
+# todo: top network ports by country
 # todo: top network ports by country by date
 # todo: combine api calls with date support
 # todo: rename API calls from top_ten
