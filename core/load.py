@@ -255,7 +255,7 @@ def start_containers(configuration):
                                                                 selected_module)
         real_machine_port = configuration[selected_module]["real_machine_port_number"]
         virtual_machine_port = configuration[selected_module]["virtual_machine_port_number"]
-        # connect to owasp nettacker networks!
+        # connect to owasp honeypot networks!
         if configuration[selected_module]["virtual_machine_internet_access"]:
             # run the container with internet access
             os.popen("docker run --net ohp_internet --name={0} -d -t -p {1}:{2} {3}"
@@ -467,7 +467,7 @@ def argv_parser():
         parser, parsed ARGVs
     """
     # create parser
-    parser = argparse.ArgumentParser(prog="Nettacker", add_help=False)
+    parser = argparse.ArgumentParser(prog="OWASP Honeypot", add_help=False)
     # create menu
     engineOpt = parser.add_argument_group(messages("en", "engine"), messages("en", "engine_input"))
     # add select module options + list of available modules
