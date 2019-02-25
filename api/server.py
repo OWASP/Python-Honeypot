@@ -1392,10 +1392,10 @@ def top_ten_honeypot_ips_by_country():
 @app.route("/api/events/top_honeypot_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_honeypot_ips_by_country_by_date():
     """
-    get top ten repeated ips in network events by country
+    get top ten repeated ips in honeypot events by country and date
 
     Returns:
-        JSON/Dict top ten repeated ips in network events by country
+        JSON/Dict top ten repeated ips in honeypot events by country and date
     """
     date = fix_date(get_value_from_request("date"))
     country = get_value_from_request("country")
@@ -1457,10 +1457,10 @@ def top_ten_honeypot_ips_by_country_by_date():
 @app.route("/api/events/top_network_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_network_ips_by_country_by_date():
     """
-    get top ten repeated ips in network events by country
+    get top ten repeated ips in network events by country and date
 
     Returns:
-        JSON/Dict top ten repeated ips in network events by country
+        JSON/Dict top ten repeated ips in network events by country and date
     """
     date = fix_date(get_value_from_request("date"))
     country = get_value_from_request("country")
