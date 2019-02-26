@@ -1389,6 +1389,7 @@ def top_ten_honeypot_ips_by_country():
     return flask_null_array_response()
 
 
+# todo: add docs to wiki
 @app.route("/api/events/top_honeypot_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_honeypot_ips_by_country_by_date():
     """
@@ -1399,7 +1400,7 @@ def top_ten_honeypot_ips_by_country_by_date():
     """
     date = fix_date(get_value_from_request("date"))
     country = get_value_from_request("country")
-    if date:
+    if date and country:
         try:
             return jsonify(
                 [
@@ -1454,6 +1455,7 @@ def top_ten_honeypot_ips_by_country_by_date():
         return flask_null_array_response()
 
 
+# todo: add docs to wiki
 @app.route("/api/events/top_network_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_network_ips_by_country_by_date():
     """
@@ -1464,7 +1466,7 @@ def top_ten_network_ips_by_country_by_date():
     """
     date = fix_date(get_value_from_request("date"))
     country = get_value_from_request("country")
-    if date:
+    if date and country:
         try:
             return jsonify(
                 [
