@@ -1389,8 +1389,138 @@ def top_ten_honeypot_ips_by_country():
     return flask_null_array_response()
 
 
-# todo: top honeypot ip by country by date
-# todo: top network ip by country by date
+# todo: add docs to wiki
+@app.route("/api/events/top_honeypot_ips_by_country_by_date", methods=["GET", "POST"])
+def top_ten_honeypot_ips_by_country_by_date():
+    """
+    get top ten repeated ips in honeypot events by country and date
+
+    Returns:
+        JSON/Dict top ten repeated ips in honeypot events by country and date
+    """
+    date = fix_date(get_value_from_request("date"))
+    country = get_value_from_request("country")
+    if date and country:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.honeypot_events.aggregate(
+                        [
+                            {
+                                "$match":
+                                {
+                                    "country": country,
+                                    "date": {
+                                        "$gte": date[0],
+                                        "$lte": date[1]
+                                    }
+                                }
+                            },
+                            {
+                                "$group":
+                                {
+                                    "_id":
+                                    {
+                                        "ip": "$ip",
+                                        "country": "$country",
+                                    },
+                                    "count":
+                                    {
+                                        "$sum": 1
+                                    }
+                                }
+                            },
+                            {
+                                "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                            },
+                            {
+                                "$skip": fix_skip(get_value_from_request("skip"))
+                            },
+                            {
+                                "$limit": fix_limit(get_value_from_request("limit"))
+                            }
+                        ]
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            del _
+        return flask_null_array_response()
+
+
+# todo: add docs to wiki
+@app.route("/api/events/top_network_ips_by_country_by_date", methods=["GET", "POST"])
+def top_ten_network_ips_by_country_by_date():
+    """
+    get top ten repeated ips in network events by country and date
+
+    Returns:
+        JSON/Dict top ten repeated ips in network events by country and date
+    """
+    date = fix_date(get_value_from_request("date"))
+    country = get_value_from_request("country")
+    if date and country:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.network_events.aggregate(
+                        [
+                            {
+                                "$match":
+                                {
+                                    "country": country,
+                                    "date": {
+                                        "$gte": date[0],
+                                        "$lte": date[1]
+                                    }
+                                }
+                            },
+                            {
+                                "$group":
+                                {
+                                    "_id":
+                                    {
+                                        "ip": "$ip",
+                                        "country": "$country",
+                                    },
+                                    "count":
+                                    {
+                                        "$sum": 1
+                                    }
+                                }
+                            },
+                            {
+                                "$sort":
+                                SON(
+                                    [
+                                        ("count", -1),
+                                        ("_id", -1)
+                                    ]
+                                )
+                            },
+                            {
+                                "$skip": fix_skip(get_value_from_request("skip"))
+                            },
+                            {
+                                "$limit": fix_limit(get_value_from_request("limit"))
+                            }
+                        ]
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            del _
+        return flask_null_array_response()
+
+
 # todo: top honeypot ports by country
 # todo: top honeypot ports by country by date
 # todo: top network ports by country
