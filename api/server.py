@@ -1165,7 +1165,6 @@ def top_ten_countries_in_network_events_by_date():
     return flask_null_array_response()
 
 
-# todo: add docs to wiki
 @app.route("/api/events/top_network_machine_names", methods=["GET", "POST"])
 def top_network_machine_names():
     """
@@ -1217,7 +1216,6 @@ def top_network_machine_names():
     return flask_null_array_response()
 
 
-# todo: add docs to wiki
 @app.route("/api/events/top_honeypot_machine_names", methods=["GET", "POST"])
 def top_honeypot_machine_names():
     """
@@ -1269,7 +1267,6 @@ def top_honeypot_machine_names():
     return flask_null_array_response()
 
 
-# todo: add docs in wiki
 @app.route("/api/events/top_network_ips_by_country", methods=["GET", "POST"])
 def top_ten_network_ips_by_country():
     """
@@ -1329,7 +1326,6 @@ def top_ten_network_ips_by_country():
     return flask_null_array_response()
 
 
-# todo: add docs in wiki
 @app.route("/api/events/top_honeypot_ips_by_country", methods=["GET", "POST"])
 def top_ten_honeypot_ips_by_country():
     """
@@ -1389,7 +1385,6 @@ def top_ten_honeypot_ips_by_country():
     return flask_null_array_response()
 
 
-# todo: add docs to wiki
 @app.route("/api/events/top_honeypot_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_honeypot_ips_by_country_by_date():
     """
@@ -1455,7 +1450,6 @@ def top_ten_honeypot_ips_by_country_by_date():
         return flask_null_array_response()
 
 
-# todo: add docs to wiki
 @app.route("/api/events/top_network_ips_by_country_by_date", methods=["GET", "POST"])
 def top_ten_network_ips_by_country_by_date():
     """
