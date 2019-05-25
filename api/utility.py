@@ -179,3 +179,17 @@ def flask_null_array_response():
     return jsonify(
         []
     ), 200
+
+
+def aggregate_function(data_connection,agr_query):
+    """
+    uses aggregate function of mongodb
+
+    Input :
+    data connection object on which to aggregate on
+    aggregated query in a list
+
+    Returns:
+         the aggregated data in a list
+    """
+    return list(data_connection.aggregate(agr_query))
