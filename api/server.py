@@ -20,6 +20,7 @@ from api.utility import fix_date
 from api.utility import fix_limit
 from api.utility import fix_skip
 from api.utility import flask_null_array_response
+from api.utility import aggregate_function
 
 template_dir = os.path.join(os.path.join(
     os.path.dirname(os.path.dirname(__file__)), "web"), "static")
@@ -477,11 +478,7 @@ def top_ten_ips_in_network_events():
         JSON/Dict top ten repeated ips in network events
     """
     try:
-        return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
+        agr_query=[
                         {
                             "$group":
                                 {
@@ -512,8 +509,8 @@ def top_ten_ips_in_network_events():
                             "$limit": fix_limit(get_value_from_request("limit"))
                         }
                     ]
-                )
-            ]
+        return jsonify(
+            aggregate_function(connector.network_events,agr_query)
         ), 200
     except Exception as _:
         del _
