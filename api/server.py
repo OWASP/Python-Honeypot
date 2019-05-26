@@ -224,7 +224,7 @@ def count_all_events():
     ), 200
 
 
-@app.route("/api/events/count_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events", methods=["GET"])
 def count_honeypot_events():
     """
     Get total number of honeypot events
@@ -239,7 +239,7 @@ def count_honeypot_events():
     ), 200
 
 
-@app.route("/api/events/count_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events", methods=["GET"])
 def count_network_events():
     """
     Get total number of network events
