@@ -46,7 +46,7 @@ function load_graphs() {
     // get number of all events
     $.ajax({
         type: "GET",
-        url: "/api/events/all-events",
+        url: "/api/events/count-all-events",
     }).done(function (res) {
         new_number_of_total_events = res["count_all_events"];
         document.getElementById('count_all_events').innerHTML = res["count_all_events"];
@@ -76,7 +76,7 @@ function load_graphs() {
             // request honeypot related events number
             $.ajax({
                 type: "GET",
-                url: "/api/events/honeypot-events",
+                url: "/api/events/count-honeypot-events",
             }).done(function (res) {
                 document.getElementById('count_honeypot_events').innerHTML = res["count_honeypot_events"];
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -89,7 +89,7 @@ function load_graphs() {
             // request network related events number
             $.ajax({
                 type: "GET",
-                url: "/api/events/network-events",
+                url: "/api/events/count-network-events",
             }).done(function (res) {
                 document.getElementById('count_network_events').innerHTML = res["count_network_events"];
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -326,7 +326,7 @@ function load_graphs() {
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/all-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count-all-events?date=" + week_dates_array[counter],
                 }).done(function (res) {
                     dates_all_events_json[res["date"].toString().split(" ")[0]] = res["count_all_events_by_date"];
 
@@ -431,7 +431,7 @@ function load_graphs() {
             for (var counter = 0; counter < week_dates_array.length; counter++) {
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/network-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count-network-events?date=" + week_dates_array[counter],
                 }).done(function (res) {
                     dates_network_events_json[res["date"].toString().split(" ")[0]] = res["count_network_events_by_date"];
                     var past_week_events_graph_config = {
@@ -535,7 +535,7 @@ function load_graphs() {
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/honeypot-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count-honeypot-events?date=" + week_dates_array[counter],
                 }).done(function (res) {
                     dates_honeypot_events_json[res["date"].toString().split(" ")[0]] = res["count_honeypot_events_by_date"];
                     var past_week_events_graph_config = {

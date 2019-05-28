@@ -206,7 +206,7 @@ def get_static_files(path):
     )
 
 
-@app.route("/api/events/all-events", methods=["GET"])
+@app.route("/api/events/count-all-events", methods=["GET"])
 def count_all_events():
     """
     Get total number of events
@@ -248,7 +248,7 @@ def count_all_events():
         ), 200
 
 
-@app.route("/api/events/honeypot-events", methods=["GET"])
+@app.route("/api/events/count-honeypot-events", methods=["GET"])
 def count_honeypot_events():
     """
     Get total number of honeypot events
@@ -279,7 +279,7 @@ def count_honeypot_events():
         ), 200
 
 
-@app.route("/api/events/network-events", methods=["GET"])
+@app.route("/api/events/count-network-events", methods=["GET"])
 def count_network_events():
     """
     Get total number of network events
@@ -741,7 +741,7 @@ def top_ten_ports_in_network_events_by_date():
     return flask_null_array_response()
 
 
-@app.route("/api/events/get_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events", methods=["GET"])
 def get_honeypot_events():
     """
     get honeypot events
@@ -749,43 +749,9 @@ def get_honeypot_events():
     Returns:
         an array contain honeypot events
     """
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.find(
-                    {},
-                    {
-                        "_id": 0
-                    }
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
-                    )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/get_honeypot_events_by_date", methods=["GET", "POST"])
-def get_honeypot_events_by_date():
-    """
-    get honeypot events by date
-
-    Returns:
-        an array contain honeypot events by date
-    """
     date = fix_date(get_value_from_request("date"))
     if date:
-        try:
-            return jsonify(
+        return jsonify(
                 [
                     i for i in
                     connector.honeypot_events.find(
@@ -810,12 +776,29 @@ def get_honeypot_events_by_date():
                     )
                 ]
             ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
+    else:
+        return jsonify(
+                [
+                    i for i in
+                    connector.honeypot_events.find(
+                        {},
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
 
 
-@app.route("/api/events/get_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events", methods=["GET"])
 def get_network_events():
     """
     get network events
@@ -823,43 +806,9 @@ def get_network_events():
     Returns:
         an array contain network events
     """
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.network_events.find(
-                    {},
-                    {
-                        "_id": 0
-                    }
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
-                    )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/get_network_events_by_date", methods=["GET", "POST"])
-def get_network_events_by_date():
-    """
-    get network events by date
-
-    Returns:
-        an array contain network events by date
-    """
     date = fix_date(get_value_from_request("date"))
     if date:
-        try:
-            return jsonify(
+        return jsonify(
                 [
                     i for i in
                     connector.network_events.find(
@@ -884,9 +833,26 @@ def get_network_events_by_date():
                     )
                 ]
             ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
+    else:
+        return jsonify(
+            [
+                i for i in
+                connector.network_events.find(
+                    {},
+                    {
+                        "_id": 0
+                    }
+                ).skip(
+                    fix_skip(
+                        get_value_from_request("skip")
+                    )
+                ).limit(
+                    fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )
+            ]
+        ), 200
 
 
 @app.route("/api/events/top_ten_countries_in_honeypot_events", methods=["GET", "POST"])
