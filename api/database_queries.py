@@ -59,3 +59,12 @@ top_machinenames_groupby={"$group":
                                   "$sum": 1
                               }
                           }}
+
+top_countries_groupby={"$group":
+                       {
+                           "_id": "$country",
+                           "count":
+                           {
+                               "$sum": 1
+                           }
+                       }}
