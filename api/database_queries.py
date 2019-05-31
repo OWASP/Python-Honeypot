@@ -27,15 +27,13 @@ sort_by_count_and_id={"$sort":
                                ("_id", -1)]
                           )}
 
-top_ports_groupby= {
-                                "$group":
-                                    {
-                                        "_id": "$port",
-                                        "count": {
-                                            "$sum": 1
-                                        }
-                                    }
-                            }
+top_ports_groupby= {"$group":
+                    {
+                        "_id": "$port",
+                        "count": {
+                            "$sum": 1
+                        }
+                    }}
 
 top_ports_group_by_country={"$group":
                             {
@@ -48,5 +46,16 @@ top_ports_group_by_country={"$group":
                                 {
                                     "$sum": 1
                                 }
-                            }
-}
+                            }}
+
+top_machinenames_groupby={"$group":
+                          {
+                              "_id":
+                              {
+                                  "machine_name": "$machine_name"
+                              },
+                              "count":
+                              {
+                                  "$sum": 1
+                              }
+                          }}

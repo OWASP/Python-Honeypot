@@ -15,6 +15,7 @@ from core.alert import write_to_api_console
 from database import connector
 from api.database_queries import top_ips_groupby
 from api.database_queries import top_ports_groupby
+from api.database_queries import top_machinenames_groupby
 from api.database_queries import top_ports_group_by_country
 from api.database_queries import sort_by_count
 from api.database_queries import sort_by_count_and_id
@@ -902,7 +903,7 @@ def top_ten_countries_in_network_events_by_date():
     return flask_null_array_response()
 
 
-@app.route("/api/events/top_network_machine_names", methods=["GET", "POST"])
+@app.route("/api/events/network-events-machinenames", methods=["GET"])
 def top_network_machine_names():
     """
     get top network machine names in network events
@@ -910,50 +911,24 @@ def top_network_machine_names():
     Returns:
         JSON/Dict top network machine names in network events
     """
+    top_machinenames_query=[top_machinenames_groupby,
+                            sort_by_count_and_id,
+                            {
+                                "$skip": fix_skip(get_value_from_request("skip"))
+                            },
+                            {
+                                "$limit": fix_limit(get_value_from_request("limit"))
+                            }]
     try:
         return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "machine_name": "$machine_name"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(connector.network_events,\
+                               top_machinenames_query)
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_honeypot_machine_names", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events-machinenames", methods=["GET"])
 def top_honeypot_machine_names():
     """
     get top honeypot machine names in honeypot events
@@ -961,47 +936,21 @@ def top_honeypot_machine_names():
     Returns:
         JSON/Dict top honeypot machine names
     """
+    top_machinenames_query=[top_machinenames_groupby,
+                            sort_by_count_and_id,
+                            {
+                                "$skip": fix_skip(get_value_from_request("skip"))
+                            },
+                            {
+                                "$limit": fix_limit(get_value_from_request("limit"))
+                            }]
     try:
         return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "machine_name": "$machine_name"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(connector.honeypot_events,\
+                               top_machinenames_query)
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
 # todo: combine api calls with date support
