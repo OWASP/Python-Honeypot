@@ -26,3 +26,27 @@ sort_by_count_and_id={"$sort":
                               [("count", -1),
                                ("_id", -1)]
                           )}
+
+top_ports_groupby= {
+                                "$group":
+                                    {
+                                        "_id": "$port",
+                                        "count": {
+                                            "$sum": 1
+                                        }
+                                    }
+                            }
+
+top_ports_group_by_country={"$group":
+                            {
+                                "_id":
+                                {
+                                    "port": "$port",
+                                    "country": "$country",
+                                },
+                                "count":
+                                {
+                                    "$sum": 1
+                                }
+                            }
+}
