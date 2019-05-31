@@ -103,7 +103,7 @@ function load_graphs() {
             // request top ten ips in honeypot events
             $.ajax({
                 type: "GET",
-                url: "/api/events/top_ten_ips_in_honeypot_events",
+                url: "/api/events/honeypot-events-ips",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_honeypot_events_graph_data_keys.push(
@@ -159,7 +159,7 @@ function load_graphs() {
             // request top ten ips in network events
             $.ajax({
                 type: "GET",
-                url: "/api/events/top_ten_ips_in_network_events",
+                url: "/api/events/network-events-ips",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_network_events_graph_data_keys.push(
