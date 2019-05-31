@@ -215,7 +215,7 @@ function load_graphs() {
             // request top ten ports in honeypot events
             $.ajax({
                 type: "GET",
-                url: "/api/events/top_ten_ports_in_honeypot_events",
+                url: "/api/events/honeypot-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]);
@@ -269,7 +269,7 @@ function load_graphs() {
             // request top ten ports in network events
             $.ajax({
                 type: "GET",
-                url: "/api/events/top_ten_ports_in_network_events",
+                url: "/api/events/network-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]);
