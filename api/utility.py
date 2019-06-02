@@ -123,11 +123,23 @@ def fix_date(date):
     """
     if date:
         if date.count(":") is 2:
-            return [date, "{0} 23:59:59".format(date.rsplit()[0])]
+            return [
+                date,
+                "{0} 23:59:59".format(
+                    date.rsplit()[0]
+                )
+            ]
         elif date.count("|") is 1 and date.count(":") is 4:
             return date.rsplit("|")
         elif date.count("|") is 1 and date.count(":") is 0:
-            return ["{0} 00:00:00".format(date.rsplit("|")[0]), "{0} 23:59:59".format(date.rsplit("|")[1])]
+            return [
+                "{0} 00:00:00".format(
+                    date.rsplit("|")[0]
+                ),
+                "{0} 23:59:59".format(
+                    date.rsplit("|")[1]
+                )
+            ]
         else:
             return "{0} 00:00:00|{0} 23:59:59".format(date).rsplit("|")
     return date
@@ -181,7 +193,7 @@ def flask_null_array_response():
     ), 200
 
 
-def aggregate_function(data_connection,agr_query):
+def aggregate_function(data_connection, agr_query):
     """
     uses aggregate function of mongodb
 
@@ -192,4 +204,8 @@ def aggregate_function(data_connection,agr_query):
     Returns:
          the aggregated data in a list
     """
-    return list(data_connection.aggregate(agr_query))
+    return list(
+        data_connection.aggregate(
+            agr_query
+        )
+    )
