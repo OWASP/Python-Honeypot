@@ -8,11 +8,16 @@ from flask import Response
 from flask import abort
 from flask import request as flask_request
 from flask import jsonify
-from bson.son import SON
-
 from config import api_configuration
 from core.alert import write_to_api_console
 from database import connector
+from api.database_queries import top_ips_groupby
+from api.database_queries import top_ports_groupby
+from api.database_queries import top_machine_names_groupby
+from api.database_queries import top_ports_group_by_country
+from api.database_queries import top_countries_groupby
+from api.database_queries import sort_by_count
+from api.database_queries import sort_by_count_and_id
 from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
@@ -20,11 +25,24 @@ from api.utility import fix_date
 from api.utility import fix_limit
 from api.utility import fix_skip
 from api.utility import flask_null_array_response
+from api.utility import aggregate_function
 
-template_dir = os.path.join(os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), "web"), "static")
-app = Flask(__name__, template_folder=template_dir)
-app.config.from_object(__name__)
+template_dir = os.path.join(
+    os.path.join(
+        os.path.dirname(
+            os.path.dirname(__file__)
+        ),
+        "web"
+    ),
+    "static"
+)
+app = Flask(
+    __name__,
+    template_folder=template_dir
+)
+app.config.from_object(
+    __name__
+)
 
 
 def get_file(filename):
@@ -205,7 +223,7 @@ def get_static_files(path):
     )
 
 
-@app.route("/api/events/count_all_events", methods=["GET", "POST"])
+@app.route("/api/events/count-all-events", methods=["GET"])
 def count_all_events():
     """
     Get total number of events
@@ -213,17 +231,49 @@ def count_all_events():
     Returns:
         JSON/Dict number of all events
     """
-    return jsonify(
-        {
-            "count_all_events": (
-                    connector.honeypot_events.estimated_document_count() +
-                    connector.network_events.estimated_document_count()
-            )
-        }
-    ), 200
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    if date:
+        try:
+            return jsonify(
+                {
+                    "count_all_events_by_date":
+                        connector.honeypot_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                            }
+                        ) + connector.network_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                            }
+                        ),
+                    "date": date
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+    else:
+        try:
+            return jsonify(
+                {
+                    "count_all_events": (
+                            connector.honeypot_events.estimated_document_count() +
+                            connector.network_events.estimated_document_count()
+                    )
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
 
 
-@app.route("/api/events/count_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/count-honeypot-events", methods=["GET"])
 def count_honeypot_events():
     """
     Get total number of honeypot events
@@ -231,114 +281,14 @@ def count_honeypot_events():
     Returns:
         JSON/Dict number of honeypot events
     """
-    return jsonify(
-        {
-            "count_honeypot_events": connector.honeypot_events.estimated_document_count()
-        }
-    ), 200
-
-
-@app.route("/api/events/count_network_events", methods=["GET", "POST"])
-def count_network_events():
-    """
-    Get total number of network events
-
-    Returns:
-        JSON/Dict number of network events
-    """
-    return jsonify(
-        {
-            "count_network_events": connector.network_events.estimated_document_count()
-        }
-    ), 200
-
-
-@app.route("/api/events/count_network_events_by_date", methods=["GET", "POST"])
-def count_network_events_by_date():
-    """
-    Get total number of network events by date
-
-    Returns:
-        JSON/Dict number of network events
-    """
-    date = fix_date(get_value_from_request("date"))
+    date = fix_date(
+        get_value_from_request("date")
+    )
     if date:
-        return jsonify(
-            {
-                "count_network_events_by_date": connector.network_events.count_documents(
-                    {
-                        "date":
-                            {
-                                "$gte": date[0],
-                                "$lte": date[1]
-                            }
-                    }
-                ),
-                "date": date
-            }
-        ), 200
-    else:
-        return jsonify(
-            {
-                "count_network_events_by_date": 0,
-                "date": date
-            }
-        ), 200
-
-
-@app.route("/api/events/count_honeypot_events_by_date", methods=["GET", "POST"])
-def count_honeypot_events_by_date():
-    """
-    Get total number of honeypot events by date
-
-    Returns:
-        JSON/Dict number of network events
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        return jsonify(
-            {
-                "count_honeypot_events_by_date": connector.honeypot_events.count_documents(
-                    {
-                        "date": {
-                            "$gte": date[0],
-                            "$lte": date[1]
-                        }
-                    }
-                ),
-                "date": date
-            }
-        ), 200
-    else:
-        return jsonify(
-            {
-                "count_honeypot_events_by_date": 0,
-                "date": date
-            }
-        ), 200
-
-
-@app.route("/api/events/count_all_events_by_date", methods=["GET", "POST"])
-def count_all_events_by_date():
-    """
-    get total number of all events by date
-
-    Returns:
-        JSON/Dict number of network events
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        return jsonify(
-            {
-                "count_all_events_by_date":
-                    connector.honeypot_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
-                            }
-                        }
-                    ) + connector.network_events.count_documents(
+        try:
+            return jsonify(
+                {
+                    "count_honeypot_events_by_date": connector.honeypot_events.count_documents(
                         {
                             "date": {
                                 "$gte": date[0],
@@ -346,19 +296,63 @@ def count_all_events_by_date():
                             }
                         }
                     ),
-                "date": date
-            }
-        ), 200
+                    "date": date
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
     else:
-        return jsonify(
-            {
-                "count_all_events_by_date": 0,
-                "date": date
-            }
-        ), 200
+        try:
+            return jsonify(
+                {
+                    "count_honeypot_events": connector.honeypot_events.estimated_document_count()
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_ips_in_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/count-network-events", methods=["GET"])
+def count_network_events():
+    """
+    Get total number of network events
+
+    Returns:
+        JSON/Dict number of network events
+    """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    if date:
+        try:
+            return jsonify(
+                {
+                    "count_network_events_by_date": connector.network_events.count_documents(
+                        {
+                            "date":
+                                {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                        }
+                    ),
+                    "date": date
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+    else:
+        try:
+            return jsonify(
+                {
+                    "count_network_events": connector.network_events.estimated_document_count()
+                }
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+
+
+@app.route("/api/events/honeypot-events-ips", methods=["GET"])
 def top_ten_ips_in_honeypot_events():
     """
     get top ten repeated ips in honeypot events
@@ -366,109 +360,70 @@ def top_ten_ips_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    country = get_value_from_request("country")
+    top_ips_query = [
+        top_ips_groupby,
+        {
+            "$skip": fix_skip(get_value_from_request("skip"))
+        },
+        {
+            "$limit": fix_limit(get_value_from_request("limit"))
+        }
+    ]
+
+    if country and date:
+        match_by_country_and_date = {
+            "$match": {
+                "country": country,
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_ips_query.insert(0, match_by_country_and_date)
+        top_ips_query.insert(2, sort_by_count_and_id)
+
+    elif country:
+        match_by_country = {
+
+            "$match": {
+                "country": country
+            }
+        }
+        top_ips_query.insert(0, match_by_country)
+        top_ips_query.insert(2, sort_by_count_and_id)
+
+    elif date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_ips_query.insert(0, match_by_date)
+        top_ips_query.insert(2, sort_by_count)
+
+    else:
+        top_ips_query.insert(1, sort_by_count)
+
     try:
         return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "ip": "$ip",
-                                            "country": "$country"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort": SON(
-                                [
-                                    ("count", -1)
-                                ]
-                            )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.honeypot_events,
+                top_ips_query
+            )
         ), 200
     except Exception as _:
-        del _
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_ips_in_honeypot_events_by_date", methods=["GET", "POST"])
-def top_ten_ips_in_honeypot_events_by_date():
-    """
-    get top ten repeated ips in honeypot events by date
-
-    Returns:
-        JSON/Dict top ten repeated ips in honeypot events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.honeypot_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id":
-                                            {
-                                                "ip": "$ip",
-                                                "country": "$country"
-                                            },
-                                        "count":
-                                            {
-                                                "$sum": 1
-                                            }
-                                    }
-                            },
-                            {
-                                "$sort":
-                                    SON(
-                                        [
-                                            ("count", -1)
-                                        ]
-                                    )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_ten_ips_in_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events-ips", methods=["GET"])
 def top_ten_ips_in_network_events():
     """
     get top ten repeated ips in network events
@@ -476,113 +431,72 @@ def top_ten_ips_in_network_events():
     Returns:
         JSON/Dict top ten repeated ips in network events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    country = get_value_from_request("country")
+    top_ips_query = [
+        top_ips_groupby,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if country and date:
+        match_by_country_and_date = {
+            "$match": {
+                "country": country,
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_ips_query.insert(0, match_by_country_and_date)
+        top_ips_query.insert(2, sort_by_count_and_id)
+
+    elif country:
+        match_by_country = {
+            "$match": {
+                "country": country
+            }
+        }
+        top_ips_query.insert(0, match_by_country)
+        top_ips_query.insert(2, sort_by_count_and_id)
+
+    elif date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_ips_query.insert(0, match_by_date)
+        top_ips_query.insert(2, sort_by_count)
+
+    else:
+        top_ips_query.insert(1, sort_by_count)
+
     try:
         return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "ip": "$ip",
-                                            "country": "$country"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.network_events,
+                top_ips_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_ips_in_network_events_by_date", methods=["GET", "POST"])
-def top_ten_ips_in_network_events_by_date():
-    """
-    get top ten repeated ips in network events by date
-
-    Returns:
-        JSON/Dict top ten repeated ips in network events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.network_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id":
-                                            {
-                                                "ip": "$ip",
-                                                "country": "$country"
-                                            },
-                                        "count":
-                                            {
-                                                "$sum": 1
-                                            }
-                                    }
-                            },
-                            {
-                                "$sort":
-                                    SON(
-                                        [
-                                            ("count", -1),
-                                            ("_id", -1)
-                                        ]
-                                    )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_ten_ports_in_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events-ports", methods=["GET"])
 def top_ten_ports_in_honeypot_events():
     """
     get top ten repeated ports in honeypot events
@@ -590,103 +504,67 @@ def top_ten_ports_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ports in honeypot events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    country = get_value_from_request("country")
+    top_ports_query = [
+        sort_by_count_and_id,
+        {
+            "$skip": fix_skip(get_value_from_request("skip"))
+        },
+        {
+            "$limit": fix_limit(get_value_from_request("limit"))
+        }
+    ]
+    if country and date:
+        match_by_country_and_date = {
+            "$match":
+                {
+                    "country": country,
+                    "date": {
+                        "$gte": date[0],
+                        "$lte": date[1]
+                    }
+                }
+        }
+        top_ports_query.insert(0, match_by_country_and_date)
+        top_ports_query.insert(1, top_ports_group_by_country)
+    elif country:
+        match_by_country = {
+            "$match":
+                {
+                    "country": country,
+                }
+        }
+        top_ports_query.insert(0, match_by_country)
+        top_ports_query.insert(1, top_ports_group_by_country)
+    elif date:
+        match_by_date = {
+            "$match": {
+                "date":
+                    {
+                        "$gte": date[0],
+                        "$lte": date[1]
+                    }
+            }
+        }
+        top_ports_query.insert(0, match_by_date)
+        top_ports_query.insert(1, top_ports_groupby)
+    else:
+        top_ports_query.insert(0, top_ports_groupby)
     try:
         return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id": "$port",
-                                    "count": {
-                                        "$sum": 1
-                                    }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.honeypot_events,
+                top_ports_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_ports_in_honeypot_events_by_date", methods=["GET", "POST"])
-def top_ten_ports_in_honeypot_events_by_date():
-    """
-    get top ten repeated ports in honeypot events by date
-
-    Returns:
-        JSON/Dict top ten repeated ports in honeypot events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.honeypot_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id": "$port",
-                                        "count": {
-                                            "$sum": 1
-                                        }
-                                    }
-                            },
-                            {
-                                "$sort":
-                                    SON(
-                                        [
-                                            ("count", -1),
-                                            ("_id", -1)
-                                        ]
-                                    )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_ten_ports_in_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events-ports", methods=["GET"])
 def top_ten_ports_in_network_events():
     """
     get top ten repeated ports in network events
@@ -694,105 +572,67 @@ def top_ten_ports_in_network_events():
     Returns:
         JSON/Dict top ten repeated ports in network events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    country = get_value_from_request("country")
+    top_ports_query = [
+        sort_by_count_and_id,
+        {
+            "$skip": fix_skip(get_value_from_request("skip"))
+        },
+        {
+            "$limit": fix_limit(get_value_from_request("limit"))
+        }
+    ]
+    if country and date:
+        match_by_country_and_date = {
+            "$match":
+                {
+                    "country": country,
+                    "date": {
+                        "$gte": date[0],
+                        "$lte": date[1]
+                    }
+                }
+        }
+        top_ports_query.insert(0, match_by_country_and_date)
+        top_ports_query.insert(1, top_ports_group_by_country)
+    elif country:
+        match_by_country = {
+            "$match":
+                {
+                    "country": country,
+                }
+        }
+        top_ports_query.insert(0, match_by_country)
+        top_ports_query.insert(1, top_ports_group_by_country)
+    elif date:
+        match_by_date = {
+            "$match": {
+                "date":
+                    {
+                        "$gte": date[0],
+                        "$lte": date[1]
+                    }
+            }
+        }
+        top_ports_query.insert(0, match_by_date)
+        top_ports_query.insert(1, top_ports_groupby)
+    else:
+        top_ports_query.insert(0, top_ports_groupby)
     try:
         return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id": "$port",
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.network_events,
+                top_ports_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_ports_in_network_events_by_date", methods=["GET", "POST"])
-def top_ten_ports_in_network_events_by_date():
-    """
-    get top ten repeated ports in network events by date
-
-    Returns:
-        JSON/Dict top ten repeated ports in network events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.network_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id": "$port",
-                                        "count":
-                                            {
-                                                "$sum": 1
-                                            }
-                                    }
-                            },
-                            {
-                                "$sort":
-                                    SON(
-                                        [
-                                            ("count", -1),
-                                            ("_id", -1)
-                                        ]
-                                    )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/get_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events", methods=["GET"])
 def get_honeypot_events():
     """
     get honeypot events
@@ -800,40 +640,9 @@ def get_honeypot_events():
     Returns:
         an array contain honeypot events
     """
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.find(
-                    {},
-                    {
-                        "_id": 0
-                    }
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
-                    )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/get_honeypot_events_by_date", methods=["GET", "POST"])
-def get_honeypot_events_by_date():
-    """
-    get honeypot events by date
-
-    Returns:
-        an array contain honeypot events by date
-    """
-    date = fix_date(get_value_from_request("date"))
+    date = fix_date(
+        get_value_from_request("date")
+    )
     if date:
         try:
             return jsonify(
@@ -862,11 +671,33 @@ def get_honeypot_events_by_date():
                 ]
             ), 200
         except Exception as _:
-            del _
-    return flask_null_array_response()
+            return flask_null_array_response()
+    else:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.honeypot_events.find(
+                        {},
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
 
 
-@app.route("/api/events/get_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events", methods=["GET"])
 def get_network_events():
     """
     get network events
@@ -874,40 +705,9 @@ def get_network_events():
     Returns:
         an array contain network events
     """
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.network_events.find(
-                    {},
-                    {
-                        "_id": 0
-                    }
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
-                    )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/get_network_events_by_date", methods=["GET", "POST"])
-def get_network_events_by_date():
-    """
-    get network events by date
-
-    Returns:
-        an array contain network events by date
-    """
-    date = fix_date(get_value_from_request("date"))
+    date = fix_date(
+        get_value_from_request("date")
+    )
     if date:
         try:
             return jsonify(
@@ -936,11 +736,33 @@ def get_network_events_by_date():
                 ]
             ), 200
         except Exception as _:
-            del _
-    return flask_null_array_response()
+            return flask_null_array_response()
+    else:
+        try:
+            return jsonify(
+                [
+                    i for i in
+                    connector.network_events.find(
+                        {},
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_countries_in_honeypot_events", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events-countries", methods=["GET"])
 def top_ten_countries_in_honeypot_events():
     """
     get top ten repeated countries in honeypot events
@@ -948,111 +770,60 @@ def top_ten_countries_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated countries honeypot in events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    top_countries_query = [
+        top_countries_groupby,
+        sort_by_count,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if date:
+        match_by_date_and_country = {
+            "$match":
+                {
+                    "country": {
+                        "$gt": "-"
+                    },
+                    "date":
+                        {
+                            "$gte": date[0],
+                            "$lte": date[1]
+                        }
+                }
+        }
+        top_countries_query.insert(0, match_by_date_and_country)
+    else:
+        match_by_country = {
+            "$match":
+                {
+                    "country": {
+                        "$gt": "-"
+                    }
+                }
+        }
+        top_countries_query.insert(0, match_by_country)
     try:
         return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$match": {
-                                "country": {
-                                    "$gt": "-"
-                                }
-                            }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id": "$country",
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort": SON(
-                                [
-                                    ("count", -1)
-                                ]
-                            )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.honeypot_events,
+                top_countries_query
+            )
         ), 200
     except Exception as _:
-        del _
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_countries_in_honeypot_events_by_date", methods=["GET", "POST"])
-def top_ten_countries_in_honeypot_events_by_date():
-    """
-    get top ten repeated countries in honeypot events by date
-
-    Returns:
-        JSON/Dict top ten repeated countries in honeypot events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.honeypot_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "country": {
-                                        "$gt": "-"
-                                    },
-                                    "date":
-                                        {
-                                            "$gte": date[0],
-                                            "$lte": date[1]
-                                        }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id": "$country",
-                                        "count":
-                                            {
-                                                "$sum": 1
-                                            }
-                                    }
-                            },
-                            {
-                                "$sort": SON(
-                                    [
-                                        ("count", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_ten_countries_in_network_events", methods=["GET", "POST"])
+@app.route("/api/events/network-events-countries", methods=["GET"])
 def top_ten_countries_in_network_events():
     """
     get top ten repeated countries in network events
@@ -1060,112 +831,60 @@ def top_ten_countries_in_network_events():
     Returns:
         JSON/Dict top ten repeated countries in network events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+    top_countries_query = [
+        top_countries_groupby,
+        sort_by_count,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if date:
+        match_by_date_and_country = {
+            "$match":
+                {
+                    "country": {
+                        "$gt": "-"
+                    },
+                    "date":
+                        {
+                            "$gte": date[0],
+                            "$lte": date[1]
+                        }
+                }
+        }
+        top_countries_query.insert(0, match_by_date_and_country)
+    else:
+        match_by_country = {
+            "$match":
+                {
+                    "country": {
+                        "$gt": "-"
+                    }
+                }
+        }
+        top_countries_query.insert(0, match_by_country)
     try:
         return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$match": {
-                                "country": {
-                                    "$gt": "-"
-                                }
-                            }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id": "$country",
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort": SON(
-                                [
-                                    ("count", -1)
-                                ]
-                            )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.network_events,
+                top_countries_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_ten_countries_in_network_events_by_date", methods=["GET", "POST"])
-def top_ten_countries_in_network_events_by_date():
-    """
-    get top ten repeated countries in network events by date
-
-    Returns:
-        JSON/Dict top ten repeated countries in network events by date
-    """
-    date = fix_date(get_value_from_request("date"))
-    if date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.network_events.aggregate(
-                        [
-                            {
-                                "$match": {
-                                    "country": {
-                                        "$gt": "-"
-                                    },
-                                    "date":
-                                        {
-                                            "$gte": date[0],
-                                            "$lte": date[1]
-                                        }
-                                }
-                            },
-                            {
-                                "$group":
-                                    {
-                                        "_id": "$country",
-                                        "count":
-                                            {
-                                                "$sum": 1
-                                            }
-                                    }
-                            },
-                            {
-                                "$sort": SON(
-                                    [
-                                        ("count", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_network_machine_names", methods=["GET", "POST"])
+@app.route("/api/events/network-events-machinenames", methods=["GET"])
 def top_network_machine_names():
     """
     get top network machine names in network events
@@ -1173,50 +892,32 @@ def top_network_machine_names():
     Returns:
         JSON/Dict top network machine names in network events
     """
+    top_machinenames_query = [
+        top_machine_names_groupby,
+        sort_by_count_and_id,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
     try:
         return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "machine_name": "$machine_name"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.network_events,
+                top_machinenames_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
+        return flask_null_array_response()
 
 
-@app.route("/api/events/top_honeypot_machine_names", methods=["GET", "POST"])
+@app.route("/api/events/honeypot-events-machinenames", methods=["GET"])
 def top_honeypot_machine_names():
     """
     get top honeypot machine names in honeypot events
@@ -1224,543 +925,30 @@ def top_honeypot_machine_names():
     Returns:
         JSON/Dict top honeypot machine names
     """
+    top_machinenames_query = [
+        top_machine_names_groupby,
+        sort_by_count_and_id,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
     try:
         return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "machine_name": "$machine_name"
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
+            aggregate_function(
+                connector.honeypot_events,
+                top_machinenames_query
+            )
         ), 200
     except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_network_ips_by_country", methods=["GET", "POST"])
-def top_ten_network_ips_by_country():
-    """
-    get top ten repeated ips in network events by country
-
-    Returns:
-        JSON/Dict top ten repeated ips in network events by country
-    """
-    country = get_value_from_request("country")
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$match":
-                                {
-                                    "country": country,
-                                }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "ip": "$ip",
-                                            "country": "$country",
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_honeypot_ips_by_country", methods=["GET", "POST"])
-def top_ten_honeypot_ips_by_country():
-    """
-    get top ten repeated ips in network events by country
-
-    Returns:
-        JSON/Dict top ten repeated ips in network events by country
-    """
-    country = get_value_from_request("country")
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$match":
-                                {
-                                    "country": country,
-                                }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "ip": "$ip",
-                                            "country": "$country",
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_honeypot_ips_by_country_by_date", methods=["GET", "POST"])
-def top_ten_honeypot_ips_by_country_by_date():
-    """
-    get top ten repeated ips in honeypot events by country and date
-
-    Returns:
-        JSON/Dict top ten repeated ips in honeypot events by country and date
-    """
-    date = fix_date(get_value_from_request("date"))
-    country = get_value_from_request("country")
-    if date and country:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.honeypot_events.aggregate(
-                        [
-                            {
-                                "$match":
-                                {
-                                    "country": country,
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                {
-                                    "_id":
-                                    {
-                                        "ip": "$ip",
-                                        "country": "$country",
-                                    },
-                                    "count":
-                                    {
-                                        "$sum": 1
-                                    }
-                                }
-                            },
-                            {
-                                "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
         return flask_null_array_response()
 
-
-@app.route("/api/events/top_network_ips_by_country_by_date", methods=["GET", "POST"])
-def top_ten_network_ips_by_country_by_date():
-    """
-    get top ten repeated ips in network events by country and date
-
-    Returns:
-        JSON/Dict top ten repeated ips in network events by country and date
-    """
-    date = fix_date(get_value_from_request("date"))
-    country = get_value_from_request("country")
-    if date and country:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.network_events.aggregate(
-                        [
-                            {
-                                "$match":
-                                {
-                                    "country": country,
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                {
-                                    "_id":
-                                    {
-                                        "ip": "$ip",
-                                        "country": "$country",
-                                    },
-                                    "count":
-                                    {
-                                        "$sum": 1
-                                    }
-                                }
-                            },
-                            {
-                                "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-        return flask_null_array_response()
-
-
-@app.route("/api/events/top_network_ports_by_country", methods=["GET", "POST"])
-def top_ten_network_ports_by_country():
-    """
-    get top ten repeated ports in network events by country
-
-    Returns:
-        JSON/Dict top ten repeated ports in network events by country
-    """
-    country = get_value_from_request("country")
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.network_events.aggregate(
-                    [
-                        {
-                            "$match":
-                                {
-                                    "country": country,
-                                }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "port": "$port",
-                                            "country": "$country",
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_honeypot_ports_by_country", methods=["GET", "POST"])
-def top_ten_honeypot_ports_by_country():
-    """
-    get top ten repeated ports in honeypot events by country
-
-    Returns:
-        JSON/Dict top ten repeated ports in honeypot events by country
-    """
-    country = get_value_from_request("country")
-    try:
-        return jsonify(
-            [
-                i for i in
-                connector.honeypot_events.aggregate(
-                    [
-                        {
-                            "$match":
-                                {
-                                    "country": country,
-                                }
-                        },
-                        {
-                            "$group":
-                                {
-                                    "_id":
-                                        {
-                                            "port": "$port",
-                                            "country": "$country",
-                                        },
-                                    "count":
-                                        {
-                                            "$sum": 1
-                                        }
-                                }
-                        },
-                        {
-                            "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                        },
-                        {
-                            "$skip": fix_skip(get_value_from_request("skip"))
-                        },
-                        {
-                            "$limit": fix_limit(get_value_from_request("limit"))
-                        }
-                    ]
-                )
-            ]
-        ), 200
-    except Exception as _:
-        del _
-    return flask_null_array_response()
-
-
-@app.route("/api/events/top_network_ports_by_country_by_date", methods=["GET", "POST"])
-def top_ten_network_ports_by_country_by_date():
-    """
-    get top ten repeated ports in network events by country and by date
-
-    Returns:
-        JSON/Dict top ten repeated ports in network events by country and by date
-    """
-    country = get_value_from_request("country")
-    date = fix_date(get_value_from_request("date"))
-    if country and date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.network_events.aggregate(
-                        [
-                            {
-                                "$match":
-                                {
-                                    "country": country,
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                {
-                                    "_id":
-                                    {
-                                        "port": "$port",
-                                        "country": "$country",
-                                    },
-                                    "count":
-                                    {
-                                        "$sum": 1
-                                    }
-                                }
-                            },
-                            {
-                                "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-        return flask_null_array_response()
-
-
-@app.route("/api/events/top_honeypot_ports_by_country_by_date", methods=["GET", "POST"])
-def top_ten_honeypot_ports_by_country_by_date():
-    """
-    get top ten repeated ports in honeypot events by country and by date
-
-    Returns:
-        JSON/Dict top ten repeated ports in honeypot events by country and by date
-    """
-    country = get_value_from_request("country")
-    date = fix_date(get_value_from_request("date"))
-    if country and date:
-        try:
-            return jsonify(
-                [
-                    i for i in
-                    connector.honeypot_events.aggregate(
-                        [
-                            {
-                                "$match":
-                                {
-                                    "country": country,
-                                    "date": {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                                }
-                            },
-                            {
-                                "$group":
-                                {
-                                    "_id":
-                                    {
-                                        "port": "$port",
-                                        "country": "$country",
-                                    },
-                                    "count":
-                                    {
-                                        "$sum": 1
-                                    }
-                                }
-                            },
-                            {
-                                "$sort":
-                                SON(
-                                    [
-                                        ("count", -1),
-                                        ("_id", -1)
-                                    ]
-                                )
-                            },
-                            {
-                                "$skip": fix_skip(get_value_from_request("skip"))
-                            },
-                            {
-                                "$limit": fix_limit(get_value_from_request("limit"))
-                            }
-                        ]
-                    )
-                ]
-            ), 200
-        except Exception as _:
-            del _
-        return flask_null_array_response()
 
 # todo: combine api calls with date support
 # todo: rename API calls from top_ten
@@ -1775,9 +963,12 @@ def start_api_server():
     """
     # Starting the API
     my_api_configuration = api_configuration()
-    write_to_api_console(" * API access key: {0}\n".format(
-        my_api_configuration["api_access_key"] if not my_api_configuration[
-            "api_access_without_key"] else "NOT REQUIRED!"))
+    write_to_api_console(
+        " * API access key: {0}\n".format(
+            my_api_configuration["api_access_key"] if not my_api_configuration["api_access_without_key"]
+            else "NOT REQUIRED!"
+        )
+    )
     global app
     app.config["OWASP_HONEYPOT_CONFIG"] = {
         "api_access_key": my_api_configuration["api_access_key"],
