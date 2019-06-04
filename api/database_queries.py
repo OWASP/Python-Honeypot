@@ -43,16 +43,6 @@ sort_by_count_and_id = {
 top_ports_groupby = {
     "$group":
         {
-            "_id": "$port",
-            "count": {
-                "$sum": 1
-            }
-        }
-}
-
-top_ports_group_by_country = {
-    "$group":
-        {
             "_id":
                 {
                     "port": "$port",

@@ -218,7 +218,7 @@ function load_graphs() {
                 url: "/api/events/honeypot-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]);
+                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]["port"]);
                     top_ten_ports_in_honeypot_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ports_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
@@ -272,7 +272,7 @@ function load_graphs() {
                 url: "/api/events/network-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]);
+                    top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]["port"]);
                     top_ten_ports_in_network_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ports_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
