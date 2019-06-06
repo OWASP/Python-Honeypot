@@ -891,6 +891,10 @@ def top_network_machine_names():
     Returns:
         JSON/Dict top network machine names in network events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
@@ -905,6 +909,16 @@ def top_network_machine_names():
             )
         }
     ]
+    if date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
             aggregate_function(
@@ -924,6 +938,9 @@ def top_honeypot_machine_names():
     Returns:
         JSON/Dict top honeypot machine names
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
@@ -938,6 +955,16 @@ def top_honeypot_machine_names():
             )
         }
     ]
+    if date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
             aggregate_function(
@@ -947,10 +974,6 @@ def top_honeypot_machine_names():
         ), 200
     except Exception as _:
         return flask_null_array_response()
-
-
-# todo: combine api calls with date support
-# todo: rename API calls from top_ten
 
 
 def start_api_server():
