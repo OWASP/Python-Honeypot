@@ -12,9 +12,8 @@ from config import api_configuration
 from core.alert import write_to_api_console
 from database import connector
 from api.database_queries import top_ips_groupby
-from api.database_queries import top_ports_groupby
 from api.database_queries import top_machine_names_groupby
-from api.database_queries import top_ports_group_by_country
+from api.database_queries import top_ports_groupby
 from api.database_queries import top_countries_groupby
 from api.database_queries import sort_by_count
 from api.database_queries import sort_by_count_and_id
@@ -509,7 +508,7 @@ def top_ten_ports_in_honeypot_events():
     )
     country = get_value_from_request("country")
     top_ports_query = [
-        sort_by_count_and_id,
+        top_ports_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -529,7 +528,7 @@ def top_ten_ports_in_honeypot_events():
                 }
         }
         top_ports_query.insert(0, match_by_country_and_date)
-        top_ports_query.insert(1, top_ports_group_by_country)
+        top_ports_query.insert(2, sort_by_count_and_id)
     elif country:
         match_by_country = {
             "$match":
@@ -538,7 +537,7 @@ def top_ten_ports_in_honeypot_events():
                 }
         }
         top_ports_query.insert(0, match_by_country)
-        top_ports_query.insert(1, top_ports_group_by_country)
+        top_ports_query.insert(2, sort_by_count_and_id)
     elif date:
         match_by_date = {
             "$match": {
@@ -550,9 +549,9 @@ def top_ten_ports_in_honeypot_events():
             }
         }
         top_ports_query.insert(0, match_by_date)
-        top_ports_query.insert(1, top_ports_groupby)
+        top_ports_query.insert(2, sort_by_count)
     else:
-        top_ports_query.insert(0, top_ports_groupby)
+        top_ports_query.insert(1, sort_by_count)
     try:
         return jsonify(
             aggregate_function(
@@ -577,7 +576,7 @@ def top_ten_ports_in_network_events():
     )
     country = get_value_from_request("country")
     top_ports_query = [
-        sort_by_count_and_id,
+        top_ports_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -597,7 +596,7 @@ def top_ten_ports_in_network_events():
                 }
         }
         top_ports_query.insert(0, match_by_country_and_date)
-        top_ports_query.insert(1, top_ports_group_by_country)
+        top_ports_query.insert(2, sort_by_count_and_id)
     elif country:
         match_by_country = {
             "$match":
@@ -606,7 +605,7 @@ def top_ten_ports_in_network_events():
                 }
         }
         top_ports_query.insert(0, match_by_country)
-        top_ports_query.insert(1, top_ports_group_by_country)
+        top_ports_query.insert(2, sort_by_count_and_id)
     elif date:
         match_by_date = {
             "$match": {
@@ -618,9 +617,9 @@ def top_ten_ports_in_network_events():
             }
         }
         top_ports_query.insert(0, match_by_date)
-        top_ports_query.insert(1, top_ports_groupby)
+        top_ports_query.insert(2, sort_by_count)
     else:
-        top_ports_query.insert(0, top_ports_groupby)
+        top_ports_query.insert(1, sort_by_count)
     try:
         return jsonify(
             aggregate_function(
@@ -892,6 +891,10 @@ def top_network_machine_names():
     Returns:
         JSON/Dict top network machine names in network events
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
@@ -906,6 +909,16 @@ def top_network_machine_names():
             )
         }
     ]
+    if date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
             aggregate_function(
@@ -925,6 +938,9 @@ def top_honeypot_machine_names():
     Returns:
         JSON/Dict top honeypot machine names
     """
+    date = fix_date(
+        get_value_from_request("date")
+    )
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
@@ -939,6 +955,16 @@ def top_honeypot_machine_names():
             )
         }
     ]
+    if date:
+        match_by_date = {
+            "$match": {
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
+                }
+            }
+        }
+        top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
             aggregate_function(
@@ -948,10 +974,6 @@ def top_honeypot_machine_names():
         ), 200
     except Exception as _:
         return flask_null_array_response()
-
-
-# todo: combine api calls with date support
-# todo: rename API calls from top_ten
 
 
 def start_api_server():
