@@ -18,6 +18,7 @@ database = client[api_configuration()["api_database_name"]]
 honeypot_events = database.honeypot_events
 network_events = database.network_events
 credential_events = database.credential_events
+honeypot_events_data = database.honeypot_events_data
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -94,6 +95,27 @@ def insert_honeypot_events_from_module_processor(ip, username, password, module_
             "date": date,
             "username": username,
             "password": password,
+            "country": str(IP2Location.get_country_short(ip).decode()),
+            "machine_name": network_configuration()["real_machine_identifier_name"]
+        }
+    ).inserted_id
+
+
+def insert_honeypot_events_data_from_module_processor(ip,module_name,date,data):
+    """
+    insert data which is recieved from honeypot modules
+    args:
+    ip : client ip used for putting the data
+    module_name : on which module client accessed
+    date : datetime of the events
+    data : Data which is obtained from the client
+    """
+    return honeypot_events_data.insert_one(
+        {
+            "ip": ip,
+            "module_name": module_name,
+            "date": date,
+            "data" : data,
             "country": str(IP2Location.get_country_short(ip).decode()),
             "machine_name": network_configuration()["real_machine_identifier_name"]
         }

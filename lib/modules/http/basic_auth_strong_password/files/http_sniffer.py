@@ -51,9 +51,9 @@ class Logger():
 
 class RequestHandler(BaseHTTPRequestHandler):
     # Create loggers
-    potlogger = Logger('logins')
-    accesslogger = Logger('access')
-    errorlogger = Logger('error')
+    potlogger = Logger('ohp_http_strong_password_creds_logs')
+    accesslogger = Logger('ohp_http_strong_password_access_logs')
+    errorlogger = Logger('ohp_http_strong_password_error_logs')
 
     # Get client source port
     def srcport_string(self):
@@ -132,12 +132,6 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 # Main
 def main():
-    # Redirect stdout and stderr
-    stdlog = StdLogger('logins')
-    outsave = sys.stdout
-    errsave = sys.stderr
-    sys.stdout = stdlog
-    sys.stderr = stdlog
 
     # Start listener
     httpd = HTTPServer(
@@ -147,10 +141,6 @@ def main():
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-
-    # Restore stdout and stderr
-    sys.stdout = outsave
-    sys.stderr = errsave
 
 if __name__ == '__main__':
     main()
