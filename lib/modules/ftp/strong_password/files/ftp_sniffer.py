@@ -9,11 +9,11 @@ import json
 users = {}
 HOST = ''
 PORT = 21
-LOGFILE = 'logins.txt'
+LOGFILE = '/root/logs/ohp_ftp_strong_password_creds_logs.txt'
 LOGFILE_LOCK = threading.Lock()
 
 def init_user_conf():
-    f = open('users.conf', 'r')
+    f = open('/root/users.conf', 'r')
     user_conf_lines = f.read().split('\n')
     for user_conf_line in user_conf_lines:
         split_line = user_conf_line.split(':')
@@ -24,7 +24,7 @@ def init_user_conf():
 
 
 def init_server_conf():
-    f = open('server.conf', 'r')
+    f = open('/root/server.conf', 'r')
     server_conf_lines = f.read().split('\n')
     for server_conf_line in server_conf_lines:
         split_line = server_conf_line.split('=')
@@ -80,7 +80,7 @@ def clientThread(conn, connip):
                 try:
                     logfile_handle = open(LOGFILE, "a")
                     logfile_handle.write(json.dumps({"username": user_to_login,
-                                                     "password": password, "IP" : connip ,\
+                                                     "password": password, "ip" : connip ,\
                                                      'login_status' : log_msg,\
                                                      "module_name" : "ftp/strong_password", \
                                                      'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) + "\n")
