@@ -8,6 +8,7 @@ import time
 
 from core._time import now
 from config import api_configuration
+from config import network_configuration
 from lib.ip2location import IP2Location
 
 client = pymongo.MongoClient(
@@ -20,6 +21,7 @@ network_events = database.network_events
 global honeypot_events_queue,network_events_queue
 honeypot_events_queue=[]
 network_events_queue=[]
+credential_events = database.credential_events
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -52,6 +54,7 @@ def insert_selected_modules_network_event(ip, port, module_name, machine_name):
             "module_name": module_name,
             "date": now(),
             "machine_name": machine_name,
+            "event_type": "honeypot_event",
             "country": str(IP2Location.get_country_short(ip).decode())
         }
     )
@@ -90,11 +93,13 @@ def insert_events_in_bulk():
     global honeypot_events_queue
     global network_events_queue
     if honeypot_events_queue:
+        new_events = honeypot_events_queue[:]
+        honeypot_events_queue=[]
         honeypot_events.insert_many(honeypot_events_queue)
     if network_events_queue:
+        new_events = network_events_queue[:]
+        network_events_queue=[]
         network_events.insert_many(network_events_queue)
-    honeypot_events_queue=[]
-    network_events_queue=[]
     return
 
 
@@ -106,3 +111,26 @@ def insert_bulk_events_from_thread():
         insert_events_in_bulk()
         time.sleep(60)
     return True
+
+
+def insert_honeypot_events_from_module_processor(ip, username, password, module_name, date):
+    """
+    insert honeypot events which are obtained from the modules
+    args:
+    ip : client ip used for connecting to the module
+    username : username tried for connecting to modules
+    password : password tried for connecting to modules
+    module_name : on which module client accessed
+    date : datetime of the event
+    """
+    return credential_events.insert_one(
+        {
+            "ip": ip,
+            "module_name": module_name,
+            "date": date,
+            "username": username,
+            "password": password,
+            "country": str(IP2Location.get_country_short(ip).decode()),
+            "machine_name": network_configuration()["real_machine_identifier_name"]
+        }
+    ).inserted_id
