@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.9.19
 CMD ["/sbin/my_init"]
 
 # update and install vsftpd + libs
-RUN apt-get update && apt-get install -y vsftpd libpam-pwdfile apache2-utils
+RUN apt-get update && apt-get install -y vsftpd libpam-pwdfile apache2-utils python3.5 python3-pip python3-dev
 
 # copy vsftpd.conf to /etc/vsftpd.conf
 COPY files/vsftpd.conf /etc/vsftpd.conf
@@ -17,7 +17,11 @@ RUN mkdir -p /etc/pam.d/ && echo -e "auth required pam_pwdfile.so pwdfile /etc/v
 
 # create /etc/init.d/vsftpd
 COPY files/vsftpd.sh /etc/init.d/vsftpd
-
+COPY files/file_watcher_script.py /root/file_watcher_script.py
+RUN pip3 install watchdog
+RUN pip3 install datetime
+COPY files/history_append.sh /root/history_append.sh
+RUN mkdir -p /root/logs
 # install ftp (not necessary)
 RUN apt-get install -y ftp
 
@@ -31,4 +35,4 @@ RUN mkdir /etc/vsftpd && \
     chown vsftpd:nogroup /var/www/html
 
 # start the service + wait for container
-ENTRYPOINT service vsftpd restart & tail
+ENTRYPOINT service vsftpd restart & tail & chmod +x /root/history_append.sh & python3 /root/file_watcher_script.py

@@ -3,6 +3,7 @@
 
 import time
 from core.compatible import generate_token
+import os
 
 
 class ModuleProcessor:
@@ -31,6 +32,6 @@ def module_configuration():
     return {
          "username": "admin",
          "password": "admin",
-         "extra_docker_options": [],
+         "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
          "module_processor": ModuleProcessor()
     }
