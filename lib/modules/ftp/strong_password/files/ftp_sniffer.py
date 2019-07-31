@@ -12,6 +12,7 @@ PORT = 21
 LOGFILE = '/root/logs/ohp_ftp_strong_password_creds_logs.txt'
 LOGFILE_LOCK = threading.Lock()
 
+
 def init_user_conf():
     f = open('/root/users.conf', 'r')
     user_conf_lines = f.read().split('\n')
@@ -52,25 +53,25 @@ def clientThread(conn, connip):
         elif isRecivingPassword == True:
             if conn_data.startswith('PASS'):
                 user_to_login = user_to_login.replace('\n', '').replace('\r', '')
-                password = conn_data[5: ].replace('\n', '').replace('\r', '')
-                if user_to_login in users.keys() and not(user_to_login == '*'):
+                password = conn_data[5:].replace('\n', '').replace('\r', '')
+                if user_to_login in users.keys() and not (user_to_login == '*'):
                     if users[user_to_login] == password:
                         conn.sendall('230 Login successful.\n'.encode())
                         log_msg = "SUCCESSFUL"
                     elif users[user_to_login] == '*':
                         conn.sendall('230 Login successful.\n'.encode())
                         log_msg = "SUCCESSFUL"
-                    else :
+                    else:
                         conn.sendall('530 Incorrect Login.\n'.encode())
                         log_msg = 'FAILED'
                 elif '*' in users.keys():
                     if users['*'] == password:
                         conn.sendall('230 Login successful.\n'.encode())
                         log_msg = "SUCCESSFUL"
-                    else :
+                    else:
                         conn.sendall('530 Incorrect Login.\n'.encode())
                         log_msg = ' FAILED'
-                else :
+                else:
                     log_msg = 'FAILED'
                     conn.sendall('530 Incorrect Login.\n'.encode())
             if (log_msg != ''):
@@ -78,11 +79,18 @@ def clientThread(conn, connip):
                 LOGFILE_LOCK.acquire()
                 try:
                     logfile_handle = open(LOGFILE, "a")
-                    logfile_handle.write(json.dumps({"username": user_to_login,
-                                                     "password": password, "ip" : connip ,\
-                                                     'login_status' : log_msg,\
-                                                     "module_name" : "ftp/strong_password", \
-                                                     'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")}) + "\n")
+                    logfile_handle.write(
+                        json.dumps(
+                            {
+                                "username": user_to_login,
+                                "password": password,
+                                "ip": connip,
+                                'login_status': log_msg,
+                                "module_name": "ftp/strong_password", \
+                                'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                            }
+                        ) + "\n"
+                    )
                     logfile_handle.close()
                 finally:
                     LOGFILE_LOCK.release()
