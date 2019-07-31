@@ -39,7 +39,6 @@ def init_server_conf():
 
 
 def clientThread(conn, connip):
-    currentDir = "/"
     isLoggedIn = False
     isRecivingPassword = False
     user_to_login = ""
