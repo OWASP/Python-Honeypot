@@ -21,4 +21,4 @@ RUN touch /var/www/logins.log && chmod 777 /var/www/logins.log
 RUN python -c "f=open(\"/etc/apache2/apache2.conf\").read().replace(\"AllowOverride None\", \"AllowOverride All\");z=open(\"/etc/apache2/apache2.conf\", \"w\"); z.write(f); z.close(); print \"apache config modified...\""
 
 # start the service + wait for container
-ENTRYPOINT python3 /root/http_sniffer.py
+ENTRYPOINT service apache2 restart && tail
