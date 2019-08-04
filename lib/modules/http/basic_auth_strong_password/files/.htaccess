@@ -1,4 +1,10 @@
+
+
 AuthType Basic
 AuthName "Restricted Content"
 AuthUserFile /var/www/html/.htpasswd
 Require valid-user
+
+RewriteEngine On
+RewriteRule ^401/?$ /logging.php [L]
+ErrorDocument 401 /logging.php
