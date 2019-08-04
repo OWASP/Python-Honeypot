@@ -41,6 +41,7 @@ else:
 
 # tmp dirs
 tmp_directories = []
+processor_threads = []
 verbose_mode = None
 
 
@@ -251,34 +252,61 @@ def start_containers(configuration):
     for selected_module in configuration:
         # get the container name to start (organizing)
         # using pattern name will help us to remove/modify the images and modules
-        container_name = virtual_machine_name_to_container_name(configuration[selected_module]["virtual_machine_name"],
-                                                                selected_module)
+        container_name = virtual_machine_name_to_container_name(
+            configuration[selected_module]["virtual_machine_name"],
+            selected_module
+        )
         real_machine_port = configuration[selected_module]["real_machine_port_number"]
         virtual_machine_port = configuration[selected_module]["virtual_machine_port_number"]
         # connect to owasp honeypot networks!
         if configuration[selected_module]["virtual_machine_internet_access"]:
             # run the container with internet access
-            os.popen("docker run --net ohp_internet --name={0} -d -t -p {1}:{2} {3}"
-                     .format(container_name, real_machine_port, virtual_machine_port,
-                             configuration[selected_module]["virtual_machine_name"])).read()
+            os.popen(
+                "docker run {0} --net ohp_internet --name={1} -d -t -p {2}:{3} {4}".format(
+                    " ".join(
+                        configuration[selected_module]["extra_docker_options"]
+                    ),
+                    container_name,
+                    real_machine_port,
+                    virtual_machine_port,
+                    configuration[selected_module]["virtual_machine_name"]
+                )
+            ).read()
         else:
             # run the container without internet access
-            os.popen("docker run --net ohp_no_internet --name={0} -d -t -p {1}:{2} {3}"
-                     .format(container_name, real_machine_port, virtual_machine_port,
-                             configuration[selected_module]["virtual_machine_name"])).read()
+            os.popen(
+                "docker run {0} --net ohp_no_internet --name={1} -d -t -p {2}:{3} {4}".format(
+                    " ".join(
+                        configuration[selected_module]["extra_docker_options"]
+                    ),
+                    container_name,
+                    real_machine_port,
+                    virtual_machine_port,
+                    configuration[selected_module]["virtual_machine_name"]
+                )
+            ).read()
         try:
             virtual_machine_ip_address = os.popen(
                 "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
-                "{{{{.IPAddress}}}}{{{{end}}}}' {0}".format(container_name)
+                "{{{{.IPAddress}}}}{{{{end}}}}' {0}"
+                    .format(
+                    container_name
+                )
             ).read().rsplit()[0].replace("\'", "")  # single quotes needs to be removed in windows
         except Exception as _:
             virtual_machine_ip_address = "CANNOT_FIND_IP_ADDRESS"
         # add virtual machine IP Address to configuration
         configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
-        info("container {0} started,"
-             " forwarding 0.0.0.0:{1} to {2}:{3}".format(container_name, real_machine_port, virtual_machine_ip_address,
-                                                         virtual_machine_port))
+        info(
+            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}"
+                .format(
+                container_name,
+                real_machine_port,
+                virtual_machine_ip_address,
+                virtual_machine_port
+            )
+        )
     return configuration
 
 
@@ -340,8 +368,14 @@ def honeypot_configuration_builder(selected_modules):
         #     }
 
         category_configuration = getattr(
-            __import__("lib.modules.{0}".format(module.rsplit("/")[0]), fromlist=["category_configuration"]),
-            "category_configuration")
+            __import__(
+                "lib.modules.{0}".
+                    format(
+                    module.rsplit("/")[0]),
+                fromlist=["category_configuration"]
+            ),
+            "category_configuration"
+        )
         # reading each module configuration (e.g. ftp/weak_password, etc..)
         # they are located in lib/modules/category/module_name/__init__.py
         # each module must have such a function (in case you can return {} if you don't have any configuration)
@@ -361,8 +395,14 @@ def honeypot_configuration_builder(selected_modules):
         #         "real_machine_port_number": 2121
         #      }
         module_configuration = getattr(
-            __import__("lib.modules.{0}".format(module.replace("/", ".")), fromlist=["module_configuration"]),
-            "module_configuration")
+            __import__(
+                "lib.modules.{0}".
+                    format(
+                    module.replace("/", ".")
+                ), fromlist=["module_configuration"]
+            ),
+            "module_configuration"
+        )
 
         # combine category + module configuration into one Dict/JSON
         combined_module_configuration = category_configuration()
@@ -381,7 +421,9 @@ def honeypot_configuration_builder(selected_modules):
         )
         # add module files
         combined_module_configuration["files"] = os.path.join(
-            get_module_dir_path(module_configuration),
+            get_module_dir_path(
+                module_configuration
+            ),
             "files"
         )
         # combine Dockerfile configuration with module and category configuration
@@ -401,7 +443,12 @@ def port_is_reserved(real_machine_port):
     """
     try:
         tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        tcp.bind((network_configuration()["real_machine_ip_address"], real_machine_port))
+        tcp.bind(
+            (
+                network_configuration()["real_machine_ip_address"],
+                real_machine_port
+            )
+        )
         tcp.close()
         return False
     except Exception as _:
@@ -457,6 +504,45 @@ def conflict_ports(configuration):
         )
         fixed_configuration[selected_module]["real_machine_port_number"] = port
     return fixed_configuration
+
+
+def run_modules_processors(configuration):
+    """
+    run ModuleProcessor for each modules
+
+    :param configuration: user final configuration
+    :return:
+    """
+    for module in configuration:
+        module_processor_thread = threading.Thread(
+            target=configuration[module]["module_processor"].processor,
+            name=virtual_machine_name_to_container_name(
+                configuration[module]["virtual_machine_name"],
+                module
+            )
+        )
+        module_processor_thread.start()
+        processor_threads.append(module_processor_thread)
+    return
+
+
+def stop_modules_processors(configuration):
+    """
+    run ModuleProcessor for each modules
+
+    :param configuration: user final configuration
+    :return:
+    """
+    for module in configuration:
+        configuration[module]["module_processor"].kill_flag = True
+
+    while True:
+        if True not in [
+            module_processor_thread.isAlive() for module_processor_thread in processor_threads
+        ]:
+            break
+        time.sleep(0.1)
+    return
 
 
 def argv_parser():
@@ -593,10 +679,23 @@ def load_honeypot_engine():
     # start containers based on selected modules
     configuration = start_containers(configuration)
     # start network monitoring thread
-    new_network_events_thread = threading.Thread(target=new_network_events, args=(configuration,),
-                                                 name="new_network_events_thread")
+    new_network_events_thread = threading.Thread(
+        target=new_network_events,
+        args=(configuration,),
+        name="new_network_events_thread"
+    )
     new_network_events_thread.start()
-    info("all selected modules started: {0}".format(", ".join(selected_modules)))
+
+    info(
+        "all selected modules started: {0}".format(
+            ", ".join(
+                selected_modules
+            )
+        )
+    )
+
+    # run module processors
+    run_modules_processors(configuration)
 
     # check if it's not a test
     if not run_as_test:
@@ -606,6 +705,8 @@ def load_honeypot_engine():
     terminate_thread(new_network_events_thread)
     # stop created containers
     stop_containers(configuration)
+    # stop module processor
+    stop_modules_processors(configuration)
     # remove created containers
     remove_old_containers(configuration)
     # remove created images
