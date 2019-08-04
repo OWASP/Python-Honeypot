@@ -5,9 +5,6 @@ FROM phusion/baseimage:0.9.19
 
 RUN apt-get update && apt-get install -y apache2 apache2-utils python php libapache2-mod-php
 
-RUN pip3 install datetime
-
-COPY files/http_sniffer.py /root/http_sniffer.py
 # create credential
 
 # copy .htaccess file using echo to /var/www/html/.htaccess (read the readme.md for more information)
