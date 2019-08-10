@@ -13,6 +13,8 @@ class ModuleProcessor:
     this is the processor to run after docker machine is up to grab the log files or do other needed process...
     """
     def __init__(self):
+        self.log_filename = 'tmp/access.log'
+        self.log_filename_dump = 'tmp/ohp_http_strong_password_creds_logs.json'
         self.kill_flag = False
 
     def processor(self):
@@ -21,6 +23,11 @@ class ModuleProcessor:
         :return:
         """
         while not self.kill_flag:
+            if os.path.exists(self.log_filename) and os.path.getsize(self.log_filename) > 0:
+                os.rename(self.log_filename, self.log_filename_dump)
+                data_dump = open(self.log_filename_dump).readlines()
+                for data in data_dump:
+                    print(data)
             time.sleep(0.1)
 
 
@@ -35,6 +42,6 @@ def module_configuration():
         "username": "admin",
         "password": generate_token(16),
         "extra_docker_options": [],
-        "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
+        "extra_docker_options": ["--volume {0}/tmp:/var/log/apache2/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }
