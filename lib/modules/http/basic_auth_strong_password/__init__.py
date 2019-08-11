@@ -24,10 +24,12 @@ class ModuleProcessor:
         """
         while not self.kill_flag:
             if os.path.exists(self.log_filename) and os.path.getsize(self.log_filename) > 0:
-                os.rename(self.log_filename, self.log_filename_dump)
-                data_dump = open(self.log_filename_dump).readlines()
+                # os.rename(self.log_filename, self.log_filename_dump)
+                data_dump = open(self.log_filename).readlines()
++               open(self.log_filename, 'w').write('')
+                # data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
-                    print(data)
+                    print(data[:-1]) # remove \n from json
             time.sleep(0.1)
 
 
