@@ -976,6 +976,130 @@ def top_honeypot_machine_names():
         return flask_null_array_response()
 
 
+@app.route("/api/events/module-events", methods=["GET"])
+def module_events():
+    """
+    Get total number of credential events according to module
+
+    Returns:
+        JSON/Dict of credential events according to module
+    """
+    module_name =get_value_from_request("module_name")
+    module_query=[{"$match" : {'module_name' : module_name}},
+                  {"$group":
+                   {
+                       "_id":
+                       {
+                           "ip": "$ip"
+                       },
+                       "count":
+                       {
+                           "$sum": 1
+                       }}},
+                  {"$skip": fix_skip(
+                      get_value_from_request("skip")
+                  )
+                  },
+                  {
+                      "$limit": fix_limit(
+                          get_value_from_request("limit")
+                      )
+                  }]
+    if module_name:
+        try:
+            return jsonify(
+                aggregate_function(connector.credential_events,module_query)
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+    else:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/most-usernames-used", methods=["GET"])
+def top_usernames_used():
+    """
+    Get top usernames used according to module
+
+    Returns:
+        JSON/Dict of top usernames used
+    """
+    module_name =get_value_from_request("module_name")
+    module_query=[{"$match" : {'module_name' : module_name}},
+    {"$group":
+        {
+            "_id":
+                {
+                    "ip": "$ip",
+                    "username" : "$username"
+                },
+           "count":
+                {
+                    "$sum": 1
+                }}},
+    {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }]
+    if module_name:
+        try:
+            return jsonify(
+                aggregate_function(connector.credential_events,module_query)
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+    else:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/most-passwords-used", methods=["GET"])
+def top_passwords_used():
+    """
+    Get top passwords used according to module
+
+    Returns:
+        JSON/Dict of top passwords used
+    """
+    module_name =get_value_from_request("module_name")
+    module_query=[{"$match" : {'module_name' : module_name}},
+    {"$group":
+        {
+            "_id":
+                {
+                    "ip": "$ip",
+                    "password" : "$password"
+                },
+           "count":
+                {
+                    "$sum": 1
+                }}},
+    {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }]
+    if module_name:
+        try:
+            return jsonify(
+                aggregate_function(connector.credential_events,module_query)
+            ), 200
+        except Exception as _:
+            return flask_null_array_response()
+    else:
+        return flask_null_array_response()
+
+
 def start_api_server():
     """
     start API server
