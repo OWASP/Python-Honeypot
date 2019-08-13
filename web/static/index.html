@@ -60,7 +60,27 @@
                 <canvas id="top_ten_ports_in_network_events_graph" width="400" height="450">
                 </canvas>
             </div>
-        </div>
+            <br>
+            <div class="col-md-6" style="">
+                <select id="module">
+                    <option value="ftp/weak_password">FTP Weak Password</option>
+                    <option value="ftp/strong_password">FTP Strong Password</option>
+					<option value="ssh/strong_password">SSH Strong Password</option>
+					<option value="ssh/weak_password">SSH Weak Password</option>
+					<option value="http/basic_auth_strong_password">HTTP Strong Password</option>
+                </select>
+				<table id="module_creds_table" class="table">
+					<thead><tr>
+						<th align="center">#</th>
+						<th align="center">Username</th>
+						<th align="center">IP Address</th>
+						<th align="center">Count</th>
+					</tr></thead>
+					<tbody>
+					</tbody>
+				</table>
+
+			</div>
         <!-- end of analytics-->
     </center>
     <div class="align-content-center text-center">

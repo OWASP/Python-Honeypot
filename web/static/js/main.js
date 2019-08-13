@@ -58,6 +58,38 @@ function load_graphs() {
         }
     });
 
+	// on change of module for creds data
+	$('#module').on('change',function(){
+        var module = $(this).val();
+        $.ajax({
+            type: "GET",
+            url: "/api/events/most-usernames-used",
+			data: {"module_name" : module},
+        }).done(function (res) {
+			var tableHtml='';
+			for (var i = 0; i < res.length; i++) {
+                var m = res[i];
+				var count= m.count;
+				var username= m._id.username;
+				var ip= m._id.ip;
+				tableHtml += "<tr>"
+					+"<td>"+ (i+1) +"</td>"
+                    + "<td>"+ username+"</td>"
+					+  "<td>"+ ip +"</td>"
+                    +  "<td>"+ count +"</td>"
+                    + "</tr>";
+            }
+		$('#module_creds_table tbody').html(tableHtml);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+            if (errorThrown == "BAD REQUEST") {
+            }
+            if (errorThrown == "UNAUTHORIZED") {
+            }
+        });
+    });
+
+
     // wait 3 seconds to get responded for the request
     setTimeout(function () {
         // if events number updated or its first time to load the graph
