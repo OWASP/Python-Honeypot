@@ -35,8 +35,6 @@ class ModuleProcessor:
                     data_json = json.loads(data)
                     ip = data_json["ip"]
                     time_of_insertion = data_json["time"]
-                    request = data_json['request']
-                    user_agent = data_json['user_agent']
                     if data_json["authorization"] != "-":
                         authorization = data_json["authorization"].split(' ')[1]
                         authorization = binascii.a2b_base64(
