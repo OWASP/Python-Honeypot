@@ -18,9 +18,9 @@ client = pymongo.MongoClient(
 database = client[api_configuration()["api_database_name"]]
 honeypot_events = database.honeypot_events
 network_events = database.network_events
-global honeypot_events_queue,network_events_queue
-honeypot_events_queue=[]
-network_events_queue=[]
+global honeypot_events_queue, network_events_queue
+honeypot_events_queue = []
+network_events_queue = []
 credential_events = database.credential_events
 IP2Location = IP2Location.IP2Location(
     os.path.join(
@@ -94,12 +94,12 @@ def insert_events_in_bulk():
     global network_events_queue
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
-        honeypot_events_queue=[]
-        honeypot_events.insert_many(honeypot_events_queue)
+        honeypot_events_queue = []
+        honeypot_events.insert_many(new_events)
     if network_events_queue:
         new_events = network_events_queue[:]
-        network_events_queue=[]
-        network_events.insert_many(network_events_queue)
+        network_events_queue = []
+        network_events.insert_many(new_events)
     return
 
 

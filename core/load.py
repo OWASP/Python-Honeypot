@@ -695,8 +695,11 @@ def load_honeypot_engine():
         )
     )
 
-    bulk_events_thread = threading.Thread(target=insert_bulk_events_from_thread, args=(),
-                                                 name="insert_events_in_bulk_thread")
+    bulk_events_thread = threading.Thread(
+        target=insert_bulk_events_from_thread,
+        args=(),
+        name="insert_events_in_bulk_thread"
+    )
     bulk_events_thread.start()
 
     # run module processors
@@ -709,7 +712,7 @@ def load_honeypot_engine():
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
-    insert_events_in_bulk() #if incase any events that were not inserted from thread
+    insert_events_in_bulk()  # if incase any events that were not inserted from thread
     # stop created containers
     stop_containers(configuration)
     # stop module processor
