@@ -42,7 +42,8 @@ class ModuleProcessor:
                         authorization = binascii.a2b_base64(
                             authorization
                         ).decode('utf-8')  # binascii is returning bytes
-                        username, password = authorization.split(":")
+                        username = authorization.split(":")[0]
+                        password = ":".join(authorization.split(":")[1:])
                         insert_honeypot_events_from_module_processor(
                             ip,
                             username,
