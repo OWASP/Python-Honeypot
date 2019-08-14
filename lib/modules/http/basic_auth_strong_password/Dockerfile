@@ -2,6 +2,7 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install apache + python
+
 RUN apt-get update && apt-get install -y apache2 apache2-utils python
 
 # create credential
@@ -11,7 +12,7 @@ RUN htpasswd -b -c /var/www/html/.htpasswd {username} {password}
 COPY files/.htaccess /var/www/html/.htaccess
 
 # config apache
-RUN python -c "f=open(\"/etc/apache2/apache2.conf\").read().replace(\"AllowOverride None\", \"AllowOverride All\");z=open(\"/etc/apache2/apache2.conf\", \"w\"); z.write(f); z.close(); print \"apache config modified...\""
+COPY files/apache2.conf /etc/apache2/apache2.conf
 
 # start the service + wait for container
 ENTRYPOINT service apache2 restart && tail
