@@ -62,14 +62,15 @@
             </div>
             <br>
             <div class="col-md-6" style="">
-                <select id="module">
+                <select id="module_username">
+					<option value="">All Modules</option>
                     <option value="ftp/weak_password">FTP Weak Password</option>
                     <option value="ftp/strong_password">FTP Strong Password</option>
 					<option value="ssh/strong_password">SSH Strong Password</option>
 					<option value="ssh/weak_password">SSH Weak Password</option>
 					<option value="http/basic_auth_strong_password">HTTP Strong Password</option>
                 </select>
-				<table id="module_creds_table" class="table">
+				<table id="module_creds_username_table" class="table" style="width:50%; float:left">
 					<thead><tr>
 						<th align="center">#</th>
 						<th align="center">Username</th>
@@ -79,7 +80,26 @@
 					<tbody>
 					</tbody>
 				</table>
-
+			</div>
+			<div class="col-md-6" style="">
+				<select id="module_password">
+					<option value="">All Modules</option>
+                    <option value="ftp/weak_password">FTP Weak Password</option>
+                    <option value="ftp/strong_password">FTP Strong Password</option>
+					<option value="ssh/strong_password">SSH Strong Password</option>
+					<option value="ssh/weak_password">SSH Weak Password</option>
+					<option value="http/basic_auth_strong_password">HTTP Strong Password</option>
+                </select>
+				<table id="module_creds_password_table" class="table" style="width:50%; float:left">
+					<thead><tr>
+						<th align="center">#</th>
+						<th align="center">Password</th>
+						<th align="center">IP Address</th>
+						<th align="center">Count</th>
+					</tr></thead>
+					<tbody>
+					</tbody>
+				</table>
 			</div>
         <!-- end of analytics-->
     </center>

@@ -17,6 +17,9 @@ from api.database_queries import top_ports_groupby
 from api.database_queries import top_countries_groupby
 from api.database_queries import sort_by_count
 from api.database_queries import sort_by_count_and_id
+from api.database_queries import group_by_ip
+from api.database_queries import group_by_ip_and_password
+from api.database_queries import group_by_ip_and_username
 from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
@@ -985,17 +988,7 @@ def module_events():
         JSON/Dict of credential events according to module
     """
     module_name =get_value_from_request("module_name")
-    module_query=[{"$match" : {'module_name' : module_name}},
-                  {"$group":
-                   {
-                       "_id":
-                       {
-                           "ip": "$ip"
-                       },
-                       "count":
-                       {
-                           "$sum": 1
-                       }}},
+    module_query=[group_by_ip,
                   {"$skip": fix_skip(
                       get_value_from_request("skip")
                   )
@@ -1006,15 +999,13 @@ def module_events():
                       )
                   }]
     if module_name:
-        try:
-            return jsonify(
-                aggregate_function(connector.credential_events,module_query)
-            ), 200
-        except Exception as _:
-            return flask_null_array_response()
-    else:
+        module_query.insert(0,{"$match" : {'module_name' : module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events,module_query)
+        ), 200
+    except Exception as _:
         return flask_null_array_response()
-
 
 @app.route("/api/events/most-usernames-used", methods=["GET"])
 def top_usernames_used():
@@ -1025,19 +1016,9 @@ def top_usernames_used():
         JSON/Dict of top usernames used
     """
     module_name =get_value_from_request("module_name")
-    module_query=[{"$match" : {'module_name' : module_name}},
-    {"$group":
+    module_query=[
+        group_by_ip_and_username,
         {
-            "_id":
-                {
-                    "ip": "$ip",
-                    "username" : "$username"
-                },
-           "count":
-                {
-                    "$sum": 1
-                }}},
-    {
             "$skip": fix_skip(
                 get_value_from_request("skip")
             )
@@ -1048,13 +1029,12 @@ def top_usernames_used():
             )
         }]
     if module_name:
-        try:
-            return jsonify(
-                aggregate_function(connector.credential_events,module_query)
-            ), 200
-        except Exception as _:
-            return flask_null_array_response()
-    else:
+        module_query.insert(0,{"$match" : {'module_name' : module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events,module_query)
+        ), 200
+    except Exception as _:
         return flask_null_array_response()
 
 
@@ -1067,18 +1047,7 @@ def top_passwords_used():
         JSON/Dict of top passwords used
     """
     module_name =get_value_from_request("module_name")
-    module_query=[{"$match" : {'module_name' : module_name}},
-    {"$group":
-        {
-            "_id":
-                {
-                    "ip": "$ip",
-                    "password" : "$password"
-                },
-           "count":
-                {
-                    "$sum": 1
-                }}},
+    module_query=[group_by_ip_and_password,
     {
             "$skip": fix_skip(
                 get_value_from_request("skip")
@@ -1090,13 +1059,12 @@ def top_passwords_used():
             )
         }]
     if module_name:
-        try:
-            return jsonify(
-                aggregate_function(connector.credential_events,module_query)
-            ), 200
-        except Exception as _:
-            return flask_null_array_response()
-    else:
+        module_query.insert(0,{"$match" : {'module_name' : module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events,module_query)
+        ), 200
+    except Exception as _:
         return flask_null_array_response()
 
 
