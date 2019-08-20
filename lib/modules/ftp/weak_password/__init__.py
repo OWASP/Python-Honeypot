@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import time
-from core.compatible import generate_token
 import os
 import json
 import datetime

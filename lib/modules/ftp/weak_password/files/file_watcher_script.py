@@ -6,8 +6,9 @@ import datetime
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-EXCLUDES = ['/dev' ]
-LOGFILE='/root/logs/ohp_ftp_weak_password_logs.txt'
+EXCLUDES = ['/dev']
+LOGFILE = '/root/logs/ohp_ftp_weak_password_logs.txt'
+
 
 class Watcher:
     DIRECTORY_TO_WATCH = "/"
@@ -33,13 +34,19 @@ class Handler(FileSystemEventHandler):
 
     @staticmethod
     def on_any_event(event):
-        if not (event.event_type == 'modified' and event.is_directory) and '/' + event.src_path.rsplit('/')[1] not in EXCLUDES:
+        if not (event.event_type == 'modified' and event.is_directory) \
+                and '/' + event.src_path.rsplit('/')[1] not in EXCLUDES:
             logfile_handle = open(LOGFILE, "a")
-            logfile_handle.write(json.dumps({'status' : event.event_type,
+            logfile_handle.write(
+                json.dumps(
+                    {
+                        'status': event.event_type,
                         'path': event.src_path,
-                        'module_name' : 'ftp/weak_password',
-                        'date' : datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-                                 +'\n')
+                        'module_name': 'ftp/weak_password',
+                        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                )
+                + '\n')
             logfile_handle.close()
 
 
