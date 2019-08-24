@@ -1,3 +1,4 @@
 pymongo
 netaddr
 flask
+watchdog
