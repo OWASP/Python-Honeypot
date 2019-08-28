@@ -18,6 +18,7 @@ database = client[api_configuration()["api_database_name"]]
 honeypot_events = database.honeypot_events
 network_events = database.network_events
 credential_events = database.credential_events
+file_change_events = database.file_change_events
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -95,6 +96,26 @@ def insert_honeypot_events_from_module_processor(ip, username, password, module_
             "username": username,
             "password": password,
             "country": str(IP2Location.get_country_short(ip).decode()),
+            "machine_name": network_configuration()["real_machine_identifier_name"]
+        }
+    ).inserted_id
+
+
+def insert_file_change_events(file_path,status,module_name,date):
+    """
+    insert file change events which are obtained from ftp/ssh weak_password module
+    args:
+    file_path : the path of the file which is changed
+    status: status of the file would be added/modified/deleted
+    module_name : on which module client accessed
+    date : datetime of the event
+    """
+    return file_change_events.insert_one(
+        {
+            "file_path": file_path,
+            "module_name": module_name,
+            "date": date,
+            "status" : status,
             "machine_name": network_configuration()["real_machine_identifier_name"]
         }
     ).inserted_id
