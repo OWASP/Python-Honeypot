@@ -16,7 +16,6 @@ RUN mkdir -p /etc/pam.d/ && echo -e "auth required pam_pwdfile.so pwdfile /etc/v
 
 # create /etc/init.d/vsftpd
 COPY files/vsftpd.sh /etc/init.d/vsftpd
-COPY files/history_append.sh /root/history_append.sh
 # install ftp (not necessary)
 RUN apt-get install -y ftp
 
