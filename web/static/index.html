@@ -63,45 +63,53 @@
             <br>
             <div class="col-md-6" style="">
                 <select id="module_username">
-					<option value="">All Modules</option>
+                    <!-- todo: add dynamic module names -->
+                    <option value="">All Modules</option>
+                    <option value="ftp/weak_password">FTP Weak Username</option>
+                    <option value="ftp/strong_password">FTP Strong Username</option>
+                    <option value="ssh/strong_password">SSH Strong Username</option>
+                    <option value="ssh/weak_password">SSH Weak Username</option>
+                    <option value="http/basic_auth_strong_password">HTTP Strong Username</option>
+                </select>
+                <table id="module_creds_username_table" class="table" style="width:50%; float:left">
+                    <thead>
+                    <tr>
+                        <th align="center">#</th>
+                        <th align="center">Username</th>
+                        <th align="center">IP Address</th>
+                        <th align="center">Count</th>
+                        <!-- todo: add module name column -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6" style="">
+                <select id="module_password">
+                    <!-- todo: add dynamic module names -->
+                    <option value="">All Modules</option>
                     <option value="ftp/weak_password">FTP Weak Password</option>
                     <option value="ftp/strong_password">FTP Strong Password</option>
-					<option value="ssh/strong_password">SSH Strong Password</option>
-					<option value="ssh/weak_password">SSH Weak Password</option>
-					<option value="http/basic_auth_strong_password">HTTP Strong Password</option>
+                    <option value="ssh/strong_password">SSH Strong Password</option>
+                    <option value="ssh/weak_password">SSH Weak Password</option>
+                    <option value="http/basic_auth_strong_password">HTTP Strong Password</option>
                 </select>
-				<table id="module_creds_username_table" class="table" style="width:50%; float:left">
-					<thead><tr>
-						<th align="center">#</th>
-						<th align="center">Username</th>
-						<th align="center">IP Address</th>
-						<th align="center">Count</th>
-					</tr></thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-			<div class="col-md-6" style="">
-				<select id="module_password">
-					<option value="">All Modules</option>
-                    <option value="ftp/weak_password">FTP Weak Password</option>
-                    <option value="ftp/strong_password">FTP Strong Password</option>
-					<option value="ssh/strong_password">SSH Strong Password</option>
-					<option value="ssh/weak_password">SSH Weak Password</option>
-					<option value="http/basic_auth_strong_password">HTTP Strong Password</option>
-                </select>
-				<table id="module_creds_password_table" class="table" style="width:50%; float:left">
-					<thead><tr>
-						<th align="center">#</th>
-						<th align="center">Password</th>
-						<th align="center">IP Address</th>
-						<th align="center">Count</th>
-					</tr></thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-        <!-- end of analytics-->
+                <table id="module_creds_password_table" class="table" style="width:50%; float:left">
+                    <thead>
+                    <tr>
+                        <th align="center">#</th>
+                        <th align="center">Password</th>
+                        <th align="center">IP Address</th>
+                        <th align="center">Count</th>
+                        <!-- todo: add module name column -->
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- end of analytics-->
     </center>
     <div class="align-content-center text-center">
         <!-- footer -->

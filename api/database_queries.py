@@ -80,35 +80,44 @@ top_countries_groupby = {
         }
 }
 
-group_by_ip={"$group":
-             {"_id":{
-                 "ip": "$ip"
-             },"count":{
-                 "$sum": 1
-             }
-             }
+group_by_ip = {
+    "$group":
+        {
+            "_id": {
+                "ip": "$ip"
+            },
+            "count": {
+                "$sum": 1
+            }
+        }
 }
 
-group_by_ip_and_username={"$group":
+group_by_ip_and_username = {
+    "$group":
         {
             "_id":
                 {
                     "ip": "$ip",
-                    "username" : "$username"
+                    "username": "$username"
                 },
-           "count":
+            "count":
                 {
                     "$sum": 1
-                }}}
+                }
+        }
+}
 
-group_by_ip_and_password={"$group":
+group_by_ip_and_password = {
+    "$group":
         {
             "_id":
                 {
                     "ip": "$ip",
-                    "password" : "$password"
+                    "password": "$password"
                 },
-           "count":
+            "count":
                 {
                     "$sum": 1
-                }}}
+                }
+        }
+}
