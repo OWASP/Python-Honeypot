@@ -29,6 +29,8 @@ from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
 from core.compatible import mkdir
 from core.compatible import get_module_dir_path
+from database.connector import insert_bulk_events_from_thread
+from database.connector import insert_events_in_bulk
 
 # temporary use fixed version of argparse
 if os_name() == "win32" or os_name() == "win64":
@@ -685,7 +687,6 @@ def load_honeypot_engine():
         name="new_network_events_thread"
     )
     new_network_events_thread.start()
-
     info(
         "all selected modules started: {0}".format(
             ", ".join(
@@ -693,6 +694,13 @@ def load_honeypot_engine():
             )
         )
     )
+
+    bulk_events_thread = threading.Thread(
+        target=insert_bulk_events_from_thread,
+        args=(),
+        name="insert_events_in_bulk_thread"
+    )
+    bulk_events_thread.start()
 
     # run module processors
     run_modules_processors(configuration)
@@ -703,6 +711,8 @@ def load_honeypot_engine():
         wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
     # kill the network events thread
     terminate_thread(new_network_events_thread)
+    terminate_thread(bulk_events_thread)
+    insert_events_in_bulk()  # if incase any events that were not inserted from thread
     # stop created containers
     stop_containers(configuration)
     # stop module processor

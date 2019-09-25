@@ -6,7 +6,6 @@ import os
 import json
 from core.compatible import generate_token
 from database.connector import insert_honeypot_events_from_module_processor
-from config import network_configuration
 
 
 class ModuleProcessor:
