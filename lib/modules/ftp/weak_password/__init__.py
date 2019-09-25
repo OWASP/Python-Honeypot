@@ -14,18 +14,24 @@ from database.connector import insert_file_change_events
 EXCLUDES = ['/dev']
 LOGFILE = 'tmp/ohp_ftp_weak_password_logs.txt'
 
+
 class Handler(FileSystemEventHandler):
 
     @staticmethod
     def on_any_event(event):
-        if not (event.event_type == 'modified' and event.is_directory) and '/' + event.src_path.rsplit('/')[
-            1] not in EXCLUDES:
+        if not (event.event_type == 'modified' and event.is_directory) and \
+                '/' + event.src_path.rsplit('/')[1] not in EXCLUDES:
             logfile_handle = open(LOGFILE, "a")
-            logfile_handle.write(json.dumps({'status': event.event_type,
-                                             'path': event.src_path,
-                                             'module_name': 'ftp/weak_password',
-                                             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
-                                 + '\n')
+            logfile_handle.write(
+                json.dumps(
+                    {
+                        'status': event.event_type,
+                        'path': event.src_path,
+                        'module_name': 'ftp/weak_password',
+                        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                )
+                + '\n')
             logfile_handle.close()
 
 
@@ -49,12 +55,12 @@ class ModuleProcessor:
         try:
             while not self.stop_execution:
                 time.sleep(1)
-        except:
+        except Exception as _:
             self.observer.stop()
         self.observer.join()
 
     def stop(self):
-        self.self_execution=True
+        self.self_execution = True
         self.observer.stop()
 
     def processor(self):
@@ -63,7 +69,7 @@ class ModuleProcessor:
         :return:
         """
         thread = threading.Thread(target=self.run, args=())
-        thread.start()                                  # Start the execution
+        thread.start()  # Start the execution
         if os.path.exists(self.log_filename):
             os.remove(self.log_filename)  # remove if exist from past
         while not self.kill_flag:
@@ -72,7 +78,6 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    print(data)
                     insert_file_change_events(
                         data['path'],
                         data['status'],
@@ -83,7 +88,6 @@ class ModuleProcessor:
             time.sleep(0.1)
         self.stop()
         terminate_thread(thread)
-
 
 
 def module_configuration():
