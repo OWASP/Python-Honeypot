@@ -68,7 +68,7 @@ class ModuleProcessor:
         processor function will be called as a new thread and will be die when kill_flag is True
         :return:
         """
-        thread = threading.Thread(target=self.run, args=())
+        thread = threading.Thread(target=self.run, args=(), name="ftp_weak_password_processor")
         thread.start()  # Start the execution
         if os.path.exists(self.log_filename):
             os.remove(self.log_filename)  # remove if exist from past
