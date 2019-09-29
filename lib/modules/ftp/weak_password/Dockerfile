@@ -12,7 +12,9 @@ COPY files/vsftpd.conf /etc/vsftpd.conf
 # create user config
 RUN mkdir -p /etc/vsftpd_user_conf && echo "local_root=/var/www/html" > /etc/vsftpd_user_conf/{username}
 
-RUN mkdir -p /etc/pam.d/ && echo -e "auth required pam_pwdfile.so pwdfile /etc/vsftpd/ftpd.passwd\x0aaccount required pam_permit.so" > /etc/pam.d/vsftpd
+RUN mkdir -p /etc/pam.d/
+RUN echo "auth required pam_pwdfile.so pwdfile /etc/vsftpd/ftpd.passwd" > /etc/pam.d/vsftpd
+RUN echo "account required pam_permit.so" >> /etc/pam.d/vsftpd
 
 # create /etc/init.d/vsftpd
 COPY files/vsftpd.sh /etc/init.d/vsftpd
