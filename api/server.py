@@ -10,6 +10,7 @@ from flask import request as flask_request
 from flask import jsonify
 from config import api_configuration
 from core.alert import write_to_api_console
+from core.get_modules import load_all_modules
 from database import connector
 from api.database_queries import top_ips_groupby
 from api.database_queries import top_machine_names_groupby
@@ -1070,6 +1071,22 @@ def top_passwords_used():
     try:
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+@app.route("/api/events/module-names", methods=["GET"])
+def all_module_names():
+    """
+    Get top passwords used according to module
+
+    Returns:
+        JSON/Dict of top passwords used
+    """
+    module_names=load_all_modules()
+    try:
+        return jsonify(
+            {"module_names": module_names}
         ), 200
     except Exception as _:
         return flask_null_array_response()

@@ -98,7 +98,8 @@ group_by_ip_and_username = {
             "_id":
                 {
                     "ip": "$ip",
-                    "username": "$username"
+                    "username": "$username",
+                    "module_name" : "$module_name"
                 },
             "count":
                 {
@@ -113,7 +114,8 @@ group_by_ip_and_password = {
             "_id":
                 {
                     "ip": "$ip",
-                    "password": "$password"
+                    "password": "$password",
+                    "module_name" : "$module_name"
                 },
             "count":
                 {
