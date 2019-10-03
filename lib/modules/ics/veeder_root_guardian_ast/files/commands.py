@@ -68,28 +68,94 @@ def I10200():
             'SYSTEM CONFIGURATION',
             '\r\n\r\n',
             'SLOT  BOARD TYPE                    POWER ON RESET     CURRENT\r\n',
-            '  1   PLLD SENSOR BD                     3882             3864\r\n',
-            '  2   INTERSTITIAL BD                  202440           201698\r\n',
-            '  3   8SMARTSENSOR BD                   39681            39594\r\n',
-            '  4   4 PROBE / G.T.                   164489           164087\r\n',
-            '  5   UNUSED                          9922452          9806112\r\n',
-            '  6   UNUSED                          9895411          9794026\r\n',
-            '  7   UNUSED                          9911016          9789239\r\n',
-            '  8   UNUSED                          9892610          9806957\r\n',
-            '  9   PLLD POWER BD                    100307           100205\r\n',
-            ' 10   PLLD POWER BD                    100133            99984\r\n',
-            ' 11   UNUSED                          9902247          9793640\r\n',
-            ' 12   UNUSED                          9906330          9807243\r\n',
-            ' 13   UNUSED                          9885509          9793619\r\n',
-            ' 14   UNUSED                          9904257          9790045\r\n',
-            ' 15   UNUSED                          9893889          9800940\r\n',
-            ' 16   UNUSED                          9890811          9786016\r\n',
-            '      COMM 1 ELEC DISP INT.            100852           100802\r\n',
-            '      COMM 2 SERIAL SAT BD             481672           480551\r\n',
-            '      COMM 3 UNUSED                   9906416          9803929\r\n',
-            '      COMM 4 UNUSED                   9884056          9782746\r\n',
-            '      COMM 5 UNUSED                   9898186          9806203\r\n',
-            '      COMM 6 UNUSED                   9890469          9786623\r\n',
+            '  1   PLLD SENSOR BD                     {0}             {1}\r\n'.format(
+                generate_randomize_int(3800, 200, -200),
+                generate_randomize_int(3800, 200, -200),
+            ),
+            '  2   INTERSTITIAL BD                    {0}             {1}\r\n'.format(
+                generate_randomize_int(20200, 200, -200),
+                generate_randomize_int(20200, 200, -200),
+            ),
+            '  3   8SMARTSENSOR BD                    {0}              {1}\r\n'.format(
+                generate_randomize_int(39600, 200, -200),
+                generate_randomize_int(39600, 200, -200),
+            ),
+            '  4   4 PROBE / G.T.                     {0}              {1}\r\n'.format(
+                generate_randomize_int(16400, 200, -200),
+                generate_randomize_int(16400, 200, -200),
+            ),
+            '  5   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9922400, 1200, -200),
+                generate_randomize_int(9806100, 1200, -200),
+            ),
+            '  6   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9895400, 200, -200),
+                generate_randomize_int(979400, 200, -200),
+            ),
+            '  7   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9911000, 200, -200),
+                generate_randomize_int(9789200, 200, -200),
+            ),
+            '  8   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9892600, 200, -200),
+                generate_randomize_int(9806900, 200, -200),
+            ),
+            '  9   PLLD POWER BD                      {0}              {1}\r\n'.format(
+                generate_randomize_int(100300, 200, -200),
+                generate_randomize_int(100300, 200, -200),
+            ),
+            ' 10   PLLD POWER BD                      {0}              {1}\r\n'.format(
+                generate_randomize_int(100100, 200, -200),
+                generate_randomize_int(99900, 200, -200),
+            ),
+            ' 11   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9902200, 200, -200),
+                generate_randomize_int(9793600, 200, -200),
+            ),
+            ' 12   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9906300, 200, -200),
+                generate_randomize_int(9807200, 200, -200),
+            ),
+            ' 13   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9885500, 200, -200),
+                generate_randomize_int(9793600, 200, -200),
+            ),
+            ' 14   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9904200, 200, -200),
+                generate_randomize_int(9790000, 200, -200),
+            ),
+            ' 15   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9893800, 200, -200),
+                generate_randomize_int(9800900, 200, -200),
+            ),
+            ' 16   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9890800, 200, -200),
+                generate_randomize_int(9786000, 200, -200),
+            ),
+            '      COMM 1 ELEC DISP INT.              {0}              {1}\r\n'.format(
+                generate_randomize_int(100800, 200, -200),
+                generate_randomize_int(100800, 200, -200),
+            ),
+            '      COMM 2 SERIAL SAT BD               {0}              {1}\r\n'.format(
+                generate_randomize_int(481600, 200, -200),
+                generate_randomize_int(480600, 200, -200),
+            ),
+            '      COMM 3 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9906400, 200, -200),
+                generate_randomize_int(9803900, 200, -200),
+            ),
+            '      COMM 4 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9884000, 200, -200),
+                generate_randomize_int(9782700, 200, -200),
+            ),
+            '      COMM 5 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9898100, 200, -200),
+                generate_randomize_int(9806200, 200, -200),
+            ),
+            '      COMM 6 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9890400, 200, -200),
+                generate_randomize_int(9786600, 200, -200),
+            ),
             '\r\n',
             '\x03'
         ]
