@@ -21,23 +21,23 @@ class TestApiUtility(unittest.TestCase):
 
     def test_fix_skip_pass(self):
         returned_values = fix_skip('0')
-        self.assertTrue(type(returned_values) is int)
+        self.assertTrue(isinstance(returned_values, int))
         self.assertEqual(returned_values, 0)
 
     def test_fix_skip_fail(self):
         returned_values = fix_skip('0')
-        self.assertFalse(type(returned_values) is not int)
+        self.assertFalse(isinstance(returned_values, str))
         self.assertNotEqual(returned_values, 1)
 
     def test_fix_limit_pass(self):
         returned_values = fix_limit('10')
         self.assertEqual(returned_values, 10)
-        self.assertTrue(type(returned_values) is int)
+        self.assertTrue(isinstance(returned_values, int))
 
     def test_fix_limit_fail(self):
         returned_values = fix_limit('0')
         self.assertNotEqual(returned_values, 11)
-        self.assertFalse(type(returned_values) is not int)
+        self.assertFalse(isinstance(returned_values, str))
 
     def test_fix_date(self):
         returned_values = fix_date("02:05:2019")
