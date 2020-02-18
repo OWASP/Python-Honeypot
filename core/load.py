@@ -663,7 +663,7 @@ def load_honeypot_engine():
     # remove old containers (in case they are not updated)
     remove_old_containers(configuration)
     # remove old images (in case they are not updated)
-    # remove_old_images(configuration)
+    remove_old_images(configuration)
     # create new images based on selected modules
     create_new_images(configuration)
     # create OWASP Honeypot networks in case not exist
@@ -710,7 +710,7 @@ def load_honeypot_engine():
     # remove created containers
     remove_old_containers(configuration)
     # remove created images
-    # remove_old_images(configuration)
+    remove_old_images(configuration)
     # remove_tmp_directories() error: access denied!
     # kill all missed threads
     for thread in threading.enumerate()[1:]:
