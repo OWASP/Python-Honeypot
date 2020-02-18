@@ -142,7 +142,7 @@ def stop_containers(configuration):
     if containers_list:
         for container in virtual_machine_names_to_container_names(configuration):
             if container in containers_list:
-                info("stopping container {0}".format(os.popen("docker stop {0}".format(container)).read().rsplit()[0]))
+                info("killing container {0}".format(os.popen("docker kill {0}".format(container)).read().rsplit()[0]))
     return True
 
 
@@ -174,7 +174,7 @@ def get_image_name_of_selected_modules(configuration):
     Returns:
         list of virtual machine image name
     """
-    return [configuration[selected_module]["virtual_machine_name"] for selected_module in configuration]
+    return virtual_machine_names_to_container_names(configuration)
 
 
 def remove_old_images(configuration):
@@ -220,18 +220,23 @@ def create_new_images(configuration):
         copy_dir_tree(configuration[selected_module]["files"], "files")
 
         # create docker image
-        info("creating image {0}".format(configuration[selected_module]["virtual_machine_name"]))
+        image_name = virtual_machine_name_to_container_name(
+            configuration[selected_module]["virtual_machine_name"],
+            selected_module
+        )
+
+        info("creating image {0}".format(image_name))
 
         # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
         # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
         # to create new modules
         if verbose_mode:
-            os.system("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"]))
+            os.system("docker build . -t {0}".format(image_name))
         else:
-            os.popen("docker build . -t {0}".format(configuration[selected_module]["virtual_machine_name"])).read()
+            os.popen("docker build . -t {0}".format(image_name)).read()
 
         # created
-        info("image {0} created".format(configuration[selected_module]["virtual_machine_name"]))
+        info("image {0} created".format(image_name))
 
         # go back to home directory
         os.chdir("../..")
@@ -258,40 +263,27 @@ def start_containers(configuration):
             configuration[selected_module]["virtual_machine_name"],
             selected_module
         )
+        configuration[selected_module]['container_name'] = container_name
         real_machine_port = configuration[selected_module]["real_machine_port_number"]
         virtual_machine_port = configuration[selected_module]["virtual_machine_port_number"]
         # connect to owasp honeypot networks!
-        if configuration[selected_module]["virtual_machine_internet_access"]:
-            # run the container with internet access
-            os.popen(
-                "docker run {0} --net ohp_internet --name={1} -d -t -p {2}:{3} {4}".format(
-                    " ".join(
-                        configuration[selected_module]["extra_docker_options"]
-                    ),
-                    container_name,
-                    real_machine_port,
-                    virtual_machine_port,
-                    configuration[selected_module]["virtual_machine_name"]
-                )
-            ).read()
-        else:
-            # run the container without internet access
-            os.popen(
-                "docker run {0} --net ohp_no_internet --name={1} -d -t -p {2}:{3} {4}".format(
-                    " ".join(
-                        configuration[selected_module]["extra_docker_options"]
-                    ),
-                    container_name,
-                    real_machine_port,
-                    virtual_machine_port,
-                    configuration[selected_module]["virtual_machine_name"]
-                )
-            ).read()
+        # run the container with internet access
+        os.popen(
+            "docker run {0} --net {4} --name={1} -d -t -p {2}:{3} {1}".format(
+                " ".join(
+                    configuration[selected_module]["extra_docker_options"]
+                ),
+                container_name,
+                real_machine_port,
+                virtual_machine_port,
+                'ohp_internet' if configuration[selected_module]["virtual_machine_internet_access"]
+                else 'ohp_no_internet'
+            )
+        ).read()
         try:
             virtual_machine_ip_address = os.popen(
                 "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
-                "{{{{.IPAddress}}}}{{{{end}}}}' {0}"
-                    .format(
+                "{{{{.IPAddress}}}}{{{{end}}}}' {0}".format(
                     container_name
                 )
             ).read().rsplit()[0].replace("\'", "")  # single quotes needs to be removed in windows
@@ -301,8 +293,7 @@ def start_containers(configuration):
         configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
         info(
-            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}"
-                .format(
+            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}".format(
                 container_name,
                 real_machine_port,
                 virtual_machine_ip_address,
@@ -474,11 +465,10 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
             if not port_is_reserved(real_machine_port):
                 unique_port = True
                 configuration[module_name]["real_machine_port_number"] = real_machine_port
+                duplicated_ports = []
                 for selected_module in configuration:
-                    if real_machine_port is configuration[selected_module]["real_machine_port_number"] and module_name \
-                            != selected_module:
-                        unique_port = False
-                if unique_port:
+                    duplicated_ports.append(configuration[selected_module]["real_machine_port_number"])
+                if duplicated_ports.count(real_machine_port) is 1:
                     info("port {0} selected for {1}".format(real_machine_port, module_name))
                     return real_machine_port
         except Exception as _:
@@ -673,7 +663,7 @@ def load_honeypot_engine():
     # remove old containers (in case they are not updated)
     remove_old_containers(configuration)
     # remove old images (in case they are not updated)
-    remove_old_images(configuration)
+    # remove_old_images(configuration)
     # create new images based on selected modules
     create_new_images(configuration)
     # create OWASP Honeypot networks in case not exist
@@ -712,7 +702,7 @@ def load_honeypot_engine():
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
-    insert_events_in_bulk()  # if incase any events that were not inserted from thread
+    insert_events_in_bulk()  # if in case any events that were not inserted from thread
     # stop created containers
     stop_containers(configuration)
     # stop module processor
@@ -720,8 +710,11 @@ def load_honeypot_engine():
     # remove created containers
     remove_old_containers(configuration)
     # remove created images
-    remove_old_images(configuration)
+    # remove_old_images(configuration)
     # remove_tmp_directories() error: access denied!
+    # kill all missed threads
+    for thread in threading.enumerate()[1:]:
+        terminate_thread(thread, False)
     info("finished.")
     # reset cmd/terminal color
     finish()
