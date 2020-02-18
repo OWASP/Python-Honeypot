@@ -105,12 +105,13 @@ def insert_events_in_bulk():
 
 
 def insert_bulk_events_from_thread():
-    '''
+    """
     Thread function for inserting bulk events in a thread
-    '''
+    :return: True/None
+    """
     while True:
         insert_events_in_bulk()
-        time.sleep(60)
+        time.sleep(3)
     return True
 
 

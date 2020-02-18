@@ -20,8 +20,10 @@ def virtual_machine_names_to_container_names(configuration):
     Returns:
         list of container name in array
     """
-    return ["{0}_{1}".format(configuration[selected_module]["virtual_machine_name"], selected_module.rsplit("/")[1])
-            for selected_module in configuration]
+    return [
+        "{0}_{1}".format(configuration[selected_module]["virtual_machine_name"], selected_module.rsplit("/")[1])
+        for selected_module in configuration
+    ]
 
 
 def virtual_machine_name_to_container_name(virtual_machine_name, module_name):
