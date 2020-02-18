@@ -303,7 +303,11 @@ def start_containers(configuration):
     return configuration
 
 
-def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration):
+def wait_until_interrupt(
+        virtual_machine_container_reset_factory_time_seconds,
+        configuration,
+        new_network_events_thread
+    ):
     """
     wait for opened threads/honeypots modules
 
@@ -331,6 +335,8 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
             info("interrupted by user, please wait to stop the containers and remove the containers and images")
+            break
+        if not new_network_events_thread.is_alive():
             break
     return True
 
@@ -698,7 +704,11 @@ def load_honeypot_engine():
     # check if it's not a test
     if not run_as_test:
         # wait forever! in case user can send ctrl + c to interrupt
-        wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration)
+        wait_until_interrupt(
+            virtual_machine_container_reset_factory_time_seconds,
+            configuration,
+            new_network_events_thread
+        )
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
