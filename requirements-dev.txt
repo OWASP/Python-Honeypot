@@ -1,5 +1,2 @@
-pymongo
-netaddr
-flask
-pytest
-codecov
+pytest==5.3.5
+codecov==2.0.15

@@ -1,3 +1,3 @@
-pymongo
-netaddr
-flask
+pymongo==3.9.0
+netaddr==0.7.19
+flask==1.1.1

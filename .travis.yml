@@ -22,7 +22,8 @@ before_install:
 script:
  - sudo service docker restart
  - sudo docker info
- - sudo pip install -r requirements-dev.txt
+ - sudo pip install -r requirements.txt
+ - sudo pip install -r requirements-dev.txt # only for development env
  - sleep 15 # wait for mongodb
  - sudo python ohp.py -m all --test
  - pytest
