@@ -13,6 +13,7 @@ from core.alert import info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
+from core._die import __die_failure
 
 
 def get_gateway_ip_addresses(configuration):
@@ -69,19 +70,23 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
+    # honeypot ports
+    honeypot_ports = []
+    for selected_module in configuration:
+        honeypot_ports.append(configuration[selected_module]["real_machine_port_number"])
     # set machine name
     machine_name = network_configuration()["real_machine_identifier_name"]
     # get ip addresses
     virtual_machine_ip_addresses = [configuration[selected_module]["ip_address"] for selected_module in configuration]
     # ignore vm ips + ips in config.py
-    ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] + virtual_machine_ip_addresses
-    ignore_ip_addresses.append(network_configuration()["real_machine_ip_address"])
+    ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] \
+        if network_configuration()["ignore_real_machine_ip_address"] else [] + virtual_machine_ip_addresses
     ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
     # ignore ports
     ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
-    run_tshark = ["tshark"]
+    run_tshark = ["tshark", "-l", "-V"]
     run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
     run_tshark.extend(
         [
@@ -92,6 +97,10 @@ def new_network_events(configuration):
         run_tshark,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
+    # wait 3 seconds if process terminated?
+    time.sleep(3)
+    if process.poll() is not None:
+        __die_failure("tshark couldn't capture network, maybe run as root!")
     # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
     # it will be easier to apply filters and analysis packets with python
     # if it requires to be run as root, please add a uid checker in framework startup
@@ -116,20 +125,14 @@ def new_network_events(configuration):
                             and ip not in ignore_ip_addresses \
                             and port not in ignore_ports:  # ignored ip addresses and ports in python - fix later
                         # check if the port is in selected module
-                        inserted_flag = True
-                        for selected_module in configuration:
-                            if port == configuration[selected_module]["real_machine_port_number"]:
-                                # insert honeypot event (selected module)
-                                insert_selected_modules_network_event(
-                                    ip,
-                                    port,
-                                    selected_module,
-                                    machine_name
-                                )
-                                inserted_flag = False
-                                break
-                        if inserted_flag:
-                            # insert common network event
+                        if port in honeypot_ports:
+                            insert_selected_modules_network_event(
+                                ip,
+                                port,
+                                selected_module,
+                                machine_name
+                            )
+                        else:
                             insert_other_network_event(
                                 ip,
                                 port,

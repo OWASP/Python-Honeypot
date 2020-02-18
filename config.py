@@ -46,8 +46,10 @@ def network_configuration():
     return {
         "store_network_captured_files": False,
         "real_machine_ip_address": real_machine_ip_address,
+        "ignore_real_machine_ip_address": True,  # or if you want to simulate from local network, save as False
         "real_machine_identifier_name": "stockholm_server_1",  # can be anything e.g. real_machine_ip_address, name, etc
-        "ignore_real_machine_ip_addresses": ["127.0.0.1"],  # e.g. ["10.0.0.1", "192.168.1.1"]
+        "ignore_real_machine_ip_addresses": list(set([real_machine_ip_address, "127.0.0.1"])),
+        # e.g. ["10.0.0.1", "192.168.1.1"]
         "ignore_real_machine_ports": []  # e.g. [22, 80, 5000]
     }
 
