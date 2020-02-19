@@ -3,7 +3,7 @@
 
 import socket
 
-from core._time import hours
+from core.time_helper import hours
 from core.compatible import generate_token
 
 real_machine_ip_address = socket.gethostbyname(socket.gethostname())

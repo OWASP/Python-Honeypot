@@ -10,7 +10,7 @@ import string
 import shutil
 import inspect
 
-from core._die import __die_failure
+from core.exit_helper import exit_failure
 
 __version__ = "0.0.1"
 __code_name__ = "SAME"
@@ -84,11 +84,11 @@ def check(language):
         # os.system("cls")
         pass
     else:
-        __die_failure(messages(language, "error_platform"))
+        exit_failure(messages(language, "error_platform"))
     if version() is 2 or version() is 3:
         pass
     else:
-        __die_failure(messages(language, "python_version_error"))
+        exit_failure(messages(language, "python_version_error"))
     logo()
     return True
 
@@ -132,7 +132,7 @@ def check_for_requirements(start_api_server):
         del netaddr
         del flask
     except Exception as _:
-        __die_failure("pip install -r requirements.txt")
+        exit_failure("pip install -r requirements.txt")
     # check mongodb
     try:
         connection = pymongo.MongoClient(api_configuration()["api_database"],
@@ -140,19 +140,19 @@ def check_for_requirements(start_api_server):
                                              "api_database_connection_timeout"])
         connection.list_database_names()
     except Exception as _:
-        __die_failure("cannot connect to mongodb")
+        exit_failure("cannot connect to mongodb")
     # check if its honeypot server not api server
     if not start_api_server:
         # check docker
         try:
             subprocess.check_output(["docker", "--help"], stderr=subprocess.PIPE)
         except Exception as _:
-            __die_failure(messages("en", "docker_error"))
+            exit_failure(messages("en", "docker_error"))
         # check tshark
         try:
             subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
         except Exception as _:
-            __die_failure("please install tshark first!")
+            exit_failure("please install tshark first!")
     return True
 
 

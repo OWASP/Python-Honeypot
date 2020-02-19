@@ -13,7 +13,7 @@ from core.alert import info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
-from core._die import __die_failure
+from core.exit_helper import exit_failure
 
 
 def get_gateway_ip_addresses(configuration):
@@ -100,7 +100,7 @@ def new_network_events(configuration):
     # wait 3 seconds if process terminated?
     time.sleep(3)
     if process.poll() is not None:
-        __die_failure("tshark couldn't capture network, maybe run as root!")
+        exit_failure("tshark couldn't capture network, maybe run as root!")
     # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
     # it will be easier to apply filters and analysis packets with python
     # if it requires to be run as root, please add a uid checker in framework startup
