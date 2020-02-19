@@ -5,7 +5,7 @@ import sys
 import ctypes
 
 
-def __die_success():
+def exit_success():
     """
     exit the framework with code 0
     """
@@ -14,7 +14,7 @@ def __die_success():
     sys.exit(0)
 
 
-def __die_failure(msg):
+def exit_failure(msg):
     """
     exit the framework with code 1
 
@@ -37,7 +37,7 @@ def terminate_thread(thread, output=True):
         output: print while killing
 
     Returns:
-        True
+        True/None
     """
     from core.alert import info
     if output:
@@ -53,9 +53,8 @@ def terminate_thread(thread, output=True):
     if res == 0:
         raise ValueError("nonexistent thread id")
     elif res > 1:
-        # """if it returns a number greater than one, you're in trouble,
-        # and you should call it again with exc=NULL to revert the effect"""
+        # if it returns a number greater than one, you're in trouble,
+        # and you should call it again with exc=NULL to revert the effect
         ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
         raise SystemError("PyThreadState_SetAsyncExc failed")
-
     return True

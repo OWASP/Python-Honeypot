@@ -9,6 +9,7 @@ import socket
 
 from core.get_modules import load_all_modules
 from core.alert import info
+from core.alert import error
 from core.color import finish
 from core.alert import messages
 from core.compatible import logo
@@ -17,13 +18,13 @@ from core.compatible import os_name
 from config import user_configuration
 from config import docker_configuration
 from config import network_configuration
-from core._die import __die_success
-from core._die import __die_failure
+from core.exit_helper import exit_success
+from core.exit_helper import exit_failure
 from core.compatible import make_tmp_thread_dir
 from core.get_modules import virtual_machine_names_to_container_names
 from core.get_modules import virtual_machine_name_to_container_name
 from core.network import new_network_events
-from core._die import terminate_thread
+from core.exit_helper import terminate_thread
 from api.server import start_api_server
 from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
@@ -303,11 +304,21 @@ def start_containers(configuration):
     return configuration
 
 
-def wait_until_interrupt(
-        virtual_machine_container_reset_factory_time_seconds,
-        configuration,
-        new_network_events_thread
-    ):
+def containers_are_unhealthy(configuration):
+    """
+    check if all selected module containers are up and running!
+
+    :param configuration: JSON container configuration
+    :return: []/[containters]
+    """
+    unhealthy_containers = [configuration[selected_module]['container_name'] for selected_module in configuration]
+    current_running_containers = running_containers()
+    return [containter for containter in unhealthy_containers if containter not in current_running_containers]
+
+
+def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
+                         configuration,
+                         new_network_events_thread):
     """
     wait for opened threads/honeypots modules
 
@@ -332,11 +343,18 @@ def wait_until_interrupt(
                 remove_old_containers(configuration)
                 # start containers based on selected modules
                 start_containers(configuration)
+            if not new_network_events_thread.is_alive():
+                return error("Interrupting the application because network capturing thread is not alive!")
+            if containers_are_unhealthy(configuration):
+                return error(
+                    "Interrupting the application because \"{0}\" container(s) is(are) not alive!"
+                        .format(
+                        ", ".join(containers_are_unhealthy(configuration))
+                    )
+                )
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
             info("interrupted by user, please wait to stop the containers and remove the containers and images")
-            break
-        if not new_network_events_thread.is_alive():
             break
     return True
 
@@ -608,13 +626,13 @@ def load_honeypot_engine():
     # check help menu
     if argv_options.show_help_menu:
         parser.print_help()
-        __die_success()
+        exit_success()
     # check for requirements before start
     check_for_requirements(argv_options.start_api_server)
     # check api server flag
     if argv_options.start_api_server:
         start_api_server()
-        __die_success()
+        exit_success()
     # check selected modules
     if argv_options.selected_modules:
         selected_modules = list(set(argv_options.selected_modules.rsplit(",")))
@@ -624,22 +642,22 @@ def load_honeypot_engine():
             selected_modules.remove("")
         # if selected modules are zero
         if not len(selected_modules):
-            __die_failure(messages("en", "zero_module_selected"))
+            exit_failure(messages("en", "zero_module_selected"))
         # if module not found
         for module in selected_modules:
             if module not in load_all_modules():
-                __die_failure(messages("en", "module_not_found").format(module))
+                exit_failure(messages("en", "module_not_found").format(module))
     # check excluded modules
     if argv_options.excluded_modules:
         excluded_modules = list(set(argv_options.excluded_modules.rsplit(",")))
         if "all" in excluded_modules:
-            __die_failure("you cannot exclude all modules")
+            exit_failure("you cannot exclude all modules")
         if "" in excluded_modules:
             excluded_modules.remove("")
         # remove excluded modules
         for module in excluded_modules:
             if module not in load_all_modules():
-                __die_failure(messages("en", "module_not_found").format(module))
+                exit_failure(messages("en", "module_not_found").format(module))
             # ignore if module not selected, it will remove anyway
             try:
                 selected_modules.remove(module)
@@ -647,7 +665,7 @@ def load_honeypot_engine():
                 del _
         # if selected modules are zero
         if not len(selected_modules):
-            __die_failure(messages("en", "zero_module_selected"))
+            exit_failure(messages("en", "zero_module_selected"))
     virtual_machine_container_reset_factory_time_seconds = argv_options. \
         virtual_machine_container_reset_factory_time_seconds
     global verbose_mode

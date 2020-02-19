@@ -6,7 +6,7 @@ import os
 import inspect
 import time
 
-from core._time import now
+from core.time_helper import now
 from config import api_configuration
 from config import network_configuration
 from lib.ip2location import IP2Location
