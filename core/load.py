@@ -14,7 +14,7 @@ from core.color import finish
 from core.alert import messages
 from core.compatible import logo
 from core.compatible import version
-from core.compatible import os_name
+from core.compatible import is_windows
 from config import user_configuration
 from config import docker_configuration
 from config import network_configuration
@@ -34,7 +34,7 @@ from database.connector import insert_bulk_events_from_thread
 from database.connector import insert_events_in_bulk
 
 # temporary use fixed version of argparse
-if os_name() == "win32" or os_name() == "win64":
+if is_windows():
     if version() is 2:
         from lib.argparse.v2 import argparse
     else:
