@@ -6,7 +6,7 @@ import socket
 from core.time_helper import hours
 from core.compatible import generate_token
 
-real_machine_ip_address = socket.gethostbyname(socket.gethostname())
+real_machine_ip_address = socket.gethostbyname("")
 
 
 def api_configuration():
