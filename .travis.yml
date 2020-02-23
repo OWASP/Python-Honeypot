@@ -25,6 +25,7 @@ script:
  - sudo pip install -r requirements-dev.txt # only for development env
  - sleep 15 # wait for mongodb
  - sudo python ohp.py -m all --test
+ - python -m pytest -rpP  # for running the tests in the directory tests
 
 after_success:
  - codecov
