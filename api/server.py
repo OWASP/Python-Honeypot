@@ -12,15 +12,15 @@ from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
 from database import connector
-from api.database_queries import top_ips_groupby
+from api.database_queries import top_ip_dests_groupby
 from api.database_queries import top_machine_names_groupby
-from api.database_queries import top_ports_groupby
+from api.database_queries import top_port_dests_groupby
 from api.database_queries import top_countries_groupby
 from api.database_queries import sort_by_count
 from api.database_queries import sort_by_count_and_id
-from api.database_queries import group_by_ip
-from api.database_queries import group_by_ip_and_password
-from api.database_queries import group_by_ip_and_username
+from api.database_queries import group_by_ip_dest
+from api.database_queries import group_by_ip_dest_and_password
+from api.database_queries import group_by_ip_dest_and_username
 from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
@@ -368,7 +368,7 @@ def top_ten_ips_in_honeypot_events():
     )
     country = get_value_from_request("country")
     top_ips_query = [
-        top_ips_groupby,
+        top_ip_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -439,7 +439,7 @@ def top_ten_ips_in_network_events():
     )
     country = get_value_from_request("country")
     top_ips_query = [
-        top_ips_groupby,
+        top_ip_dests_groupby,
         {
             "$skip": fix_skip(
                 get_value_from_request("skip")
@@ -512,7 +512,7 @@ def top_ten_ports_in_honeypot_events():
     )
     country = get_value_from_request("country")
     top_ports_query = [
-        top_ports_groupby,
+        top_port_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -580,7 +580,7 @@ def top_ten_ports_in_network_events():
     )
     country = get_value_from_request("country")
     top_ports_query = [
-        top_ports_groupby,
+        top_port_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -990,7 +990,7 @@ def module_events():
     """
     module_name = get_value_from_request("module_name")
     module_query = [
-        group_by_ip,
+        group_by_ip_dest,
         {
             "$skip": fix_skip(
                 get_value_from_request("skip")
@@ -1022,7 +1022,7 @@ def top_usernames_used():
     """
     module_name = get_value_from_request("module_name")
     module_query = [
-        group_by_ip_and_username,
+        group_by_ip_dest_and_username,
         {
             "$skip": fix_skip(
                 get_value_from_request("skip")
@@ -1054,7 +1054,7 @@ def top_passwords_used():
     """
     module_name = get_value_from_request("module_name")
     module_query = [
-        group_by_ip_and_password,
+        group_by_ip_dest_and_password,
         {
             "$skip": fix_skip(
                 get_value_from_request("skip")

@@ -14,6 +14,7 @@ from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
 from core.exit_helper import exit_failure
+from core.compatible import byte_to_str
 
 
 def get_gateway_ip_addresses(configuration):
@@ -119,8 +120,8 @@ def new_network_events(configuration):
                     # split the IP and Port
                     try:
                         line = line.rsplit()
-                        ip_dest = str(line[0].decode())
-                        ip_src = str(line[1].decode())
+                        ip_dest = byte_to_str(line[0])
+                        ip_src = byte_to_str(line[1])
                         port_dest = int(line[2])
                         port_src = int(line[3])
                         if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)) \
@@ -131,14 +132,15 @@ def new_network_events(configuration):
                             # ignored ip addresses and ports in python - fix later
                             # check if the port is in selected module
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
-                                insert_selected_modules_network_event(
-                                    ip_dest,
-                                    port_dest,
-                                    ip_src,
-                                    port_src,
-                                    selected_module,
-                                    machine_name
-                                )
+                                if port_dest in honeypot_ports:
+                                    insert_selected_modules_network_event(
+                                        ip_dest,
+                                        port_dest,
+                                        ip_src,
+                                        port_src,
+                                        selected_module,
+                                        machine_name
+                                    )
                             else:
                                 insert_other_network_event(
                                     ip_dest,
