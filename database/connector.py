@@ -34,13 +34,15 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_selected_modules_network_event(ip, port, module_name, machine_name):
+def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name):
     """
     insert selected modules event to honeypot_events collection
 
     Args:
-        ip: connected ip
-        port: connected port
+        ip_dest: dest ip (machine)
+        port_dest: dest port (machine)
+        ip_src: src ip
+        port_src: src port
         module_name: module name ran on the port
         machine_name: real machine name
 
@@ -50,25 +52,29 @@ def insert_selected_modules_network_event(ip, port, module_name, machine_name):
     global honeypot_events_queue
     honeypot_events_queue.append(
         {
-            "ip": ip,
-            "port": int(port),
+            "ip_dest": ip_dest,
+            "port_dest": int(port_dest),
+            "ip_src": ip_src,
+            "port_src": int(port_src),
             "module_name": module_name,
             "date": now(),
             "machine_name": machine_name,
             "event_type": "honeypot_event",
-            "country": str(IP2Location.get_country_short(ip).decode())
+            "country": str(IP2Location.get_country_short(ip_src).decode())
         }
     )
     return
 
 
-def insert_other_network_event(ip, port, machine_name):
+def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name):
     """
     insert other network events (port scan, etc..) to network_events collection
 
     Args:
-        ip: connected ip
-        port: connected port
+        ip_dest: dest ip (machine)
+        port_dest: dest port (machine)
+        ip_src: src ip
+        port_src: src port
         machine_name: real machine name
 
     Returns:
@@ -77,11 +83,13 @@ def insert_other_network_event(ip, port, machine_name):
     global network_events_queue
     network_events_queue.append(
         {
-            "ip": ip,
-            "port": int(port),
+            "ip_dest": ip_dest,
+            "port_dest": int(port_dest),
+            "ip_src": ip_src,
+            "port_src": int(port_src),
             "date": now(),
             "machine_name": machine_name,
-            "country": str(IP2Location.get_country_short(ip).decode())
+            "country": str(IP2Location.get_country_short(ip_src).decode())
         }
     )
     return
@@ -138,7 +146,7 @@ def insert_honeypot_events_from_module_processor(ip, username, password, module_
     ).inserted_id
 
 
-def insert_honeypot_events_data_from_module_processor(ip,module_name,date,data):
+def insert_honeypot_events_data_from_module_processor(ip, module_name, date, data):
     """
     insert data which is recieved from honeypot modules
     args:
@@ -152,7 +160,7 @@ def insert_honeypot_events_data_from_module_processor(ip,module_name,date,data):
             "ip": ip,
             "module_name": module_name,
             "date": date,
-            "data" : data,
+            "data": data,
             "country": str(IP2Location.get_country_short(ip).decode()),
             "machine_name": network_configuration()["real_machine_identifier_name"]
         }
