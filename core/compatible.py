@@ -237,3 +237,13 @@ def generate_token(length=32):
         token string
     """
     return "".join(random.choice("0123456789abcdef") for _ in range(32))
+
+
+def byte_to_str(data):
+    """
+    convert data to str
+
+    :param data: data
+    :return: str(data)
+    """
+    return str(data if isinstance(data, str) else data.decode() if isinstance(data, bytes) else data)

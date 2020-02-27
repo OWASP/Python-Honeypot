@@ -4,10 +4,11 @@
 import time
 import os
 import json
-import threading
 import socket
 
 from core.get_modules import load_all_modules
+from terminable_thread import Thread
+from terminable_thread import threading
 from core.alert import info
 from core.alert import error
 from core.color import finish
@@ -530,7 +531,7 @@ def run_modules_processors(configuration):
     :return:
     """
     for module in configuration:
-        module_processor_thread = threading.Thread(
+        module_processor_thread = Thread(
             target=configuration[module]["module_processor"].processor,
             name=virtual_machine_name_to_container_name(
                 configuration[module]["virtual_machine_name"],
@@ -695,7 +696,7 @@ def load_honeypot_engine():
     # start containers based on selected modules
     configuration = start_containers(configuration)
     # start network monitoring thread
-    new_network_events_thread = threading.Thread(
+    new_network_events_thread = Thread(
         target=new_network_events,
         args=(configuration,),
         name="new_network_events_thread"
@@ -709,7 +710,7 @@ def load_honeypot_engine():
         )
     )
 
-    bulk_events_thread = threading.Thread(
+    bulk_events_thread = Thread(
         target=insert_bulk_events_from_thread,
         args=(),
         name="insert_events_in_bulk_thread"
