@@ -2,6 +2,7 @@ language: python
 dist: xenial
 
 python:
+ - "2.7"
  - "3.7"
 
 os:
@@ -21,5 +22,10 @@ script:
  - sudo service docker restart
  - sudo docker info
  - sudo pip install -r requirements.txt
+ - sudo pip install -r requirements-dev.txt # only for development env
  - sleep 15 # wait for mongodb
  - sudo python ohp.py -m all --test
+ - python -m pytest -rpP  # for running the tests in the directory tests
+
+after_success:
+ - codecov

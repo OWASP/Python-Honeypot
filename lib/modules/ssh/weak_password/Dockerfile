@@ -11,7 +11,7 @@ RUN echo {username}:{password} | /usr/sbin/chpasswd
 RUN python -c "f=open(\"/etc/ssh/sshd_config\").read().replace(\"#Port 22\",\"Port 22\").replace(\"#PermitRootLogin yes\",\"PermitRootLogin yes\"); z = open(\"/etc/ssh/sshd_config\", \"w\");z.write(f); z.close(); print \"fixed sshd_config\""
 
 # run ssh-keygen non-interactive
-RUN ssh-keygen -f id_rsa -t rsa -N '' && service ssh restart
+RUN ssh-keygen -k -f id_rsa -t rsa -N '' -f /root/.ssh/id_rsa >/dev/null && service ssh restart
 
 # start the service + wait for container
 ENTRYPOINT service ssh restart && tail

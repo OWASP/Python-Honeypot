@@ -24,6 +24,94 @@ var chartColors = window.chartColors;
 var old_number_of_total_events;
 var new_number_of_total_events;
 
+function load_creds_username(module){
+	$.ajax({
+        type: "GET",
+        url: "/api/events/most-usernames-used",
+		data: {"module_name" : module},
+    }).done(function (res) {
+		var tableHtml='';
+		for (var i = 0; i < res.length; i++) {
+            var m = res[i];
+			var count= m.count;
+			var username= m._id.username;
+			var ip_dest= m._id.ip_dest;
+			var module_name = m._id.module_name;
+			tableHtml += "<tr>"
+				+"<td>"+ (i+1) +"</td>"
+                + "<td>"+ username+"</td>"
+				+  "<td>"+ ip_dest +"</td>"
+                +  "<td>"+ count +"</td>"
+				+  "<td>"+ module_name +"</td>"
+                + "</tr>";
+        }
+		$('#module_creds_username_table tbody').html(tableHtml);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+        if (errorThrown == "BAD REQUEST") {
+        }
+        if (errorThrown == "UNAUTHORIZED") {
+        }
+    });
+}
+
+function load_creds_password(module){
+	$.ajax({
+        type: "GET",
+        url: "/api/events/most-passwords-used",
+		data: {"module_name" : module},
+    }).done(function (res) {
+		var tableHtml='';
+		for (var i = 0; i < res.length; i++) {
+            var m = res[i];
+			var count= m.count;
+			var password= m._id.password;
+			var ip_dest= m._id.ip_dest;
+			var module_name = m._id.module_name;
+			tableHtml += "<tr>"
+				+"<td>"+ (i+1) +"</td>"
+                + "<td>"+ password+"</td>"
+				+  "<td>"+ ip_dest +"</td>"
+                +  "<td>"+ count +"</td>"
+			    +  "<td>" + module_name + "</td>"
+                + "</tr>";
+        }
+		$('#module_creds_password_table tbody').html(tableHtml);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+        if (errorThrown == "BAD REQUEST") {
+        }
+        if (errorThrown == "UNAUTHORIZED") {
+        }
+    });
+}
+
+function load_module_options(){
+	$.ajax({
+        type: "GET",
+        url: "/api/events/module-names",
+		data: {},
+    }).done(function (res) {
+		var tableHtml='<option value=\"\"> All Modules </option>';
+		for (var i = 0; i < res.module_names.length; i++) {
+            var module_name = res.module_names[i];
+			tableHtml += "<option value="+
+				module_name+">"
+				+module_name
+			+ "</option>";
+        }
+		$('#module_username').html(tableHtml);
+		$('#module_password').html(tableHtml);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+        if (errorThrown == "BAD REQUEST") {
+        }
+        if (errorThrown == "UNAUTHORIZED") {
+        }
+    });
+}
+
+
 function load_graphs() {
     var top_ten_ips_in_honeypot_events_graph_data_keys = [];
     var top_ten_ips_in_honeypot_events_graph_data_values = [];
@@ -56,6 +144,22 @@ function load_graphs() {
         }
         if (errorThrown == "UNAUTHORIZED") {
         }
+    });
+
+	var username_module = $('#module_username option:selected').val();
+	load_creds_username(username_module);
+	var password_module = $('#module_password option:selected').val();
+	load_creds_password(password_module);
+
+	// on change of module for creds data
+	$('#module_username').on('change',function(){
+        var module = $(this).val();
+        load_creds_username(module);
+    });
+
+	$('#module_password').on('change',function(){
+        var module = $(this).val();
+		load_creds_password(module);
     });
 
     // wait 3 seconds to get responded for the request
@@ -107,7 +211,7 @@ function load_graphs() {
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_honeypot_events_graph_data_keys.push(
-                        res[i]["_id"]["ip"] + " (" + res[i]["_id"]["country"] + ")"
+                        res[i]["_id"]["ip_dest"] + " (" + res[i]["_id"]["country_ip_dest"] + ")"
                     );
                     top_ten_ips_in_honeypot_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ips_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
@@ -163,7 +267,7 @@ function load_graphs() {
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_network_events_graph_data_keys.push(
-                        res[i]["_id"]["ip"] + " (" + res[i]["_id"]["country"] + ")"
+                        res[i]["_id"]["ip_dest"] + " (" + res[i]["_id"]["country_ip_dest"] + ")"
                        );
                     top_ten_ips_in_network_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ips_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
@@ -218,7 +322,7 @@ function load_graphs() {
                 url: "/api/events/honeypot-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]["port"]);
+                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]["port_dest"]);
                     top_ten_ports_in_honeypot_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ports_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
@@ -272,7 +376,7 @@ function load_graphs() {
                 url: "/api/events/network-events-ports",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]["port"]);
+                    top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]["port_dest"]);
                     top_ten_ports_in_network_events_graph_data_values.push(res[i]["count"]);
                     top_ten_ports_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
@@ -648,6 +752,8 @@ function keep_update() {
 
 // load first time
 load_graphs();
+//only load one time
+load_module_options();
 
 // 30 seconds delay loop
 keep_update();

@@ -5,12 +5,14 @@ import time
 from core.compatible import generate_token
 import os
 import json
-from database.connector import insert_honeypot_events_from_module_processor
+from database.connector import insert_honeypot_events_credential_from_module_processor
+
 
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the log files or do other needed process...
     """
+
     def __init__(self):
         self.kill_flag = False
         self.log_filename = 'tmp/ohp_ftp_strong_password_creds_logs.txt'
@@ -29,7 +31,7 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    insert_honeypot_events_from_module_processor(
+                    insert_honeypot_events_credential_from_module_processor(
                         data['ip'],
                         data['username'],
                         data['password'],
@@ -48,8 +50,8 @@ def module_configuration():
         JSON/Dict module configuration
     """
     return {
-         "username": "admin",
-         "password": generate_token(16),
-         "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
-         "module_processor": ModuleProcessor()
+        "username": "admin",
+        "password": generate_token(16),
+        "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
+        "module_processor": ModuleProcessor()
     }

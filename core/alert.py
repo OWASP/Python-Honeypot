@@ -6,7 +6,7 @@ import sys
 import json
 from core import color
 from core.compatible import version
-from core._time import now
+from core.time_helper import now
 
 
 def is_not_run_from_api():
@@ -16,7 +16,7 @@ def is_not_run_from_api():
     Returns:
         True if run from API otherwise False
     """
-    if "--start-api" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
+    if "--start-api-server" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
         return False
     return True
 
@@ -32,7 +32,7 @@ def messages(language, msg_id):
     Returns:
         the message content in the selected language if message found otherwise return message in English
     """
-    # Returning selected langauge
+    # Returning selected language
     if language is -1:
         return list(
             set(
@@ -71,7 +71,7 @@ def messages(language, msg_id):
     return msgs
 
 
-def __input_msg(content):
+def input_msg(content):
     """
     build the input message to get input from users
 

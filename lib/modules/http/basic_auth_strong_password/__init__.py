@@ -6,8 +6,7 @@ from core.compatible import generate_token
 import os
 import binascii
 import json
-from database.connector import insert_honeypot_events_from_module_processor
-from database.connector import insert_honeypot_events_data_from_module_processor
+from database.connector import insert_honeypot_events_credential_from_module_processor
 
 
 class ModuleProcessor:
@@ -42,7 +41,7 @@ class ModuleProcessor:
                         ).decode('utf-8')  # binascii is returning bytes
                         username = authorization.split(":")[0]
                         password = ":".join(authorization.split(":")[1:])
-                        insert_honeypot_events_from_module_processor(
+                        insert_honeypot_events_credential_from_module_processor(
                             ip,
                             username,
                             password,
