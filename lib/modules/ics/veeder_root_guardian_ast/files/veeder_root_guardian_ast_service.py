@@ -23,7 +23,15 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setblocking(0)
 server_socket.bind(("0.0.0.0", module_configuration()["virtual_machine_port_number"]))
 server_socket.listen(10)
-log_connections = open("/root/ics_veeder_root_guardian_ast.log", "wb")
+
+logs_filename = "/tmp/ics_veeder_root_guardian_ast.log"
+
+
+def save_log(log_data):
+    log_connections = open(logs_filename, "ab")
+    log_connections.write(json.dumps(log_data) + "\n")
+    log_connections.close()
+
 
 # list of all commands
 commands = {
@@ -160,12 +168,10 @@ while True:
                 new_con, addr = server_socket.accept()
                 log_data = {
                     "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "ip": addr,
+                    "ip": addr[0],
                     "module_name": "ics/veeder_root_guardian_ast",
-                    "data": {
-                        "content": "",
-                        "valid_command": False
-                    },
+                    "content": "",
+                    "valid_command": False
                 }
                 new_con.settimeout(30.0)
                 active_sockets.append(new_con)
@@ -184,41 +190,44 @@ while True:
                     if response[0] != "\x01":
                         conn.close()
                         active_sockets.remove(conn)
+                        log_data["content"] = response
+                        save_log(log_data)
                         continue
                     if len(response) < 6:
                         conn.close()
                         active_sockets.remove(conn)
+                        log_data["content"] = response
+                        save_log(log_data)
                         continue
                     cmd = response[1:7]
                     if cmd in commands:
-                        log_data["data"]["valid_command"] = True
+                        log_data["valid_command"] = True
                         for data in commands[cmd]().rsplit("\r\n"):
                             data += "\r\n"
                             conn.send(data)
                             time.sleep(random.choice(([0.01] * 10) + ([0.1] * 10) + ([1] * 3)))
                         print(addr[0], cmd, "responded")
-                    log_data["data"]["content"] = response
-                    log_connections.write(json.dumps(log_data))
+                    log_data["content"] = response
+                    save_log(log_data)
                 except Exception, e:
                     print("Unknown Error: {}".format(str(e)))
                     try:
-                        log_data["data"]["content"] = response
+                        log_data["content"] = response
                     except:
                         pass
-                    log_connections.write(json.dumps(log_data))
+                    save_log(log_data)
                     raise
                 except KeyboardInterrupt:
                     try:
-                        log_data["data"]["content"] = response
+                        log_data["content"] = response
                     except:
                         pass
-                    log_connections.write(json.dumps(log_data))
+                    save_log(log_data)
                     conn.close()
                 except select.error:
                     try:
-                        log_data["data"]["content"] = response
+                        log_data["content"] = response
                     except:
                         pass
-                    log_connections.write(json.dumps(log_data))
+                    save_log(log_data)
                     conn.close()
-log_connections.close()
