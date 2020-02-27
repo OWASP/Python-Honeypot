@@ -246,4 +246,4 @@ def byte_to_str(data):
     :param data: data
     :return: str(data)
     """
-    return data if type(data) == str else str(data.decode())
+    return str(data if type(data) == str else data.decode() if type(data) == bytes else data)
