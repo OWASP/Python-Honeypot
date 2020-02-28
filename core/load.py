@@ -595,7 +595,7 @@ def argv_parser():
     engineOpt.add_argument("--start-api-server", action="store_true", dest="start_api_server", default=False,
                            help="start API server")
     # enable verbose mode (debug mode)
-    engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
+    engineOpt.add_argument("-v", "--verbose", action="store_true", dest="verbose_mode", default=False,
                            help="enable verbose mode")
     # disable color CLI
     engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
@@ -698,7 +698,7 @@ def load_honeypot_engine():
     # start network monitoring thread
     new_network_events_thread = Thread(
         target=new_network_events,
-        args=(configuration,),
+        args=(configuration, verbose_mode),
         name="new_network_events_thread"
     )
     new_network_events_thread.start()

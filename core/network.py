@@ -10,6 +10,7 @@ import os
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
 from core.alert import info
+from core.alert import network_info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
@@ -60,7 +61,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def new_network_events(configuration):
+def new_network_events(configuration, verbose_mode = False):
     """
     get and submit new network events
 
@@ -131,8 +132,12 @@ def new_network_events(configuration):
                                 and port_src not in ignore_ports:
                             # ignored ip addresses and ports in python - fix later
                             # check if the port is in selected module
+
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
                                 if port_dest in honeypot_ports:
+
+                                    if verbose_mode : 
+                                        network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = True)
                                     insert_selected_modules_network_event(
                                         ip_dest,
                                         port_dest,
@@ -142,6 +147,8 @@ def new_network_events(configuration):
                                         machine_name
                                     )
                             else:
+                                if verbose_mode :
+                                    network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False)
                                 insert_other_network_event(
                                     ip_dest,
                                     port_dest,

@@ -201,6 +201,26 @@ def warn(content):
     return
 
 
+def network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False):
+    """
+    build the incoming and outgoing packet information message
+
+    args:
+        ip_src : source IP
+        ip_dest : destination IP
+        port_src : source port
+        port_dest : destination port
+        honeypot_event : Bool value to itentify if the packet is an honeypot event
+    return:
+        the packet information message - None
+    """
+    if honeypot_event: 
+        warn(f"src IP: {ip_src:<16} src port: {port_src:<10} | dest IP {ip_dest:<16} dest port {port_dest:<10}")
+
+    else:
+        write(f"[*] [{now()}] src IP: {ip_src:<16} src port: {port_src:<10} | dest IP {ip_dest:<16} dest port {port_dest:<10}\n")
+
+
 def error(content):
     """
     build the error message
