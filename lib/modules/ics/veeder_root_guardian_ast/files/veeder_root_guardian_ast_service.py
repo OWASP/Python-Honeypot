@@ -10,6 +10,7 @@ import select
 import datetime
 import time
 import random
+import json
 
 # import all commands
 from commands import *
@@ -22,6 +23,15 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setblocking(0)
 server_socket.bind(("0.0.0.0", module_configuration()["virtual_machine_port_number"]))
 server_socket.listen(10)
+
+logs_filename = "/tmp/ics_veeder_root_guardian_ast.log"
+
+
+def save_log(log_data):
+    log_connections = open(logs_filename, "ab")
+    log_connections.write(json.dumps(log_data) + "\n")
+    log_connections.close()
+
 
 # list of all commands
 commands = {
@@ -156,11 +166,18 @@ while True:
         for conn in readable:
             if conn is server_socket:
                 new_con, addr = server_socket.accept()
+                log_data = {
+                    "date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "ip": addr[0],
+                    "module_name": "ics/veeder_root_guardian_ast",
+                    "content": "",
+                    "valid_command": False
+                }
                 new_con.settimeout(30.0)
                 active_sockets.append(new_con)
             else:
                 addr = conn.getpeername()
-                print addr[0], "connected"
+                print(addr[0], "connected")
                 try:
                     TIME = datetime.datetime.utcnow()
                     response = conn.recv(4096)
@@ -173,22 +190,44 @@ while True:
                     if response[0] != "\x01":
                         conn.close()
                         active_sockets.remove(conn)
+                        log_data["content"] = response
+                        save_log(log_data)
                         continue
                     if len(response) < 6:
                         conn.close()
                         active_sockets.remove(conn)
+                        log_data["content"] = response
+                        save_log(log_data)
                         continue
                     cmd = response[1:7]
                     if cmd in commands:
+                        log_data["valid_command"] = True
                         for data in commands[cmd]().rsplit("\r\n"):
                             data += "\r\n"
                             conn.send(data)
                             time.sleep(random.choice(([0.01] * 10) + ([0.1] * 10) + ([1] * 3)))
-                        print addr[0], cmd, "responded"
+                        print(addr[0], cmd, "responded")
+                    log_data["content"] = response
+                    save_log(log_data)
                 except Exception, e:
-                    print "Unknown Error: {}".format(str(e))
+                    print("Unknown Error: {}".format(str(e)))
+                    try:
+                        log_data["content"] = response
+                    except:
+                        pass
+                    save_log(log_data)
                     raise
                 except KeyboardInterrupt:
+                    try:
+                        log_data["content"] = response
+                    except:
+                        pass
+                    save_log(log_data)
                     conn.close()
                 except select.error:
+                    try:
+                        log_data["content"] = response
+                    except:
+                        pass
+                    save_log(log_data)
                     conn.close()
