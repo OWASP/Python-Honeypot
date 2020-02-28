@@ -40,6 +40,20 @@ def generate_randomize_int(number, plus, minus):
     return "%d" % random.randint(number + minus, number + plus)
 
 
+def shifted_time(minutes=0, time_model="%I:%M %p"):
+    dt = datetime.datetime.now()
+    time_shifted = dt + datetime.timedelta(minutes=minutes)
+    time = time_shifted.strftime(time_model)
+    return time
+
+
+def shifted_date(days=0, date_model="%d-%m-%Y"):
+    dt = datetime.datetime.now()
+    date_shifted = dt + datetime.timedelta(days=days)
+    date = date_shifted.strftime(date_model)
+    return date
+
+
 def I10100():
     return "".join(
         [
@@ -68,28 +82,94 @@ def I10200():
             'SYSTEM CONFIGURATION',
             '\r\n\r\n',
             'SLOT  BOARD TYPE                    POWER ON RESET     CURRENT\r\n',
-            '  1   PLLD SENSOR BD                     3882             3864\r\n',
-            '  2   INTERSTITIAL BD                  202440           201698\r\n',
-            '  3   8SMARTSENSOR BD                   39681            39594\r\n',
-            '  4   4 PROBE / G.T.                   164489           164087\r\n',
-            '  5   UNUSED                          9922452          9806112\r\n',
-            '  6   UNUSED                          9895411          9794026\r\n',
-            '  7   UNUSED                          9911016          9789239\r\n',
-            '  8   UNUSED                          9892610          9806957\r\n',
-            '  9   PLLD POWER BD                    100307           100205\r\n',
-            ' 10   PLLD POWER BD                    100133            99984\r\n',
-            ' 11   UNUSED                          9902247          9793640\r\n',
-            ' 12   UNUSED                          9906330          9807243\r\n',
-            ' 13   UNUSED                          9885509          9793619\r\n',
-            ' 14   UNUSED                          9904257          9790045\r\n',
-            ' 15   UNUSED                          9893889          9800940\r\n',
-            ' 16   UNUSED                          9890811          9786016\r\n',
-            '      COMM 1 ELEC DISP INT.            100852           100802\r\n',
-            '      COMM 2 SERIAL SAT BD             481672           480551\r\n',
-            '      COMM 3 UNUSED                   9906416          9803929\r\n',
-            '      COMM 4 UNUSED                   9884056          9782746\r\n',
-            '      COMM 5 UNUSED                   9898186          9806203\r\n',
-            '      COMM 6 UNUSED                   9890469          9786623\r\n',
+            '  1   PLLD SENSOR BD                     {0}             {1}\r\n'.format(
+                generate_randomize_int(3800, 200, -200),
+                generate_randomize_int(3800, 200, -200),
+            ),
+            '  2   INTERSTITIAL BD                    {0}             {1}\r\n'.format(
+                generate_randomize_int(20200, 200, -200),
+                generate_randomize_int(20200, 200, -200),
+            ),
+            '  3   8SMARTSENSOR BD                    {0}              {1}\r\n'.format(
+                generate_randomize_int(39600, 200, -200),
+                generate_randomize_int(39600, 200, -200),
+            ),
+            '  4   4 PROBE / G.T.                     {0}              {1}\r\n'.format(
+                generate_randomize_int(16400, 200, -200),
+                generate_randomize_int(16400, 200, -200),
+            ),
+            '  5   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9922400, 1200, -200),
+                generate_randomize_int(9806100, 1200, -200),
+            ),
+            '  6   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9895400, 200, -200),
+                generate_randomize_int(979400, 200, -200),
+            ),
+            '  7   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9911000, 200, -200),
+                generate_randomize_int(9789200, 200, -200),
+            ),
+            '  8   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9892600, 200, -200),
+                generate_randomize_int(9806900, 200, -200),
+            ),
+            '  9   PLLD POWER BD                      {0}              {1}\r\n'.format(
+                generate_randomize_int(100300, 200, -200),
+                generate_randomize_int(100300, 200, -200),
+            ),
+            ' 10   PLLD POWER BD                      {0}              {1}\r\n'.format(
+                generate_randomize_int(100100, 200, -200),
+                generate_randomize_int(99900, 200, -200),
+            ),
+            ' 11   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9902200, 200, -200),
+                generate_randomize_int(9793600, 200, -200),
+            ),
+            ' 12   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9906300, 200, -200),
+                generate_randomize_int(9807200, 200, -200),
+            ),
+            ' 13   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9885500, 200, -200),
+                generate_randomize_int(9793600, 200, -200),
+            ),
+            ' 14   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9904200, 200, -200),
+                generate_randomize_int(9790000, 200, -200),
+            ),
+            ' 15   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9893800, 200, -200),
+                generate_randomize_int(9800900, 200, -200),
+            ),
+            ' 16   UNUSED                             {0}              {1}\r\n'.format(
+                generate_randomize_int(9890800, 200, -200),
+                generate_randomize_int(9786000, 200, -200),
+            ),
+            '      COMM 1 ELEC DISP INT.              {0}              {1}\r\n'.format(
+                generate_randomize_int(100800, 200, -200),
+                generate_randomize_int(100800, 200, -200),
+            ),
+            '      COMM 2 SERIAL SAT BD               {0}              {1}\r\n'.format(
+                generate_randomize_int(481600, 200, -200),
+                generate_randomize_int(480600, 200, -200),
+            ),
+            '      COMM 3 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9906400, 200, -200),
+                generate_randomize_int(9803900, 200, -200),
+            ),
+            '      COMM 4 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9884000, 200, -200),
+                generate_randomize_int(9782700, 200, -200),
+            ),
+            '      COMM 5 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9898100, 200, -200),
+                generate_randomize_int(9806200, 200, -200),
+            ),
+            '      COMM 6 UNUSED                      {0}              {1}\r\n'.format(
+                generate_randomize_int(9890400, 200, -200),
+                generate_randomize_int(9786600, 200, -200),
+            ),
             '\r\n',
             '\x03'
         ]
@@ -105,57 +185,107 @@ def I11100():
             module_configuration()["company_name_address"],
             '\r\n\r\n',
             'PRIORITY ALARM HISTORY\r\n',
-            'ID  CATEGORY  DESCRIPTION          ALARM TYPE           STATE    DATE    TIME\r\n',
-            'Q 4 OTHER     DIESEL               PERIODIC LINE FAIL   CLEAR   7-09-18  2:49PM\r\n',
-            'Q 4 OTHER     DIESEL               PERIODIC LINE FAIL   ALARM   7-09-18  4:36AM\r\n',
-            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  CLEAR   6-19-18  9:01AM\r\n',
-            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      CLEAR   6-19-18  9:01AM\r\n',
-            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  ALARM   6-19-18  8:46AM\r\n',
-            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      ALARM   6-19-18  8:46AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   5-10-18 11:29AM\r\n',
-            'Q 3 OTHER     SUPREME              GROSS LINE FAIL      CLEAR   5-10-18 11:29AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   5-10-18 11:24AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   5-10-18 10:52AM\r\n',
-            'Q 3 OTHER     SUPREME              GROSS LINE FAIL      ALARM   5-10-18 10:52AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   5-10-18 10:43AM\r\n',
-            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  CLEAR   4-19-18 11:34AM\r\n',
-            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      CLEAR   4-19-18 11:34AM\r\n',
-            'Q 2 OTHER     PLUS                 PLLD SHUTDOWN ALARM  CLEAR   4-19-18 11:33AM\r\n',
-            'Q 2 OTHER     PLUS                 GROSS LINE FAIL      CLEAR   4-19-18 11:33AM\r\n',
-            'Q 1 OTHER     REGULAR              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 11:33AM\r\n',
-            'Q 1 OTHER     REGULAR              GROSS LINE FAIL      CLEAR   4-19-18 11:33AM\r\n',
-            'L 2 ANNULAR   PLUS ANNULAR         FUEL ALARM           CLEAR   4-19-18 11:09AM\r\n',
-            'L 2 ANNULAR   PLUS ANNULAR         FUEL ALARM           ALARM   4-19-18 11:06AM\r\n',
-            'L 1 ANNULAR   REGULAR ANNULAR      FUEL ALARM           CLEAR   4-19-18 11:01AM\r\n',
-            'L 1 ANNULAR   REGULAR ANNULAR      FUEL ALARM           ALARM   4-19-18 11:00AM\r\n',
-            'L 4 ANNULAR   DIESEL ANNULAR       FUEL ALARM           CLEAR   4-19-18 10:55AM\r\n',
-            'L 4 ANNULAR   DIESEL ANNULAR       FUEL ALARM           ALARM   4-19-18 10:51AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   4-19-18 10:46AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   4-19-18 10:45AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              WATER ALARM          CLEAR   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              WATER ALARM          ALARM   4-19-18 10:45AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   4-19-18 10:45AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              FUEL ALARM           CLEAR   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              FUEL ALARM           ALARM   4-19-18 10:45AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   4-19-18 10:45AM\r\n',
-            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   4-19-18 10:44AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 10:43AM\r\n',
-            's 6 OTHER     3,4 PAN              WATER ALARM          CLEAR   4-19-18 10:43AM\r\n',
-            's 6 OTHER     3,4 PAN              WATER ALARM          ALARM   4-19-18 10:42AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   4-19-18 10:42AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 10:42AM\r\n',
-            's 6 OTHER     3,4 PAN              FUEL ALARM           CLEAR   4-19-18 10:42AM\r\n',
-            's 6 OTHER     3,4 PAN              FUEL ALARM           ALARM   4-19-18 10:42AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   4-19-18 10:42AM\r\ns',
-            ' 7 OTHER     5,6 PAN-DIESEL       WATER ALARM          CLEAR   4-19-18 10:41AM\r\n',
-            's 7 OTHER     5,6 PAN-DIESEL       WATER ALARM          ALARM   4-19-18 10:41AM\r\n',
-            's 7 OTHER     5,6 PAN-DIESEL       FUEL ALARM           CLEAR   4-19-18 10:41AM\r\n',
-            's 7 OTHER     5,6 PAN-DIESEL       FUEL ALARM           ALARM   4-19-18 10:41AM\r\n',
-            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   4-19-18 10:40AM\r\n',
-            's 5 OTHER     1,2 PAN              WATER ALARM          CLEAR   4-19-18 10:40AM\r\n',
+            'ID  CATEGORY  DESCRIPTION          ALARM TYPE           STATE    DATE     TIME\r\n',
+            'Q 4 OTHER     DIESEL               PERIODIC LINE FAIL   CLEAR    {0}      {1}\r\n'.format(
+                shifted_date(2), shifted_time(120)),
+            'Q 4 OTHER     DIESEL               PERIODIC LINE FAIL   ALARM   {0}       {1}\r\n'.format(
+                shifted_date(2), shifted_time(10)),
+            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  CLEAR   {0}       {1}\r\n'.format(
+                shifted_date(1), shifted_time(-10)),
+            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(1), shifted_time(-10)),
+            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\n'.format(
+                shifted_date(1), shifted_time(-25)),
+            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      ALARM   {0}        {1}\r\n'.format(
+                shifted_date(1), shifted_time(-25)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(65)),
+            'Q 3 OTHER     SUPREME              GROSS LINE FAIL      CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(65)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(61)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(55)),
+            'Q 3 OTHER     SUPREME              GROSS LINE FAIL      ALARM   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(56)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   {0}        {1}\r\n'.format(
+                shifted_date(0), shifted_time(48)),
+            'Q 4 OTHER     DIESEL               PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(70)),
+            'Q 4 OTHER     DIESEL               GROSS LINE FAIL      CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(70)),
+            'Q 2 OTHER     PLUS                 PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(69)),
+            'Q 2 OTHER     PLUS                 GROSS LINE FAIL      CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(69)),
+            'Q 1 OTHER     REGULAR              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(69)),
+            'Q 1 OTHER     REGULAR              GROSS LINE FAIL      CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(69)),
+            'L 2 ANNULAR   PLUS ANNULAR         FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(50)),
+            'L 2 ANNULAR   PLUS ANNULAR         FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(47)),
+            'L 1 ANNULAR   REGULAR ANNULAR      FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(42)),
+            'L 1 ANNULAR   REGULAR ANNULAR      FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(41)),
+            'L 4 ANNULAR   DIESEL ANNULAR       FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(36)),
+            'L 4 ANNULAR   DIESEL ANNULAR       FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(32)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(28)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              WATER ALARM          CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              WATER ALARM          ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(27)),
+            's 8 OTHER     7,8 PAN              INSTALL ALARM        ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(26)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(25)),
+            's 6 OTHER     3,4 PAN              WATER ALARM          CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(25)),
+            's 6 OTHER     3,4 PAN              WATER ALARM          ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(24)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(24)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(24)),
+            's 6 OTHER     3,4 PAN              FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(24)),
+            's 6 OTHER     3,4 PAN              FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(24)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  ALARM   {0}        {1}\r\ns'.format(
+                shifted_date(-30), shifted_time(24)),
+            ' 7 OTHER     5,6 PAN-DIESEL       WATER ALARM          CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(23)),
+            's 7 OTHER     5,6 PAN-DIESEL       WATER ALARM          ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(23)),
+            's 7 OTHER     5,6 PAN-DIESEL       FUEL ALARM           CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(23)),
+            's 7 OTHER     5,6 PAN-DIESEL       FUEL ALARM           ALARM   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(23)),
+            'Q 3 OTHER     SUPREME              PLLD SHUTDOWN ALARM  CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(22)),
+            's 5 OTHER     1,2 PAN              WATER ALARM          CLEAR   {0}        {1}\r\n'.format(
+                shifted_date(-30), shifted_time(22)),
             '\r\n',
             '\x03'
         ]

@@ -10,7 +10,7 @@ dist/*
 *egg-info*
 
 #tmp files
-tmp/thread_*
+tmp/*
 *.py~
 *.log
 results.*
