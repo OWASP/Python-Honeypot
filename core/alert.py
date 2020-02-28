@@ -214,7 +214,7 @@ def network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False):
     return:
         the packet information message - None
     """
-    if honeypot_event: 
+    if honeypot_event:
         warn(f"src IP: {ip_src:<16} src port: {port_src:<10} | dest IP {ip_dest:<16} dest port {port_dest:<10}")
 
     else:
