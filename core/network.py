@@ -135,8 +135,7 @@ def new_network_events(configuration, verbose_mode = False):
 
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
                                 if port_dest in honeypot_ports:
-
-                                    if verbose_mode : 
+                                    if verbose_mode :
                                         network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = True)
                                     insert_selected_modules_network_event(
                                         ip_dest,
