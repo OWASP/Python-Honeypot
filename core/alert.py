@@ -215,10 +215,12 @@ def network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False):
         the packet information message - None
     """
     if honeypot_event:
-        warn(f"src IP: {ip_src:<16} src port: {port_src:<10} | dest IP {ip_dest:<16} dest port {port_dest:<10}")
+        warn("src IP: {:<16} src port: {:<10} | dest IP {:<16} dest port {:<10}".format(ip_src, \
+            port_src, ip_dest, port_dest))
 
     else:
-        write(f"[*] [{now()}] src IP: {ip_src:<16} src port: {port_src:<10} | dest IP {ip_dest:<16} dest port {port_dest:<10}\n")
+        write("[*] [{}] src IP: {:<16} src port: {:<10} | dest IP {:<16} dest port {:<10}\n".format(now(),\
+             ip_src, port_src, ip_dest, port_dest))
 
 
 def error(content):
