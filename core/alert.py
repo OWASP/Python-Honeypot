@@ -201,27 +201,28 @@ def warn(content):
     return
 
 
-def network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False):
+def verbose_info(honeypot_event = False, **kwargs):
     """
-    build the incoming and outgoing packet information message
+    Displays the Verbose output of module events
 
     args:
-        ip_src : source IP
-        ip_dest : destination IP
-        port_src : source port
-        port_dest : destination port
-        honeypot_event : Bool value to itentify if the packet is an honeypot event
-    return:
-        the packet information message - None
+        honeypot_event = Bool value to indicate if the events are of interst to the honeypot
+        **Kwargs = key-value pair to identify event feature and value eg. IP_src = 127.0.0.1
+
+    returns:
+        None
     """
+    message = ""
+    for key in kwargs.keys():
+        if key not in ("port_dest","port_dest"):
+            message += "{:<10}{:<20}".format(key, kwargs[key])
+        else:
+            message += "{:<10}{:<10}".format(key, kwargs[key])
     if honeypot_event:
-        warn("src IP: {:<16} src port: {:<10} | dest IP {:<16} dest port {:<10}".format(ip_src, \
-            port_src, ip_dest, port_dest))
-
+        info(message)
     else:
-        write("[*] [{}] src IP: {:<16} src port: {:<10} | dest IP {:<16} dest port {:<10}\n".format(now(),\
-             ip_src, port_src, ip_dest, port_dest))
-
+        write("[*] [{}] ".format(now())+message+"\n")
+    return
 
 def error(content):
     """

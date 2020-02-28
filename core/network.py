@@ -10,7 +10,6 @@ import os
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
 from core.alert import info
-from core.alert import network_info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
@@ -61,7 +60,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def new_network_events(configuration, verbose_mode = False):
+def new_network_events(configuration, verbose = False): #change
     """
     get and submit new network events
 
@@ -135,25 +134,23 @@ def new_network_events(configuration, verbose_mode = False):
 
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
                                 if port_dest in honeypot_ports:
-                                    if verbose_mode :
-                                        network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = True)
                                     insert_selected_modules_network_event(
                                         ip_dest,
                                         port_dest,
                                         ip_src,
                                         port_src,
                                         selected_module,
-                                        machine_name
+                                        machine_name,
+                                        verbose
                                     )
                             else:
-                                if verbose_mode :
-                                    network_info(ip_src, ip_dest, port_src, port_dest, honeypot_event = False)
                                 insert_other_network_event(
                                     ip_dest,
                                     port_dest,
                                     ip_src,
                                     port_src,
-                                    machine_name
+                                    machine_name,
+                                    verbose
                                 )
                     except Exception as _:
                         del _

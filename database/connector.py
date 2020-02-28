@@ -11,7 +11,7 @@ from config import api_configuration
 from config import network_configuration
 from lib.ip2location import IP2Location
 from core.compatible import byte_to_str
-
+from core.alert import verbose_info
 client = pymongo.MongoClient(
     api_configuration()["api_database"],
     serverSelectionTimeoutMS=api_configuration()["api_database_connection_timeout"]
@@ -35,7 +35,7 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name):
+def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name, verbose = False):
     """
     insert selected modules event to honeypot_events collection
 
@@ -50,6 +50,10 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     Returns:
         ObjectId(inserted_id)
     """
+    if verbose:
+        verbose_info(ip_dest = ip_dest, port_dest = port_dest, ip_src = ip_src, \
+            port_src = port_src, mod_name = module_name, honeypot_event = True)
+
     global honeypot_events_queue
     honeypot_events_queue.append(
         {
@@ -68,7 +72,7 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     return
 
 
-def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name):
+def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name, verbose = False):
     """
     insert other network events (port scan, etc..) to network_events collection
 
@@ -82,6 +86,9 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
     Returns:
         ObjectId(inserted_id)
     """
+    if verbose:
+        verbose_info(ip_dest = ip_dest, port_dest = port_dest, ip_src = ip_src, \
+            port_src = port_src, honeypot_event = False)
     global network_events_queue
     network_events_queue.append(
         {
