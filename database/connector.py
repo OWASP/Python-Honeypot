@@ -12,6 +12,8 @@ from config import network_configuration
 from lib.ip2location import IP2Location
 from core.compatible import byte_to_str
 from core.alert import verbose_info
+from core.compatible import is_verbose_mode
+
 client = pymongo.MongoClient(
     api_configuration()["api_database"],
     serverSelectionTimeoutMS=api_configuration()["api_database_connection_timeout"]
@@ -35,7 +37,7 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name, verbose = False):
+def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name):
     """
     insert selected modules event to honeypot_events collection
 
@@ -50,9 +52,13 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     Returns:
         ObjectId(inserted_id)
     """
-    if verbose:
-        verbose_info(ip_dest = ip_dest, port_dest = port_dest, ip_src = ip_src, \
-            port_src = port_src, mod_name = module_name, honeypot_event = True)
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
+            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
+                ip_dest, port_dest, ip_src, port_src, module_name, machine_name
+            )
+        )
 
     global honeypot_events_queue
     honeypot_events_queue.append(
@@ -72,7 +78,7 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     return
 
 
-def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name, verbose = False):
+def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name):
     """
     insert other network events (port scan, etc..) to network_events collection
 
@@ -86,9 +92,13 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
     Returns:
         ObjectId(inserted_id)
     """
-    if verbose:
-        verbose_info(ip_dest = ip_dest, port_dest = port_dest, ip_src = ip_src, \
-            port_src = port_src, honeypot_event = False)
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
+            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
+                ip_dest, port_dest, ip_src, port_src, machine_name
+            )
+        )
     global network_events_queue
     network_events_queue.append(
         {
@@ -111,6 +121,8 @@ def insert_events_in_bulk():
     """
     global honeypot_events_queue
     global network_events_queue
+    if is_verbose_mode() and honeypot_events_queue and network_events_queue:
+        verbose_info("Submitting new events to database")
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
         honeypot_events_queue = []
@@ -142,7 +154,16 @@ def insert_honeypot_events_credential_from_module_processor(ip, username, passwo
     password : password tried for connecting to modules
     module_name : on which module client accessed
     date : datetime of the event
+
+    :return: inserted_id
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot credential event, ip_dest:{0}, username:{1}, "
+            "password:{2}, module_name:{3}, machine_name:{4}".format(
+                ip, username, password, module_name, network_configuration()["real_machine_identifier_name"]
+            )
+        )
     return credential_events.insert_one(
         {
             "ip_dest": byte_to_str(ip),
@@ -164,7 +185,16 @@ def insert_honeypot_events_data_from_module_processor(ip, module_name, date, dat
     module_name : on which module client accessed
     date : datetime of the events
     data : Data which is obtained from the client
+
+    :return: inserted_id
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot credential event, ip_dest:{0}, module_name:{1}, "
+            "machine_name:{2}, data:{3}".format(
+                ip, module_name, network_configuration()["real_machine_identifier_name"], data
+            )
+        )
     return honeypot_events_data.insert_one(
         {
             "ip_dest": byte_to_str(ip),

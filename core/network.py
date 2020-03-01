@@ -15,6 +15,7 @@ from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
 from core.exit_helper import exit_failure
 from core.compatible import byte_to_str
+from core.compatible import is_verbose_mode
 
 
 def get_gateway_ip_addresses(configuration):
@@ -60,7 +61,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def new_network_events(configuration, verbose = False): #change
+def new_network_events(configuration):
     """
     get and submit new network events
 
@@ -141,7 +142,7 @@ def new_network_events(configuration, verbose = False): #change
                                         port_src,
                                         selected_module,
                                         machine_name,
-                                        verbose
+                                        is_verbose_mode()
                                     )
                             else:
                                 insert_other_network_event(
@@ -150,7 +151,7 @@ def new_network_events(configuration, verbose = False): #change
                                     ip_src,
                                     port_src,
                                     machine_name,
-                                    verbose
+                                    is_verbose_mode()
                                 )
                     except Exception as _:
                         del _

@@ -201,28 +201,51 @@ def warn(content):
     return
 
 
-def verbose_info(honeypot_event = False, **kwargs):
+def verbose_info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
     """
-    Displays the Verbose output of module events
+    build the info message, log the message in database if requested, rewrite the thread temporary file
 
-    args:
-        honeypot_event = Bool value to indicate if the events are of interst to the honeypot
-        **Kwargs = key-value pair to identify event feature and value eg. IP_src = 127.0.0.1
+    Args:
+        content: content of the message
+        log_in_file: log filename name
+        mode: write mode, [w, w+, wb, a, ab, ...]
+        event: standard event in JSON structure
+        language: the language
+        thread_tmp_filename: thread temporary filename
 
-    returns:
+    Returns:
         None
     """
-    message = ""
-    for key in kwargs.keys():
-        if key not in ("port_dest","port_dest"):
-            message += "{:<10}{:<20}".format(key, kwargs[key])
+    if is_not_run_from_api():  # prevent to stdout if run from API
+        if version() is 2:
+            sys.stdout.write(
+                color.color("cyan") +
+                "[v] [{0}] ".format(now()) +
+                color.color("grey") +
+                content.encode("utf8") +
+                color.color("reset") +
+                "\n"
+            )
         else:
-            message += "{:<10}{:<10}".format(key, kwargs[key])
-    if honeypot_event:
-        info(message)
-    else:
-        write("[*] [{}] ".format(now())+message+"\n")
+            sys.stdout.buffer.write(
+                bytes(
+                    color.color("yellow") +
+                    "[v] [{0}] ".format(now()) +
+                    color.color("green") +
+                    content +
+                    color.color("reset") +
+                    "\n",
+                    "utf8"
+                )
+            )
+            sys.stdout.flush()
+    if event:  # if an event is present log it
+        from core.log import __log_into_file
+        __log_into_file(log_in_file, mode, json.dumps(event), language)
+        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
+            __log_into_file(thread_tmp_filename, "w", "0", language)
     return
+
 
 def error(content):
     """
