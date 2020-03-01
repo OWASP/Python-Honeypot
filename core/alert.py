@@ -229,9 +229,9 @@ def verbose_info(content, log_in_file=None, mode=None, event=None, language=None
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("yellow") +
+                    color.color("cyan") +
                     "[v] [{0}] ".format(now()) +
-                    color.color("green") +
+                    color.color("grey") +
                     content +
                     color.color("reset") +
                     "\n",
