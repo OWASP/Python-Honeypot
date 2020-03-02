@@ -15,7 +15,6 @@ from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
 from core.exit_helper import exit_failure
 from core.compatible import byte_to_str
-from core.compatible import is_verbose_mode
 
 
 def get_gateway_ip_addresses(configuration):
