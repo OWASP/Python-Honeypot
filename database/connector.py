@@ -121,7 +121,7 @@ def insert_events_in_bulk():
     """
     global honeypot_events_queue
     global network_events_queue
-    if is_verbose_mode() and honeypot_events_queue and network_events_queue:
+    if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
         verbose_info("Submitting new events to database")
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
