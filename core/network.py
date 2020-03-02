@@ -141,8 +141,7 @@ def new_network_events(configuration):
                                         ip_src,
                                         port_src,
                                         selected_module,
-                                        machine_name,
-                                        is_verbose_mode()
+                                        machine_name
                                     )
                             else:
                                 insert_other_network_event(
@@ -150,8 +149,7 @@ def new_network_events(configuration):
                                     port_dest,
                                     ip_src,
                                     port_src,
-                                    machine_name,
-                                    is_verbose_mode()
+                                    machine_name
                                 )
                     except Exception as _:
                         del _

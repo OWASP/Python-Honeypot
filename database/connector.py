@@ -94,7 +94,7 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
     """
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
+            "Received network event, ip_dest:{0}, port_dest:{1}, "
             "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
                 ip_dest, port_dest, ip_src, port_src, machine_name
             )
@@ -179,7 +179,7 @@ def insert_honeypot_events_credential_from_module_processor(ip, username, passwo
 
 def insert_honeypot_events_data_from_module_processor(ip, module_name, date, data):
     """
-    insert data which is recieved from honeypot modules
+    insert data which is received from honeypot modules
     args:
     ip : client ip used for putting the data
     module_name : on which module client accessed
@@ -190,7 +190,7 @@ def insert_honeypot_events_data_from_module_processor(ip, module_name, date, dat
     """
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot credential event, ip_dest:{0}, module_name:{1}, "
+            "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}".format(
                 ip, module_name, network_configuration()["real_machine_identifier_name"], data
             )
