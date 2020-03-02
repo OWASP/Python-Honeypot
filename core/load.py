@@ -33,6 +33,7 @@ from core.compatible import mkdir
 from core.compatible import get_module_dir_path
 from database.connector import insert_bulk_events_from_thread
 from database.connector import insert_events_in_bulk
+from core.compatible import is_verbose_mode
 
 # temporary use fixed version of argparse
 if is_windows():
@@ -46,7 +47,6 @@ else:
 # tmp dirs
 tmp_directories = []
 processor_threads = []
-verbose_mode = None
 
 
 def all_existing_networks():
@@ -232,7 +232,7 @@ def create_new_images(configuration):
         # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
         # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
         # to create new modules
-        if verbose_mode:
+        if is_verbose_mode():
             os.system("docker build . -t {0}".format(image_name))
         else:
             os.popen("docker build . -t {0}".format(image_name)).read()
@@ -595,7 +595,7 @@ def argv_parser():
     engineOpt.add_argument("--start-api-server", action="store_true", dest="start_api_server", default=False,
                            help="start API server")
     # enable verbose mode (debug mode)
-    engineOpt.add_argument("--verbose", action="store_true", dest="verbose_mode", default=False,
+    engineOpt.add_argument("-v", "--verbose", action="store_true", dest="verbose_mode", default=False,
                            help="enable verbose mode")
     # disable color CLI
     engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
@@ -669,8 +669,6 @@ def load_honeypot_engine():
             exit_failure(messages("en", "zero_module_selected"))
     virtual_machine_container_reset_factory_time_seconds = argv_options. \
         virtual_machine_container_reset_factory_time_seconds
-    global verbose_mode
-    verbose_mode = argv_options.verbose_mode
     run_as_test = argv_options.run_as_test
     #########################################
     # argv rules apply

@@ -131,6 +131,7 @@ def new_network_events(configuration):
                                 and port_src not in ignore_ports:
                             # ignored ip addresses and ports in python - fix later
                             # check if the port is in selected module
+
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
                                 if port_dest in honeypot_ports:
                                     insert_selected_modules_network_event(

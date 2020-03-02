@@ -11,6 +11,8 @@ from config import api_configuration
 from config import network_configuration
 from lib.ip2location import IP2Location
 from core.compatible import byte_to_str
+from core.alert import verbose_info
+from core.compatible import is_verbose_mode
 
 client = pymongo.MongoClient(
     api_configuration()["api_database"],
@@ -50,6 +52,14 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     Returns:
         ObjectId(inserted_id)
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
+            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
+                ip_dest, port_dest, ip_src, port_src, module_name, machine_name
+            )
+        )
+
     global honeypot_events_queue
     honeypot_events_queue.append(
         {
@@ -82,6 +92,13 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
     Returns:
         ObjectId(inserted_id)
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received network event, ip_dest:{0}, port_dest:{1}, "
+            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
+                ip_dest, port_dest, ip_src, port_src, machine_name
+            )
+        )
     global network_events_queue
     network_events_queue.append(
         {
@@ -104,6 +121,8 @@ def insert_events_in_bulk():
     """
     global honeypot_events_queue
     global network_events_queue
+    if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
+        verbose_info("Submitting new events to database")
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
         honeypot_events_queue = []
@@ -135,7 +154,16 @@ def insert_honeypot_events_credential_from_module_processor(ip, username, passwo
     password : password tried for connecting to modules
     module_name : on which module client accessed
     date : datetime of the event
+
+    :return: inserted_id
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot credential event, ip_dest:{0}, username:{1}, "
+            "password:{2}, module_name:{3}, machine_name:{4}".format(
+                ip, username, password, module_name, network_configuration()["real_machine_identifier_name"]
+            )
+        )
     return credential_events.insert_one(
         {
             "ip_dest": byte_to_str(ip),
@@ -151,13 +179,22 @@ def insert_honeypot_events_credential_from_module_processor(ip, username, passwo
 
 def insert_honeypot_events_data_from_module_processor(ip, module_name, date, data):
     """
-    insert data which is recieved from honeypot modules
+    insert data which is received from honeypot modules
     args:
     ip : client ip used for putting the data
     module_name : on which module client accessed
     date : datetime of the events
     data : Data which is obtained from the client
+
+    :return: inserted_id
     """
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
+            "machine_name:{2}, data:{3}".format(
+                ip, module_name, network_configuration()["real_machine_identifier_name"], data
+            )
+        )
     return honeypot_events_data.insert_one(
         {
             "ip_dest": byte_to_str(ip),

@@ -247,3 +247,12 @@ def byte_to_str(data):
     :return: str(data)
     """
     return str(data if isinstance(data, str) else data.decode() if isinstance(data, bytes) else data)
+
+
+def is_verbose_mode():
+    """
+    is run as verbose mode?
+
+    :return: boolean
+    """
+    return '--verbose' in sys.argv or '-v' in sys.argv
