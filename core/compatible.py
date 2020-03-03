@@ -59,7 +59,7 @@ def version():
     """
     return int(sys.version_info[0])
 
-def promt_sudo():
+def prompt_sudo():
     """
     Promt to enter root password
 

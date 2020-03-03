@@ -31,7 +31,7 @@ from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
 from core.compatible import mkdir
 from core.compatible import get_module_dir_path
-from core.compatible import promt_sudo
+from core.compatible import prompt_sudo
 from database.connector import insert_bulk_events_from_thread
 from database.connector import insert_events_in_bulk
 
@@ -620,7 +620,7 @@ def load_honeypot_engine():
     logo()
 
     # Ask for sudo password if not root user
-    if promt_sudo()!= 0:
+    if prompt_sudo()!= 0:
         return
     # parse argv
     parser, argv_options = argv_parser()
