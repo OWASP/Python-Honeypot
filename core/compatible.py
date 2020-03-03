@@ -59,6 +59,18 @@ def version():
     """
     return int(sys.version_info[0])
 
+def promt_sudo():
+    """
+    Promt to enter root password
+
+    Returns:
+        0 if password entered successfully
+    """
+    ret = 0
+    if os.geteuid != 0:
+        msg = "[sudo] password for %u: "
+        ret = subprocess.check_call(["sudo","-v","-p",msg])
+    return ret
 
 def check(language):
     """
