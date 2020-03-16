@@ -84,4 +84,3 @@ RUN git clone https://github.com/zdresearch/OWASP-Honeypot.git
 RUN pip install wheel
 RUN cd OWASP-Honeypot && pip install -r requirements.txt && pip install -r requirements-dev.txt
 EXPOSE 5000
-RUN cd OWASP-Honeypot && python ohp.py --start-api-server
