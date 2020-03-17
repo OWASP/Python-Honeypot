@@ -1,10 +1,8 @@
-FROM ubuntu
-MAINTAINER Chakshu Gupta
-RUN apt update
+FROM ubuntu:18.04
+RUN apt-get update
 
 RUN apt-get update && apt-get install -y \
     --no-install-suggests --no-install-recommends \
-    add-apt-key \
     apt-utils \
     asciidoctor \
     bison \
@@ -38,8 +36,7 @@ RUN apt-get update && apt-get install -y \
     libxml2-* \
     libzstd-dev \
     python-pip\
-    python-setuptools \
-    python2.7-dev \
+    python-setuptools\
     python3.7 \
     python3.7-dev \
     qtbase5-dev \
@@ -58,16 +55,12 @@ RUN apt-get update
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get install -y mongodb-org
-RUN echo "mongodb-org hold" | dpkg --set-selections
-RUN echo "mongodb-org-server hold" | dpkg --set-selections
-RUN echo "mongodb-org-shell hold" | dpkg --set-selections
-RUN echo "mongodb-org-mongos hold" | dpkg --set-selections
-RUN echo "mongodb-org-tools hold" | dpkg --set-selections
 
 RUN wget https://www.wireshark.org/download/src/wireshark-3.2.2.tar.xz -O wireshark-3.2.2.tar.xz
 RUN tar -xvf wireshark-3.2.2.tar.xz
 RUN apt-get update && apt-get dist-upgrade
-RUN cd wireshark-3.2.2 && cmake . && make && make install
+WORKDIR /wireshark-3.2.2
+RUN cmake . && make && make install
 
 # RUN systemctl daemon-reload
 # RUN systemctl start mongod
@@ -80,7 +73,13 @@ RUN apt-get -yqq install krb5-user libpam-krb5
 ARG CC=gcc-9
 ARG CXX=g++-9
 
-RUN git clone https://github.com/zdresearch/OWASP-Honeypot.git
-RUN pip install wheel
-RUN cd OWASP-Honeypot && pip install -r requirements.txt && pip install -r requirements-dev.txt
+RUN git clone https://github.com/zdresearch/OWASP-Honeypot.git /OWASP-Honeypot
+RUN pip install wheel==0.34.2
+WORKDIR /OWASP-Honeypot
+RUN pip install -r requirements.txt
+RUN pip install -r requirements-dev.txt
 EXPOSE 5000
+
+RUN python ohp.py --start-api-server
+
+RUN python ohp.py -m all
