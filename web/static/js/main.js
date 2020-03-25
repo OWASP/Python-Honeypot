@@ -55,6 +55,37 @@ function load_creds_username(module){
     });
 }
 
+function load_creds_username_search(module, textval){
+	$.ajax({
+        type: "GET",
+        url: "/api/events/most-usernames-used-search",
+		data: {"module_name" : module, "search_val": textval},
+    }).done(function (res) {
+		var tableHtml='';
+		for (var i = 0; i < res.length; i++) {
+            var m = res[i];
+			var count= m.count;
+			var username= m._id.username;
+			var ip_dest= m._id.ip_dest;
+			var module_name = m._id.module_name;
+			tableHtml += "<tr>"
+				+"<td>"+ (i+1) +"</td>"
+                + "<td>"+ username+"</td>"
+				+  "<td>"+ ip_dest +"</td>"
+                +  "<td>"+ count +"</td>"
+				+  "<td>"+ module_name +"</td>"
+                + "</tr>";
+        }
+		$('#module_creds_username_table tbody').html(tableHtml);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+        if (errorThrown == "BAD REQUEST") {
+        }
+        if (errorThrown == "UNAUTHORIZED") {
+        }
+    });
+}
+
 function load_creds_password(module){
 	$.ajax({
         type: "GET",
@@ -74,6 +105,37 @@ function load_creds_password(module){
 				+  "<td>"+ ip_dest +"</td>"
                 +  "<td>"+ count +"</td>"
 			    +  "<td>" + module_name + "</td>"
+                + "</tr>";
+        }
+		$('#module_creds_password_table tbody').html(tableHtml);
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+        if (errorThrown == "BAD REQUEST") {
+        }
+        if (errorThrown == "UNAUTHORIZED") {
+        }
+    });
+}
+
+function load_creds_password_search(module, textval){
+	$.ajax({
+        type: "GET",
+        url: "/api/events/most-passwords-used-search",
+		data: {"module_name" : module, "search_val": textval},
+    }).done(function (res) {
+		var tableHtml='';
+		for (var i = 0; i < res.length; i++) {
+            var m = res[i];
+			var count= m.count;
+			var password= m._id.password;
+			var ip_dest= m._id.ip_dest;
+			var module_name = m._id.module_name;
+			tableHtml += "<tr>"
+				+"<td>"+ (i+1) +"</td>"
+                + "<td>"+ password+"</td>"
+				+  "<td>"+ ip_dest +"</td>"
+                +  "<td>"+ count +"</td>"
+				+  "<td>"+ module_name +"</td>"
                 + "</tr>";
         }
 		$('#module_creds_password_table tbody').html(tableHtml);
@@ -157,9 +219,21 @@ function load_graphs() {
         load_creds_username(module);
     });
 
+    $('#search_creds_usernames').on('keyup',function(){
+        var textval = $(this).val();
+        var module_types = $('#module_username option:selected').val();
+        load_creds_username_search(module_types, textval);
+    });
+
 	$('#module_password').on('change',function(){
         var module = $(this).val();
 		load_creds_password(module);
+    });
+
+    $('#search_creds_passwords').on('keyup',function(){
+        var textval = $(this).val();
+        var module_types = $('#module_password option:selected').val();
+        load_creds_password_search(module_types, textval);
     });
 
     // wait 3 seconds to get responded for the request

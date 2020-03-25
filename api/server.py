@@ -1044,6 +1044,65 @@ def top_usernames_used():
         return flask_null_array_response()
 
 
+@app.route("/api/events/most-usernames-used-search", methods=["GET"])
+def top_usernames_used_search_query():
+    """
+    Get top usernames used according to module and search query
+
+    Returns:
+        JSON/Dict of top usernames used
+    """
+    module_name = get_value_from_request("module_name")
+    search_val = get_value_from_request("search_val")
+    module_query = [
+        group_by_ip_dest_and_username,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if module_name:
+        module_query.insert(0, {
+            "$match": {
+                "$or": [
+                    {
+                        'username': search_val,
+                        'module_name': module_name
+                    },
+                    {
+                        'ip_dest': search_val,
+                        'module_name': module_name
+                    }
+                ]
+            }
+        })
+    else:
+        module_query.insert(0, {
+            "$match": {
+                "$or": [
+                    {
+                        'username': search_val
+                    },
+                    {
+                        'ip_dest': search_val
+                    }
+                ]
+            }
+        })
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+
 @app.route("/api/events/most-passwords-used", methods=["GET"])
 def top_passwords_used():
     """
@@ -1068,6 +1127,64 @@ def top_passwords_used():
     ]
     if module_name:
         module_query.insert(0, {"$match": {'module_name': module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+@app.route("/api/events/most-passwords-used-search", methods=["GET"])
+def top_passwords_used_search_query():
+    """
+    Get top passwords used according to module and search query
+
+    Returns:
+        JSON/Dict of top passwords used
+    """
+    module_name = get_value_from_request("module_name")
+    search_val = get_value_from_request("search_val")
+    module_query = [
+        group_by_ip_dest_and_password,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if module_name:
+        module_query.insert(0, {
+            "$match": {
+                "$or": [
+                    {
+                        'password': search_val,
+                        'module_name': module_name
+                    },
+                    {
+                        'ip_dest': search_val,
+                        'module_name': module_name
+                    }
+                ]
+            }
+        })
+    else:
+        module_query.insert(0, {
+            "$match": {
+                "$or": [
+                    {
+                        'password': search_val
+                    },
+                    {
+                        'ip_dest': search_val
+                    }
+                ]
+            }
+        })
     try:
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
