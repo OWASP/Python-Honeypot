@@ -60,7 +60,7 @@ upstream  https://github.com/zdresearch/OWASP-Honeypot.git    (fetch)
 upstream  https://github.com/zdresearch/OWASP-Honeypot.git    (push)
 ```
 
-### 4. Sync it :recycle:
+### 4. Sync it 
 
 Always keep your local copy of repository updated with the original repository.
 Before making any changes and/or in an appropriate interval, run the following commands *carefully* to update your local repository.
@@ -79,7 +79,7 @@ git reset --hard upstream/master
 git push origin master
 ```
 
-### 5. Ready Steady Go... :turtle: :rabbit2:
+### 5. Ready Steady Go... 
 
 Once you have completed these steps, you are ready to start contributing by checking our `Help Wanted` Issues and creating [pull requests](https://github.com/zdresearch/OWASP-Honeypot/pulls).
 
