@@ -1,7 +1,7 @@
 # Contributing to OWASP-Honeypot
 
 First off, thanks for taking the time to contribute!
-We gladly support and appreciate anyone is interested to contribute to the OWASP Nettacker Project. Overall developers may focus on developing core framework, modules or payloads, language libraries and media. After reading this document you should be able to get the basic knowledge to start developing. Please consider that we are using PEP8 python code style and using Codacy to figure the code quality. In addition, Travis-CI will check your PR automatically on several Python versions (2.x, 3.x). Before sending your PR, make sure you added code-based documentation to your codes and read the PR template. If you use any code/library/module with a license, add the license into external license file.
+We gladly support and appreciate anyone is interested to contribute to the OWASP Honeypot Project. Overall developers may focus on developing core framework or modules. Please consider that we are using PEP8 python code style and using Codacy to figure the code quality. In addition, Travis-CI will check your PR automatically on several Python versions (3.x). Before sending your PR, make sure you added code-based documentation to your codes. If you use any code/library/module with a license, add the license into external license file.
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
 
