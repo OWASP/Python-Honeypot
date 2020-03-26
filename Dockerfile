@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 RUN apt-get update
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get -y update && apt-get -y install \
     --no-install-suggests --no-install-recommends \
     apt-utils \
     asciidoctor \
@@ -51,22 +51,25 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | apt-key add -
 
 RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list
 
-RUN apt-get update
+RUN apt-get -y update
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get install -y mongodb-org
+RUN apt-get install -y \
+    mongodb-org=4.2.3 
+
+VOLUME ["/data/db"]
 
 RUN wget https://www.wireshark.org/download/src/wireshark-3.2.2.tar.xz -O wireshark-3.2.2.tar.xz
 RUN tar -xvf wireshark-3.2.2.tar.xz
-RUN apt-get update && apt-get dist-upgrade
+RUN apt-get -y update && apt-get -y dist-upgrade
 WORKDIR /wireshark-3.2.2
 RUN cmake . && make && make install
 
-# RUN systemctl daemon-reload
-# RUN systemctl start mongod
-# RUN systemctl enable mongod
-# RUN systemctl stop mongod
-# RUN systemctl restart mongod
+# CMD ["systemctl","daemon-reload"]
+# CMD ["systemctl", "start", "mongod"]
+# CMD ["systemctl", "enable"," mongod"]
+# CMD ["systemctl", "stop" ,"mongod"]
+# CMD ["systemctl", "restart", "mongod"]
 
 RUN apt-get -yqq install krb5-user libpam-krb5
 
@@ -79,7 +82,8 @@ WORKDIR /OWASP-Honeypot
 RUN pip install -r requirements.txt
 RUN pip install -r requirements-dev.txt
 EXPOSE 5000
+EXPOSE 27017
 
-RUN python ohp.py --start-api-server
+CMD ["python", "ohp.py", "--start-api-server"]
 
-RUN python ohp.py -m all
+# CMD ["python", "ohp.py", "-m", "all"]
