@@ -2,11 +2,26 @@
 # -*- coding: utf-8 -*-
 
 import time
-import os
-import json
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from database.connector import insert_file_change_events
+from core.alert import info
+from core.compatible import byte_to_str
+from core.time_helper import now
+
+
+def is_excluded(path, dirs):
+    """
+    if path is excluded in list of dirs/files
+
+    :param path: path to check for exclude
+    :param dirs: list of excludes
+    :return: Boolean
+    """
+    for directory in dirs:
+        if path.startswith(directory):
+            return True
+    return False
 
 
 class containerFilesHandler(FileSystemEventHandler):
@@ -17,8 +32,16 @@ class containerFilesHandler(FileSystemEventHandler):
 
     @staticmethod
     def on_any_event(event):
-        if not (event.event_type == 'modified' and event.is_directory):
-            print(event)
+        if not (event.event_type == 'modified' and event.is_directory) and is_excluded(event.src_path, self.EXCLUDES):
+            # todo: self is not accessible from here, must be fix before merging the PR. not sure if we should use
+            # super() or something else
+            insert_file_change_events(
+                byte_to_str(event.src_path),
+                byte_to_str(event.event_type),
+                self.module_name,
+                now()
+            )
+            info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 
 class fileMonitor:
@@ -45,18 +68,6 @@ class fileMonitor:
         self.observer.start()
         while not self.stop_execution:
             try:
-                if os.path.exists(self.log_filename):
-                    os.rename(self.log_filename, self.log_filename_dump)
-                    data_dump = open(self.log_filename_dump).readlines()
-                    for data in data_dump:
-                        data = json.loads(data)
-                        insert_file_change_events(
-                            data['path'],
-                            data['status'],
-                            data['module_name'],
-                            data['date']
-                        )
-                    os.remove(self.log_filename_dump)
+                time.sleep(0.1)
             except Exception as _:
                 del _
-            time.sleep(0.3)
