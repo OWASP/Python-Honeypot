@@ -7,13 +7,13 @@ Created this file because the queries are repeated over the URI's.
 """
 from bson.son import SON
 
-top_ips_groupby = {
+top_ip_dests_groupby = {
     "$group":
         {
             "_id":
                 {
-                    "ip": "$ip",
-                    "country": "$country"
+                    "ip_dest": "$ip_dest",
+                    "country_ip_dest": "$country_ip_dest"
                 },
             "count":
                 {
@@ -40,13 +40,13 @@ sort_by_count_and_id = {
         )
 }
 
-top_ports_groupby = {
+top_port_dests_groupby = {
     "$group":
         {
             "_id":
                 {
-                    "port": "$port",
-                    "country": "$country",
+                    "port_dest": "$port_dest",
+                    "country_ip_dest": "$country_ip_dest",
                 },
             "count":
                 {
@@ -72,7 +72,51 @@ top_machine_names_groupby = {
 top_countries_groupby = {
     "$group":
         {
-            "_id": "$country",
+            "_id": "$country_ip_dest",
+            "count":
+                {
+                    "$sum": 1
+                }
+        }
+}
+
+group_by_ip_dest = {
+    "$group":
+        {
+            "_id": {
+                "ip_dest": "$ip_dest"
+            },
+            "count": {
+                "$sum": 1
+            }
+        }
+}
+
+group_by_ip_dest_and_username = {
+    "$group":
+        {
+            "_id":
+                {
+                    "ip_dest": "$ip_dest",
+                    "username": "$username",
+                    "module_name": "$module_name"
+                },
+            "count":
+                {
+                    "$sum": 1
+                }
+        }
+}
+
+group_by_ip_dest_and_password = {
+    "$group":
+        {
+            "_id":
+                {
+                    "ip_dest": "$ip_dest",
+                    "password": "$password",
+                    "module_name": "$module_name"
+                },
             "count":
                 {
                     "$sum": 1

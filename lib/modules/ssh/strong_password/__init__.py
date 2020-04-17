@@ -5,7 +5,7 @@ import time
 import os
 import json
 from core.compatible import generate_token
-from database.connector import insert_honeypot_events_from_module_processor
+from database.connector import insert_honeypot_events_credential_from_module_processor
 
 
 class ModuleProcessor:
@@ -31,7 +31,7 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    insert_honeypot_events_from_module_processor(
+                    insert_honeypot_events_credential_from_module_processor(
                         data['ip'],
                         data['username'],
                         data['password'],

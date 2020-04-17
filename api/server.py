@@ -10,13 +10,17 @@ from flask import request as flask_request
 from flask import jsonify
 from config import api_configuration
 from core.alert import write_to_api_console
+from core.get_modules import load_all_modules
 from database import connector
-from api.database_queries import top_ips_groupby
+from api.database_queries import top_ip_dests_groupby
 from api.database_queries import top_machine_names_groupby
-from api.database_queries import top_ports_groupby
+from api.database_queries import top_port_dests_groupby
 from api.database_queries import top_countries_groupby
 from api.database_queries import sort_by_count
 from api.database_queries import sort_by_count_and_id
+from api.database_queries import group_by_ip_dest
+from api.database_queries import group_by_ip_dest_and_password
+from api.database_queries import group_by_ip_dest_and_username
 from api.utility import msg_structure
 from api.utility import all_mime_types
 from api.utility import root_dir
@@ -362,9 +366,9 @@ def top_ten_ips_in_honeypot_events():
     date = fix_date(
         get_value_from_request("date")
     )
-    country = get_value_from_request("country")
+    country_ip_dest = get_value_from_request("country_ip_dest")
     top_ips_query = [
-        top_ips_groupby,
+        top_ip_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -373,10 +377,10 @@ def top_ten_ips_in_honeypot_events():
         }
     ]
 
-    if country and date:
+    if country_ip_dest and date:
         match_by_country_and_date = {
             "$match": {
-                "country": country,
+                "country_ip_dest": country_ip_dest,
                 "date": {
                     "$gte": date[0],
                     "$lte": date[1]
@@ -386,11 +390,11 @@ def top_ten_ips_in_honeypot_events():
         top_ips_query.insert(0, match_by_country_and_date)
         top_ips_query.insert(2, sort_by_count_and_id)
 
-    elif country:
+    elif country_ip_dest:
         match_by_country = {
 
             "$match": {
-                "country": country
+                "country_ip_dest": country_ip_dest
             }
         }
         top_ips_query.insert(0, match_by_country)
@@ -433,9 +437,9 @@ def top_ten_ips_in_network_events():
     date = fix_date(
         get_value_from_request("date")
     )
-    country = get_value_from_request("country")
+    country_ip_dest = get_value_from_request("country_ip_dest")
     top_ips_query = [
-        top_ips_groupby,
+        top_ip_dests_groupby,
         {
             "$skip": fix_skip(
                 get_value_from_request("skip")
@@ -447,10 +451,10 @@ def top_ten_ips_in_network_events():
             )
         }
     ]
-    if country and date:
+    if country_ip_dest and date:
         match_by_country_and_date = {
             "$match": {
-                "country": country,
+                "country_ip_dest": country_ip_dest,
                 "date": {
                     "$gte": date[0],
                     "$lte": date[1]
@@ -460,10 +464,10 @@ def top_ten_ips_in_network_events():
         top_ips_query.insert(0, match_by_country_and_date)
         top_ips_query.insert(2, sort_by_count_and_id)
 
-    elif country:
+    elif country_ip_dest:
         match_by_country = {
             "$match": {
-                "country": country
+                "country_ip_dest": country_ip_dest
             }
         }
         top_ips_query.insert(0, match_by_country)
@@ -506,9 +510,9 @@ def top_ten_ports_in_honeypot_events():
     date = fix_date(
         get_value_from_request("date")
     )
-    country = get_value_from_request("country")
+    country_ip_dest = get_value_from_request("country_ip_dest")
     top_ports_query = [
-        top_ports_groupby,
+        top_port_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -516,11 +520,11 @@ def top_ten_ports_in_honeypot_events():
             "$limit": fix_limit(get_value_from_request("limit"))
         }
     ]
-    if country and date:
+    if country_ip_dest and date:
         match_by_country_and_date = {
             "$match":
                 {
-                    "country": country,
+                    "country_ip_dest": country_ip_dest,
                     "date": {
                         "$gte": date[0],
                         "$lte": date[1]
@@ -529,11 +533,11 @@ def top_ten_ports_in_honeypot_events():
         }
         top_ports_query.insert(0, match_by_country_and_date)
         top_ports_query.insert(2, sort_by_count_and_id)
-    elif country:
+    elif country_ip_dest:
         match_by_country = {
             "$match":
                 {
-                    "country": country,
+                    "country_ip_dest": country_ip_dest,
                 }
         }
         top_ports_query.insert(0, match_by_country)
@@ -574,9 +578,9 @@ def top_ten_ports_in_network_events():
     date = fix_date(
         get_value_from_request("date")
     )
-    country = get_value_from_request("country")
+    country_ip_dest = get_value_from_request("country_ip_dest")
     top_ports_query = [
-        top_ports_groupby,
+        top_port_dests_groupby,
         {
             "$skip": fix_skip(get_value_from_request("skip"))
         },
@@ -584,11 +588,11 @@ def top_ten_ports_in_network_events():
             "$limit": fix_limit(get_value_from_request("limit"))
         }
     ]
-    if country and date:
+    if country_ip_dest and date:
         match_by_country_and_date = {
             "$match":
                 {
-                    "country": country,
+                    "country_ip_dest": country_ip_dest,
                     "date": {
                         "$gte": date[0],
                         "$lte": date[1]
@@ -597,11 +601,11 @@ def top_ten_ports_in_network_events():
         }
         top_ports_query.insert(0, match_by_country_and_date)
         top_ports_query.insert(2, sort_by_count_and_id)
-    elif country:
+    elif country_ip_dest:
         match_by_country = {
             "$match":
                 {
-                    "country": country,
+                    "country_ip_dest": country_ip_dest,
                 }
         }
         top_ports_query.insert(0, match_by_country)
@@ -790,7 +794,7 @@ def top_ten_countries_in_honeypot_events():
         match_by_date_and_country = {
             "$match":
                 {
-                    "country": {
+                    "country_ip_dest": {
                         "$gt": "-"
                     },
                     "date":
@@ -805,7 +809,7 @@ def top_ten_countries_in_honeypot_events():
         match_by_country = {
             "$match":
                 {
-                    "country": {
+                    "country_ip_dest": {
                         "$gt": "-"
                     }
                 }
@@ -851,7 +855,7 @@ def top_ten_countries_in_network_events():
         match_by_date_and_country = {
             "$match":
                 {
-                    "country": {
+                    "country_ip_dest": {
                         "$gt": "-"
                     },
                     "date":
@@ -866,7 +870,7 @@ def top_ten_countries_in_network_events():
         match_by_country = {
             "$match":
                 {
-                    "country": {
+                    "country_ip_dest": {
                         "$gt": "-"
                     }
                 }
@@ -971,6 +975,119 @@ def top_honeypot_machine_names():
                 connector.honeypot_events,
                 top_machinenames_query
             )
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/module-events", methods=["GET"])
+def module_events():
+    """
+    Get total number of credential events according to module
+
+    Returns:
+        JSON/Dict of credential events according to module
+    """
+    module_name = get_value_from_request("module_name")
+    module_query = [
+        group_by_ip_dest,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if module_name:
+        module_query.insert(0, {"$match": {'module_name': module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/most-usernames-used", methods=["GET"])
+def top_usernames_used():
+    """
+    Get top usernames used according to module
+
+    Returns:
+        JSON/Dict of top usernames used
+    """
+    module_name = get_value_from_request("module_name")
+    module_query = [
+        group_by_ip_dest_and_username,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if module_name:
+        module_query.insert(0, {"$match": {'module_name': module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/most-passwords-used", methods=["GET"])
+def top_passwords_used():
+    """
+    Get top passwords used according to module
+
+    Returns:
+        JSON/Dict of top passwords used
+    """
+    module_name = get_value_from_request("module_name")
+    module_query = [
+        group_by_ip_dest_and_password,
+        {
+            "$skip": fix_skip(
+                get_value_from_request("skip")
+            )
+        },
+        {
+            "$limit": fix_limit(
+                get_value_from_request("limit")
+            )
+        }
+    ]
+    if module_name:
+        module_query.insert(0, {"$match": {'module_name': module_name}})
+    try:
+        return jsonify(
+            aggregate_function(connector.credential_events, module_query)
+        ), 200
+    except Exception as _:
+        return flask_null_array_response()
+
+
+@app.route("/api/events/module-names", methods=["GET"])
+def all_module_names():
+    """
+    Get top passwords used according to module
+
+    Returns:
+        JSON/Dict of top passwords used
+    """
+    module_names = load_all_modules()
+    try:
+        return jsonify(
+            {"module_names": module_names}
         ), 200
     except Exception as _:
         return flask_null_array_response()

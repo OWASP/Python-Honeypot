@@ -6,7 +6,7 @@ import sys
 import json
 from core import color
 from core.compatible import version
-from core._time import now
+from core.time_helper import now
 
 
 def is_not_run_from_api():
@@ -16,7 +16,7 @@ def is_not_run_from_api():
     Returns:
         True if run from API otherwise False
     """
-    if "--start-api" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
+    if "--start-api-server" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
         return False
     return True
 
@@ -32,7 +32,7 @@ def messages(language, msg_id):
     Returns:
         the message content in the selected language if message found otherwise return message in English
     """
-    # Returning selected langauge
+    # Returning selected language
     if language is -1:
         return list(
             set(
@@ -71,7 +71,7 @@ def messages(language, msg_id):
     return msgs
 
 
-def __input_msg(content):
+def input_msg(content):
     """
     build the input message to get input from users
 
@@ -198,6 +198,52 @@ def warn(content):
                     "utf8")
             )
             sys.stdout.flush()
+    return
+
+
+def verbose_info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
+    """
+    build the info message, log the message in database if requested, rewrite the thread temporary file
+
+    Args:
+        content: content of the message
+        log_in_file: log filename name
+        mode: write mode, [w, w+, wb, a, ab, ...]
+        event: standard event in JSON structure
+        language: the language
+        thread_tmp_filename: thread temporary filename
+
+    Returns:
+        None
+    """
+    if is_not_run_from_api():  # prevent to stdout if run from API
+        if version() is 2:
+            sys.stdout.write(
+                color.color("cyan") +
+                "[v] [{0}] ".format(now()) +
+                color.color("grey") +
+                content.encode("utf8") +
+                color.color("reset") +
+                "\n"
+            )
+        else:
+            sys.stdout.buffer.write(
+                bytes(
+                    color.color("cyan") +
+                    "[v] [{0}] ".format(now()) +
+                    color.color("grey") +
+                    content +
+                    color.color("reset") +
+                    "\n",
+                    "utf8"
+                )
+            )
+            sys.stdout.flush()
+    if event:  # if an event is present log it
+        from core.log import __log_into_file
+        __log_into_file(log_in_file, mode, json.dumps(event), language)
+        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
+            __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
 
