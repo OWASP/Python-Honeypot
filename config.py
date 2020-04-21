@@ -30,7 +30,7 @@ def api_configuration():
             "enabled": False,
             "filename": "ohp_api_access.log"
         },
-        "api_database": "mongodb://127.0.0.1:27017/",  # mongodb://user:password@127.0.0.1:27017/
+        "api_database": "mongodb://172.16.192.2:27017/",  # mongodb://user:password@127.0.0.1:27017/
         "api_database_connection_timeout": 2000,  # miliseconds
         "api_database_name": "ohp_events"
     }
