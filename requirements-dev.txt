@@ -1,2 +1,2 @@
 pytest==4.6.9
-codecov==2.0.15
+codecov==2.0.22
