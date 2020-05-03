@@ -1,4 +1,4 @@
-pymongo==3.9.0
+pymongo==3.10.1
 netaddr==0.7.19
 flask==1.1.1
 terminable_thread==0.7.1
