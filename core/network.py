@@ -92,7 +92,8 @@ def new_network_events(configuration):
     run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
     run_tshark.extend(
         [
-            "-T", "fields", "-e", "ip.dst", "-e", "ip.src", "-e", "tcp.dstport", "-e", "tcp.srcport", "-ni", "any"
+            "-T", "fields", "-e", "ip.dst", "-e", "ip.src",
+            "-e", "tcp.dstport", "-e", "tcp.srcport", "-ni", "any"
         ]
     )
     process = subprocess.Popen(
@@ -103,9 +104,11 @@ def new_network_events(configuration):
     time.sleep(3)
     if process.poll() is not None:
         exit_failure("tshark couldn't capture network, maybe run as root!")
-    # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
+    # todo: replace tshark with python port sniffing -
+    # e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
     # it will be easier to apply filters and analysis packets with python
-    # if it requires to be run as root, please add a uid checker in framework startup
+    # if it requires to be run as root,
+    # please add a uid checker in framework startup
 
     # readline timeout bug fix: https://stackoverflow.com/a/10759061
     pull_object = select.poll()
@@ -124,15 +127,17 @@ def new_network_events(configuration):
                         ip_src = byte_to_str(line[1])
                         port_dest = int(line[2])
                         port_src = int(line[3])
-                        if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)) \
-                                and ip_dest not in ignore_ip_addresses \
-                                and ip_src not in ignore_ip_addresses \
-                                and port_dest not in ignore_ports \
-                                and port_src not in ignore_ports:
-                            # ignored ip addresses and ports in python - fix later
+                        if netaddr.valid_ipv4(ip_dest) or \
+                           netaddr.valid_ipv6(ip_dest) \
+                           and ip_dest not in ignore_ip_addresses \
+                           and ip_src not in ignore_ip_addresses \
+                           and port_dest not in ignore_ports \
+                           and port_src not in ignore_ports:
+                            # ignored ip addresses and ports in python -fix later
                             # check if the port is in selected module
 
-                            if port_dest in honeypot_ports or port_src in honeypot_ports:
+                            if (port_dest in honeypot_ports or
+                               port_src in honeypot_ports):
                                 if port_dest in honeypot_ports:
                                     insert_selected_modules_network_event(
                                         ip_dest,
@@ -154,8 +159,10 @@ def new_network_events(configuration):
                         del _
                     # check if event shows an IP
             time.sleep(0.001)
-            # todo: is sleep(0.001) fastest/best? it means it could get 1000 packets per second (maximum) from tshark
-            # how could we prevent the DDoS attacks in here and avoid submitting in MongoDB? should we?
+            # todo: is sleep(0.001) fastest/best?
+            # it means it could get 1000 packets per second(maximum) from tshark
+            # how could we prevent the DDoS attacks in here
+            # and avoid submitting in MongoDB? should we?
     except Exception as _:
         del _
     return True

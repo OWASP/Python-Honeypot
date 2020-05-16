@@ -16,7 +16,8 @@ def is_not_run_from_api():
     Returns:
         True if run from API otherwise False
     """
-    if "--start-api-server" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
+    if "--start-api-server" in sys.argv \
+       or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
         return False
     return True
 
@@ -30,7 +31,8 @@ def messages(language, msg_id):
         msg_id: message id
 
     Returns:
-        the message content in the selected language if message found otherwise return message in English
+        the message content in the selected language if message found \
+        otherwise return message in English
     """
     # Returning selected language
     if language is -1:
@@ -45,7 +47,8 @@ def messages(language, msg_id):
                             "\\", "/"
                         ) + "/../lib/language/"
                     )
-                    if langs != "readme.md" and langs.rsplit("_")[1].rsplit(".")[0] != ""
+                    if langs != "readme.md" and
+                    langs.rsplit("_")[1].rsplit(".")[0] != ""
                 ]
             )
         )
@@ -97,9 +100,11 @@ def input_msg(content):
         )
 
 
-def info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
+def info(content, log_in_file=None, mode=None,
+         event=None, language=None, thread_tmp_filename=None):
     """
-    build the info message, log the message in database if requested, rewrite the thread temporary file
+    build the info message, log the message in
+    database if requested, rewrite the thread temporary file
 
     Args:
         content: content of the message
@@ -138,7 +143,8 @@ def info(content, log_in_file=None, mode=None, event=None, language=None, thread
     if event:  # if an event is present log it
         from core.log import __log_into_file
         __log_into_file(log_in_file, mode, json.dumps(event), language)
-        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
+        # if thread temporary filename present, rewrite it
+        if thread_tmp_filename:
             __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
@@ -201,9 +207,11 @@ def warn(content):
     return
 
 
-def verbose_info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
+def verbose_info(content, log_in_file=None, mode=None,
+                 event=None, language=None, thread_tmp_filename=None):
     """
-    build the info message, log the message in database if requested, rewrite the thread temporary file
+    build the info message, log the message in database
+    if requested, rewrite the thread temporary file
 
     Args:
         content: content of the message
@@ -242,7 +250,8 @@ def verbose_info(content, log_in_file=None, mode=None, event=None, language=None
     if event:  # if an event is present log it
         from core.log import __log_into_file
         __log_into_file(log_in_file, mode, json.dumps(event), language)
-        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
+        # if thread temporary filename present, rewrite it
+        if thread_tmp_filename:
             __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 

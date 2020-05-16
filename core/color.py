@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import ctypes
 import sys
+from core.compatible import os_name
 
 
 def finish():
@@ -29,7 +31,6 @@ def color(color):
     """
     if "--disable-colors" in sys.argv:
         return ""
-    from core.compatible import os_name
     if "linux" in os_name() or os_name() == "darwin":
         if color == "reset":
             return "\033[0m"
@@ -50,7 +51,6 @@ def color(color):
         if color == "white":
             return "\033[1;37m"
     else:
-        import ctypes
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
         handle = std_out_handle
         if color == "reset":

@@ -10,40 +10,29 @@ import string
 import shutil
 import inspect
 
+from config import api_configuration
+from core.alert import write_to_api_console
+from core.alert import messages
+from core.color import finish
 from core.exit_helper import exit_failure
-
-__version__ = "0.0.1"
-__code_name__ = "SAME"
-
-
-def _version_info():
-    """
-    version information of the framework
-
-    Returns:
-        an array of version and code name
-    """
-    return [__version__, __code_name__]
 
 
 def logo():
     """
     OWASP HoneyPot Logo
     """
-    from core.alert import write_to_api_console
-    from core.color import finish
     write_to_api_console("""
-      ______          __      _____ _____  
-     / __ \ \        / /\    / ____|  __ \ 
+      ______          __      _____ _____
+     / __ \ \        / /\    / ____|  __ \
     | |  | \ \  /\  / /  \  | (___ | |__) |
-    | |  | |\ \/  \/ / /\ \  \___ \|  ___/  
-    | |__| | \  /\  / ____ \ ____) | |      
+    | |  | |\ \/  \/ / /\ \  \___ \|  ___/
+    | |__| | \  /\  / ____ \ ____) | |
      \____/   \/  \/_/    \_\_____/|_|
-                      _    _                        _____      _   
-                     | |  | |                      |  __ \    | |  
-                     | |__| | ___  _ __   ___ _   _| |__) |__ | |_ 
+                      _    _                        _____      _
+                     | |  | |                      |  __ \    | |
+                     | |__| | ___  _ __   ___ _   _| |__) |__ | |_
                      |  __  |/ _ \| "_ \ / _ \ | | |  ___/ _ \| __|
-                     | |  | | (_) | | | |  __/ |_| | |  | (_) | |_ 
+                     | |  | | (_) | | | |  __/ |_| | |  | (_) | |_
                      |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
                                                __/ |
                                               |___/   \n\n""")
@@ -69,21 +58,7 @@ def check(language):
     Returns:
         True if compatible otherwise None
     """
-    # from core.color import finish
-    from core.alert import messages
-    if "linux" in os_name() or "darwin" in os_name():
-        pass
-        # os.system("clear")
-    elif "win32" == os_name() or "win64" == os_name():
-        # if language != "en":
-        #    from core.color import finish
-        #    from core.alert import error
-        #   error("please use english language on windows!")
-        #    finish()
-        #    sys.exit(1)
-        # os.system("cls")
-        pass
-    else:
+    if os_name() not in ["linux", "darwin", "win32", "win64"]:
         exit_failure(messages(language, "error_platform"))
     if version() is 2 or version() is 3:
         pass
@@ -122,8 +97,6 @@ def check_for_requirements(start_api_server):
     Returns:
         True if exist otherwise False
     """
-    from core.alert import messages
-    from config import api_configuration
     # check external required modules
     try:
         import pymongo
@@ -145,12 +118,14 @@ def check_for_requirements(start_api_server):
     if not start_api_server:
         # check docker
         try:
-            subprocess.check_output(["docker", "--help"], stderr=subprocess.PIPE)
+            subprocess.check_output(["docker", "--help"],
+                                    stderr=subprocess.PIPE)
         except Exception as _:
             exit_failure(messages("en", "docker_error"))
         # check tshark
         try:
-            subprocess.check_output(["tshark", "--help"], stderr=subprocess.PIPE)
+            subprocess.check_output(["tshark", "--help"],
+                                    stderr=subprocess.PIPE)
         except Exception as _:
             exit_failure("please install tshark first!")
     return True
@@ -246,7 +221,8 @@ def byte_to_str(data):
     :param data: data
     :return: str(data)
     """
-    return str(data if isinstance(data, str) else data.decode() if isinstance(data, bytes) else data)
+    return str(data if isinstance(data, str) else data.decode()
+               if isinstance(data, bytes) else data)
 
 
 def is_verbose_mode():

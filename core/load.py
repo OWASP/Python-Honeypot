@@ -6,9 +6,12 @@ import os
 import json
 import socket
 
-from core.get_modules import load_all_modules
+from config import user_configuration
+from config import docker_configuration
+from config import network_configuration
 from terminable_thread import Thread
 from terminable_thread import threading
+from core.get_modules import load_all_modules
 from core.alert import info
 from core.alert import error
 from core.color import finish
@@ -16,9 +19,6 @@ from core.alert import messages
 from core.compatible import logo
 from core.compatible import version
 from core.compatible import is_windows
-from config import user_configuration
-from config import docker_configuration
-from config import network_configuration
 from core.exit_helper import exit_success
 from core.exit_helper import exit_failure
 from core.compatible import make_tmp_thread_dir
@@ -31,9 +31,9 @@ from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
 from core.compatible import mkdir
 from core.compatible import get_module_dir_path
+from core.compatible import is_verbose_mode
 from database.connector import insert_bulk_events_from_thread
 from database.connector import insert_events_in_bulk
-from core.compatible import is_verbose_mode
 
 # temporary use fixed version of argparse
 if is_windows():
@@ -56,7 +56,8 @@ def all_existing_networks():
     Returns:
         an array with list of all existing networks name
     """
-    return [network_name.rsplit()[1] for network_name in os.popen("docker network ls").read().rsplit("\n")[1:-1]]
+    return [network_name.rsplit()[1] for network_name in
+            os.popen("docker network ls").read().rsplit("\n")[1:-1]]
 
 
 def create_ohp_networks():
@@ -107,7 +108,8 @@ def running_containers():
     Returns:
         an array with list of running containers name
     """
-    return [container.rsplit()[-1] for container in os.popen("docker ps").read().rsplit("\n")[1:-1]]
+    return [container.rsplit()[-1] for container in
+            os.popen("docker ps").read().rsplit("\n")[1:-1]]
 
 
 def all_existing_containers():
@@ -117,7 +119,8 @@ def all_existing_containers():
     Returns:
         an array with list of all existing containers name
     """
-    return [container.rsplit()[-1] for container in os.popen("docker ps -a").read().rsplit("\n")[1:-1]]
+    return [container.rsplit()[-1] for container in
+            os.popen("docker ps -a").read().rsplit("\n")[1:-1]]
 
 
 def all_existing_images():
@@ -127,7 +130,8 @@ def all_existing_images():
     Returns:
         a array with list of all existing images name
     """
-    return [container.rsplit()[0] for container in os.popen("docker images").read().rsplit("\n")[1:-1]]
+    return [container.rsplit()[0] for container in
+            os.popen("docker images").read().rsplit("\n")[1:-1]]
 
 
 def stop_containers(configuration):
@@ -229,8 +233,10 @@ def create_new_images(configuration):
 
         info("creating image {0}".format(image_name))
 
-        # in case if verbose mode is enabled, we will be use os.system instead of os.popen to show the outputs in case
-        # of anyone want to be aware what's happening or what's the error, it's a good feature for developers as well
+        # in case if verbose mode is enabled, we will be use os.system
+        # instead of os.popen to show the outputs in case
+        # of anyone want to be aware what's happening or what's the error,
+        # it's a good feature for developers as well
         # to create new modules
         if is_verbose_mode():
             os.system("docker build . -t {0}".format(image_name))
@@ -326,8 +332,10 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
     Returns:
         True
     """
-    # running_time variable will be use to check if its need to reset the container after a while
-    # if virtual_machine_container_reset_factory_time_seconds < 0, it will keep containers until user interruption
+    # running_time variable will be use to check
+    # if its need to reset the container after a while
+    # if virtual_machine_container_reset_factory_time_seconds < 0,
+    # it will keep containers until user interruption
     running_time = 0
     while True:
         # while True sleep until user send ctrl + c
