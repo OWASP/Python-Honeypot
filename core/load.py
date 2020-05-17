@@ -145,10 +145,12 @@ def stop_containers(configuration):
         True
     """
     containers_list = running_containers()
+    container_names = virtual_machine_names_to_container_names(configuration)
     if containers_list:
-        for container in virtual_machine_names_to_container_names(configuration):
+        for container in container_names:
             if container in containers_list:
-                info("killing container {0}".format(os.popen("docker kill {0}".format(container)).read().rsplit()[0]))
+                info("killing container {0}".format(
+                    os.popen("docker kill {0}".format(container)).read().rsplit()[0]))
     return True
 
 
@@ -166,7 +168,8 @@ def remove_old_containers(configuration):
     containers_list = all_existing_containers()
     for container in virtual_machine_names_to_container_names(configuration):
         if container in containers_list:
-            info("removing container {0}".format(os.popen("docker rm {0}".format(container)).read().rsplit()[0]))
+            info("removing container {0}".format(
+                os.popen("docker rm {0}".format(container)).read().rsplit()[0]))
     return True
 
 
@@ -318,7 +321,10 @@ def containers_are_unhealthy(configuration):
     :param configuration: JSON container configuration
     :return: []/[containters]
     """
-    unhealthy_containers = [configuration[selected_module]['container_name'] for selected_module in configuration]
+    unhealthy_containers = []
+    for selected_module in configuration:
+        container_name = configuration[selected_module]['container_name']
+        unhealthy_containers.append(container_name)
     current_running_containers = running_containers()
     return [containter for containter in unhealthy_containers if containter not in current_running_containers]
 
@@ -500,9 +506,11 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                 configuration[module_name]["real_machine_port_number"] = real_machine_port
                 duplicated_ports = []
                 for selected_module in configuration:
-                    duplicated_ports.append(configuration[selected_module]["real_machine_port_number"])
+                    duplicated_ports.append(
+                        configuration[selected_module]["real_machine_port_number"])
                 if duplicated_ports.count(real_machine_port) is 1:
-                    info("port {0} selected for {1}".format(real_machine_port, module_name))
+                    info("port {0} selected for {1}".format(
+                        real_machine_port, module_name))
                     return real_machine_port
         except Exception as _:
             del _
@@ -580,7 +588,8 @@ def argv_parser():
     # create parser
     parser = argparse.ArgumentParser(prog="OWASP Honeypot", add_help=False)
     # create menu
-    engineOpt = parser.add_argument_group(messages("en", "engine"), messages("en", "engine_input"))
+    engineOpt = parser.add_argument_group(
+        messages("en", "engine"), messages("en", "engine_input"))
     # add select module options + list of available modules
     engineOpt.add_argument("-m", "--select-module", action="store",
                            dest="selected_modules", default=user_configuration()["default_selected_modules"],
@@ -609,7 +618,8 @@ def argv_parser():
     engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
                            help="disable colors in CLI")
     # test CI/ETC
-    engineOpt.add_argument("--test", action="store_true", dest="run_as_test", default=False, help="run a test and exit")
+    engineOpt.add_argument("--test", action="store_true",
+                           dest="run_as_test", default=False, help="run a test and exit")
     # help menu
     engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
                            help=messages("en", "show_help_menu"))

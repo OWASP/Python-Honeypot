@@ -98,6 +98,7 @@ def check_for_requirements(start_api_server):
         True if exist otherwise False
     """
     # check external required modules
+    connection_timeout = api_configuration()["api_database_connection_timeout"]
     try:
         import pymongo
         import netaddr
@@ -109,8 +110,7 @@ def check_for_requirements(start_api_server):
     # check mongodb
     try:
         connection = pymongo.MongoClient(api_configuration()["api_database"],
-                                         serverSelectionTimeoutMS=api_configuration()[
-                                             "api_database_connection_timeout"])
+                                         serverSelectionTimeoutMS=connection_timeout)
         connection.list_database_names()
     except Exception as _:
         exit_failure("cannot connect to mongodb")
@@ -138,10 +138,13 @@ def make_tmp_thread_dir():
     Returns:
         name of directory or False
     """
-    return mkdir("tmp/thread_"
-                 + "".join([str(string.ascii_uppercase + string.ascii_lowercase + string.digits)[
-                                random.randint(0, len(str(string.ascii_uppercase + string.ascii_lowercase +
-                                                          string.digits)) - 1)] for i in range(15)]))
+    uppercase_string = string.ascii_uppercase
+    lowercase_string = string.ascii_lowercase
+    digits = string.digits
+    combined_string = uppercase_string + lowercase_string + digits
+    random_digit = random.randint(0, len(combined_string) - 1)
+    return mkdir("tmp/thread_" +
+                 "".join([combined_string[random_digit] for i in range(15)]))
 
 
 def mkdir(dir):

@@ -73,12 +73,15 @@ def new_network_events(configuration):
     info("new_network_events thread started")
     # honeypot ports
     honeypot_ports = []
+    virtual_machine_ip_addresses = []
     for selected_module in configuration:
-        honeypot_ports.append(configuration[selected_module]["real_machine_port_number"])
+        port_number = configuration[selected_module]["real_machine_port_number"]
+        ip_address  = configuration[selected_module]["ip_address"]
+        honeypot_ports.append(port_number)
+        # get ip addresses
+        virtual_machine_ip_addresses.append(ip_address)
     # set machine name
     machine_name = network_configuration()["real_machine_identifier_name"]
-    # get ip addresses
-    virtual_machine_ip_addresses = [configuration[selected_module]["ip_address"] for selected_module in configuration]
     # ignore vm ips + ips in config.py
     ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] \
         if network_configuration()["ignore_real_machine_ip_address"] else [] + virtual_machine_ip_addresses \
