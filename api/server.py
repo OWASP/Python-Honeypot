@@ -75,7 +75,6 @@ def get_value_from_request(_key):
     Returns:
         the value content if found otherwise None
     """
-    global flask_request
     try:
         key = flask_request.args[_key]
     except Exception as _:
@@ -100,7 +99,6 @@ def is_authorized():
         200 HTTP code if it's valid otherwise 401 error
 
     """
-    global app
     if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] is not None \
             and app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != get_value_from_request("key"):
         abort(401, "invalid API key")
@@ -1108,7 +1106,7 @@ def start_api_server():
             else "NOT REQUIRED!"
         )
     )
-    global app
+
     app.config["OWASP_HONEYPOT_CONFIG"] = {
         "api_access_key": my_api_configuration["api_access_key"],
         "api_client_white_list": my_api_configuration["api_client_white_list"]["enabled"],
