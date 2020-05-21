@@ -21,9 +21,8 @@ client = pymongo.MongoClient(
 database = client[api_configuration()["api_database_name"]]
 honeypot_events = database.honeypot_events
 network_events = database.network_events
-global honeypot_events_queue, network_events_queue
-honeypot_events_queue = []
-network_events_queue = []
+honeypot_events_queue = list()
+network_events_queue = list()
 credential_events = database.credential_events
 honeypot_events_data = database.honeypot_events_data
 IP2Location = IP2Location.IP2Location(
@@ -60,7 +59,7 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
             )
         )
 
-    global honeypot_events_queue
+
     honeypot_events_queue.append(
         {
             "ip_dest": byte_to_str(ip_dest),
@@ -99,7 +98,7 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
                 ip_dest, port_dest, ip_src, port_src, machine_name
             )
         )
-    global network_events_queue
+
     network_events_queue.append(
         {
             "ip_dest": byte_to_str(ip_dest),
@@ -119,17 +118,16 @@ def insert_events_in_bulk():
     """
     inserts all honeypot and network events in bulk to honeypot_events and network_events collection respectively
     """
-    global honeypot_events_queue
-    global network_events_queue
+
     if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
         verbose_info("Submitting new events to database")
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
-        honeypot_events_queue = []
+        honeypot_events_queue.clear()
         honeypot_events.insert_many(new_events)
     if network_events_queue:
         new_events = network_events_queue[:]
-        network_events_queue = []
+        network_events_queue.clear()
         network_events.insert_many(new_events)
     return
 
