@@ -5,7 +5,7 @@ from glob import glob
 import os
 import inspect
 
-import lib
+import modules
 from core.compatible import is_windows
 from core.alert import warn
 from core.alert import messages
@@ -53,7 +53,7 @@ def load_all_modules():
     # structure of module name: module_name = lib/modules/(category_name/module_name)/__init.py
     # example: module_name = lib/modules/(ftp/weak_password)/__init.py = ftp/weak_password
     module_names = []
-    for module in glob(os.path.dirname(inspect.getfile(lib)) + '/modules/*/*/__init__.py'):
+    for module in glob(os.path.dirname(inspect.getfile(modules)) + '/*/*/__init__.py'):
         module_name = module.rsplit('\\' if is_windows() else '/')[-3] + '/' + \
                       module.rsplit('\\' if is_windows() else '/')[-2]
         if os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'Dockerfile'):
