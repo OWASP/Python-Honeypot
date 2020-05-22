@@ -42,7 +42,8 @@ def all_mime_types():
         ".css": "text/css",
         ".csv": "text/csv",
         ".doc": "application/msword",
-        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".docx": "application/vnd.openxmlformats-officedocument.\
+                                        wordprocessingml.document",
         ".eot": "application/vnd.ms-fontobject",
         ".epub": "application/epub+zip",
         ".gif": "image/gif",
@@ -69,7 +70,8 @@ def all_mime_types():
         ".png": "image/png",
         ".pdf": "application/pdf",
         ".ppt": "application/vnd.ms-powerpoint",
-        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ".pptx": "application/vnd.openxmlformats-officedocument.\
+                                        presentationml.presentation",
         ".rar": "application/x-rar-compressed",
         ".rtf": "application/rtf",
         ".sh": "application/x-sh",
@@ -89,7 +91,8 @@ def all_mime_types():
         ".woff2": "font/woff2",
         ".xhtml": "application/xhtml+xml",
         ".xls": "application/vnd.ms-excel",
-        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.\
+                                                spreadsheetml.sheet",
         ".xml": "application/xml",
         ".xul": "application/vnd.mozilla.xul+xml",
         ".zip": "application/zip",
@@ -108,7 +111,9 @@ def root_dir():
     Returns:
         root path for static files
     """
-    return os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), "web"), "static")
+    return os.path.join(os.path.join(os.path
+                                        .dirname(os.path
+                                        .dirname(__file__)), "web"), "static")
 
 
 def fix_date(date):

@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-This file is to be used to store all the queries which are being used for querying mongodb using pymongo.
+This file is to be used to store all the queries which are being used
+for querying mongodb using pymongo.
+
 Created this file because the queries are repeated over the URI's.
 """
 from bson.son import SON
