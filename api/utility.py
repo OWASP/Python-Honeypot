@@ -127,16 +127,16 @@ def fix_date(date):
         an array with fixed date value or original date
     """
     if date:
-        if date.count(":") is 2:
+        if date.count(":") == 2:
             return [
                 date,
                 "{0} 23:59:59".format(
                     date.rsplit()[0]
                 )
             ]
-        elif date.count("|") is 1 and date.count(":") is 4:
+        elif date.count("|") == 1 and date.count(":") == 4:
             return date.rsplit("|")
-        elif date.count("|") is 1 and date.count(":") is 0:
+        elif date.count("|") == 1 and date.count(":") == 0:
             return [
                 "{0} 00:00:00".format(
                     date.rsplit("|")[0]
