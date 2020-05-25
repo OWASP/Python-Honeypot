@@ -14,8 +14,10 @@ services:
         - .:/OWASP-Honeypot
     links:
         - mongodb
+        - docker_service
     depends_on:
         - mongodb
+        - docker_service
 
   mongodb:
     image: mongo:latest
@@ -30,4 +32,13 @@ services:
     ports:
         - 27017:27017
     command: mongod --logpath=/dev/null # --quiet
-
+  
+  docker_service:
+    build: .
+    environment: 
+        - DOCKER_HOST='tcp://0.0.0.0:2375'
+        - DOCKER_TLS_VERIFY=1
+    expose: 
+        - 2375
+    ports:
+        - 2375:2375
