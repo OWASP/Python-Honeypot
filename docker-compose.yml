@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    command: python3 ohp.py -m all --test
+    environment:
+      - FLASK_ENV=development
+    expose:
+        - 5000
+    ports:
+      - 5000:5000
+    volumes:
+        - .:/OWASP-Honeypot
+    links:
+        - mongodb
+    depends_on:
+        - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+        - MONGO_DATA_DIR=/data/db
+        - MONGO_LOG_DIR=/dev/null
+    volumes:
+        - ./data/db:/data/db
+    expose:
+        - 27017
+    ports:
+        - 27017:27017
+    command: mongod --logpath=/dev/null # --quiet
+
