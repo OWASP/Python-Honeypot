@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -yqq update && apt-get -yqq upgrade && apt-get -yqq install \
     --no-install-suggests --no-install-recommends \
+    apt-transport-https\
     apt-utils \
     asciidoctor \
     bison \
@@ -11,8 +12,8 @@ RUN apt-get -yqq update && apt-get -yqq upgrade && apt-get -yqq install \
     byacc \
     ca-certificates \
     cmake \
+    curl\
     dialog \
-    docker \
     doxygen \
     flex \
     git \
@@ -51,6 +52,7 @@ RUN apt-get -yqq update && apt-get -yqq upgrade && apt-get -yqq install \
     qtmultimedia5-dev \
     qttools5-dev-tools \
     qttools5-dev\
+    software-properties-common\
     tshark \
     wget \
     xsltproc
@@ -58,20 +60,14 @@ RUN apt-get -yqq update && apt-get -yqq upgrade && apt-get -yqq install \
 RUN git clone https://github.com/zdresearch/OWASP-Honeypot.git /OWASP-Honeypot
 WORKDIR /OWASP-Honeypot
 
-
-# COPY requirements.txt requirements.txt
-# COPY requirements-dev.txt requirements-dev.txt
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - &&\
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable" &&\
+    apt-get -y update && apt-get install -y docker-ce
+    
 RUN pip3 --no-cache-dir install --upgrade setuptools==46.1.3
 RUN pip3 install -r requirements.txt
 RUN pip3 install -r requirements-dev.txt
 
-# COPY . .
-
-# EXPOSE 5000
-# EXPOSE 27017
-
-# ENV FLASK_APP=ohp.py
-
-# CMD ["python3", "ohp.py", "-m all --test"]
+RUN service docker start
 
 CMD [ "python3","-m", "pytest", "-rpP" ]
