@@ -17,7 +17,7 @@ def api_configuration():
         a JSON with API configuration
     """
     return {  # OWASP Honeypot API Default Configuration
-        "api_host": "127.0.0.1",
+        "api_host": "0.0.0.0",
         "api_port": 5000,
         "api_debug_mode": False,
         "api_access_without_key": True,
