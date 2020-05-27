@@ -73,7 +73,8 @@ def create_ohp_networks():
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
                  "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
                  "com.docker.network.driver.mtu=1500").read()
-        network_json = json.loads(os.popen("docker network inspect ohp_internet").read())[0]["IPAM"]["Config"][0]
+        network_json = json.loads(os.popen("docker network inspect ohp_internet").read())[
+            0]["IPAM"]["Config"][0]
         info("ohp_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
                                                                           network_json["Gateway"]))
     if "ohp_no_internet" not in all_existing_networks():
@@ -83,7 +84,8 @@ def create_ohp_networks():
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
                  "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 "
                  "--opt com.docker.network.driver.mtu=1500").read()
-        network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[0]["IPAM"]["Config"][0]
+        network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[
+            0]["IPAM"]["Config"][0]
         info("ohp_no_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
                                                                              network_json["Gateway"]))
     return True

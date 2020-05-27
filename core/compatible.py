@@ -9,8 +9,8 @@ import random
 import string
 import shutil
 import inspect
+import config
 
-from config import api_configuration
 from core.alert import write_to_api_console
 from core.alert import messages
 from core.color import finish
@@ -98,7 +98,7 @@ def check_for_requirements(start_api_server):
         True if exist otherwise False
     """
     # check external required modules
-    connection_timeout = api_configuration()["api_database_connection_timeout"]
+    connection_timeout = config.api_configuration()["api_database_connection_timeout"]
     try:
         import pymongo
         import netaddr
@@ -109,7 +109,7 @@ def check_for_requirements(start_api_server):
         exit_failure("pip install -r requirements.txt")
     # check mongodb
     try:
-        connection = pymongo.MongoClient(api_configuration()["api_database"],
+        connection = pymongo.MongoClient(config.api_configuration()["api_database"],
                                          serverSelectionTimeoutMS=connection_timeout)
         connection.list_database_names()
     except Exception as _:
