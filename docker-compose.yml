@@ -16,6 +16,18 @@ services:
     depends_on:
         - mongodb
 
+  modules:
+    build: .
+    command: python3 ohp.py -m all --test
+    environment:
+      - DOCKER_ENV=1
+    volumes:
+      - .:/OWASP-Honeypot
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+
   mongodb:
     image: mongo:latest
     container_name: "mongodb"
