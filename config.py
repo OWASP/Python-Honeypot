@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import socket
 
 from core.time_helper import hours
@@ -16,6 +17,13 @@ def api_configuration():
     Returns:
         a JSON with API configuration
     """
+    # DOCKER_ENV variable is set in the docker-compose file.
+    if os.environ.get('DOCKER_ENV') != None:
+        db_url = "mongodb://mongodb:27017/"
+    else:
+        db_url = "mongodb://127.0.0.1:27017/"
+        
+    
     return {  # OWASP Honeypot API Default Configuration
         "api_host": "0.0.0.0",
         "api_port": 5000,
@@ -31,7 +39,7 @@ def api_configuration():
             "filename": "ohp_api_access.log"
         },
          # mongodb://user:password@127.0.0.1:27017/
-        "api_database": "mongodb://127.0.0.1:27017/", # Change to mongodb://mongodb:27017/ for Docker container
+        "api_database": db_url, 
         "api_database_connection_timeout": 2000,  # miliseconds
         "api_database_name": "ohp_events"
     }

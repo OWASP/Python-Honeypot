@@ -6,6 +6,7 @@ services:
     command: python3 ohp.py --start-api-server
     environment:
       - FLASK_ENV=development
+      - DOCKER_ENV=1
     ports:
       -  5000:5000
     volumes:
