@@ -22,11 +22,15 @@ services:
     environment:
       - DOCKER_ENV=1
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - .:/OWASP-Honeypot
     links:
       - mongodb
     depends_on:
       - mongodb
+    ports:
+      - 8080:80
+      - 8081:81
 
   mongodb:
     image: mongo:latest
