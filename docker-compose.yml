@@ -18,7 +18,9 @@ services:
 
   modules:
     build: .
-    command: python3 ohp.py -m all --test
+    command: python3 ohp.py -m all
+    ports:
+      - 8080:80
     environment:
       - DOCKER_ENV=1
     volumes:
@@ -28,9 +30,6 @@ services:
       - mongodb
     depends_on:
       - mongodb
-    ports:
-      - 8080:80
-      - 8081:81
 
   mongodb:
     image: mongo:latest
