@@ -8,10 +8,7 @@ from flask import Response
 from flask import abort
 from flask import request as flask_request
 from flask import jsonify
-from config import api_configuration
-from core.alert import write_to_api_console
-from core.get_modules import load_all_modules
-from database import connector
+
 from api.database_queries import top_ip_dests_groupby
 from api.database_queries import top_machine_names_groupby
 from api.database_queries import top_port_dests_groupby
@@ -29,6 +26,11 @@ from api.utility import fix_limit
 from api.utility import fix_skip
 from api.utility import flask_null_array_response
 from api.utility import aggregate_function
+from config import api_configuration
+from core.alert import write_to_api_console
+from core.get_modules import load_all_modules
+from database import connector
+
 
 template_dir = os.path.join(
     os.path.join(
@@ -99,10 +101,11 @@ def is_authorized():
         200 HTTP code if it's valid otherwise 401 error
 
     """
-    if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] is not None \
-                and app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != \
-                get_value_from_request("key"):
-        abort(401, "invalid API key")
+    api_access_key = app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"]
+
+    if api_access_key is not None and \
+        api_access_key != get_value_from_request("key"):
+            abort(401, "invalid API key")
     return True
 
 
@@ -181,12 +184,17 @@ def authorization_check():
         None or Abort(403) or Abort(401)
     """
     # IP Limitation
-    if app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]:
-        if flask_request.remote_addr not in \
-                        app.config["OWASP_HONEYPOT_CONFIG"]\
-                                  ["api_client_white_list_ips"]:
+    white_list_enabled = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]
+    white_list_ips = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]
+    api_access_without_key = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]
+
+    if white_list_enabled:
+        if flask_request.remote_addr not in white_list_ips:
             abort(403, "unauthorized IP")
-    if not app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]:
+    if not api_access_without_key:
         is_authorized()
     return
 
@@ -218,7 +226,8 @@ def get_static_files(path):
     return Response(
         get_file(
             os.path.join(
-                root_dir(), path
+                root_dir(),
+                path
             )
         ),
         mimetype=static_types.get(
@@ -1115,17 +1124,20 @@ def start_api_server():
     """
     # Starting the API
     my_api_configuration = api_configuration()
+    api_access_key = my_api_configuration["api_access_key"]
+    api_access_without_key = my_api_configuration["api_access_without_key"]
+
     write_to_api_console(
         " * API access key: {0}\n".format(
-            my_api_configuration["api_access_key"] \
-                if not my_api_configuration["api_access_without_key"]
-            else "NOT REQUIRED!"
+                api_access_key
+                if not api_access_without_key 
+                else "NOT REQUIRED!"
         )
     )
 
     app.config["OWASP_HONEYPOT_CONFIG"] = {
         "api_access_key":
-                    my_api_configuration["api_access_key"],
+                    api_access_key,
         "api_client_white_list":
                     my_api_configuration["api_client_white_list"]["enabled"],
         "api_client_white_list_ips":
@@ -1135,7 +1147,7 @@ def start_api_server():
         "api_access_log_filename":
                     my_api_configuration["api_access_log"]["filename"],
         "api_access_without_key":
-                    my_api_configuration["api_access_without_key"],
+                    api_access_without_key,
         "language": "en"
     }
     app.run(

@@ -202,7 +202,7 @@ def aggregate_function(data_connection, agr_query):
     """
     uses aggregate function of mongodb
 
-    Input :
+    Args :
     data connection object on which to aggregate on
     aggregated query in a list
 
