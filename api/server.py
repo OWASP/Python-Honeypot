@@ -2,35 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import os
-from flask import Flask
-from flask import render_template
-from flask import Response
-from flask import abort
-from flask import request as flask_request
-from flask import jsonify
 
-from api.database_queries import top_ip_dests_groupby
-from api.database_queries import top_machine_names_groupby
-from api.database_queries import top_port_dests_groupby
-from api.database_queries import top_countries_groupby
-from api.database_queries import sort_by_count
-from api.database_queries import sort_by_count_and_id
-from api.database_queries import group_by_ip_dest
-from api.database_queries import group_by_ip_dest_and_password
-from api.database_queries import group_by_ip_dest_and_username
-from api.utility import msg_structure
-from api.utility import all_mime_types
-from api.utility import root_dir
-from api.utility import fix_date
-from api.utility import fix_limit
-from api.utility import fix_skip
-from api.utility import flask_null_array_response
-from api.utility import aggregate_function
+from flask import Flask, Response, abort, jsonify, render_template
+from flask import request as flask_request
+
+from api.database_queries import (group_by_ip_dest,
+                                  group_by_ip_dest_and_password,
+                                  group_by_ip_dest_and_username, sort_by_count,
+                                  sort_by_count_and_id, top_countries_groupby,
+                                  top_ip_dests_groupby,
+                                  top_machine_names_groupby,
+                                  top_port_dests_groupby)
+from api.utility import (aggregate_function, all_mime_types, fix_date,
+                         fix_limit, fix_skip, flask_null_array_response,
+                         msg_structure, root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
 from database import connector
-
 
 template_dir = os.path.join(
     os.path.join(
