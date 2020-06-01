@@ -14,18 +14,25 @@ from core.compatible import byte_to_str
 from core.alert import verbose_info
 from core.compatible import is_verbose_mode
 
+api_config = api_configuration()
+network_config = network_configuration()
+
 client = pymongo.MongoClient(
-    api_configuration()["api_database"],
+    api_config["api_database"],
     serverSelectionTimeoutMS=
-                api_configuration()["api_database_connection_timeout"]
+                api_config["api_database_connection_timeout"]
 )
-database = client[api_configuration()["api_database_name"]]
+database = client[api_config["api_database_name"]]
+
+credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
+
 honeypot_events_queue = list()
 network_events_queue = list()
-credential_events = database.credential_events
+
 honeypot_events_data = database.honeypot_events_data
+
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -150,7 +157,8 @@ def insert_events_in_bulk():
 def insert_bulk_events_from_thread():
     """
     Thread function for inserting bulk events in a thread
-    :return: True/None
+    Returns:
+        True/None
     """
     while True:
         insert_events_in_bulk()
@@ -162,14 +170,16 @@ def insert_honeypot_events_credential_from_module_processor(ip, username,
                                                 password, module_name, date):
     """
     insert honeypot events which are obtained from the modules
-    args:
+    
+    Args:
     ip : client ip used for connecting to the module
     username : username tried for connecting to modules
     password : password tried for connecting to modules
     module_name : on which module client accessed
     date : datetime of the event
 
-    :return: inserted_id
+    Returns:
+        inserted_id
     """
     if is_verbose_mode():
         verbose_info(
@@ -179,7 +189,7 @@ def insert_honeypot_events_credential_from_module_processor(ip, username,
                 username,
                 password,
                 module_name,
-                network_configuration()["real_machine_identifier_name"]
+                network_config["real_machine_identifier_name"]
             )
         )
     return credential_events.insert_one(
@@ -191,8 +201,7 @@ def insert_honeypot_events_credential_from_module_processor(ip, username,
             "password": password,
             "country": byte_to_str(IP2Location
                                 .get_country_short(byte_to_str(ip))),
-            "machine_name": network_configuration()
-                                    ["real_machine_identifier_name"]
+            "machine_name": network_config["real_machine_identifier_name"]
         }
     ).inserted_id
 
@@ -201,13 +210,15 @@ def insert_honeypot_events_data_from_module_processor(ip, module_name,
                                                         date, data):
     """
     insert data which is received from honeypot modules
-    args:
-    ip : client ip used for putting the data
-    module_name : on which module client accessed
-    date : datetime of the events
-    data : Data which is obtained from the client
 
-    :return: inserted_id
+    Args:
+        ip : client ip used for putting the data
+        module_name : on which module client accessed
+        date : datetime of the events
+        data : Data which is obtained from the client
+
+    Returns:
+        inserted_id
     """
     if is_verbose_mode():
         verbose_info(
@@ -215,7 +226,7 @@ def insert_honeypot_events_data_from_module_processor(ip, module_name,
             "machine_name:{2}, data:{3}".format(
                 ip, 
                 module_name,
-                network_configuration()["real_machine_identifier_name"],
+                network_config["real_machine_identifier_name"],
                 data
             )
         )
@@ -227,7 +238,6 @@ def insert_honeypot_events_data_from_module_processor(ip, module_name,
             "data": data,
             "country": byte_to_str(IP2Location
                             .get_country_short(byte_to_str(ip))),
-            "machine_name": network_configuration()
-                                    ["real_machine_identifier_name"]
+            "machine_name": network_config["real_machine_identifier_name"]
         }
     ).inserted_id
