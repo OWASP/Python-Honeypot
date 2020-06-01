@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import subprocess
-import netaddr
-import select
-import time
 import os
+import select
+import subprocess
+import time
 
-from database.connector import insert_selected_modules_network_event
-from database.connector import insert_other_network_event
-from core.alert import info
+import netaddr
+
 from config import network_configuration
-from core.get_modules import virtual_machine_name_to_container_name
-from core.alert import warn
-from core.exit_helper import exit_failure
+from core.alert import info, warn
 from core.compatible import byte_to_str
-
+from core.exit_helper import exit_failure
+from core.get_modules import virtual_machine_name_to_container_name
+from database.connector import (insert_to_network_events_queue,
+                                insert_to_honeypot_events_queue)
+from database.datatypes import HoneypotEvent, NetworkEvent
 
 def get_gateway_ip_addresses(configuration):
     """
@@ -134,21 +134,25 @@ def new_network_events(configuration):
 
                             if port_dest in honeypot_ports or port_src in honeypot_ports:
                                 if port_dest in honeypot_ports:
-                                    insert_selected_modules_network_event(
-                                        ip_dest,
-                                        port_dest,
-                                        ip_src,
-                                        port_src,
-                                        selected_module,
-                                        machine_name
+                                    insert_to_honeypot_events_queue(
+                                        HoneypotEvent(
+                                            ip_dest=ip_dest,
+                                            port_dest=port_dest,
+                                            ip_src=ip_src,
+                                            port_src=port_src,
+                                            module_name=selected_module,
+                                            machine_name=machine_name
+                                        )
                                     )
                             else:
-                                insert_other_network_event(
-                                    ip_dest,
-                                    port_dest,
-                                    ip_src,
-                                    port_src,
-                                    machine_name
+                                insert_to_network_events_queue(
+                                    NetworkEvent(
+                                        ip_dest=ip_dest,
+                                        port_dest=port_dest,
+                                        ip_src=ip_src,
+                                        port_src=port_src,
+                                        machine_name=machine_name
+                                    )
                                 )
                     except Exception as _:
                         del _

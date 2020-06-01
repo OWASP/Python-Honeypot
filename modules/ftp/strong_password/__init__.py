@@ -5,12 +5,14 @@ import time
 from core.compatible import generate_token
 import os
 import json
-from database.connector import insert_honeypot_events_credential_from_module_processor
+from database.connector import insert_to_credential_events_collection
+from database.datatypes import CredentialEvent
 
 
 class ModuleProcessor:
     """
-    this is the processor to run after docker machine is up to grab the log files or do other needed process...
+    this is the processor to run after docker machine is up to grab the
+    log files or do other needed process...
     """
 
     def __init__(self):
@@ -20,8 +22,8 @@ class ModuleProcessor:
 
     def processor(self):
         """
-        processor function will be called as a new thread and will be die when kill_flag is True
-        :return:
+        processor function will be called as a new thread and will be
+        die when kill_flag is True
         """
         if os.path.exists(self.log_filename):
             os.remove(self.log_filename)  # remove if exist from past
@@ -31,12 +33,14 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    insert_honeypot_events_credential_from_module_processor(
-                        data['ip'],
-                        data['username'],
-                        data['password'],
-                        data['module_name'],
-                        data['date']
+                    insert_to_credential_events_collection(
+                        CredentialEvent(
+                            ip=data['ip'],
+                            username=data['username'],
+                            password=data['password'],
+                            module_name=data['module_name'],
+                            date=data['date']
+                        )                   
                     )
                 os.remove(self.log_filename_dump)
             time.sleep(0.1)
@@ -52,6 +56,7 @@ def module_configuration():
     return {
         "username": "admin",
         "password": generate_token(16),
-        "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
+        "extra_docker_options": ["--volume {0}/tmp:/root/logs/"
+                                    .format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

@@ -5,10 +5,13 @@ import time
 import os
 import json
 
+from database.connector import insert_to_ics_honeypot_events_collection
+from database.datatypes import ICSHoneypotEvent
 
 class ModuleProcessor:
     """
-    this is the processor to run after docker machine is up to grab the log files or do other needed process...
+    this is the processor to run after docker machine is up to grab the
+    log files or do other needed process...
     """
 
     def __init__(self):
@@ -17,12 +20,13 @@ class ModuleProcessor:
 
     def processor(self):
         """
-        processor function will be called as a new thread and will be die when kill_flag is True
-        :return:
+        processor function will be called as a new thread and will
+        be die when kill_flag is True
         """
-        from database.connector import insert_honeypot_events_data_from_module_processor
         while not self.kill_flag:
-            if os.path.exists(self.log_filename) and os.path.getsize(self.log_filename) > 0:
+            if os.path.exists(self.log_filename) and \
+                os.path.getsize(self.log_filename) > 0:
+
                 data_dump = open(self.log_filename).readlines()
                 open(self.log_filename, 'w').write('')
                 for data in data_dump:
@@ -33,11 +37,13 @@ class ModuleProcessor:
                         "content": data_json["content"],
                         "valid_command": data_json["valid_command"]
                     }
-                    insert_honeypot_events_data_from_module_processor(
-                        ip,
-                        "ics/veeder_root_guardian_ast",
-                        time_of_insertion,
-                        recorded_data
+                    insert_to_ics_honeypot_events_collection(
+                        ICSHoneypotEvent(
+                            ip=ip,
+                            module_name="ics/veeder_root_guardian_ast",
+                            date=time_of_insertion,
+                            data=recorded_data
+                        )
                     )
             time.sleep(0.1)
 

@@ -6,12 +6,14 @@ from core.compatible import generate_token
 import os
 import binascii
 import json
-from database.connector import insert_honeypot_events_credential_from_module_processor
+from database.connector import insert_to_credential_events_collection
+from database.datatypes import CredentialEvent
 
 
 class ModuleProcessor:
     """
-    this is the processor to run after docker machine is up to grab the log files or do other needed process...
+    this is the processor to run after docker machine is up to grab the
+    log files or do other needed process...
     """
 
     def __init__(self):
@@ -21,11 +23,13 @@ class ModuleProcessor:
 
     def processor(self):
         """
-        processor function will be called as a new thread and will be die when kill_flag is True
-        :return:
+        processor function will be called as a new thread and will be
+        die when kill_flag is True
         """
         while not self.kill_flag:
-            if os.path.exists(self.log_filename) and os.path.getsize(self.log_filename) > 0:
+            if os.path.exists(self.log_filename) and \
+                os.path.getsize(self.log_filename) > 0:
+
                 # os.rename(self.log_filename, self.log_filename_dump)
                 data_dump = open(self.log_filename).readlines()
                 open(self.log_filename, 'w').write('')
@@ -41,12 +45,14 @@ class ModuleProcessor:
                         ).decode('utf-8')  # binascii is returning bytes
                         username = authorization.split(":")[0]
                         password = ":".join(authorization.split(":")[1:])
-                        insert_honeypot_events_credential_from_module_processor(
-                            ip,
-                            username,
-                            password,
-                            "http/basic_auth_strong_password",
-                            time_of_insertion
+                        insert_to_credential_events_collection(
+                            CredentialEvent(
+                                ip=ip,
+                                username=username,
+                                password=password,
+                                module_name="http/basic_auth_strong_password",
+                                date=time_of_insertion
+                            )
                         )
             time.sleep(0.1)
 
@@ -62,6 +68,7 @@ def module_configuration():
         "username": "admin",
         "password": generate_token(16),
         "extra_docker_options": [],
-        "extra_docker_options": ["--volume {0}/tmp:/var/log/apache2/".format(os.getcwd())],
+        "extra_docker_options": ["--volume {0}/tmp:/var/log/apache2/"
+                                                .format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }
