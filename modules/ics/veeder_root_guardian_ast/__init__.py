@@ -8,6 +8,9 @@ import json
 from database.connector import insert_to_ics_honeypot_events_collection
 from database.datatypes import ICSHoneypotEvent
 
+
+LOGFILE = 'tmp/ics_veeder_root_guardian_ast.log'
+
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the
@@ -15,7 +18,6 @@ class ModuleProcessor:
     """
 
     def __init__(self):
-        self.log_filename = 'tmp/ics_veeder_root_guardian_ast.log'
         self.kill_flag = False
 
     def processor(self):
@@ -24,11 +26,11 @@ class ModuleProcessor:
         be die when kill_flag is True
         """
         while not self.kill_flag:
-            if os.path.exists(self.log_filename) and \
-                os.path.getsize(self.log_filename) > 0:
+            if os.path.exists(LOGFILE) and \
+                os.path.getsize(LOGFILE) > 0:
 
-                data_dump = open(self.log_filename).readlines()
-                open(self.log_filename, 'w').write('')
+                data_dump = open(LOGFILE).readlines()
+                open(LOGFILE, 'w').write('')
                 for data in data_dump:
                     data_json = json.loads(data)
                     ip = data_json["ip"]

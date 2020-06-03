@@ -9,6 +9,9 @@ from database.connector import insert_to_credential_events_collection
 from database.datatypes import CredentialEvent
 
 
+LOGFILE = 'tmp/ohp_ftp_strong_password_creds_logs.txt'
+LOGFILE_DUMP = 'tmp/ohp_ftp_strong_password_creds_logs.json'
+
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the
@@ -17,20 +20,18 @@ class ModuleProcessor:
 
     def __init__(self):
         self.kill_flag = False
-        self.log_filename = 'tmp/ohp_ftp_strong_password_creds_logs.txt'
-        self.log_filename_dump = 'tmp/ohp_ftp_strong_password_creds_logs.json'
 
     def processor(self):
         """
         processor function will be called as a new thread and will be
         die when kill_flag is True
         """
-        if os.path.exists(self.log_filename):
-            os.remove(self.log_filename)  # remove if exist from past
+        if os.path.exists(LOGFILE):
+            os.remove(LOGFILE)  # remove if exist from past
         while not self.kill_flag:
-            if os.path.exists(self.log_filename):
-                os.rename(self.log_filename, self.log_filename_dump)
-                data_dump = open(self.log_filename_dump).readlines()
+            if os.path.exists(LOGFILE):
+                os.rename(LOGFILE, LOGFILE_DUMP)
+                data_dump = open(LOGFILE_DUMP).readlines()
                 for data in data_dump:
                     data = json.loads(data)
                     insert_to_credential_events_collection(
@@ -42,7 +43,7 @@ class ModuleProcessor:
                             date=data['date']
                         )                   
                     )
-                os.remove(self.log_filename_dump)
+                os.remove(LOGFILE_DUMP)
             time.sleep(0.1)
 
 

@@ -11,10 +11,12 @@ HOST = ''
 PORT = 21
 LOGFILE = '/root/logs/ohp_ftp_strong_password_creds_logs.txt'
 LOGFILE_LOCK = threading.Lock()
+SERVER_CONFIG = '/root/server.conf'
+USER_CONFIG = '/root/users.conf'
 
 
 def init_user_conf():
-    f = open('/root/users.conf', 'r')
+    f = open(USER_CONFIG, 'r')
     user_conf_lines = f.read().split('\n')
     for user_conf_line in user_conf_lines:
         split_line = user_conf_line.split(':')
@@ -25,16 +27,16 @@ def init_user_conf():
 
 
 def init_server_conf():
-    f = open('/root/server.conf', 'r')
+    f = open(SERVER_CONFIG, 'r')
     server_conf_lines = f.read().split('\n')
     for server_conf_line in server_conf_lines:
         split_line = server_conf_line.split('=')
     if len(split_line) >= 2:
-        conf_variable = split_line[0]
+        conf_variable_key = split_line[0]
         conf_variable_value = split_line[1]
-        if conf_variable == 'PORT':
+        if conf_variable_key == 'PORT':
             PORT = int(conf_variable_value)
-        elif conf_variable == 'HOST':
+        elif conf_variable_key == 'HOST':
             if conf_variable_value != 'DEFAULT':
                 HOST = str(conf_variable_value)
 
