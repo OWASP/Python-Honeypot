@@ -133,8 +133,8 @@ def new_network_events(configuration):
                         ip_src = byte_to_str(line[1])
                         port_dest = int(line[2])
                         port_src = int(line[3])
-                        if netaddr.valid_ipv4(ip_dest) or \
-                           netaddr.valid_ipv6(ip_dest) \
+                        if (netaddr.valid_ipv4(ip_dest) or \
+                           netaddr.valid_ipv6(ip_dest)) \
                            and ip_dest not in ignore_ip_addresses \
                            and ip_src not in ignore_ip_addresses \
                            and port_dest not in ignore_ports \
