@@ -13,7 +13,7 @@ import config
 
 from core.alert import write_to_api_console
 from core.alert import messages
-from core.color import finish
+from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
 
 
@@ -36,7 +36,7 @@ def logo():
                      |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
                                                __/ |
                                               |___/   \n\n""")
-    finish()
+    reset_cmd_color()
 
 
 def version():

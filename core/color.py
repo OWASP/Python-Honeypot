@@ -6,20 +6,19 @@ import sys
 import core.compatible
 
 
-def finish():
+def reset_cmd_color():
     """
     reset the color of windows/terminal before exit
     """
     if "linux" in core.compatible.os_name() or core.compatible.os_name() == "darwin":
         sys.stdout.write("\033[0m")
     else:
-        import ctypes
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
         handle = std_out_handle
         ctypes.windll.kernel32.SetConsoleTextAttribute(handle, 7)
 
 
-def color(color):
+def color_cmd(color):
     """
     colors for terminal and windows cmd
 

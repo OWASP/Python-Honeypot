@@ -56,8 +56,9 @@ def load_all_modules():
     # for example:
     # module_name = lib/modules/ftp/weak_password/__init.py = ftp/weak_password
     module_names = []
-    for module in glob(os.path.dirname(inspect.getfile(lib)) +
-                       '/modules/*/*/__init__.py'):
+    module_directory = os.path.dirname(inspect.getfile(lib)) + \
+                       '/modules/*/*/__init__.py'
+    for module in glob(module_directory):
         module_name = module.rsplit('\\' if is_windows() else '/')[-3] + '/' + \
                       module.rsplit('\\' if is_windows() else '/')[-2]
         if os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'Dockerfile'):

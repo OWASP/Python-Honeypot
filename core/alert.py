@@ -4,9 +4,9 @@
 import os
 import sys
 import json
+import core.compatible
 from core import color
 from core.time_helper import now
-import core.compatible
 
 def is_not_run_from_api():
     """
@@ -84,17 +84,17 @@ def input_msg(content):
         the message in input structure
     """
     if core.compatible.version() is 2:
-        return color.color("yellow") + \
+        return color.color_cmd("yellow") + \
                "[+] " + \
-               color.color("green") + \
+               color.color_cmd("green") + \
                content.encode("utf8") + \
-               color.color("reset")
+               color.color_cmd("reset")
     else:
         return bytes(
-            color.color("yellow") +
-            "[+] " + color.color("green") +
+            color.color_cmd("yellow") +
+            "[+] " + color.color_cmd("green") +
             content +
-            color.color("reset"),
+            color.color_cmd("reset"),
             "utf8"
         )
 
@@ -119,21 +119,21 @@ def info(content, log_in_file=None, mode=None,
     if is_not_run_from_api():  # prevent to stdout if run from API
         if core.compatible.version() is 2:
             sys.stdout.write(
-                color.color("yellow") +
+                color.color_cmd("yellow") +
                 "[+] [{0}] ".format(now()) +
-                color.color("green") +
+                color.color_cmd("green") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("yellow") +
+                    color.color_cmd("yellow") +
                     "[+] [{0}] ".format(now()) +
-                    color.color("green") +
+                    color.color_cmd("green") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8"
                 )
@@ -184,21 +184,21 @@ def warn(content):
     if is_not_run_from_api():
         if core.compatible.version() is 2:
             sys.stdout.write(
-                color.color("blue") +
+                color.color_cmd("blue") +
                 "[!] [{0}] ".format(now()) +
-                color.color("yellow") +
+                color.color_cmd("yellow") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("blue") +
+                    color.color_cmd("blue") +
                     "[!] [{0}] ".format(now()) +
-                    color.color("yellow") +
+                    color.color_cmd("yellow") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8")
             )
@@ -226,21 +226,21 @@ def verbose_info(content, log_in_file=None, mode=None,
     if is_not_run_from_api():  # prevent to stdout if run from API
         if core.compatible.version() is 2:
             sys.stdout.write(
-                color.color("cyan") +
+                color.color_cmd("cyan") +
                 "[v] [{0}] ".format(now()) +
-                color.color("grey") +
+                color.color_cmd("grey") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("cyan") +
+                    color.color_cmd("cyan") +
                     "[v] [{0}] ".format(now()) +
-                    color.color("grey") +
+                    color.color_cmd("grey") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8"
                 )
@@ -268,20 +268,20 @@ def error(content):
     if is_not_run_from_api():
         if core.compatible.version() is 2:
             sys.stdout.write(
-                color.color("red") +
+                color.color_cmd("red") +
                 "[X] [{0}] ".format(now()) +
-                color.color("yellow") +
+                color.color_cmd("yellow") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 (
-                        color.color("red") +
+                        color.color_cmd("red") +
                         "[X] [{0}] ".format(now()) +
-                        color.color("yellow") +
-                        content + color.color("reset") +
+                        color.color_cmd("yellow") +
+                        content + color.color_cmd("reset") +
                         "\n"
                 ).encode("utf8")
             )

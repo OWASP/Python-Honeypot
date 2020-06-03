@@ -14,7 +14,7 @@ from terminable_thread import threading
 from core.get_modules import load_all_modules
 from core.alert import info
 from core.alert import error
-from core.color import finish
+from core.color import reset_cmd_color
 from core.alert import messages
 from core.compatible import logo
 from core.compatible import version
@@ -764,5 +764,5 @@ def load_honeypot_engine():
         terminate_thread(thread, False)
     info("finished.")
     # reset cmd/terminal color
-    finish()
+    reset_cmd_color()
     return True
