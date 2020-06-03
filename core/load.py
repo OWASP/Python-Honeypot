@@ -328,7 +328,8 @@ def containers_are_unhealthy(configuration):
         container_name = configuration[selected_module]['container_name']
         unhealthy_containers.append(container_name)
     current_running_containers = running_containers()
-    return [containter for containter in unhealthy_containers if containter not in current_running_containers]
+    return [containter for containter in unhealthy_containers
+            if containter not in current_running_containers]
 
 
 def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
@@ -594,12 +595,16 @@ def argv_parser():
         messages("en", "engine"), messages("en", "engine_input"))
     # add select module options + list of available modules
     engineOpt.add_argument("-m", "--select-module", action="store",
-                           dest="selected_modules", default=user_configuration()["default_selected_modules"],
-                           help=messages("en", "select_module").format(load_all_modules() + ["all"]))
+                           dest="selected_modules",
+                           default=user_configuration()["default_selected_modules"],
+                           help=messages("en", "select_module").format(
+                               load_all_modules() + ["all"]))
     # by default all modules are selected, in case users can exclude one or some (separated with comma)
     engineOpt.add_argument("-x", "--exclude-module", action="store",
-                           dest="excluded_modules", default=user_configuration()["default_excluded_modules"],
-                           help=messages("en", "exclude_module").format(load_all_modules()))
+                           dest="excluded_modules",
+                           default=user_configuration()["default_excluded_modules"],
+                           help=messages("en", "exclude_module").format(
+                               load_all_modules()))
     # limit the virtual machine storage to avoid related abuse
     engineOpt.add_argument("-s", "--vm-storage-limit", action="store",
                            dest="virtual_machine_storage_limit", type=float,
@@ -611,19 +616,24 @@ def argv_parser():
                            default=docker_configuration()["virtual_machine_container_reset_factory_time_seconds"],
                            help=messages("en", "vm_reset_factory_time"))
     # start api
-    engineOpt.add_argument("--start-api-server", action="store_true", dest="start_api_server", default=False,
+    engineOpt.add_argument("--start-api-server", action="store_true",
+                           dest="start_api_server", default=False,
                            help="start API server")
     # enable verbose mode (debug mode)
-    engineOpt.add_argument("-v", "--verbose", action="store_true", dest="verbose_mode", default=False,
+    engineOpt.add_argument("-v", "--verbose", action="store_true",
+                           dest="verbose_mode", default=False,
                            help="enable verbose mode")
     # disable color CLI
-    engineOpt.add_argument("--disable-colors", action="store_true", dest="disable_colors", default=False,
+    engineOpt.add_argument("--disable-colors", action="store_true",
+                           dest="disable_colors", default=False,
                            help="disable colors in CLI")
     # test CI/ETC
     engineOpt.add_argument("--test", action="store_true",
-                           dest="run_as_test", default=False, help="run a test and exit")
+                           dest="run_as_test",
+                           default=False, help="run a test and exit")
     # help menu
-    engineOpt.add_argument("-h", "--help", action="store_true", default=False, dest="show_help_menu",
+    engineOpt.add_argument("-h", "--help", action="store_true", default=False,
+                           dest="show_help_menu",
                            help=messages("en", "show_help_menu"))
     return parser, parser.parse_args()
 
