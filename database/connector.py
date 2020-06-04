@@ -133,7 +133,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
     return
 
 
-def push_queues_to_database():
+def push_events_queues_to_database():
     """
     Pushes all honeypot and network events collected in the 
     honeypot_events_queue and network_events_queue to honeypot_events
@@ -165,7 +165,7 @@ def push_events_to_database_from_thread():
         True/None
     """
     while True:
-        push_queues_to_database()
+        push_events_queues_to_database()
         time.sleep(3)
     return True
 

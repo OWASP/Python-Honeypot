@@ -32,7 +32,7 @@ from core.compatible import copy_dir_tree
 from core.compatible import mkdir
 from core.compatible import get_module_dir_path
 from database.connector import push_events_to_database_from_thread
-from database.connector import push_queues_to_database
+from database.connector import push_events_queues_to_database
 from core.compatible import is_verbose_mode
 
 # temporary use fixed version of argparse
@@ -729,7 +729,7 @@ def load_honeypot_engine():
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
-    push_queues_to_database()  # if in case any events that were not inserted from thread
+    push_events_queues_to_database()  # if in case any events that were not inserted from thread
     # stop created containers
     stop_containers(configuration)
     # stop module processor
