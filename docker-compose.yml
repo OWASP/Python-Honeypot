@@ -25,6 +25,7 @@ services:
       - 8080:80
     environment:
       - DOCKER_ENV=1
+      - DOCKER_API_VERSION=1.39
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .:/OWASP-Honeypot
