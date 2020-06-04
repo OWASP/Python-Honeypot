@@ -267,9 +267,11 @@ def count_all_events():
             return jsonify(
                 {
                     "count_all_events": (
-                            connector.honeypot_events
+                            connector
+                                    .honeypot_events
                                     .estimated_document_count()
-                            +  connector
+                            + 
+                            connector
                                     .network_events
                                     .estimated_document_count()
                     )
