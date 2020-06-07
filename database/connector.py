@@ -206,26 +206,6 @@ def insert_file_change_events(file_path, status, module_name, date):
     ).inserted_id
 
 
-def insert_file_change_events(file_path, status, module_name, date):
-    """
-    insert file change events which are obtained from ftp/ssh weak_password module
-    args:
-    file_path : the path of the file which is changed
-    status: status of the file would be added/modified/deleted
-    module_name : on which module client accessed
-    date : datetime of the event
-    """
-    return file_change_events.insert_one(
-        {
-            "file_path": file_path,
-            "module_name": module_name,
-            "date": date,
-            "status": status,
-            "machine_name": network_configuration()["real_machine_identifier_name"]
-        }
-    ).inserted_id
-
-
 def insert_honeypot_events_data_from_module_processor(ip, module_name, date, data):
     """
     insert data which is received from honeypot modules
