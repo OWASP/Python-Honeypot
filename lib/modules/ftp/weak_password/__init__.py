@@ -5,7 +5,7 @@ import time
 import os
 import threading
 from core.exit_helper import terminate_thread
-from core.file_monitor import fileMonitor
+from core.file_monitor import FileMonitor
 
 
 class ModuleProcessor:
@@ -29,13 +29,13 @@ class ModuleProcessor:
         processor function will be called as a new thread and will be die when kill_flag is True
         :return:
         """
-        newFileHandler = fileMonitor()
-        newFileHandler.log_filename = self.log_filename
-        newFileHandler.log_filename_dump = self.log_filename_dump
-        newFileHandler.DIRECTORY_TO_WATCH = self.DIRECTORY_TO_WATCH
-        newFileHandler.EXCLUDES = self.EXCLUDES
-        newFileHandler.module_name = self.module_name
-        thread = threading.Thread(target=newFileHandler.run, args=(), name="ftp_weak_password_processor")
+        new_file_handler = FileMonitor()
+        new_file_handler.log_filename = self.log_filename
+        new_file_handler.log_filename_dump = self.log_filename_dump
+        new_file_handler.DIRECTORY_TO_WATCH = self.DIRECTORY_TO_WATCH
+        new_file_handler.EXCLUDES = self.EXCLUDES
+        new_file_handler.module_name = self.module_name
+        thread = threading.Thread(target=new_file_handler.run, args=(), name="ftp_weak_password_processor")
         if os.path.exists(self.log_filename):
             os.remove(self.log_filename)  # remove if exist from past
         thread.start()  # Start the execution
@@ -44,7 +44,7 @@ class ModuleProcessor:
                 time.sleep(0.1)
             except Exception as _:
                 del _
-        newFileHandler.stop()
+        new_file_handler.stop()
         terminate_thread(thread)
 
 

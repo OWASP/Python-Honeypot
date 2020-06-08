@@ -24,7 +24,7 @@ def is_excluded(path, dirs):
     return False
 
 
-class containerFilesHandler(FileSystemEventHandler):
+class ContainerFilesHandler(FileSystemEventHandler):
     def __init__(self):
         self.log_filename = None
         self.EXCLUDES = None
@@ -42,7 +42,7 @@ class containerFilesHandler(FileSystemEventHandler):
             info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 
-class fileMonitor:
+class FileMonitor:
     def __init__(self):
         self.observer = Observer()
         self.log_filename = None
@@ -57,7 +57,7 @@ class fileMonitor:
         self.observer.stop()
 
     def run(self):
-        event_handler = containerFilesHandler()
+        event_handler = ContainerFilesHandler()
         event_handler.log_filename = self.log_filename
         event_handler.EXCLUDES = self.EXCLUDES
         event_handler.module_name = self.module_name
