@@ -11,7 +11,6 @@ LOGFILE = '/root/logs/ohp_ftp_weak_password_logs.txt'
 
 
 class Watcher:
-    DIRECTORY_TO_WATCH = "tmp/"
 
     def __init__(self):
         self.observer = Observer()
