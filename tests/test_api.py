@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-from flask_testing import TestCase
 import os
 import unittest
 import requests
@@ -11,14 +9,8 @@ import requests
 API_URL = 'http://127.0.0.1:5000'
 
 
-class TestApi(TestCase):
-
-
-    def create_app(self):
-        app = Flask(__name__)
-        app.config['TESTING'] = True
-        return app
-    
+class TestApi(unittest.TestCase):
+  
 
     def test_index(self):
         """
