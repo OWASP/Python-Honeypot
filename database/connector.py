@@ -79,7 +79,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
                 ))
     
     # Get country of the destination IP Address
-    honeypot_event["country_ip_src"] = \
+    honeypot_event["country_ip_dest"] = \
             byte_to_str(
                 IP2Location.get_country_short(
                     honeypot_event["ip_dest"]
@@ -122,7 +122,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
                 ))
     
     # Get country of the destination IP Address
-    network_event.country_ip_src = \
+    network_event["country_ip_dest"] = \
             byte_to_str(
                 IP2Location.get_country_short(
                     network_event["ip_dest"]
