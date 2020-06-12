@@ -581,29 +581,31 @@ def argv_parser():
     # create parser
     parser = argparse.ArgumentParser(prog="OWASP Honeypot", add_help=False)
     # create menu
+    docker_config = docker_configuration()
+    user_config = user_configuration()
     engineOpt = parser.add_argument_group(
         messages("en", "engine"), messages("en", "engine_input"))
     # add select module options + list of available modules
     engineOpt.add_argument("-m", "--select-module", action="store",
                            dest="selected_modules",
-                           default=user_configuration()["default_selected_modules"],
+                           default=user_config["default_selected_modules"],
                            help=messages("en", "select_module").format(
                                load_all_modules() + ["all"]))
     # by default all modules are selected, in case users can exclude one or some (separated with comma)
     engineOpt.add_argument("-x", "--exclude-module", action="store",
                            dest="excluded_modules",
-                           default=user_configuration()["default_excluded_modules"],
+                           default=user_config["default_excluded_modules"],
                            help=messages("en", "exclude_module").format(
                                load_all_modules()))
     # limit the virtual machine storage to avoid related abuse
     engineOpt.add_argument("-s", "--vm-storage-limit", action="store",
                            dest="virtual_machine_storage_limit", type=float,
-                           default=docker_configuration()["virtual_machine_storage_limit"],
+                           default=docker_config["virtual_machine_storage_limit"],
                            help=messages("en", "vm_storage_limit"))
     # reset the containers once in a time to prevent being continues botnet zombie
     engineOpt.add_argument("-r", "--vm-reset-factory-time", action="store",
                            dest="virtual_machine_container_reset_factory_time_seconds", type=int,
-                           default=docker_configuration()["virtual_machine_container_reset_factory_time_seconds"],
+                           default=docker_config["virtual_machine_container_reset_factory_time_seconds"],
                            help=messages("en", "vm_reset_factory_time"))
     # start api
     engineOpt.add_argument("--start-api-server", action="store_true",

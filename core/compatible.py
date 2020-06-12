@@ -98,7 +98,8 @@ def check_for_requirements(start_api_server):
         True if exist otherwise False
     """
     # check external required modules
-    connection_timeout = config.api_configuration()["api_database_connection_timeout"]
+    api_config = config.api_configuration()
+    connection_timeout = api_config["api_database_connection_timeout"]
     try:
         import pymongo
         import netaddr
@@ -109,7 +110,7 @@ def check_for_requirements(start_api_server):
         exit_failure("pip install -r requirements.txt")
     # check mongodb
     try:
-        connection = pymongo.MongoClient(config.api_configuration()["api_database"],
+        connection = pymongo.MongoClient(api_config["api_database"],
                                          serverSelectionTimeoutMS=connection_timeout)
         connection.list_database_names()
     except Exception as _:

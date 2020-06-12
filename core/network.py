@@ -74,6 +74,7 @@ def new_network_events(configuration):
     # honeypot ports
     honeypot_ports = []
     virtual_machine_ip_addresses = []
+    network_config = network_configuration()
     for selected_module in configuration:
         port_number = configuration[selected_module]["real_machine_port_number"]
         ip_address  = configuration[selected_module]["ip_address"]
@@ -81,17 +82,17 @@ def new_network_events(configuration):
         # get ip addresses
         virtual_machine_ip_addresses.append(ip_address)
     # set machine name
-    machine_name = network_configuration()["real_machine_identifier_name"]
+    machine_name = network_config["real_machine_identifier_name"]
     # ignore vm ips + ips in config.py
     # vm = virtual machine, rm = real machine
-    ignore_rm_ip_addresses = network_configuration()["ignore_real_machine_ip_address"]
-    ignore_vm_ip_addresses = network_configuration()["ignore_virtual_machine_ip_addresses"]
-    ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] \
+    ignore_rm_ip_addresses = network_config["ignore_real_machine_ip_address"]
+    ignore_vm_ip_addresses = network_config["ignore_virtual_machine_ip_addresses"]
+    ignore_ip_addresses = network_config["ignore_real_machine_ip_addresses"] \
         if ignore_rm_ip_addresses else [] + virtual_machine_ip_addresses \
         if ignore_vm_ip_addresses else []
     ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
     # ignore ports
-    ignore_ports = network_configuration()["ignore_real_machine_ports"]
+    ignore_ports = network_config["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
     run_tshark = ["tshark", "-l", "-V"]
