@@ -3,8 +3,7 @@
 
 import sys
 import ctypes
-from core.alert import error
-from core.alert import info
+from core.alert import (error,info)
 from core.color import reset_cmd_color
 
 

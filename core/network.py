@@ -7,8 +7,8 @@ import select
 import time
 import os
 
-from database.connector import insert_selected_modules_network_event
-from database.connector import insert_other_network_event
+from database.connector import (insert_selected_modules_network_event,\
+                                insert_other_network_event)
 from core.alert import info
 from config import network_configuration
 from core.get_modules import virtual_machine_name_to_container_name

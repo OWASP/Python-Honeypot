@@ -6,8 +6,7 @@ import inspect
 import lib
 from glob import glob
 from core.compatible import is_windows
-from core.alert import warn
-from core.alert import messages
+from core.alert import (warn,messages)
 
 
 def virtual_machine_names_to_container_names(configuration):
