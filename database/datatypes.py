@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from typing import TypedDict
+from dataclasses import dataclass
 
-class HoneypotEvent(TypedDict):
+@dataclass
+class HoneypotEvent:
     """
     Object to store Honeypot Event Parameters.
 
@@ -25,16 +26,16 @@ class HoneypotEvent(TypedDict):
     port_dest: int
     ip_src: str
     port_src: int
-    date: datetime = datetime.now()
     module_name: str
     machine_name: str
+    date: datetime = datetime.now()
     event_type: str = "honeypot_event"
     country_ip_src: str = None
     country_ip_dest: str = None
     
 
-
-class NetworkEvent(TypedDict):
+@dataclass
+class NetworkEvent:
     """
     Object to store Network Event Parameters
 
@@ -52,14 +53,14 @@ class NetworkEvent(TypedDict):
     port_dest: int
     ip_src: str
     port_src: int
-    date: datetime = datetime.now()
     machine_name: str
+    date: datetime = datetime.now()
     country_ip_src: str = None
     country_ip_dest: str = None
 
 
-
-class CredentialEvent(TypedDict):
+@dataclass
+class CredentialEvent:
     """
     Object to store Credential Event Parameters
 
@@ -77,11 +78,12 @@ class CredentialEvent(TypedDict):
     date: datetime
     username: str
     password: str
-    machine_name: str
+    machine_name: str = None
     country: str = None
 
 
-class ICSHoneypotEvent(TypedDict):
+@dataclass
+class ICSHoneypotEvent:
     """
     Object to store ICS Honeypot Event Parameters received from
     the ICS Module Processor
@@ -96,5 +98,5 @@ class ICSHoneypotEvent(TypedDict):
     module_name: str
     date: datetime
     data: str
-    machine_name: str
+    machine_name: str = None
     country: str = None
