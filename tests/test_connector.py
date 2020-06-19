@@ -46,8 +46,8 @@ class TestConnector(unittest.TestCase):
         push_events_queues_to_database()
 
         # Find the records in the DB
-        honeypot_record = honeypot_events.find_one(asdict(honeypot_event))
-        network_record = network_events.find_one(asdict(network_event))
+        honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
+        network_record = network_events.find_one(network_event.__dict__)
         
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
@@ -57,8 +57,8 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(network_record["ip_dest"], network_event.ip_dest)
 
         # Delete test events from the database
-        honeypot_events.delete_one(asdict(honeypot_event))
-        network_events.delete_one(asdict(network_event))
+        honeypot_events.delete_one(honeypot_event.__dict__)
+        network_events.delete_one(network_event.__dict__)
 
     
     def test_insert_to_credential_events(self):
@@ -76,7 +76,7 @@ class TestConnector(unittest.TestCase):
         insert_to_credential_events_collection(credential_event)
 
         # Find the record in the DB
-        credential_record = credential_events.find_one(asdict(credential_event))
+        credential_record = credential_events.find_one(credential_event.__dict__)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(credential_record["ip"],
@@ -89,7 +89,7 @@ class TestConnector(unittest.TestCase):
                          credential_event.password)
 
         # Delete test events from the database
-        credential_events.delete_one(asdict(credential_event))
+        credential_events.delete_one(credential_event.__dict__)
 
 
     def test_insert_ics_honeypot_events(self):
@@ -106,14 +106,14 @@ class TestConnector(unittest.TestCase):
         insert_to_ics_honeypot_events_collection(ics_honeypot_event)
 
         # Find the record in the DB
-        ics_honeypot_record = ics_honeypot_events.find_one(asdict(ics_honeypot_event))
+        ics_honeypot_record = ics_honeypot_events.find_one(ics_honeypot_event.__dict__)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(ics_honeypot_record["ip"], ics_honeypot_event.ip)
         self.assertEqual(ics_honeypot_record["data"],
                          ics_honeypot_event.data)
         
-        ics_honeypot_events.delete_one(asdict(ics_honeypot_event))
+        ics_honeypot_events.delete_one(ics_honeypot_event.__dict__)
 
 
 if __name__ == '__main__':
