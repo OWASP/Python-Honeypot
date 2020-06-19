@@ -4,7 +4,6 @@
 import inspect
 import os
 import time
-from dataclasses import asdict
 
 import pymongo
 
@@ -86,7 +85,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
                     honeypot_event.ip_dest
                 ))
 
-    honeypot_events_queue.append(asdict(honeypot_event))
+    honeypot_events_queue.append(honeypot_event.__dict__)
 
     return
 
@@ -129,7 +128,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
                     network_event.ip_dest
                 ))
 
-    network_events_queue.append(asdict(network_event))
+    network_events_queue.append(network_event.__dict__)
 
     return
 
@@ -205,7 +204,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
             )
         )
     
-    return credential_events.insert_one(asdict(credential_event)).inserted_id
+    return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
 def insert_to_ics_honeypot_events_collection(ics_honeypot_event: ICSHoneypotEvent):
@@ -243,4 +242,4 @@ def insert_to_ics_honeypot_events_collection(ics_honeypot_event: ICSHoneypotEven
             )
         )
 
-    return ics_honeypot_events.insert_one(asdict(ics_honeypot_event)).inserted_id
+    return ics_honeypot_events.insert_one(ics_honeypot_event.__dict__).inserted_id
