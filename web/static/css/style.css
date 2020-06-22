@@ -2,6 +2,18 @@ body {
     background: url("/img/background.jpeg")
 }
 
+#logo {
+    height: 50px;
+    width: auto;
+    filter: contrast(150%);
+}
+
+#titlebar{
+    background-color: rgba(24, 102, 90, 0.6);
+    text-decoration-color: black;
+}
+
+
 [am-TopLogo] {
     max-height: 70px;
     max-width: 210px;
