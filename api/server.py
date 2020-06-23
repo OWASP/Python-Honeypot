@@ -52,7 +52,7 @@ def get_file(filename):
     try:
         src = os.path.join(root_dir(), filename)
         return open(src, 'rb').read()
-    except IOError as _:
+    except IOError:
         abort(404)
 
 
@@ -68,13 +68,13 @@ def get_value_from_request(_key):
     """
     try:
         key = flask_request.args[_key]
-    except Exception as _:
+    except Exception:
         try:
             key = flask_request.form[_key]
-        except Exception as _:
+        except Exception:
             try:
                 key = flask_request.cookies[_key]
-            except Exception as _:
+            except Exception:
                 key = None
     if key:
         # todo: fix it later
@@ -92,9 +92,10 @@ def is_authorized():
     """
     api_access_key = app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"]
 
-    if api_access_key is not None and \
-        api_access_key != get_value_from_request("key"):
-            abort(401, "invalid API key")
+    key_from_request = get_value_from_request("key")
+
+    if api_access_key is not None and api_access_key != key_from_request:
+        abort(401, "invalid API key")
     return True
 
 
@@ -260,24 +261,20 @@ def count_all_events():
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
                     "count_all_events": (
-                            connector
-                                    .honeypot_events
-                                    .estimated_document_count()
-                            + 
-                            connector
-                                    .network_events
-                                    .estimated_document_count()
+                        connector.honeypot_events.estimated_document_count()
+                        +
+                        connector.network_events.estimated_document_count()
                     )
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -296,9 +293,8 @@ def count_honeypot_events():
         try:
             return jsonify(
                 {
-                    "count_honeypot_events_by_date": connector
-                                                        .honeypot_events
-                                                        .count_documents(
+                    "count_honeypot_events_by_date":
+                    connector.honeypot_events.count_documents(
                         {
                             "date": {
                                 "$gte": date[0],
@@ -309,18 +305,17 @@ def count_honeypot_events():
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
-                    "count_honeypot_events": connector
-                                                .honeypot_events
-                                                .estimated_document_count()
+                    "count_honeypot_events":
+                    connector.honeypot_events.estimated_document_count()
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -339,9 +334,8 @@ def count_network_events():
         try:
             return jsonify(
                 {
-                    "count_network_events_by_date": connector
-                                                        .network_events
-                                                        .count_documents(
+                    "count_network_events_by_date":
+                    connector.network_events.count_documents(
                         {
                             "date":
                                 {
@@ -353,18 +347,17 @@ def count_network_events():
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
-                    "count_network_events": connector
-                                                .network_events
-                                                .estimated_document_count()
+                    "count_network_events":
+                    connector.network_events.estimated_document_count()
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -435,7 +428,7 @@ def top_ten_ips_in_honeypot_events():
                 top_ips_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -508,7 +501,7 @@ def top_ten_ips_in_network_events():
                 top_ips_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -576,7 +569,7 @@ def top_ten_ports_in_honeypot_events():
                 top_ports_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -644,7 +637,7 @@ def top_ten_ports_in_network_events():
                 top_ports_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -686,7 +679,7 @@ def get_honeypot_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
@@ -709,7 +702,7 @@ def get_honeypot_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -751,7 +744,7 @@ def get_network_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
@@ -774,7 +767,7 @@ def get_network_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -835,7 +828,7 @@ def top_ten_countries_in_honeypot_events():
                 top_countries_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -896,7 +889,7 @@ def top_ten_countries_in_network_events():
                 top_countries_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -943,7 +936,7 @@ def top_network_machine_names():
                 top_machinenames_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -989,7 +982,7 @@ def top_honeypot_machine_names():
                 top_machinenames_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1021,7 +1014,7 @@ def module_events():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1053,7 +1046,7 @@ def top_usernames_used():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1085,7 +1078,7 @@ def top_passwords_used():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1102,7 +1095,7 @@ def all_module_names():
         return jsonify(
             {"module_names": module_names}
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1121,24 +1114,30 @@ def start_api_server():
     write_to_api_console(
         " * API access key: {0}\n".format(
                 api_access_key
-                if not api_access_without_key 
+                if not api_access_without_key
                 else "NOT REQUIRED!"
         )
     )
 
     app.config["OWASP_HONEYPOT_CONFIG"] = {
         "api_access_key":
-                    api_access_key,
+        api_access_key,
+
         "api_client_white_list":
-                    my_api_configuration["api_client_white_list"]["enabled"],
+        my_api_configuration["api_client_white_list"]["enabled"],
+
         "api_client_white_list_ips":
-                    my_api_configuration["api_client_white_list"]["ips"],
+        my_api_configuration["api_client_white_list"]["ips"],
+
         "api_access_log":
-                    my_api_configuration["api_access_log"]["enabled"],
+        my_api_configuration["api_access_log"]["enabled"],
+
         "api_access_log_filename":
-                    my_api_configuration["api_access_log"]["filename"],
+        my_api_configuration["api_access_log"]["filename"],
+
         "api_access_without_key":
-                    api_access_without_key,
+        api_access_without_key,
+
         "language": "en"
     }
     app.run(
