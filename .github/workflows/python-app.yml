@@ -5,10 +5,14 @@ name: Python application
 
 on:
   push:
-    branches: [ master,'**']
+    branches:
+      - 'master'
+      - '**'
 
   pull_request:
-    branches: [ master, '**'  ]
+    branches:
+      - 'master'
+      - '**'
     types: [ opened, edited , review_requested ]
 
 jobs:
