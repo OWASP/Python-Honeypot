@@ -10,7 +10,7 @@ on:
       - '**'
 
   pull_request:
-    types: [ opened, edited , review_requested , ready_for_review, reopened]
+    types: [ opened, reopened, edited, review_requested , ready_for_review, reopened]
 
 jobs:
   build:
