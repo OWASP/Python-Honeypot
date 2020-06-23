@@ -12,6 +12,7 @@ from database.datatypes import CredentialEvent
 LOGFILE = 'tmp/ohp_ftp_strong_password_creds_logs.txt'
 LOGFILE_DUMP = 'tmp/ohp_ftp_strong_password_creds_logs.json'
 
+
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the
@@ -57,7 +58,7 @@ def module_configuration():
     return {
         "username": "admin",
         "password": generate_token(16),
-        "extra_docker_options": ["--volume {0}/tmp:/root/logs/"
-                                    .format(os.getcwd())],
+        "extra_docker_options":
+        ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

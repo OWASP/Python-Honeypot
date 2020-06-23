@@ -35,32 +35,33 @@ def init_server_conf():
         conf_variable_key = split_line[0]
         conf_variable_value = split_line[1]
         if conf_variable_key == 'PORT':
-            PORT = int(conf_variable_value)
+            port = int(conf_variable_value)
         elif conf_variable_key == 'HOST':
             if conf_variable_value != 'DEFAULT':
-                HOST = str(conf_variable_value)
+                host = str(conf_variable_value)
+    return host, port
 
 
 def clientThread(conn, connip):
     isLoggedIn = False
     isRecivingPassword = False
-    user_to_login = ""
+    login_user = ""
     log_msg = ""
     while True:
         conn_data = conn.recv(1024).decode()
-        if isLoggedIn == False and conn_data.startswith('USER'):
-            user_to_login = conn_data[5:]
+        if not isLoggedIn and conn_data.startswith('USER'):
+            login_user = conn_data[5:]
             conn.sendall('331 Please specify the password.\n'.encode())
             isRecivingPassword = True
-        elif isRecivingPassword == True:
+        elif isRecivingPassword:
             if conn_data.startswith('PASS'):
-                user_to_login = user_to_login.replace('\n', '').replace('\r', '')
+                login_user = login_user.replace('\n', '').replace('\r', '')
                 password = conn_data[5:].replace('\n', '').replace('\r', '')
-                if user_to_login in users.keys() and not (user_to_login == '*'):
-                    if users[user_to_login] == password:
+                if login_user in users.keys() and not (login_user == '*'):
+                    if users[login_user] == password:
                         conn.sendall('230 Login successful.\n'.encode())
                         log_msg = "SUCCESSFUL"
-                    elif users[user_to_login] == '*':
+                    elif users[login_user] == '*':
                         conn.sendall('230 Login successful.\n'.encode())
                         log_msg = "SUCCESSFUL"
                     else:
@@ -84,12 +85,13 @@ def clientThread(conn, connip):
                     logfile_handle.write(
                         json.dumps(
                             {
-                                "username": user_to_login,
+                                "username": login_user,
                                 "password": password,
                                 "ip": connip,
                                 'login_status': log_msg,
-                                "module_name": "ftp/strong_password", \
-                                'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                "module_name": "ftp/strong_password",
+                                'date':
+                                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                             }
                         ) + "\n"
                     )
@@ -124,7 +126,7 @@ if __name__ == '__main__':
     print('Starting logging, Date (DD/MM/YY): ' + getDateTime() + "\n")
     print("configuring server settings...")
     try:
-        init_server_conf()
+        HOST, PORT = init_server_conf()
     except Exception as e:
         print("FAILED: " + str(e))
         print("configuring FTP users...")
