@@ -10,7 +10,6 @@ import pymongo
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
-from core.time_helper import now
 from database.datatypes import (CredentialEvent, HoneypotEvent,
                                 ICSHoneypotEvent, NetworkEvent)
 from lib.ip2location import IP2Location
@@ -21,8 +20,7 @@ network_config = network_configuration()
 # MongoDB Client
 client = pymongo.MongoClient(
     api_config["api_database"],
-    serverSelectionTimeoutMS=
-                api_config["api_database_connection_timeout"]
+    serverSelectionTimeoutMS=api_config["api_database_connection_timeout"]
 )
 database = client[api_config["api_database_name"]]
 
@@ -71,19 +69,17 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
             )
         )
 
-    # Get country of the source IP Address    
-    honeypot_event.country_ip_src = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                    honeypot_event.ip_src
-                ))
-    
+    # Get country of the source IP Address
+    honeypot_event.country_ip_src = byte_to_str(
+                                        IP2Location.get_country_short(
+                                            honeypot_event.ip_src
+                                        ))
+
     # Get country of the destination IP Address
-    honeypot_event.country_ip_dest = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                    honeypot_event.ip_dest
-                ))
+    honeypot_event.country_ip_dest = byte_to_str(
+                                        IP2Location.get_country_short(
+                                            honeypot_event.ip_dest
+                                        ))
 
     honeypot_events_queue.append(honeypot_event.__dict__)
 
@@ -114,19 +110,17 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
             )
         )
 
-    # Get country of the source IP Address 
-    network_event.country_ip_src = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                    network_event.ip_src
-                ))
-    
+    # Get country of the source IP Address
+    network_event.country_ip_src = byte_to_str(
+                                        IP2Location.get_country_short(
+                                            network_event.ip_src
+                                        ))
+
     # Get country of the destination IP Address
-    network_event.country_ip_dest = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                    network_event.ip_dest
-                ))
+    network_event.country_ip_dest = byte_to_str(
+                                        IP2Location.get_country_short(
+                                            network_event.ip_dest
+                                        ))
 
     network_events_queue.append(network_event.__dict__)
 
@@ -135,14 +129,14 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
 
 def push_events_queues_to_database():
     """
-    Pushes all honeypot and network events collected in the 
+    Pushes all honeypot and network events collected in the
     honeypot_events_queue and network_events_queue to honeypot_events
     and network_events collection respectively
     """
 
     if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
         verbose_info("Submitting new events to database")
-    
+
     # Insert all honeypot events to database (honeypot_events collection)
     if honeypot_events_queue:
         new_events = honeypot_events_queue[:]
@@ -174,22 +168,21 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     """
     insert credentials from honeypot events which are obtained
     from the module processor to credential_event collection
-    
+
     Args:
-        credential_event: Object of CredentialEvent Class with honeypot 
+        credential_event: Object of CredentialEvent Class with honeypot
                           event credentials
 
     Returns:
         inserted_id
     """
-    credential_event.country = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                        credential_event.ip
-                    ))
-    
+    credential_event.country = byte_to_str(
+                                    IP2Location.get_country_short(
+                                        credential_event.ip
+                                    ))
+
     credential_event.machine_name = \
-                network_config["real_machine_identifier_name"]
+        network_config["real_machine_identifier_name"]
 
     if is_verbose_mode():
         verbose_info(
@@ -203,11 +196,12 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
                 credential_event.machine_name
             )
         )
-    
+
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
-def insert_to_ics_honeypot_events_collection(ics_honeypot_event: ICSHoneypotEvent):
+def insert_to_ics_honeypot_events_collection(
+                            ics_honeypot_event: ICSHoneypotEvent):
     """
     Insert data received from the ICS module processor to the
     ics_honeypot_data collection
@@ -222,24 +216,25 @@ def insert_to_ics_honeypot_events_collection(ics_honeypot_event: ICSHoneypotEven
         inserted_id
     """
     ics_honeypot_event.machine_name = \
-                network_config["real_machine_identifier_name"]
+        network_config["real_machine_identifier_name"]
 
-    ics_honeypot_event.country = \
-            byte_to_str(
-                IP2Location.get_country_short(
-                    ics_honeypot_event.ip
-                ))
+    ics_honeypot_event.country = byte_to_str(
+                                        IP2Location.get_country_short(
+                                            ics_honeypot_event.ip
+                                        ))
 
     if is_verbose_mode():
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}"
             .format(
-                ics_honeypot_event.ip, 
+                ics_honeypot_event.ip,
                 ics_honeypot_event.module_name,
                 ics_honeypot_event.machine_name,
                 ics_honeypot_event.data
             )
         )
 
-    return ics_honeypot_events.insert_one(ics_honeypot_event.__dict__).inserted_id
+    return ics_honeypot_events.insert_one(
+                ics_honeypot_event.__dict__
+            ).inserted_id

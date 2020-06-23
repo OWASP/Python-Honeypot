@@ -13,6 +13,7 @@ from database.datatypes import CredentialEvent
 LOGFILE = 'tmp/access.log'
 LOGFILE_DUMP = 'tmp/ohp_http_strong_password_creds_logs.json'
 
+
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the
@@ -28,8 +29,7 @@ class ModuleProcessor:
         die when kill_flag is True
         """
         while not self.kill_flag:
-            if os.path.exists(LOGFILE) and \
-                os.path.getsize(LOGFILE) > 0:
+            if os.path.exists(LOGFILE) and os.path.getsize(LOGFILE) > 0:
 
                 # os.rename(self.log_filename, self.log_filename_dump)
                 data_dump = open(LOGFILE).readlines()
@@ -40,10 +40,12 @@ class ModuleProcessor:
                     ip = data_json["ip"]
                     time_of_insertion = data_json["time"]
                     if data_json["authorization"] != "-":
-                        authorization = data_json["authorization"].split(' ')[1]
+                        authorization = \
+                            data_json["authorization"].split(' ')[1]
+                        # binascii is returning bytes
                         authorization = binascii.a2b_base64(
-                            authorization
-                        ).decode('utf-8')  # binascii is returning bytes
+                                            authorization
+                                        ).decode('utf-8')
                         username = authorization.split(":")[0]
                         password = ":".join(authorization.split(":")[1:])
                         insert_to_credential_events_collection(
@@ -68,7 +70,7 @@ def module_configuration():
     return {
         "username": "admin",
         "password": generate_token(16),
-        "extra_docker_options": ["--volume {0}/tmp:/var/log/apache2/"
-                                                .format(os.getcwd())],
+        "extra_docker_options":
+        ["--volume {0}/tmp:/var/log/apache2/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

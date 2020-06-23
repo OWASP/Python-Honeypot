@@ -3,6 +3,7 @@
 
 from datetime import datetime
 
+
 class HoneypotEvent(object):
     """
     Object to store Honeypot Event Parameters.
@@ -20,8 +21,10 @@ class HoneypotEvent(object):
         country_ip_dest: Country of destination IP Address
 
     """
-    def __init__(self, ip_dest, port_dest, ip_src, port_src,
-                                     module_name, machine_name):
+    def __init__(
+                self, ip_dest, port_dest, ip_src,
+                port_src, module_name, machine_name):
+
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
@@ -33,7 +36,7 @@ class HoneypotEvent(object):
         self.country_ip_src = None
         self.country_ip_dest = None
 
-    
+
 class NetworkEvent(object):
     """
     Object to store Network Event Parameters
@@ -48,9 +51,11 @@ class NetworkEvent(object):
         country_ip_src: Country of source IP Address
         country_ip_dest: Country of destination IP Address
     """
-    
-    def __init__(self, ip_dest, port_dest, ip_src, port_src,
-                                     machine_name):
+
+    def __init__(
+                self, ip_dest, port_dest,
+                ip_src, port_src, machine_name):
+
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
@@ -74,7 +79,7 @@ class CredentialEvent(object):
         machine_name: Real machine name
         country: Country corresponding to the IP Address
     """
-    
+
     def __init__(self, ip, module_name, date, username, password):
         self.ip = ip
         self.module_name = module_name
@@ -83,7 +88,6 @@ class CredentialEvent(object):
         self.password = password
         self.machine_name = None
         self.country = None
-
 
 
 class ICSHoneypotEvent(object):

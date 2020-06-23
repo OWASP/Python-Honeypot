@@ -11,6 +11,7 @@ from database.datatypes import ICSHoneypotEvent
 
 LOGFILE = 'tmp/ics_veeder_root_guardian_ast.log'
 
+
 class ModuleProcessor:
     """
     this is the processor to run after docker machine is up to grab the
@@ -26,8 +27,7 @@ class ModuleProcessor:
         be die when kill_flag is True
         """
         while not self.kill_flag:
-            if os.path.exists(LOGFILE) and \
-                os.path.getsize(LOGFILE) > 0:
+            if os.path.exists(LOGFILE) and os.path.getsize(LOGFILE) > 0:
 
                 data_dump = open(LOGFILE).readlines()
                 open(LOGFILE, 'w').write('')
@@ -60,7 +60,8 @@ def module_configuration():
     return {
         "virtual_machine_port_number": 10001,
         "real_machine_port_number": 10001,
-        "company_name_address": "3356234 SL OIL 433234\r\n9346 GLODEN AVE.\r\nQUEEN SPRING, MD\r\n",
+        "company_name_address": "3356234 SL OIL 433234\r\n9346 GLODEN AVE."
+                                "\r\nQUEEN SPRING, MD\r\n",
         "extra_docker_options": ["--volume {0}/tmp:/tmp/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }
