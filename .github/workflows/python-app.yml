@@ -13,6 +13,10 @@ on:
     branches:
       - 'master'
       - 'code_refactor_stage'
+    
+    paths-ignore:
+      - 'lib/**'
+    
     types: [ opened, edited, review_requested , ready_for_review, reopened]
 
 jobs:
