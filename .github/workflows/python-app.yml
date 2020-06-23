@@ -6,13 +6,13 @@ name: Python application
 on:
   push:
     branches:
-      - 'master'
+      - master
       - '**'
 
   pull_request:
     branches:
-      - 'master'
-      - 'code_refactor_stage'
+      - master
+      - code_refactor_stage
     
     paths-ignore:
       - 'lib/**'
