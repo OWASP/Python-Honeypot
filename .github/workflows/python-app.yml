@@ -10,6 +10,9 @@ on:
       - '**'
 
   pull_request:
+    branches:
+      - 'master'
+      - 'code_refactor_stage'
     types: [ opened, edited, review_requested , ready_for_review, reopened]
 
 jobs:
