@@ -3,14 +3,15 @@
 
 import ctypes
 import sys
-import core.compatible
 
 
 def reset_cmd_color():
     """
     reset the color of windows/terminal before exit
     """
-    if "linux" in core.compatible.os_name() or core.compatible.os_name() == "darwin":
+    #TODO : Fix the cyclic dependency later
+    from core.compatible import os_name
+    if "linux" in os_name() or os_name() == "darwin":
         sys.stdout.write("\033[0m")
     else:
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
@@ -28,10 +29,11 @@ def color_cmd(color):
     Returns:
         color values or empty string
     """
+    from core.compatible import os_name
     if "--disable-colors" in sys.argv:
         return ""
-    if "linux" in core.compatible.os_name() or \
-       core.compatible.os_name() == "darwin":
+    if "linux" in os_name() or \
+       os_name() == "darwin":
         if color == "reset":
             return "\033[0m"
         if color == "grey":

@@ -3,7 +3,7 @@
 
 import sys
 import ctypes
-from core.alert import (error,info)
+
 from core.color import reset_cmd_color
 
 
@@ -22,7 +22,8 @@ def exit_failure(msg):
     Args:
         msg: the error message
     """
-
+    #TODO : Fix the cyclic dependency later
+    from core.alert import error
     error(msg)
     reset_cmd_color()
     sys.exit(1)
@@ -39,6 +40,7 @@ def terminate_thread(thread, verbose=True):
     Returns:
         True/None
     """
+    from core.alert import info
     if verbose:
         info("killing {0}".format(thread.name))
     if not thread.isAlive():

@@ -9,10 +9,7 @@ import random
 import string
 import shutil
 import inspect
-import config
 
-from core.alert import (write_to_api_console,\
-                        messages)
 from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
 
@@ -21,6 +18,8 @@ def logo():
     """
     OWASP HoneyPot Logo
     """
+    #TODO : Fix the cyclic dependency later
+    from core.alert import write_to_api_console
     write_to_api_console("""
       ______          __      _____ _____
      / __ \ \        / /\    / ____|  __ \
@@ -58,6 +57,7 @@ def check(language):
     Returns:
         True if compatible otherwise None
     """
+    from core.alert import messages
     if os_name() not in ["linux", "darwin", "win32", "win64"]:
         exit_failure(messages(language, "error_platform"))
     if version() is 2 or version() is 3:
@@ -97,8 +97,9 @@ def check_for_requirements(start_api_server):
     Returns:
         True if exist otherwise False
     """
+    from config import api_configuration
     # check external required modules
-    api_config = config.api_configuration()
+    api_config = api_configuration()
     connection_timeout = api_config["api_database_connection_timeout"]
     try:
         import pymongo
