@@ -139,12 +139,13 @@ def info(content, log_in_file=None, mode=None,
                 )
             )
             sys.stdout.flush()
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event), language)
-        # if thread temporary filename present, rewrite it
-        if thread_tmp_filename:
-            __log_into_file(thread_tmp_filename, "w", "0", language)
+    # TODO: implement log functionality later
+    # if event:  # if an event is present log it
+    #     from core.log import __log_into_file
+    #     __log_into_file(log_in_file, mode, json.dumps(event), language)
+    #     # if thread temporary filename present, rewrite it
+    #     if thread_tmp_filename:
+    #         __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
 
@@ -246,12 +247,13 @@ def verbose_info(content, log_in_file=None, mode=None,
                 )
             )
             sys.stdout.flush()
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event), language)
-        # if thread temporary filename present, rewrite it
-        if thread_tmp_filename:
-            __log_into_file(thread_tmp_filename, "w", "0", language)
+    # TODO: implement log functionality later
+    # if event:  # if an event is present log it
+    #     from core.log import __log_into_file
+    #     __log_into_file(log_in_file, mode, json.dumps(event), language)
+    #     # if thread temporary filename present, rewrite it
+    #     if thread_tmp_filename:
+    #         __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
 
