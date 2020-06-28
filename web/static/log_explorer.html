@@ -29,7 +29,7 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="event_type">Event Type: </label>
-                            <select class="form-control" name="event_type" id="event_type">
+                            <select class="form-control" name="event_type" id="event_type" onchange="change_form()">
                                 <option selected value="">Choose...</option>
                                 <option value="honeypot-event">Honeypot Event</option>
                                 <option value="network-event">Network Event</option>
@@ -37,7 +37,7 @@
                                 <option value="ics-honeypot-event">ICS Honeypot Event</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-6" id="module_list" style="visibility: hidden;">
                             <label for="">Module Name: </label>
                             <select class="form-control" name="module_names" id="module_names">
                             </select>

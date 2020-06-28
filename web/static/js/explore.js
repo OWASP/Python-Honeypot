@@ -12,7 +12,7 @@ function load_module_options(){
 				+module_name
 			+ "</option>";
         }
-		$('#module_names').html(tableHtml);
+        $('#module_names').html(tableHtml);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         document.getElementById('error_msg').innerHTML = jqXHR.responseText;
         if (errorThrown == "BAD REQUEST") {
@@ -46,7 +46,6 @@ function populate_table(result){
     for(var j = 0; j < result.length; j++) {
         var table_row = table.insertRow(-1);
         var record = result[j];
-        console.log(record);
 
         var body_cell = table_row.insertCell(-1);
         body_cell.innerHTML = "<center>"+ (j+1) +"</center>";
@@ -68,7 +67,6 @@ function load_data(event_type) {
             url: "/api/events/honeypot-events",
         }).done(function (res) {
             populate_table(res);
-            // console.log(res);
         }).fail(function (jqXHR, textStatus, errorThrown) {
             document.getElementById('error_msg').innerHTML = jqXHR.responseText;
             if (errorThrown == "BAD REQUEST") {
@@ -104,6 +102,19 @@ function search() {
     var end_date=$("#end_date").val();
     
     load_data(event_type);
+}
+
+function change_form(){
+    var events_with_module = new Array("honeypot-event", "credential-event", "ics-honeypot-event")
+    var event_type=$("select[name='event_type'] option:selected").val();
+
+    if(events_with_module.indexOf(event_type)>-1){
+        document.getElementById("module_list").style.visibility= "visible" ;
+    }
+    else{
+        document.getElementById("module_list").style.visibility= "hidden" ;
+    }
+    
 }
 
 load_module_options();
