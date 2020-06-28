@@ -86,32 +86,6 @@ function load_creds_password(module){
     });
 }
 
-function load_module_options(){
-	$.ajax({
-        type: "GET",
-        url: "/api/events/module-names",
-		data: {},
-    }).done(function (res) {
-		var tableHtml='<option value=\"\"> All Modules </option>';
-		for (var i = 0; i < res.module_names.length; i++) {
-            var module_name = res.module_names[i];
-			tableHtml += "<option value="+
-				module_name+">"
-				+module_name
-			+ "</option>";
-        }
-		$('#module_username').html(tableHtml);
-		$('#module_password').html(tableHtml);
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-        if (errorThrown == "BAD REQUEST") {
-        }
-        if (errorThrown == "UNAUTHORIZED") {
-        }
-    });
-}
-
-
 function load_graphs() {
     var top_ten_ips_in_honeypot_events_graph_data_keys = [];
     var top_ten_ips_in_honeypot_events_graph_data_values = [];
@@ -752,8 +726,6 @@ function keep_update() {
 
 // load first time
 load_graphs();
-//only load one time
-load_module_options();
 
 // 30 seconds delay loop
 keep_update();

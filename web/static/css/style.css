@@ -13,6 +13,10 @@ body {
     text-decoration-color: black;
 }
 
+#event_data_table{
+    float: center;
+}
+
 
 [am-TopLogo] {
     max-height: 70px;
