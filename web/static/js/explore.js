@@ -22,77 +22,98 @@ function load_module_options(){
     });
 }
 
-function populate_table(result){
-    console.log(Object.keys(result[0]));
-    var headers = Object.keys(result[0]);
-    var table = document.getElementById("event_data_table");
-    if(table.rows.length>0){
-        table.innerHTML = "";
-    }
-
-    var header = table.createTHead();
-    var header_row = header.insertRow(-1);
-
-    var header_cell = header_row.insertCell(-1);
-    header_cell.innerHTML = "<b><center>#</center></b>";
-    
-    for (var i = 0; i < headers.length; i++) {
-        var header_cell = header_row.insertCell(-1);
-        header_cell.innerHTML = "<b><center>"+ headers[i] +"</center></b>";
-        console.log(result[0][headers[i]]);
-    }
-
-    // var table_body_html = "";
-    for(var j = 0; j < result.length; j++) {
-        var table_row = table.insertRow(-1);
-        var record = result[j];
-
-        var body_cell = table_row.insertCell(-1);
-        body_cell.innerHTML = "<center>"+ (j+1) +"</center>";
-        
-        for (var i = 0; i < headers.length; i++) {
-            var body_cell = table_row.insertCell(-1);
-            body_cell.innerHTML = "<center>" +record[headers[i]]+"</center>";
-        }
-    }   
-       
-}
-
 
 function load_data(event_type) {
-    if(event_type == "honeypot-event"){
-        // request honeypot events
-        $.ajax({
-            type: "GET",
-            url: "/api/events/honeypot-events",
-        }).done(function (res) {
-            populate_table(res);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-            if (errorThrown == "BAD REQUEST") {
-            }
-            if (errorThrown == "UNAUTHORIZED") {
-            }
+  if ( $.fn.dataTable.isDataTable( '#datatable' ) ) {
+    $('#datatable').DataTable().clear().destroy();
+  }
+
+     
+  if(event_type == "honeypot-event"){
+    $(document).ready(function() {
+
+      $('#datatable').dataTable({
+        ajax: {
+              type: "GET",
+              url: "/api/events/honeypot-events",
+              contentType:'application/json; charset=utf-8',
+              dataType: "json",
+              dataSrc: ""
+          },
+        columns:[
+              { data: 'ip_src', defaultContent: '', title: "Src IP"},
+              { data: 'port_src', defaultContent: '', title: "Src Port"},
+              { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
+              { data: 'port_dest', defaultContent: '', title: "Dest Port"},
+              { data: 'module_name', defaultContent: '', title: "Module Name"},
+              { data: 'date', defaultContent: '', title: "Date"},
+              { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+              { data: 'country_ip_src', defaultContent: '', title: "Country: Src IP"},
+              { data: 'country_ip_dest', defaultContent: '', title: "Country: Dest IP"}],
+        bSort: true,
+        info: true,
+        paging: true,
+        oLanguage: {
+          sStripClasses: "",
+          sSearch: "",
+          sSearchPlaceholder: "Search filter...",
+          sInfo: "_START_ -_END_ of _TOTAL_",
+          sLengthMenu: '<span>Rows per page:</span><select class="browser-default">' +
+            '<option value="10">10</option>' +
+            '<option value="20">20</option>' +
+            '<option value="30">30</option>' +
+            '<option value="40">40</option>' +
+            '<option value="50">50</option>' +
+            '<option value="-1">All</option>' +
+            '</select></div>'
+        },
+        bAutoWidth: true,
+        searching:true
+      });
+    });
+
+  }
+  else if( event_type == "network-event"){
+      $(document).ready(function() {
+          $('#datatable').dataTable({
+            ajax: {
+                  type: "GET",
+                  url: "/api/events/network-events",
+                  contentType:'application/json; charset=utf-8',
+                  dataType: "json",
+                  dataSrc: ""
+              },
+            columns:[
+                  { data: 'ip_src', defaultContent: '', title: "Src IP"},
+                  { data: 'port_src', defaultContent: '', title: "Src Port"},
+                  { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
+                  { data: 'port_dest', defaultContent: '', title: "Dest Port"},
+                  { data: 'date', defaultContent: '', title: "Date"},
+                  { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+                  { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
+                  { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}],
+            bSort: true,
+            info: true,
+            paging: true,
+            oLanguage: {
+              sStripClasses: "",
+              sSearch: "",
+              sSearchPlaceholder: "Search filter...",
+              sInfo: "_START_ -_END_ of _TOTAL_",
+              sLengthMenu: '<span>Rows per page:</span><select class="browser-default">' +
+                '<option value="10">10</option>' +
+                '<option value="20">20</option>' +
+                '<option value="30">30</option>' +
+                '<option value="40">40</option>' +
+                '<option value="50">50</option>' +
+                '<option value="-1">All</option>' +
+                '</select></div>'
+            },
+            bAutoWidth: true,
+            searching: true
+          });
         });
-    }
-    else if( event_type == "network-event"){
-        // request honeypot events
-        $.ajax({
-            type: "GET",
-            url: "/api/events/network-events",
-        }).done(function (res) {
-            populate_table(res);
-            for(let key of Object.keys(res[0])){
-                console.log(key)
-            }
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-            if (errorThrown == "BAD REQUEST") {
-            }
-            if (errorThrown == "UNAUTHORIZED") {
-            }
-        });
-    }
+  }
 }
 
 function search() {
@@ -105,7 +126,7 @@ function search() {
 }
 
 function change_form(){
-    var events_with_module = new Array("honeypot-event", "credential-event", "ics-honeypot-event")
+    var events_with_module = new Array("honeypot-event", "credential-event")
     var event_type=$("select[name='event_type'] option:selected").val();
 
     if(events_with_module.indexOf(event_type)>-1){
