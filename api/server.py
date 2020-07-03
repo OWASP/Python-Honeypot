@@ -643,22 +643,39 @@ def get_honeypot_events():
     Returns:
         an array contain honeypot events
     """
-    date = fix_date(
-        get_value_from_request("date")
+    module_name = get_value_from_request("module_name")
+    start_date = fix_date(
+        get_value_from_request("start_date")
     )
-    if date:
+    end_date = fix_date(
+        get_value_from_request("end_date")
+    )
+
+    if start_date and end_date:
         try:
+            if module_name:
+                query = {
+                            "module_name": module_name,
+                            "date":
+                                {
+                                    "$gte": start_date[0],
+                                    "$lte": end_date[1]
+                                }
+                        }
+            else:
+                query = {
+                            "date":
+                                {
+                                    "$gte": start_date[0],
+                                    "$lte": end_date[1]
+                                }
+                        }
+
             return jsonify(
                 [
                     i for i in
                     connector.honeypot_events.find(
-                        {
-                            "date":
-                                {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                        },
+                        query,
                         {
                             "_id": 0
                         }
@@ -677,11 +694,18 @@ def get_honeypot_events():
             return flask_null_array_response()
     else:
         try:
+            if module_name:
+                query = {
+                            "module_name": module_name,
+                        }
+            else:
+                query = {}
+            
             return jsonify(
                 [
                     i for i in
                     connector.honeypot_events.find(
-                        {},
+                        query,
                         {
                             "_id": 0
                         }
@@ -708,10 +732,14 @@ def get_network_events():
     Returns:
         an array contain network events
     """
-    date = fix_date(
-        get_value_from_request("date")
+    start_date = fix_date(
+        get_value_from_request("start_date")
     )
-    if date:
+    end_date = fix_date(
+        get_value_from_request("end_date")
+    )
+
+    if start_date and end_date:
         try:
             return jsonify(
                 [
@@ -720,8 +748,8 @@ def get_network_events():
                         {
                             "date":
                                 {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
+                                    "$gte": start_date[0],
+                                    "$lte": end_date[1]
                                 }
                         },
                         {
