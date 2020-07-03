@@ -770,10 +770,10 @@ def get_network_events():
 @app.route("/api/events/get-events-data", methods=["GET"])
 def get_events_data():
     """
-    get honeypot events
+    get events data
 
     Returns:
-        an array contain honeypot events
+        an array contain event data
     """
     event_type = get_value_from_request("event_type")
     module_name = get_value_from_request("module_name")

@@ -1,3 +1,6 @@
+/**
+ * Load list of modules in a select list
+ */
 function load_module_options(){
 	$.ajax({
         type: "GET",
@@ -22,6 +25,13 @@ function load_module_options(){
     });
 }
 
+
+/**
+ * Call the API to get event data from the database
+ * @param {*} api_endpoint : API endpoint URL
+ * @param {*} columns_def : Column definition for the selected event type
+ * @param {*} api_params  : GET parameters for the API call
+ */
 function call_api(api_endpoint, columns_def, api_params){
   $(document).ready(function() {
 
@@ -62,6 +72,13 @@ function call_api(api_endpoint, columns_def, api_params){
 }
 
 
+/**
+ * Load data to the table based on user selected filters.
+ * @param {*} event_type 
+ * @param {*} module_name 
+ * @param {*} start_date 
+ * @param {*} end_date 
+ */
 function load_data(event_type, module_name, start_date, end_date) {
   if ( $.fn.dataTable.isDataTable( '#datatable' ) ) {
     $('#datatable').DataTable().clear().destroy();
@@ -70,7 +87,8 @@ function load_data(event_type, module_name, start_date, end_date) {
   var columns = [];
   var api_endpoint = "/api/events/get-events-data";
   var limit = 1000;
-     
+
+  // Define table columns based on selected event type
   if(event_type == "honeypot-event"){
     columns = [
       { data: 'date', defaultContent: '', title: "Date"},
@@ -114,15 +132,20 @@ function load_data(event_type, module_name, start_date, end_date) {
       { data: 'country', defaultContent: '', title: "Country"}];
   }
 
+  // Set API call parameters
   api_params = {event_type: event_type, start_date: start_date, end_date: end_date, limit:limit}
 
   if(module_name != ""){
     api_params.module_name = module_name;
   }
-   
+  
   call_api(api_endpoint, columns, api_params);
 }
 
+
+/**
+ * Function called when "submit" button is clicked.
+ */
 function search() {
     var event_type=$("select[name='event_type'] option:selected").val();
     var module_name=$("select[name='module_names'] option:selected").val();
@@ -142,6 +165,10 @@ function search() {
     }
 }
 
+
+/**
+ * Form update based on event type selected
+ */
 function change_form(){
     var events_with_module = new Array("honeypot-event", "credential-event")
     var event_type=$("select[name='event_type'] option:selected").val();
