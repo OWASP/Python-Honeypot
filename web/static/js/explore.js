@@ -26,6 +26,17 @@ function load_module_options(){
 }
 
 
+// Get the file name of the export file
+function get_export_fileName(file_type){
+  var d = new Date();
+  var n = d.getTime();
+  if(file_type == 'csv')
+    return './Honeypot-data-csv-' + n + ".csv";
+  else if(file_type == 'excel')
+    return './Honeypot-data-excel-' + n + ".xlsx";
+}
+
+
 /**
  * Call the API to get event data from the database
  * @param {*} api_endpoint : API endpoint URL
@@ -45,12 +56,26 @@ function call_api(api_endpoint, columns_def, api_params){
             dataSrc: ""
         },
       autoWidth: true,
+      dom: 'Bfrtip',
+      buttons: [
+        {
+          extend: 'csv',
+          filename: function () { return get_export_fileName('csv');},
+          className: "export-button btn-default"
+        },
+        {
+          extend: 'excel',
+          filename: function () { return get_export_fileName('excel');},
+          className: "export-button btn-default"
+        }
+      ],
       columns:columns_def,
       destroy: true,
       order: [0, 'desc'],
       sort: true,
       info: true,
       paging: true,
+      pageLength: 20,
       oLanguage: {
         sStripClasses: "",
         sSearch: "",

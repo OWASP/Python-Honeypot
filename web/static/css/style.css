@@ -2,6 +2,10 @@ body {
     background: url("/img/background.jpeg")
 }
 
+.dt-button.export-button{
+    color: rgba(1, 19, 16, 0.6);
+}
+
 #logo {
     height: 50px;
     width: auto;
@@ -90,8 +94,6 @@ div.material-table table th.sorting_desc:after {
   word-wrap: normal;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  /* content: "arrow_back"; */
-  -webkit-transform: rotate(90deg);
   display: none;
   vertical-align: middle;
 }
@@ -119,12 +121,6 @@ div.material-table table th:last-child,
 div.material-table table td:last-child {
   padding: 0 14px 0 0;
 }
-
-/* th {
-    background: rgba(30, 43, 41, 0.6);
-    color: #ffffff;
-    font-weight: 100;
-  } */
 
 [am-TopLogo] {
     max-height: 70px;
