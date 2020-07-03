@@ -22,7 +22,7 @@ function load_module_options(){
     });
 }
 
-function call_api(api_endpoint, columns_def){
+function call_api(api_endpoint, columns_def, api_params){
   $(document).ready(function() {
 
     var table = $('#datatable').dataTable({
@@ -30,12 +30,14 @@ function call_api(api_endpoint, columns_def){
             type: "GET",
             url: api_endpoint,
             contentType:'application/json; charset=utf-8',
+            data: api_params,
             dataType: "json",
             dataSrc: ""
         },
       autoWidth: true,
       columns:columns_def,
       destroy: true,
+      order: [0, 'desc'],
       sort: true,
       info: true,
       paging: true,
@@ -56,47 +58,82 @@ function call_api(api_endpoint, columns_def){
       searching:true,
       responsive: true
     });
+    $('#next').on( 'click', function () {
+      table.page( 'next' ).draw( 'page' );
+    } );
+    
+    $('#previous').on( 'click', function () {
+        table.page( 'previous' ).draw( 'page' );
+    } );
   });
 }
 
 
-function load_data(event_type) {
+function load_data(event_type, module_name, start_date, end_date) {
   if ( $.fn.dataTable.isDataTable( '#datatable' ) ) {
     $('#datatable').DataTable().clear().destroy();
     $('#datatable').empty();
   }
-  var columns = []
-  var api_endpoint = ""
+  var columns = [];
+  var api_endpoint = "";
+  var limit = 1000;
      
   if(event_type == "honeypot-event"){
     columns = [
+      { data: 'date', defaultContent: '', title: "Date"},
       { data: 'ip_src', defaultContent: '', title: "Src IP"},
       { data: 'port_src', defaultContent: '', title: "Src Port"},
       { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
       { data: 'port_dest', defaultContent: '', title: "Dest Port"},
       { data: 'module_name', defaultContent: '', title: "Module Name"},
-      { data: 'date', defaultContent: '', title: "Date"},
       { data: 'machine_name', defaultContent: '', title: "Machine Name"},
       { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
       { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
     
     api_endpoint = "/api/events/honeypot-events";
-    call_api(api_endpoint, columns);
+
   }
   else if( event_type == "network-event"){
     columns = [
+      { data: 'date', defaultContent: '', title: "Date"},
       { data: 'ip_src', defaultContent: '', title: "Src IP"},
       { data: 'port_src', defaultContent: '', title: "Src Port"},
       { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
       { data: 'port_dest', defaultContent: '', title: "Dest Port"},
-      { data: 'date', defaultContent: '', title: "Date"},
       { data: 'machine_name', defaultContent: '', title: "Machine Name"},
       { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
       { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
 
     api_endpoint = "/api/events/network-events";
-    call_api(api_endpoint, columns);
   }
+  else if( event_type == "credential-event"){
+    columns = [
+      { data: 'date', defaultContent: '', title: "Date"},
+      { data: 'ip', defaultContent: '', title: "IP"},
+      { data: 'module_name', defaultContent: '', title: "Module Name"},
+      { data: 'username', defaultContent: '', title: "Username"},
+      { data: 'password', defaultContent: '', title: "Password"},
+      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+      { data: 'country', defaultContent: '', title: "Country"}];
+  }
+  else if( event_type == "ics-honeypot-event"){
+    columns = [
+      { data: 'date', defaultContent: '', title: "Date"},
+      { data: 'ip', defaultContent: '', title: "IP"},
+      { data: 'module_name', defaultContent: '', title: "Module Name"},
+      { data: 'data', defaultContent: '', title: "Data"},
+      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+      { data: 'country', defaultContent: '', title: "Country"}];
+  }
+
+  if(module_name == ""){
+    api_params = {start_date:start_date, end_date: end_date, limit:limit}
+  }
+  else{
+    api_params = {module_name: module_name, start_date: start_date, end_date: end_date, limit:limit};
+  }
+  
+  call_api(api_endpoint, columns, api_params);
 }
 
 function search() {
@@ -104,8 +141,18 @@ function search() {
     var module_name=$("select[name='module_names'] option:selected").val();
     var start_date=$("#start_date").val();
     var end_date=$("#end_date").val();
-    
-    load_data(event_type);
+
+    if(start_date == "" || end_date == ""){
+      alert("Either Start Date or End date missing!")
+    }
+    else{
+      if(start_date <= end_date){
+        load_data(event_type, module_name, start_date, end_date);
+      }
+      else{
+        alert("Start date is greater than End date!")
+      }
+    }
 }
 
 function change_form(){
@@ -113,14 +160,12 @@ function change_form(){
     var event_type=$("select[name='event_type'] option:selected").val();
 
     if(events_with_module.indexOf(event_type)>-1){
-        document.getElementById("module_list").style.visibility= "visible" ;
+      document.getElementById("module_names").disabled = false;
     }
     else{
-        document.getElementById("module_list").style.visibility= "hidden" ;
+      document.getElementById("module_names").disabled = true;
     }
     
 }
 
 load_module_options();
-
-load_data();
