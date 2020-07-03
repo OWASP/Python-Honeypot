@@ -58,13 +58,6 @@ function call_api(api_endpoint, columns_def, api_params){
       searching:true,
       responsive: true
     });
-    $('#next').on( 'click', function () {
-      table.page( 'next' ).draw( 'page' );
-    } );
-    
-    $('#previous').on( 'click', function () {
-        table.page( 'previous' ).draw( 'page' );
-    } );
   });
 }
 
@@ -75,7 +68,7 @@ function load_data(event_type, module_name, start_date, end_date) {
     $('#datatable').empty();
   }
   var columns = [];
-  var api_endpoint = "";
+  var api_endpoint = "/api/events/get-events-data";
   var limit = 1000;
      
   if(event_type == "honeypot-event"){
@@ -89,9 +82,6 @@ function load_data(event_type, module_name, start_date, end_date) {
       { data: 'machine_name', defaultContent: '', title: "Machine Name"},
       { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
       { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
-    
-    api_endpoint = "/api/events/honeypot-events";
-
   }
   else if( event_type == "network-event"){
     columns = [
@@ -103,8 +93,6 @@ function load_data(event_type, module_name, start_date, end_date) {
       { data: 'machine_name', defaultContent: '', title: "Machine Name"},
       { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
       { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
-
-    api_endpoint = "/api/events/network-events";
   }
   else if( event_type == "credential-event"){
     columns = [
@@ -126,13 +114,12 @@ function load_data(event_type, module_name, start_date, end_date) {
       { data: 'country', defaultContent: '', title: "Country"}];
   }
 
-  if(module_name == ""){
-    api_params = {start_date:start_date, end_date: end_date, limit:limit}
+  api_params = {event_type: event_type, start_date: start_date, end_date: end_date, limit:limit}
+
+  if(module_name != ""){
+    api_params.module_name = module_name;
   }
-  else{
-    api_params = {module_name: module_name, start_date: start_date, end_date: end_date, limit:limit};
-  }
-  
+   
   call_api(api_endpoint, columns, api_params);
 }
 
@@ -163,6 +150,7 @@ function change_form(){
       document.getElementById("module_names").disabled = false;
     }
     else{
+      document.getElementById("module_names").selectedIndex = 0;
       document.getElementById("module_names").disabled = true;
     }
     
