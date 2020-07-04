@@ -56,17 +56,19 @@ function call_api(api_endpoint, columns_def, api_params){
             dataSrc: ""
         },
       autoWidth: true,
-      dom: 'Bfrtip',
+      dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+      "<'row'<'col-sm-12'tr>>" +
+      "<'row'<'col-sm-12 col-md-5'li><'col-sm-12 col-md-7'p>>",
       buttons: [
         {
           extend: 'csv',
           filename: function () { return get_export_fileName('csv');},
-          className: "export-button btn-default"
+          className: "export-button btn-success"
         },
         {
           extend: 'excel',
           filename: function () { return get_export_fileName('excel');},
-          className: "export-button btn-default"
+          className: "export-button btn-success"
         }
       ],
       columns:columns_def,
@@ -75,7 +77,6 @@ function call_api(api_endpoint, columns_def, api_params){
       sort: true,
       info: true,
       paging: true,
-      pageLength: 20,
       oLanguage: {
         sStripClasses: "",
         sSearch: "",

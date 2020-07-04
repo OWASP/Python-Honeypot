@@ -25,10 +25,6 @@ div.material-table {
     padding: 20;
 }
 
-div.material-table table {
-    table-layout: inherit;
-}
-
 div.material-table .table-title {
     font-size: 20px;
     color: #000;
