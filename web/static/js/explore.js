@@ -56,19 +56,19 @@ function call_api(api_endpoint, columns_def, api_params){
             dataSrc: ""
         },
       autoWidth: true,
-      dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
       "<'row'<'col-sm-12'tr>>" +
-      "<'row'<'col-sm-12 col-md-5'li><'col-sm-12 col-md-7'p>>",
+      "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
       buttons: [
         {
           extend: 'csv',
           filename: function () { return get_export_fileName('csv');},
-          className: "export-button btn-success"
+          className: "btn btn-info btn-sm"
         },
         {
           extend: 'excel',
           filename: function () { return get_export_fileName('excel');},
-          className: "export-button btn-success"
+          className: "btn btn-info btn-sm"
         }
       ],
       columns:columns_def,
