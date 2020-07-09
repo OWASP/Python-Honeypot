@@ -67,19 +67,19 @@ def get_value_from_request(_key):
         the value content if found otherwise None
     """
     try:
-        key = flask_request.args[_key]
+        value = flask_request.args[_key]
     except Exception:
         try:
-            key = flask_request.form[_key]
+            value = flask_request.form[_key]
         except Exception:
             try:
-                key = flask_request.cookies[_key]
+                value = flask_request.cookies[_key]
             except Exception:
-                key = None
-    if key:
+                value = None
+    if value:
         # todo: fix it later
-        key = key.replace("\\\"", "\"").replace("\\\'", "\'")
-    return key
+        value = value.replace("\\\"", "\"").replace("\\\'", "\'")
+    return value
 
 
 def is_authorized():
