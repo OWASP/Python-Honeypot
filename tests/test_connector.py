@@ -65,12 +65,13 @@ class TestConnector(unittest.TestCase):
         """
         Test the data insertion to the credential_events collection
         """
+
         credential_event = CredentialEvent(
                                 ip="88.99.11.22",
                                 username="admin",
                                 password="password",
                                 module_name="http/basic_auth_weak_password",
-                                date=datetime.now()
+                                date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                             )
         
         insert_to_credential_events_collection(credential_event)
@@ -89,7 +90,7 @@ class TestConnector(unittest.TestCase):
                          credential_event.password)
 
         # Delete test events from the database
-        credential_events.delete_one(credential_event.__dict__)
+        # credential_events.delete_one(credential_event.__dict__)
 
 
     def test_insert_ics_honeypot_events(self):
