@@ -30,10 +30,7 @@ function load_module_options(){
 function get_export_fileName(file_type){
   var d = new Date();
   var n = d.getTime();
-  if(file_type == 'csv')
-    return './Honeypot-data-csv-' + n + ".csv";
-  else if(file_type == 'excel')
-    return './Honeypot-data-excel-' + n + ".xlsx";
+  return './Honeypot-data-' + file_type + '-' + n ;
 }
 
 
