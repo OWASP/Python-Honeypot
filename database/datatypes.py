@@ -90,10 +90,10 @@ class CredentialEvent(object):
         self.country = None
 
 
-class ICSHoneypotEvent(object):
+class EventData(object):
     """
-    Object to store ICS Honeypot Event Parameters received from
-    the ICS Module Processor
+    Object to store Honeypot Event Data collected from
+    modules such as ICS Module.
 
     Attributes:
         ip: Client IP used for putting the data

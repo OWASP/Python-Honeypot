@@ -11,7 +11,7 @@ from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
 from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                ICSHoneypotEvent, NetworkEvent)
+                                EventData, NetworkEvent)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -28,7 +28,7 @@ database = client[api_config["api_database_name"]]
 credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
-ics_honeypot_events = database.ics_honeypot_events
+events_data = database.events_data
 
 # Event queues
 honeypot_events_queue = list()
@@ -200,11 +200,11 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
-def insert_to_ics_honeypot_events_collection(
-                            ics_honeypot_event: ICSHoneypotEvent):
+def insert_to_events_data_collection(
+                            event_data: EventData):
     """
-    Insert data received from the ICS module processor to the
-    ics_honeypot_data collection
+    Insert data collected from module processors of modules such as-
+    ICS module
 
     Args:
         ip : client ip used for putting the data
@@ -215,12 +215,12 @@ def insert_to_ics_honeypot_events_collection(
     Returns:
         inserted_id
     """
-    ics_honeypot_event.machine_name = \
+    event_data.machine_name = \
         network_config["real_machine_identifier_name"]
 
-    ics_honeypot_event.country = byte_to_str(
+    event_data.country = byte_to_str(
                                         IP2Location.get_country_short(
-                                            ics_honeypot_event.ip
+                                            event_data.ip
                                         ))
 
     if is_verbose_mode():
@@ -228,13 +228,11 @@ def insert_to_ics_honeypot_events_collection(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}"
             .format(
-                ics_honeypot_event.ip,
-                ics_honeypot_event.module_name,
-                ics_honeypot_event.machine_name,
-                ics_honeypot_event.data
+                event_data.ip,
+                event_data.module_name,
+                event_data.machine_name,
+                event_data.data
             )
         )
 
-    return ics_honeypot_events.insert_one(
-                ics_honeypot_event.__dict__
-            ).inserted_id
+    return events_data.insert_one(event_data.__dict__).inserted_id

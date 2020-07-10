@@ -5,8 +5,8 @@ import time
 import os
 import json
 
-from database.connector import insert_to_ics_honeypot_events_collection
-from database.datatypes import ICSHoneypotEvent
+from database.connector import insert_to_events_data_collection
+from database.datatypes import EventData
 
 
 LOGFILE = 'tmp/ics_veeder_root_guardian_ast.log'
@@ -39,8 +39,8 @@ class ModuleProcessor:
                         "content": data_json["content"],
                         "valid_command": data_json["valid_command"]
                     }
-                    insert_to_ics_honeypot_events_collection(
-                        ICSHoneypotEvent(
+                    insert_to_events_data_collection(
+                        EventData(
                             ip=ip,
                             module_name="ics/veeder_root_guardian_ast",
                             date=time_of_insertion,
