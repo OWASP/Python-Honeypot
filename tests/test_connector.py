@@ -4,15 +4,15 @@ from datetime import datetime
 from dataclasses import asdict
 
 from database.connector import (credential_events, honeypot_events,
-                                honeypot_events_queue, ics_honeypot_events,
+                                honeypot_events_queue, events_data,
                                 insert_to_credential_events_collection,
                                 insert_to_honeypot_events_queue,
-                                insert_to_ics_honeypot_events_collection,
+                                insert_to_events_data_collection,
                                 insert_to_network_events_queue, network_events,
                                 network_events_queue,
                                 push_events_queues_to_database)
 from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                ICSHoneypotEvent, NetworkEvent)
+                                EventData, NetworkEvent)
 
 
 class TestConnector(unittest.TestCase):
@@ -93,28 +93,28 @@ class TestConnector(unittest.TestCase):
         # credential_events.delete_one(credential_event.__dict__)
 
 
-    def test_insert_ics_honeypot_events(self):
+    def test_insert_eventss_data(self):
         """
-        Test the data insertion to the ics_honeypot_events collection 
+        Test the data insertion to the events_data collection 
         """
-        ics_honeypot_event = ICSHoneypotEvent(
+        event_data = EventData(
                                 ip="55.66.77.88",
                                 module_name="ics/veeder_root_guardian_ast",
                                 date=datetime.now(),
                                 data="Test Data"
                             )
 
-        insert_to_ics_honeypot_events_collection(ics_honeypot_event)
+        insert_to_events_data_collection(event_data)
 
         # Find the record in the DB
-        ics_honeypot_record = ics_honeypot_events.find_one(ics_honeypot_event.__dict__)
+        event_record_data = events_data.find_one(event_data.__dict__)
 
         # Compare the record found in the DB with the one pushed
-        self.assertEqual(ics_honeypot_record["ip"], ics_honeypot_event.ip)
-        self.assertEqual(ics_honeypot_record["data"],
-                         ics_honeypot_event.data)
+        self.assertEqual(event_record_data["ip"], event_data.ip)
+        self.assertEqual(event_record_data["data"],
+                         event_data.data)
         
-        ics_honeypot_events.delete_one(ics_honeypot_event.__dict__)
+        events_data.delete_one(event_data.__dict__)
 
 
 if __name__ == '__main__':
