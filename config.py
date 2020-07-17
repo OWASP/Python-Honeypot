@@ -6,6 +6,12 @@ import socket
 from core.time_helper import hours
 from core.compatible import generate_token
 
+# Protocol number to protocol string table
+protocol_table = { 
+            num:name[8:] 
+            for name,num in vars(socket).items()
+            if name.startswith("IPPROTO")
+        }
 real_machine_ip_address = socket.gethostbyname(socket.gethostname())
 
 

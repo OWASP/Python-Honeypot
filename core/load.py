@@ -634,6 +634,11 @@ def load_honeypot_engine():
     if argv_options.start_api_server:
         start_api_server()
         exit_success()
+
+    # Check if the script is running with sudo
+    if not os.geteuid() == 0:
+        exit_failure("The script must be run as root!")
+    
     # check selected modules
     if argv_options.selected_modules:
         selected_modules = list(set(argv_options.selected_modules.rsplit(",")))

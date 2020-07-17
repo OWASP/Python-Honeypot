@@ -37,7 +37,7 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, module_name, machine_name):
+def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, protocol, module_name, machine_name):
     """
     insert selected modules event to honeypot_events collection
 
@@ -69,6 +69,7 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
             "port_src": int(port_src),
             "module_name": module_name,
             "date": now(),
+            "protocol": protocol,
             "machine_name": machine_name,
             "event_type": "honeypot_event",
             "country_ip_src": byte_to_str(IP2Location.get_country_short(byte_to_str(ip_src))),
@@ -78,7 +79,7 @@ def insert_selected_modules_network_event(ip_dest, port_dest, ip_src, port_src, 
     return
 
 
-def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_name):
+def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, protocol, machine_name):
     """
     insert other network events (port scan, etc..) to network_events collection
 
@@ -107,6 +108,7 @@ def insert_other_network_event(ip_dest, port_dest, ip_src, port_src, machine_nam
             "ip_src": byte_to_str(ip_src),
             "port_src": int(port_src),
             "date": now(),
+            "protocol": protocol,
             "machine_name": machine_name,
             "country_ip_src": byte_to_str(IP2Location.get_country_short(byte_to_str(ip_src))),
             "country_ip_dest": byte_to_str(IP2Location.get_country_short(byte_to_str(ip_dest)))

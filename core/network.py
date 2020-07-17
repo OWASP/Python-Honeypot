@@ -6,11 +6,12 @@ import netaddr
 import select
 import time
 import os
+import pyshark
 
 from database.connector import insert_selected_modules_network_event
 from database.connector import insert_other_network_event
-from core.alert import info
-from config import network_configuration
+from core.alert import error, info
+from config import network_configuration, protocol_table
 from core.get_modules import virtual_machine_name_to_container_name
 from core.alert import warn
 from core.exit_helper import exit_failure
@@ -88,74 +89,163 @@ def new_network_events(configuration):
     ignore_ports = network_configuration()["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
-    run_tshark = ["tshark", "-l", "-V"]
-    run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
-    run_tshark.extend(
-        [
-            "-T", "fields", "-e", "ip.dst", "-e", "ip.src", "-e", "tcp.dstport", "-e", "tcp.srcport", "-ni", "any"
-        ]
-    )
-    process = subprocess.Popen(
-        run_tshark,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    # wait 3 seconds if process terminated?
-    time.sleep(3)
-    if process.poll() is not None:
-        exit_failure("tshark couldn't capture network, maybe run as root!")
-    # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
-    # it will be easier to apply filters and analysis packets with python
-    # if it requires to be run as root, please add a uid checker in framework startup
 
-    # readline timeout bug fix: https://stackoverflow.com/a/10759061
-    pull_object = select.poll()
-    pull_object.register(process.stdout, select.POLLIN)
-    # while True, read tshark output
+    store_captured_traffic = network_configuration()["store_network_captured_files"]
+
+    # Capture filter to be applied to the Live Capture
+    display_filter = ""
+
+    for ip in ignore_ip_addresses:
+        display_filter += "ip.src != " + ip +\
+                     " and ip.dst != " + ip + " and "
+
+    for port in ignore_ports:
+        display_filter += "tcp.srcport != " + port +\
+                     " and tcp.dstport != " + port + " and "
+
+    display_filter = display_filter[:-5]
+
+    output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
+    output_file_path = os.path.join("tmp", output_file_name)
+
     try:
-        while True:
-            if pull_object.poll(0):
-                line = process.stdout.readline()
-                # check if new IP and Port printed
-                if len(line) > 0:
-                    # split the IP and Port
-                    try:
-                        line = line.rsplit()
-                        ip_dest = byte_to_str(line[0])
-                        ip_src = byte_to_str(line[1])
-                        port_dest = int(line[2])
-                        port_src = int(line[3])
-                        if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)) \
-                                and ip_dest not in ignore_ip_addresses \
-                                and ip_src not in ignore_ip_addresses \
-                                and port_dest not in ignore_ports \
-                                and port_src not in ignore_ports:
-                            # ignored ip addresses and ports in python - fix later
-                            # check if the port is in selected module
+        
+        if store_captured_traffic:
+            capture = pyshark.LiveCapture(interface='any', display_filter=display_filter, output_file=output_file_path)
+        else:
+            capture = pyshark.LiveCapture(interface='any', display_filter=display_filter)
 
-                            if port_dest in honeypot_ports or port_src in honeypot_ports:
-                                if port_dest in honeypot_ports:
-                                    insert_selected_modules_network_event(
-                                        ip_dest,
-                                        port_dest,
-                                        ip_src,
-                                        port_src,
-                                        selected_module,
-                                        machine_name
-                                    )
-                            else:
-                                insert_other_network_event(
+        # Debug option for pyshark capture
+        # capture.set_debug()
+
+        for packet in capture.sniff_continuously():
+            
+            try:
+                # Check if packet contains IP layer
+                if "IP" in packet:
+                    ip_dest = packet.ip.dst
+                    ip_src = packet.ip.src
+                    protocol = protocol_table[int(packet.ip.proto)]
+                    
+                    # Check if packet contains TCP layer and get the port info
+                    if "TCP" in packet:
+                        port_dest = packet.tcp.dstport
+                        port_src = packet.tcp.srcport
+
+                    if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)):
+                        # ignored ip addresses and ports in python - fix later
+                        # check if the port is in selected module
+
+                        if port_dest in honeypot_ports or port_src in honeypot_ports:
+                            if port_dest in honeypot_ports:
+                                insert_selected_modules_network_event(
                                     ip_dest,
                                     port_dest,
                                     ip_src,
                                     port_src,
+                                    protocol,
+                                    selected_module,
                                     machine_name
                                 )
-                    except Exception as _:
-                        del _
-                    # check if event shows an IP
-            time.sleep(0.001)
-            # todo: is sleep(0.001) fastest/best? it means it could get 1000 packets per second (maximum) from tshark
-            # how could we prevent the DDoS attacks in here and avoid submitting in MongoDB? should we?
-    except Exception as _:
-        del _
-    return True
+                        else:
+                            insert_other_network_event(
+                                ip_dest,
+                                port_dest,
+                                ip_src,
+                                port_src,
+                                protocol,
+                                machine_name
+                            )
+                
+                else:
+                    continue
+            
+            except Exception as _e:
+                del _e
+           
+    except Exception as _e:
+        error(_e)
+        del _e
+
+    finally:
+        capture.clear()
+        capture.close()
+
+    # return True
+
+
+
+    # run_tshark = ["tshark", "-l", "-V"]
+    # run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
+    # run_tshark.extend(
+    #     [
+    #         "-T", "fields", "-e", "ip.dst", "-e", "ip.src", "-e", "tcp.dstport", "-e", "tcp.srcport", "-e", "ip.proto", "-ni", "any"
+    #     ]
+    # )
+    # process = subprocess.Popen(
+    #     run_tshark,
+    #     stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    # )
+    # # wait 3 seconds if process terminated?
+    # time.sleep(3)
+    # if process.poll() is not None:
+    #     exit_failure("tshark couldn't capture network, maybe run as root!")
+    # # todo: replace tshark with python port sniffing - e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
+    # # it will be easier to apply filters and analysis packets with python
+    # # if it requires to be run as root, please add a uid checker in framework startup
+
+    # # readline timeout bug fix: https://stackoverflow.com/a/10759061
+    # pull_object = select.poll()
+    # pull_object.register(process.stdout, select.POLLIN)
+    # # while True, read tshark output
+    # try:
+    #     while True:
+    #         if pull_object.poll(0):
+    #             line = process.stdout.readline()
+    #             # check if new IP and Port printed
+    #             if len(line) > 0:
+    #                 # split the IP and Port
+    #                 try:
+    #                     line = line.rsplit()
+    #                     ip_dest = byte_to_str(line[0])
+    #                     ip_src = byte_to_str(line[1])
+    #                     port_dest = int(line[2])
+    #                     port_src = int(line[3])
+    #                     proto = int(line[4])
+    #                     if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)) \
+    #                             and ip_dest not in ignore_ip_addresses \
+    #                             and ip_src not in ignore_ip_addresses \
+    #                             and port_dest not in ignore_ports \
+    #                             and port_src not in ignore_ports:
+    #                         # ignored ip addresses and ports in python - fix later
+    #                         # check if the port is in selected module
+
+    #                         if port_dest in honeypot_ports or port_src in honeypot_ports:
+    #                             if port_dest in honeypot_ports:
+    #                                 insert_selected_modules_network_event(
+    #                                     ip_dest,
+    #                                     port_dest,
+    #                                     ip_src,
+    #                                     port_src,
+    #                                     proto,
+    #                                     selected_module,
+    #                                     machine_name
+    #                                 )
+    #                         else:
+    #                             insert_other_network_event(
+    #                                 ip_dest,
+    #                                 port_dest,
+    #                                 ip_src,
+    #                                 port_src,
+    #                                 proto,
+    #                                 machine_name
+    #                             )
+    #                 except Exception as _:
+    #                     del _
+    #                 # check if event shows an IP
+    #         time.sleep(0.001)
+    #         # todo: is sleep(0.001) fastest/best? it means it could get 1000 packets per second (maximum) from tshark
+    #         # how could we prevent the DDoS attacks in here and avoid submitting in MongoDB? should we?
+    # except Exception as _:
+    #     del _
+    # return True
