@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from glob import glob
 import os
 import inspect
 
-import modules
-# from core.compatible import is_windows
-from core.alert import warn
-from core.alert import messages
+import lib
+from glob import glob
+from core.compatible import is_windows
+from core.alert import (warn, messages)
+
 
 
 def virtual_machine_names_to_container_names(configuration):
@@ -21,7 +21,8 @@ def virtual_machine_names_to_container_names(configuration):
         list of container name in array
     """
     return [
-        "{0}_{1}".format(configuration[selected_module]["virtual_machine_name"], selected_module.rsplit("/")[1])
+        "{0}_{1}".format(configuration[selected_module]["virtual_machine_name"],
+                         selected_module.rsplit("/")[1])
         for selected_module in configuration
     ]
 
@@ -68,6 +69,7 @@ def load_all_modules():
         dockerfile_path = os.path.join(module_dir, "Dockerfile")
 
         if os.path.exists(dockerfile_path):
+
             if module_name not in module_names:
                 module_names.append(module_name)
         else:
