@@ -4,11 +4,10 @@
 import os
 import inspect
 
-import lib
+import modules
 from glob import glob
-from core.compatible import is_windows
-from core.alert import (warn, messages)
 
+from core.alert import (warn, messages)
 
 
 def virtual_machine_names_to_container_names(configuration):
@@ -21,8 +20,10 @@ def virtual_machine_names_to_container_names(configuration):
         list of container name in array
     """
     return [
-        "{0}_{1}".format(configuration[selected_module]["virtual_machine_name"],
-                         selected_module.rsplit("/")[1])
+        "{0}_{1}".format(
+                configuration[selected_module]["virtual_machine_name"],
+                selected_module.rsplit("/")[1]
+                )
         for selected_module in configuration
     ]
 
@@ -49,10 +50,13 @@ def load_all_modules():
         an array of all module names
     """
     # Search for Modules
-    # the modules are available in modules/category_name/module_name (e.g. modules/ftp/weak_password
+    # the modules are available in
+    # modules/category_name/module_name (e.g. modules/ftp/weak_password
     # they will be listed based on the folder names and if "Dockerfile" exist!
-    # structure of module name: module_name = modules/(category_name/module_name)/__init.py
-    # example: module_name = modules/(ftp/weak_password)/__init.py = ftp/weak_password
+    # structure of module name:
+    # module_name = modules/(category_name/module_name)/__init.py
+    # example: module_name = modules/(ftp/weak_password)/__init.py
+    #                      = ftp/weak_password
     module_names = []
     module_basepath = os.path.dirname(inspect.getfile(modules))
     path_pattern = module_basepath + '/*/*/__init__.py'

@@ -60,7 +60,7 @@ def check(language):
     from core.alert import messages
     if os_name() not in ["linux", "darwin", "win32", "win64"]:
         exit_failure(messages(language, "error_platform"))
-    if version() is 2 or version() is 3:
+    if version() == 2 or version() == 3:
         pass
     else:
         exit_failure(messages(language, "python_version_error"))
@@ -107,14 +107,16 @@ def check_for_requirements(start_api_server):
         import flask
         del netaddr
         del flask
-    except Exception as _:
+    except Exception:
         exit_failure("pip install -r requirements.txt")
     # check mongodb
     try:
-        connection = pymongo.MongoClient(api_config["api_database"],
-                                         serverSelectionTimeoutMS=connection_timeout)
+        connection = pymongo.MongoClient(
+                            api_config["api_database"],
+                            serverSelectionTimeoutMS=connection_timeout
+                        )
         connection.list_database_names()
-    except Exception as _:
+    except Exception:
         exit_failure("cannot connect to mongodb")
     # check if its honeypot server not api server
     if not start_api_server:
@@ -122,13 +124,13 @@ def check_for_requirements(start_api_server):
         try:
             subprocess.check_output(["docker", "--help"],
                                     stderr=subprocess.PIPE)
-        except Exception as _:
+        except Exception:
             exit_failure(messages("en", "docker_error"))
         # check tshark
         try:
             subprocess.check_output(["tshark", "--help"],
                                     stderr=subprocess.PIPE)
-        except Exception as _:
+        except Exception:
             exit_failure("please install tshark first!")
     return True
 
@@ -162,7 +164,7 @@ def mkdir(dir):
     if not os.path.exists(dir):
         try:
             os.makedirs(dir)
-        except Exception as _:
+        except Exception_:
             return False
     return dir
 

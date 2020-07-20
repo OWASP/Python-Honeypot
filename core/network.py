@@ -40,7 +40,7 @@ def get_gateway_ip_addresses(configuration):
                 "{{{{.Gateway}}}}{{{{end}}}}' {0}".format(container_name)
             ).read().rsplit()[0].replace("\'", "")
             gateway_ips.append(gateway_ip)
-        except IndexError as _:
+        except IndexError:
             warn("unable to get container {0} IP address".format(container_name))
     return list(set(gateway_ips))
 
@@ -168,12 +168,13 @@ def new_network_events(configuration):
                                         machine_name=machine_name
                                     )
                                 )
-                    except Exception as _:
+                    except Exception:
                         del _
                     # check if event shows an IP
             time.sleep(0.001)
             # todo: is sleep(0.001) fastest/best?
-            # it means it could get 1000 packets per second(maximum) from tshark
+            # it means it could get 1000 packets per second(maximum) from
+            # tshark
             # how could we prevent the DDoS attacks in here
             # and avoid submitting in MongoDB? should we?
     except Exception as _:
