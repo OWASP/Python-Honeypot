@@ -98,6 +98,7 @@ def check_for_requirements(start_api_server):
         True if exist otherwise False
     """
     from config import api_configuration
+    from core.alert import messages
     # check external required modules
     api_config = api_configuration()
     connection_timeout = api_config["api_database_connection_timeout"]
