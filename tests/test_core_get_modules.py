@@ -20,7 +20,7 @@ class TestCoreGetModules(unittest.TestCase):
                        'ohp_sshserver_strong_password',
                        'ohp_httpserver_basic_auth_strong_password',
                        'ohp_httpserver_basic_auth_weak_password']
-        self.assertEqual(container_names, all_modules)
+        self.assertCountEqual(container_names, all_modules)
 
     def test_load_all_modules(self):
         """
