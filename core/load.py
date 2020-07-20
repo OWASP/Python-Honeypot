@@ -31,13 +31,13 @@ from core.compatible import check_for_requirements
 from core.compatible import copy_dir_tree
 from core.compatible import mkdir
 from core.compatible import get_module_dir_path
-from database.connector import insert_bulk_events_from_thread
-from database.connector import insert_events_in_bulk
+from database.connector import push_events_to_database_from_thread
+from database.connector import push_events_queues_to_database
 from core.compatible import is_verbose_mode
 
 # temporary use fixed version of argparse
 if is_windows():
-    if version() is 2:
+    if version() == 2:
         from lib.argparse.v2 import argparse
     else:
         from lib.argparse.v3 import argparse
@@ -387,7 +387,7 @@ def honeypot_configuration_builder(selected_modules):
 
         category_configuration = getattr(
             __import__(
-                "lib.modules.{0}".
+                "modules.{0}".
                     format(
                     module.rsplit("/")[0]),
                 fromlist=["category_configuration"]
@@ -414,7 +414,7 @@ def honeypot_configuration_builder(selected_modules):
         #      }
         module_configuration = getattr(
             __import__(
-                "lib.modules.{0}".
+                "modules.{0}".
                     format(
                     module.replace("/", ".")
                 ), fromlist=["module_configuration"]
@@ -493,7 +493,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                 duplicated_ports = []
                 for selected_module in configuration:
                     duplicated_ports.append(configuration[selected_module]["real_machine_port_number"])
-                if duplicated_ports.count(real_machine_port) is 1:
+                if duplicated_ports.count(real_machine_port) == 1:
                     info("port {0} selected for {1}".format(real_machine_port, module_name))
                     return real_machine_port
         except Exception as _:
@@ -709,7 +709,7 @@ def load_honeypot_engine():
     )
 
     bulk_events_thread = Thread(
-        target=insert_bulk_events_from_thread,
+        target=push_events_to_database_from_thread,
         args=(),
         name="insert_events_in_bulk_thread"
     )
@@ -729,7 +729,7 @@ def load_honeypot_engine():
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
-    insert_events_in_bulk()  # if in case any events that were not inserted from thread
+    push_events_queues_to_database()  # if in case any events that were not inserted from thread
     # stop created containers
     stop_containers(configuration)
     # stop module processor
