@@ -9,7 +9,7 @@ def reset_cmd_color():
     """
     reset the color of windows/terminal before exit
     """
-    #TODO : Fix the cyclic dependency later
+    # TODO : Fix the cyclic dependency later
     from core.compatible import os_name
     if "linux" in os_name() or os_name() == "darwin":
         sys.stdout.write("\033[0m")
@@ -33,7 +33,7 @@ def color_cmd(color):
     if "--disable-colors" in sys.argv:
         return ""
     if "linux" in os_name() or \
-       os_name() == "darwin":
+            os_name() == "darwin":
         if color == "reset":
             return "\033[0m"
         if color == "grey":

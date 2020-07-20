@@ -8,6 +8,7 @@ from core import color
 from core.compatible import version
 from core.time_helper import now
 
+
 def is_not_run_from_api():
     """
     check if framework run from API to prevent any alert
@@ -16,7 +17,7 @@ def is_not_run_from_api():
         True if run from API otherwise False
     """
     if "--start-api-server" in sys.argv \
-       or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
+            or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
         return False
     return True
 
@@ -47,7 +48,7 @@ def messages(language, msg_id):
                         ) + "/../lib/language/"
                     )
                     if langs != "readme.md" and
-                    langs.rsplit("_")[1].rsplit(".")[0] != ""
+                       langs.rsplit("_")[1].rsplit(".")[0] != ""
                 ]
             )
         )

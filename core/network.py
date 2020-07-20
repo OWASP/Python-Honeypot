@@ -7,7 +7,7 @@ import select
 import time
 import os
 
-from database.connector import (insert_selected_modules_network_event,\
+from database.connector import (insert_selected_modules_network_event, \
                                 insert_other_network_event)
 from core.alert import info
 from config import network_configuration
@@ -77,7 +77,7 @@ def new_network_events(configuration):
     network_config = network_configuration()
     for selected_module in configuration:
         port_number = configuration[selected_module]["real_machine_port_number"]
-        ip_address  = configuration[selected_module]["ip_address"]
+        ip_address = configuration[selected_module]["ip_address"]
         honeypot_ports.append(port_number)
         # get ip addresses
         virtual_machine_ip_addresses.append(ip_address)
@@ -135,16 +135,16 @@ def new_network_events(configuration):
                         port_dest = int(line[2])
                         port_src = int(line[3])
                         if (netaddr.valid_ipv4(ip_dest) or \
-                           netaddr.valid_ipv6(ip_dest)) \
-                           and ip_dest not in ignore_ip_addresses \
-                           and ip_src not in ignore_ip_addresses \
-                           and port_dest not in ignore_ports \
-                           and port_src not in ignore_ports:
+                            netaddr.valid_ipv6(ip_dest)) \
+                                and ip_dest not in ignore_ip_addresses \
+                                and ip_src not in ignore_ip_addresses \
+                                and port_dest not in ignore_ports \
+                                and port_src not in ignore_ports:
                             # ignored ip addresses and ports in python -fix later
                             # check if the port is in selected module
 
                             if (port_dest in honeypot_ports or
-                               port_src in honeypot_ports):
+                                    port_src in honeypot_ports):
                                 if port_dest in honeypot_ports:
                                     insert_selected_modules_network_event(
                                         ip_dest,
