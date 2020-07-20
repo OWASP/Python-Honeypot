@@ -18,7 +18,7 @@ def logo():
     """
     OWASP HoneyPot Logo
     """
-    #TODO : Fix the cyclic dependency later
+    # TODO : Fix the cyclic dependency later
     from core.alert import write_to_api_console
     write_to_api_console("""
       ______          __      _____ _____
@@ -227,7 +227,7 @@ def byte_to_str(data):
     :return: str(data)
     """
     return str(data if isinstance(data, str) else data.decode()
-               if isinstance(data, bytes) else data)
+    if isinstance(data, bytes) else data)
 
 
 def is_verbose_mode():

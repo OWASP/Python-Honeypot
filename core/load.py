@@ -6,23 +6,23 @@ import os
 import json
 import socket
 
-from config import (user_configuration, docker_configuration,\
+from config import (user_configuration, docker_configuration,
                     network_configuration)
 from terminable_thread import (Thread, threading)
 from core.get_modules import load_all_modules
-from core.alert import (info,error,messages)
+from core.alert import (info, error, messages)
 from core.color import reset_cmd_color
 from core.compatible import (logo, version, is_windows)
 from core.exit_helper import (exit_success, exit_failure)
 from core.compatible import make_tmp_thread_dir
-from core.get_modules import (virtual_machine_names_to_container_names,\
+from core.get_modules import (virtual_machine_names_to_container_names,
                               virtual_machine_name_to_container_name)
 from core.network import new_network_events
 from core.exit_helper import terminate_thread
 from api.server import start_api_server
-from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,\
+from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
                              get_module_dir_path, is_verbose_mode)
-from database.connector import (insert_bulk_events_from_thread,\
+from database.connector import (insert_bulk_events_from_thread,
                                 insert_events_in_bulk)
 
 # temporary use fixed version of argparse

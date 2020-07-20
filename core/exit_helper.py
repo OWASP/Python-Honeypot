@@ -22,7 +22,7 @@ def exit_failure(msg):
     Args:
         msg: the error message
     """
-    #TODO : Fix the cyclic dependency later
+    # TODO : Fix the cyclic dependency later
     from core.alert import error
     error(msg)
     reset_cmd_color()
