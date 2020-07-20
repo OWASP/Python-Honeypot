@@ -6,7 +6,7 @@ import os
 import inspect
 
 import modules
-from core.compatible import is_windows
+# from core.compatible import is_windows
 from core.alert import warn
 from core.alert import messages
 
