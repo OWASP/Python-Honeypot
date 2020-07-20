@@ -17,6 +17,7 @@ from database.connector import (insert_to_network_events_queue,
                                 insert_to_honeypot_events_queue)
 from database.datatypes import HoneypotEvent, NetworkEvent
 
+
 def get_gateway_ip_addresses(configuration):
     """
     get gateway ip addresses

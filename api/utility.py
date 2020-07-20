@@ -113,12 +113,12 @@ def root_dir():
         root path for static files
     """
     return os.path.join(
-                        os.path.join(
-                            os.path.dirname(os.path.dirname(__file__)),
-                            "web"
-                        ),
-                        "static"
-                    )
+        os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "web"
+        ),
+        "static"
+    )
 
 
 def fix_date(date):
