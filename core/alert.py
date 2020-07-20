@@ -35,6 +35,7 @@ def messages(language, msg_id):
         otherwise return message in English
     """
     # Returning selected language
+    # todo: fix -1 to a variable name or add comment
     if language is -1:
         return list(
             set(
