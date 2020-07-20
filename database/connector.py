@@ -179,7 +179,8 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     credential_event.country = byte_to_str(
         IP2Location.get_country_short(
             credential_event.ip
-        ))
+        )
+    )
 
     credential_event.machine_name = \
         network_config["real_machine_identifier_name"]
@@ -187,8 +188,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     if is_verbose_mode():
         verbose_info(
             "Received honeypot credential event, ip_dest:{0}, username:{1}, "
-            "password:{2}, module_name:{3}, machine_name:{4}"
-                .format(
+            "password:{2}, module_name:{3}, machine_name:{4}".format(
                 credential_event.ip,
                 credential_event.username,
                 credential_event.password,
