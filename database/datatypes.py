@@ -21,10 +21,10 @@ class HoneypotEvent(object):
         country_ip_dest: Country of destination IP Address
 
     """
-    def __init__(
-                self, ip_dest, port_dest, ip_src,
-                port_src, module_name, machine_name):
 
+    def __init__(
+            self, ip_dest, port_dest, ip_src,
+            port_src, module_name, machine_name):
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
@@ -53,9 +53,8 @@ class NetworkEvent(object):
     """
 
     def __init__(
-                self, ip_dest, port_dest,
-                ip_src, port_src, machine_name):
-
+            self, ip_dest, port_dest,
+            ip_src, port_src, machine_name):
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src

@@ -59,7 +59,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
         verbose_info(
             "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
             "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}"
-            .format(
+                .format(
                 honeypot_event.ip_dest,
                 honeypot_event.port_dest,
                 honeypot_event.ip_src,
@@ -71,15 +71,15 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
 
     # Get country of the source IP Address
     honeypot_event.country_ip_src = byte_to_str(
-                                        IP2Location.get_country_short(
-                                            honeypot_event.ip_src
-                                        ))
+        IP2Location.get_country_short(
+            honeypot_event.ip_src
+        ))
 
     # Get country of the destination IP Address
     honeypot_event.country_ip_dest = byte_to_str(
-                                        IP2Location.get_country_short(
-                                            honeypot_event.ip_dest
-                                        ))
+        IP2Location.get_country_short(
+            honeypot_event.ip_dest
+        ))
 
     honeypot_events_queue.append(honeypot_event.__dict__)
 
@@ -101,7 +101,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
         verbose_info(
             "Received network event, ip_dest:{0}, port_dest:{1}, "
             "ip_src:{2}, port_src:{3}, machine_name:{4}"
-            .format(
+                .format(
                 network_event.ip_dest,
                 network_event.port_dest,
                 network_event.ip_src,
@@ -112,15 +112,15 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
 
     # Get country of the source IP Address
     network_event.country_ip_src = byte_to_str(
-                                        IP2Location.get_country_short(
-                                            network_event.ip_src
-                                        ))
+        IP2Location.get_country_short(
+            network_event.ip_src
+        ))
 
     # Get country of the destination IP Address
     network_event.country_ip_dest = byte_to_str(
-                                        IP2Location.get_country_short(
-                                            network_event.ip_dest
-                                        ))
+        IP2Location.get_country_short(
+            network_event.ip_dest
+        ))
 
     network_events_queue.append(network_event.__dict__)
 
@@ -177,9 +177,10 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         inserted_id
     """
     credential_event.country = byte_to_str(
-                                    IP2Location.get_country_short(
-                                        credential_event.ip
-                                    ))
+        IP2Location.get_country_short(
+            credential_event.ip
+        )
+    )
 
     credential_event.machine_name = \
         network_config["real_machine_identifier_name"]
@@ -187,8 +188,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     if is_verbose_mode():
         verbose_info(
             "Received honeypot credential event, ip_dest:{0}, username:{1}, "
-            "password:{2}, module_name:{3}, machine_name:{4}"
-            .format(
+            "password:{2}, module_name:{3}, machine_name:{4}".format(
                 credential_event.ip,
                 credential_event.username,
                 credential_event.password,
@@ -201,7 +201,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
 
 
 def insert_to_events_data_collection(
-                            event_data: EventData):
+        event_data: EventData):
     """
     Insert data collected from module processors of modules such as-
     ICS module
@@ -219,15 +219,15 @@ def insert_to_events_data_collection(
         network_config["real_machine_identifier_name"]
 
     event_data.country = byte_to_str(
-                                        IP2Location.get_country_short(
-                                            event_data.ip
-                                        ))
+        IP2Location.get_country_short(
+            event_data.ip
+        ))
 
     if is_verbose_mode():
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}"
-            .format(
+                .format(
                 event_data.ip,
                 event_data.module_name,
                 event_data.machine_name,
