@@ -7,7 +7,7 @@ import select
 import time
 import os
 
-from database.connector import (insert_selected_modules_network_event, \
+from database.connector import (insert_selected_modules_network_event,
                                 insert_other_network_event)
 from core.alert import info
 from config import network_configuration
@@ -91,7 +91,8 @@ def new_network_events(configuration):
         if ignore_rm_ip_addresses else [] + virtual_machine_ip_addresses \
         if ignore_vm_ip_addresses else []
     ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
-    # ignore ports
+    # ign
+    # ore ports
     ignore_ports = network_config["ignore_real_machine_ports"]
     # start tshark to capture network
     # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
@@ -134,7 +135,7 @@ def new_network_events(configuration):
                         ip_src = byte_to_str(line[1])
                         port_dest = int(line[2])
                         port_src = int(line[3])
-                        if (netaddr.valid_ipv4(ip_dest) or \
+                        if (netaddr.valid_ipv4(ip_dest) or
                             netaddr.valid_ipv6(ip_dest)) \
                                 and ip_dest not in ignore_ip_addresses \
                                 and ip_src not in ignore_ip_addresses \

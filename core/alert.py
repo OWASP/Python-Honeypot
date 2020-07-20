@@ -3,7 +3,7 @@
 
 import os
 import sys
-import json
+# import json
 from core import color
 from core.compatible import version
 from core.time_helper import now
@@ -35,6 +35,7 @@ def messages(language, msg_id):
         otherwise return message in English
     """
     # Returning selected language
+    # todo: fix -1 to a variable name or add comment
     if language is -1:
         return list(
             set(
