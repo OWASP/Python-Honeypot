@@ -164,7 +164,7 @@ def mkdir(dir):
     if not os.path.exists(dir):
         try:
             os.makedirs(dir)
-        except Exception_:
+        except Exception:
             return False
     return dir
 
