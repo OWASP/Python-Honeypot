@@ -56,7 +56,7 @@ jobs:
         sleep 15
     - name: run modules test
       run: |
-        sudo python3 ohp.py -m all --test
+        python3 ohp.py -m all --test
     - name: Test with pytest
       run: |
         python3 -m pytest -rpP --ignore="tests/test_api.py"
