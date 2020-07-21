@@ -4,13 +4,14 @@
 import sys
 import ctypes
 
+from core.color import reset_cmd_color
+
 
 def exit_success():
     """
     exit the framework with code 0
     """
-    from core.color import finish
-    finish()
+    reset_cmd_color()
     sys.exit(0)
 
 
@@ -21,14 +22,14 @@ def exit_failure(msg):
     Args:
         msg: the error message
     """
-    from core.color import finish
+    # TODO : Fix the cyclic dependency later
     from core.alert import error
     error(msg)
-    finish()
+    reset_cmd_color()
     sys.exit(1)
 
 
-def terminate_thread(thread, output=True):
+def terminate_thread(thread, verbose=True):
     """
     kill a thread https://stackoverflow.com/a/15274929
 
@@ -40,7 +41,7 @@ def terminate_thread(thread, output=True):
         True/None
     """
     from core.alert import info
-    if output:
+    if verbose:
         info("killing {0}".format(thread.name))
     if not thread.isAlive():
         return
