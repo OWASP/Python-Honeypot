@@ -48,9 +48,9 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="lib/*"
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="lib/argparse/*,lib/ip2location/*"
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics --exclude="lib/*"
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics --exclude="lib/argparse/*,lib/ip2location/*"
     - name: wait for mongodb
       run: |
         sleep 15
@@ -59,7 +59,7 @@ jobs:
         python3 ohp.py -m all --test
     - name: Run API server
       run: |
-        nohup python3 ohp.py --start-api-server & >/tmp/ohp
+        nohup python3 ohp.py --start-api-server &> /tmp/ohp
     - name: Wait for API server
       run: |
         sleep 5
@@ -69,3 +69,6 @@ jobs:
     - name: Kill API Server
       run: |
         killall python3
+    - name: Check API server logs
+      run: |
+        cat /tmp/ohp
