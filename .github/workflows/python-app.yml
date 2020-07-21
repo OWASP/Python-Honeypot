@@ -59,5 +59,6 @@ jobs:
         python3 ohp.py -m all --test
     - name: Test with pytest
       run: |
-        python3 -m pytest -rpP --ignore="tests/test_api.py"
+        nohup python3 ohp.py --start-api-server
+        python3 -m pytest -rpP
    
