@@ -4,7 +4,6 @@ import unittest
 from unittest.mock import patch
 import sys
 from core.alert import (is_not_run_from_api, messages, info, write, warn)
-from lib.language.messages_en import all_messages
 
 
 class TestCoreAlert(unittest.TestCase):

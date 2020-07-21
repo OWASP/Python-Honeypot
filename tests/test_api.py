@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import os
 import unittest
 
 import requests
@@ -20,7 +18,7 @@ class TestApi(unittest.TestCase):
 
     def test_count_all_events(self):
         """
-        Test count_all_events end-point of the API returns a value 
+        Test count_all_events end-point of the API returns a value
         greater than or equal to zero.
         """
         response = requests.get(API_URL + "/api/events/count-all-events")
@@ -29,7 +27,7 @@ class TestApi(unittest.TestCase):
 
     def test_count_honeypot_events(self):
         """
-        Test count_honeypot_events end-point of the API returns a value 
+        Test count_honeypot_events end-point of the API returns a value
         greater than or equal to zero.
         """
         response = requests.get(API_URL + "/api/events/count-honeypot-events")
@@ -38,7 +36,7 @@ class TestApi(unittest.TestCase):
 
     def test_count_network_events(self):
         """
-        Test count_network_events end-point of the API returns a value 
+        Test count_network_events end-point of the API returns a value
         greater than or equal to zero.
         """
         response = requests.get(API_URL + "/api/events/count-network-events")

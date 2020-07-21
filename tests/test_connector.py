@@ -1,18 +1,15 @@
-import os
 import unittest
 from datetime import datetime
-from dataclasses import asdict
 
-from database.connector import (credential_events, honeypot_events,
-                                honeypot_events_queue, events_data,
+from database.connector import (credential_events, events_data,
+                                honeypot_events,
                                 insert_to_credential_events_collection,
-                                insert_to_honeypot_events_queue,
                                 insert_to_events_data_collection,
+                                insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue, network_events,
-                                network_events_queue,
                                 push_events_queues_to_database)
-from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent)
+from database.datatypes import (CredentialEvent, EventData, HoneypotEvent,
+                                NetworkEvent)
 
 
 class TestConnector(unittest.TestCase):
@@ -76,7 +73,8 @@ class TestConnector(unittest.TestCase):
         insert_to_credential_events_collection(credential_event)
 
         # Find the record in the DB
-        credential_record = credential_events.find_one(credential_event.__dict__)
+        credential_record = credential_events.find_one(
+                                        credential_event.__dict__)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(credential_record["ip"],
@@ -93,7 +91,7 @@ class TestConnector(unittest.TestCase):
 
     def test_insert_eventss_data(self):
         """
-        Test the data insertion to the events_data collection 
+        Test the data insertion to the events_data collection
         """
         event_data = EventData(
             ip="55.66.77.88",
