@@ -59,7 +59,7 @@ jobs:
         python3 ohp.py -m all --test
     - name: Run API server
       run: |
-        nohup python3 ohp.py --start-api-server &> /tmp/ohp
+        nohup python3 ohp.py --start-api-server & >/tmp/ohp
     - name: Wait for API server
       run: |
         sleep 5
