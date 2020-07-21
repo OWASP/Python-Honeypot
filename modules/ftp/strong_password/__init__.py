@@ -8,7 +8,6 @@ import json
 from database.connector import insert_to_credential_events_collection
 from database.datatypes import CredentialEvent
 
-
 LOGFILE = 'tmp/ohp_ftp_strong_password_creds_logs.txt'
 LOGFILE_DUMP = 'tmp/ohp_ftp_strong_password_creds_logs.json'
 
@@ -42,7 +41,7 @@ class ModuleProcessor:
                             password=data['password'],
                             module_name=data['module_name'],
                             date=data['date']
-                        )                   
+                        )
                     )
                 os.remove(LOGFILE_DUMP)
             time.sleep(0.1)
@@ -59,6 +58,6 @@ def module_configuration():
         "username": "admin",
         "password": generate_token(16),
         "extra_docker_options":
-        ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
+            ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }
