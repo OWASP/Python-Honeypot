@@ -54,11 +54,18 @@ jobs:
     - name: wait for mongodb
       run: |
         sleep 15
-    - name: run modules test
+    - name: Run modules test
       run: |
         python3 ohp.py -m all --test
+    - name: Run API server
+      run: |
+        nohup python3 ohp.py --start-api-server &> /tmp/ohp
+    - name: Wait for API server
+      run: |
+        sleep 5
     - name: Test with pytest
       run: |
-        nohup python3 ohp.py --start-api-server
         python3 -m pytest -rpP
-   
+    - name: Kill API Server
+      run: |
+        killall python3
