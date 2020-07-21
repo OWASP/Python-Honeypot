@@ -268,9 +268,9 @@ def count_all_events():
             return jsonify(
                 {
                     "count_all_events": (
-                            connector.honeypot_events.estimated_document_count()
-                            +
-                            connector.network_events.estimated_document_count()
+                        connector.honeypot_events.estimated_document_count()
+                        +
+                        connector.network_events.estimated_document_count()
                     )
                 }
             ), 200
@@ -719,7 +719,7 @@ def get_network_events():
         get_value_from_request("date")
     )
 
-    if start_date and end_date:
+    if date:
         try:
             return jsonify(
                 [
@@ -800,7 +800,6 @@ def get_events_data():
         db_collection_name = connector.honeypot_events_data
     else:
         return flask_null_array_response()
-    
 
     if start_date and end_date:
         try:
@@ -833,7 +832,7 @@ def get_events_data():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
@@ -862,9 +861,8 @@ def get_events_data():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
-
 
 
 @app.route("/api/events/honeypot-events-countries", methods=["GET"])
