@@ -121,7 +121,7 @@ class TestApi(unittest.TestCase):
                         'ssh/strong_password',
                         'ssh/weak_password']
         response = requests.get(API_URL + "/api/events/module-names")
-        self.assertListEqual(module_names, response.json()["module_names"])
+        self.assertCountEqual(module_names, response.json()["module_names"])
 
     def test_credential_events(self):
         """
