@@ -1,6 +1,8 @@
 import unittest
-from core.get_modules import virtual_machine_names_to_container_names, load_all_modules, \
-    virtual_machine_name_to_container_name
+
+from core.get_modules import (load_all_modules,
+                              virtual_machine_name_to_container_name,
+                              virtual_machine_names_to_container_names)
 from core.load import honeypot_configuration_builder
 
 
@@ -18,7 +20,7 @@ class TestCoreGetModules(unittest.TestCase):
                        'ohp_sshserver_strong_password',
                        'ohp_httpserver_basic_auth_strong_password',
                        'ohp_httpserver_basic_auth_weak_password']
-        self.assertEqual(container_names, all_modules)
+        self.assertCountEqual(container_names, all_modules)
 
     def test_load_all_modules(self):
         """

@@ -36,7 +36,7 @@ def messages(language, msg_id):
     """
     # Returning selected language
     # todo: fix -1 to a variable name or add comment
-    if language is -1:
+    if language == -1:
         return list(
             set(
                 [
@@ -48,8 +48,7 @@ def messages(language, msg_id):
                             "\\", "/"
                         ) + "/../lib/language/"
                     )
-                    if langs != "readme.md" and
-                       langs.rsplit("_")[1].rsplit(".")[0] != ""
+                    if langs != "readme.md" and langs.rsplit("_")[1].rsplit(".")[0] != ""
                 ]
             )
         )
@@ -62,7 +61,7 @@ def messages(language, msg_id):
             ),
             "all_messages"
         )()[str(msg_id)]
-    except Exception as _:
+    except Exception:
         msgs = getattr(
             __import__(
                 "lib.language.messages_en",
@@ -70,7 +69,7 @@ def messages(language, msg_id):
             ),
             "all_messages"
         )()[str(msg_id)]
-    if version() is 2:
+    if version() == 2:
         return msgs.decode("utf8")
     return msgs
 
@@ -85,7 +84,7 @@ def input_msg(content):
     Returns:
         the message in input structure
     """
-    if version() is 2:
+    if version() == 2:
         return color.color_cmd("yellow") + \
                "[+] " + \
                color.color_cmd("green") + \
@@ -119,7 +118,7 @@ def info(content, log_in_file=None, mode=None,
         None
     """
     if is_not_run_from_api():  # prevent to stdout if run from API
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 color.color_cmd("yellow") +
                 "[+] [{0}] ".format(now()) +
@@ -162,7 +161,7 @@ def write(content):
         None
     """
     if is_not_run_from_api():
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 content.encode("utf8")
             )
@@ -185,7 +184,7 @@ def warn(content):
         the message in warn structure - None
     """
     if is_not_run_from_api():
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 color.color_cmd("blue") +
                 "[!] [{0}] ".format(now()) +
@@ -227,7 +226,7 @@ def verbose_info(content, log_in_file=None, mode=None,
         None
     """
     if is_not_run_from_api():  # prevent to stdout if run from API
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 color.color_cmd("cyan") +
                 "[v] [{0}] ".format(now()) +
@@ -270,7 +269,7 @@ def error(content):
         the message in error structure - None
     """
     if is_not_run_from_api():
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 color.color_cmd("red") +
                 "[X] [{0}] ".format(now()) +
@@ -303,7 +302,7 @@ def write_to_api_console(content):
     Returns:
         None
     """
-    if version() is 2:
+    if version() == 2:
         sys.stdout.write(
             content.encode("utf8")
         )

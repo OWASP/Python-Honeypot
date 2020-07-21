@@ -3,9 +3,10 @@
 
 import os
 import inspect
-import lib
+
+import modules
 from glob import glob
-from core.compatible import is_windows
+
 from core.alert import (warn, messages)
 
 
@@ -19,8 +20,10 @@ def virtual_machine_names_to_container_names(configuration):
         list of container name in array
     """
     return [
-        "{0}_{1}".format(configuration[selected_module]["virtual_machine_name"],
-                         selected_module.rsplit("/")[1])
+        "{0}_{1}".format(
+                configuration[selected_module]["virtual_machine_name"],
+                selected_module.rsplit("/")[1]
+                )
         for selected_module in configuration
     ]
 
@@ -47,20 +50,30 @@ def load_all_modules():
         an array of all module names
     """
     # Search for Modules
-    # the modules are available in lib/modules/category_name/module_name
-    # (e.g. lib/modules/ftp/weak_password)
+    # the modules are available in
+    # modules/category_name/module_name (e.g. modules/ftp/weak_password
     # they will be listed based on the folder names and if "Dockerfile" exist!
     # structure of module name:
-    # module_name = lib/modules/(category_name/module_name)/__init.py
-    # for example:
-    # module_name = lib/modules/ftp/weak_password/__init.py = ftp/weak_password
+    # module_name = modules/(category_name/module_name)/__init.py
+    # example: module_name = modules/(ftp/weak_password)/__init.py
+    #                      = ftp/weak_password
     module_names = []
-    module_directory = os.path.dirname(inspect.getfile(lib)) + \
-                       '/modules/*/*/__init__.py'
-    for module in glob(module_directory):
-        module_name = module.rsplit('\\' if is_windows() else '/')[-3] + '/' + \
-                      module.rsplit('\\' if is_windows() else '/')[-2]
-        if os.path.exists(module.rsplit('__init__.py')[0] + '/' + 'Dockerfile'):
+    module_basepath = os.path.dirname(inspect.getfile(modules))
+    path_pattern = module_basepath + '/*/*/__init__.py'
+
+    for module in glob(path_pattern):
+
+        module_dir = os.path.split(module)[0]
+
+        sub_module_name = os.path.split(module_dir)[1]
+        category_name = os.path.split(os.path.split(module_dir)[0])[1]
+
+        module_name = category_name + '/' + sub_module_name
+
+        dockerfile_path = os.path.join(module_dir, "Dockerfile")
+
+        if os.path.exists(dockerfile_path):
+
             if module_name not in module_names:
                 module_names.append(module_name)
         else:

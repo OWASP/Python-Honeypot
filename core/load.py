@@ -22,12 +22,13 @@ from core.exit_helper import terminate_thread
 from api.server import start_api_server
 from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
                              get_module_dir_path, is_verbose_mode)
-from database.connector import (insert_bulk_events_from_thread,
-                                insert_events_in_bulk)
+from database.connector import (push_events_to_database_from_thread,
+                                push_events_queues_to_database)
+
 
 # temporary use fixed version of argparse
 if is_windows():
-    if version() is 2:
+    if version() == 2:
         from lib.argparse.v2 import argparse
     else:
         from lib.argparse.v3 import argparse
@@ -142,7 +143,10 @@ def stop_containers(configuration):
         for container in container_names:
             if container in containers_list:
                 info("killing container {0}".format(
-                    os.popen("docker kill {0}".format(container)).read().rsplit()[0]))
+                    os.popen("docker kill {0}".format(
+                        container
+                        )
+                    ).read().rsplit()[0]))
     return True
 
 
@@ -261,7 +265,8 @@ def start_containers(configuration):
     """
     for selected_module in configuration:
         # get the container name to start (organizing)
-        # using pattern name will help us to remove/modify the images and modules
+        # using pattern name will help us to remove/modify the images and
+        # modules
         container_name = virtual_machine_name_to_container_name(
             configuration[selected_module]["virtual_machine_name"],
             selected_module
@@ -272,7 +277,8 @@ def start_containers(configuration):
         # connect to owasp honeypot networks!
         # run the container with internet access
         os.popen(
-            "docker run {0} --net {4} --name={1} -d -t -p {2}:{3} {1}".format(
+            "docker run {0} --net {4} --name={1} -d -t -p {2}:{3} {1}"
+            .format(
                 " ".join(
                     configuration[selected_module]["extra_docker_options"]
                 ),
@@ -286,17 +292,19 @@ def start_containers(configuration):
         try:
             virtual_machine_ip_address = os.popen(
                 "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
-                "{{{{.IPAddress}}}}{{{{end}}}}' {0}".format(
+                "{{{{.IPAddress}}}}{{{{end}}}}' {0}"
+                .format(
                     container_name
                 )
             ).read().rsplit()[0].replace("\'", "")  # single quotes needs to be removed in windows
-        except Exception as _:
+        except Exception:
             virtual_machine_ip_address = "CANNOT_FIND_IP_ADDRESS"
         # add virtual machine IP Address to configuration
         configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
         info(
-            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}".format(
+            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}"
+            .format(
                 container_name,
                 real_machine_port,
                 virtual_machine_ip_address,
@@ -342,7 +350,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
             time.sleep(1)
             running_time += 1
             # check if running_time is equal to reset factory time
-            if running_time is virtual_machine_container_reset_factory_time_seconds:
+            if running_time == virtual_machine_container_reset_factory_time_seconds:
                 # reset the run time
                 running_time = 0
                 # stop old containers (in case they are not stopped)
@@ -352,17 +360,20 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error("Interrupting the application because network capturing thread is not alive!")
+                return error("Interrupting the application because network\
+                                capturing thread is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
-                    "Interrupting the application because \"{0}\" container(s) is(are) not alive!"
-                        .format(
+                    "Interrupting the application because \"{0}\"\
+                        container(s) is(are) not alive!"
+                    .format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
-            info("interrupted by user, please wait to stop the containers and remove the containers and images")
+            info("interrupted by user, please wait to stop the containers and\
+                 remove the containers and images")
             break
     return True
 
@@ -377,12 +388,14 @@ def honeypot_configuration_builder(selected_modules):
     Returns:
         JSON/Dict OHP configuration
     """
-    # the modules are available in lib/modules/category_name/module_name (e.g. lib/modules/ftp/weak_password
+    # the modules are available in lib/modules/category_name/module_name
+    # (e.g. lib/modules/ftp/weak_password
     # they will be listed based on the folder names and if "Dockerfile" exist!
     # the Dockerfile will be read and add into JSON configuration (dockerfile)
     honeypot_configuration = {}
     for module in selected_modules:
-        # read category configuration (e.g. ftp, ssh, http, etc..), they are located in lib/modules/category/__init__.py
+        # read category configuration (e.g. ftp, ssh, http, etc..), they are
+        # located in lib/modules/category/__init__.py
         # in the __init__.py every category has same function as below!
         # def category_configuration():
         #     return {
@@ -394,8 +407,8 @@ def honeypot_configuration_builder(selected_modules):
 
         category_configuration = getattr(
             __import__(
-                "lib.modules.{0}".
-                    format(
+                "modules.{0}"
+                .format(
                     module.rsplit("/")[0]),
                 fromlist=["category_configuration"]
             ),
@@ -421,8 +434,8 @@ def honeypot_configuration_builder(selected_modules):
         #      }
         module_configuration = getattr(
             __import__(
-                "lib.modules.{0}".
-                    format(
+                "modules.{0}"
+                .format(
                     module.replace("/", ".")
                 ), fromlist=["module_configuration"]
             ),
@@ -451,7 +464,8 @@ def honeypot_configuration_builder(selected_modules):
             ),
             "files"
         )
-        # combine Dockerfile configuration with module and category configuration
+        # combine Dockerfile configuration with module and category
+        # configuration
         honeypot_configuration[module] = combined_module_configuration
     return honeypot_configuration
 
@@ -476,7 +490,7 @@ def port_is_reserved(real_machine_port):
         )
         tcp.close()
         return False
-    except Exception as _:
+    except Exception:
         return True
 
 
@@ -495,17 +509,17 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
     while True:
         try:
             if not port_is_reserved(real_machine_port):
-                unique_port = True
+                # unique_port = True
                 configuration[module_name]["real_machine_port_number"] = real_machine_port
                 duplicated_ports = []
                 for selected_module in configuration:
                     duplicated_ports.append(
                         configuration[selected_module]["real_machine_port_number"])
-                if duplicated_ports.count(real_machine_port) is 1:
+                if duplicated_ports.count(real_machine_port) == 1:
                     info("port {0} selected for {1}".format(
                         real_machine_port, module_name))
                     return real_machine_port
-        except Exception as _:
+        except Exception:
             del _
         real_machine_port += 1
 
@@ -591,7 +605,8 @@ def argv_parser():
                            default=user_config["default_selected_modules"],
                            help=messages("en", "select_module").format(
                                load_all_modules() + ["all"]))
-    # by default all modules are selected, in case users can exclude one or some (separated with comma)
+    # by default all modules are selected, in case users can exclude one or
+    # some (separated with comma)
     engineOpt.add_argument("-x", "--exclude-module", action="store",
                            dest="excluded_modules",
                            default=user_config["default_excluded_modules"],
@@ -602,7 +617,8 @@ def argv_parser():
                            dest="virtual_machine_storage_limit", type=float,
                            default=docker_config["virtual_machine_storage_limit"],
                            help=messages("en", "vm_storage_limit"))
-    # reset the containers once in a time to prevent being continues botnet zombie
+    # reset the containers once in a time to prevent being continues botnet
+    # zombie
     engineOpt.add_argument("-r", "--vm-reset-factory-time", action="store",
                            dest="virtual_machine_container_reset_factory_time_seconds", type=int,
                            default=docker_config["virtual_machine_container_reset_factory_time_seconds"],
@@ -684,7 +700,7 @@ def load_honeypot_engine():
             # ignore if module not selected, it will remove anyway
             try:
                 selected_modules.remove(module)
-            except Exception as _:
+            except Exception:
                 del _
         # if selected modules are zero
         if not len(selected_modules):
@@ -731,7 +747,7 @@ def load_honeypot_engine():
     )
 
     bulk_events_thread = Thread(
-        target=insert_bulk_events_from_thread,
+        target=push_events_to_database_from_thread,
         args=(),
         name="insert_events_in_bulk_thread"
     )
@@ -751,7 +767,8 @@ def load_honeypot_engine():
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
-    insert_events_in_bulk()  # if in case any events that were not inserted from thread
+    # if in case any events that were not inserted from thread
+    push_events_queues_to_database()
     # stop created containers
     stop_containers(configuration)
     # stop module processor
