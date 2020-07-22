@@ -25,7 +25,6 @@ from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
 from database.connector import (push_events_to_database_from_thread,
                                 push_events_queues_to_database)
 
-
 # temporary use fixed version of argparse
 if is_windows():
     if version() == 2:
@@ -145,7 +144,7 @@ def stop_containers(configuration):
                 info("killing container {0}".format(
                     os.popen("docker kill {0}".format(
                         container
-                        )
+                    )
                     ).read().rsplit()[0]))
     return True
 
@@ -277,8 +276,7 @@ def start_containers(configuration):
         # connect to owasp honeypot networks!
         # run the container with internet access
         os.popen(
-            "docker run {0} --net {4} --name={1} -d -t -p {2}:{3} {1}"
-            .format(
+            "docker run {0} --net {4} --name={1} -d -t -p {2}:{3} {1}".format(
                 " ".join(
                     configuration[selected_module]["extra_docker_options"]
                 ),
@@ -292,8 +290,7 @@ def start_containers(configuration):
         try:
             virtual_machine_ip_address = os.popen(
                 "docker inspect -f '{{{{range.NetworkSettings.Networks}}}}"
-                "{{{{.IPAddress}}}}{{{{end}}}}' {0}"
-                .format(
+                "{{{{.IPAddress}}}}{{{{end}}}}' {0}".format(
                     container_name
                 )
             ).read().rsplit()[0].replace("\'", "")  # single quotes needs to be removed in windows
@@ -303,8 +300,7 @@ def start_containers(configuration):
         configuration[selected_module]["ip_address"] = virtual_machine_ip_address
         # print started container information
         info(
-            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}"
-            .format(
+            "container {0} started, forwarding 0.0.0.0:{1} to {2}:{3}".format(
                 container_name,
                 real_machine_port,
                 virtual_machine_ip_address,
@@ -360,19 +356,17 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error("Interrupting the application because network"+
-                                "capturing thread is not alive!")
+                return error("Interrupting the application because network " +
+                             "capturing thread is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
-                    "Interrupting the application because \"{0}\"\
-                        container(s) is(are) not alive!"
-                    .format(
+                    "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
-            info("interrupted by user, please wait to stop the containers and"+
+            info("interrupted by user, please wait to stop the containers and " +
                  "remove the containers and images")
             break
     return True
@@ -407,8 +401,7 @@ def honeypot_configuration_builder(selected_modules):
 
         category_configuration = getattr(
             __import__(
-                "modules.{0}"
-                .format(
+                "modules.{0}".format(
                     module.rsplit("/")[0]),
                 fromlist=["category_configuration"]
             ),
@@ -434,8 +427,7 @@ def honeypot_configuration_builder(selected_modules):
         #      }
         module_configuration = getattr(
             __import__(
-                "modules.{0}"
-                .format(
+                "modules.{0}".format(
                     module.replace("/", ".")
                 ), fromlist=["module_configuration"]
             ),
@@ -520,7 +512,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                         real_machine_port, module_name))
                     return real_machine_port
         except Exception:
-            del _
+            pass
         real_machine_port += 1
 
 
@@ -701,7 +693,7 @@ def load_honeypot_engine():
             try:
                 selected_modules.remove(module)
             except Exception:
-                del _
+                pass
         # if selected modules are zero
         if not len(selected_modules):
             exit_failure(messages("en", "zero_module_selected"))
