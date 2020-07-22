@@ -1,24 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import subprocess
-import netaddr
-import select
-import time
 import os
+import time
+
+import netaddr
 import pyshark
 
-from database.connector import insert_selected_modules_network_event
-from database.connector import insert_other_network_event
-from core.alert import error, info
 from config import network_configuration, protocol_table
+from core.alert import error, info, warn
 from core.get_modules import virtual_machine_name_to_container_name
-from core.alert import warn
-from core.exit_helper import exit_failure
-from core.compatible import byte_to_str
+from database.connector import (insert_to_honeypot_events_queue,
+                                insert_to_network_events_queue)
+from database.datatypes import HoneypotEvent, NetworkEvent
 
 # honeypot ports
 honeypot_ports = dict()
+
 
 def get_gateway_ip_addresses(configuration):
     """
@@ -42,8 +40,10 @@ def get_gateway_ip_addresses(configuration):
                 "{{{{.Gateway}}}}{{{{end}}}}' {0}".format(container_name)
             ).read().rsplit()[0].replace("\'", "")
             gateway_ips.append(gateway_ip)
-        except IndexError as _:
-            warn("unable to get container {0} IP address".format(container_name))
+        except IndexError:
+            warn("unable to get container {0} IP address".format(
+                                                            container_name
+                                                            ))
     return list(set(gateway_ips))
 
 
@@ -80,8 +80,9 @@ def process_packet(packet):
             protocol = protocol_table[int(packet.ip.proto)]
             port_dest = int()
             port_src = int()
-            
-            # Check packet protocol and if it contains a layer with the same name
+
+            # Check packet protocol and if it contains a layer with the same
+            # name
             if protocol == "TCP" and "TCP" in packet:
                 port_dest = packet.tcp.dstport
                 port_src = packet.tcp.srcport
@@ -94,30 +95,35 @@ def process_packet(packet):
                 # ignored ip addresses and ports in python - fix later
                 # check if the port is in selected module
 
-                if port_dest in honeypot_ports.keys() or port_src in honeypot_ports.keys():
+                if port_dest in honeypot_ports.keys() or \
+                                    port_src in honeypot_ports.keys():
+
                     if port_dest in honeypot_ports.keys():
-                        insert_selected_modules_network_event(
+                        insert_to_honeypot_events_queue(
+                            HoneypotEvent(
+                                ip_dest,
+                                port_dest,
+                                ip_src,
+                                port_src,
+                                protocol,
+                                honeypot_ports[port_dest],
+                                machine_name
+                            )
+                        )
+                else:
+                    insert_to_network_events_queue(
+                        NetworkEvent(
                             ip_dest,
                             port_dest,
                             ip_src,
                             port_src,
                             protocol,
-                            honeypot_ports[port_dest],
                             machine_name
                         )
-                else:
-                    insert_other_network_event(
-                        ip_dest,
-                        port_dest,
-                        ip_src,
-                        port_src,
-                        protocol,
-                        machine_name
                     )
 
     except Exception as _e:
         del _e
-    
 
 
 def new_network_events(configuration):
@@ -131,22 +137,37 @@ def new_network_events(configuration):
         True
     """
     info("new_network_events thread started")
-    for selected_module in configuration:
-        honeypot_ports[configuration[selected_module]["real_machine_port_number"]] = selected_module
-    
-    # get ip addresses
-    virtual_machine_ip_addresses = [configuration[selected_module]["ip_address"] for selected_module in configuration]
-    # ignore vm ips + ips in config.py
-    ignore_ip_addresses = network_configuration()["ignore_real_machine_ip_addresses"] \
-        if network_configuration()["ignore_real_machine_ip_address"] else [] + virtual_machine_ip_addresses \
-        if network_configuration()["ignore_virtual_machine_ip_addresses"] else []
-    ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
-    # ignore ports
-    ignore_ports = network_configuration()["ignore_real_machine_ports"]
-    # start tshark to capture network
-    # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
 
-    store_captured_traffic = network_configuration()["store_network_captured_files"]
+    for selected_module in configuration:
+        port_number = \
+            configuration[selected_module]["real_machine_port_number"]
+
+        honeypot_ports[port_number] = selected_module
+
+    network_config = network_configuration()
+    # get ip addresses
+    virtual_machine_ip_addresses = \
+        [configuration[selected_module]["ip_address"]
+            for selected_module in configuration]
+
+    # Ignore VM IPs + IPs in config.py
+    # VM = virtual machine, RM = real machine
+    ignore_rm_ip_addresses = \
+        network_config["ignore_real_machine_ip_address"]
+    ignore_vm_ip_addresses = \
+        network_config["ignore_virtual_machine_ip_addresses"]
+
+    # Ignore real machine IPs
+    ignore_ip_addresses = network_config["ignore_real_machine_ip_addresses"] \
+        if ignore_rm_ip_addresses else [] + virtual_machine_ip_addresses \
+        if ignore_vm_ip_addresses else []
+
+    ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
+
+    # Ignore ports
+    ignore_ports = network_config["ignore_real_machine_ports"]
+
+    store_captured_traffic = network_config["store_network_captured_files"]
 
     # Display filter to be applied to the Live Captured network traffic
     display_filter = ""
@@ -167,17 +188,24 @@ def new_network_events(configuration):
     output_file_path = os.path.join("tmp", output_file_name)
 
     try:
-        
+
         if store_captured_traffic:
-            capture = pyshark.LiveCapture(interface='any', display_filter=display_filter, output_file=output_file_path)
+            capture = pyshark.LiveCapture(
+                                        interface='any',
+                                        display_filter=display_filter,
+                                        output_file=output_file_path
+                                    )
         else:
-            capture = pyshark.LiveCapture(interface='any', display_filter=display_filter)
+            capture = pyshark.LiveCapture(
+                                        interface='any',
+                                        display_filter=display_filter
+                                    )
 
         # Debug option for pyshark capture
         # capture.set_debug()
-        
+
         # Applied on every packet captured by pyshark LiveCapture
-        capture.apply_on_packets(process_packet)       
+        capture.apply_on_packets(process_packet)
 
     except Exception as _e:
         error(_e)
