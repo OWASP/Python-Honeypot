@@ -59,7 +59,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     """
     rules = []
     for ip_address in ignore_ip_addresses:
-        rules.append("-Y ip.dst != {0}".format(ip_address))
+        rules.append("-Y ip.dst!={0}".format(ip_address))
     return rules
 
 
@@ -200,7 +200,6 @@ def new_network_events(configuration):
                                         interface='any',
                                         display_filter=display_filter
                                     )
-
         # Debug option for pyshark capture
         # capture.set_debug()
 
