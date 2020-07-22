@@ -1,5 +1,5 @@
-pymongo==3.9.0
-netaddr==0.7.19
-flask==1.1.1
+pymongo==3.10.1
+netaddr==0.8.0
+flask==1.1.2
 terminable_thread==0.7.1
 watchdog==0.10.2

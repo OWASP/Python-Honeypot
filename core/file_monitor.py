@@ -4,7 +4,8 @@
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from database.connector import insert_file_change_events
+from database.connector import insert_to_file_change_events_collection
+from database.datatypes import FileEventsData
 from core.alert import info
 from core.compatible import byte_to_str
 from core.time_helper import now
@@ -33,12 +34,13 @@ class ContainerFilesHandler(FileSystemEventHandler):
 
     def on_any_event(self,event):
         if not (event.event_type == 'modified' and event.is_directory) and is_excluded(event.src_path, self.EXCLUDES):
-            insert_file_change_events(
-                byte_to_str(event.src_path),
-                byte_to_str(event.event_type),
-                self.module_name,
-                now()
-            )
+            insert_to_file_change_events_collection(
+                FileEventsData(
+                file_path = byte_to_str(event.src_path),
+                status = byte_to_str(event.event_type),
+                module_name= self.module_name,
+                date = now()
+            ))
             info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 
