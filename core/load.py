@@ -360,8 +360,8 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error("Interrupting the application because network\
-                                capturing thread is not alive!")
+                return error("Interrupting the application because network"+
+                                "capturing thread is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
                     "Interrupting the application because \"{0}\"\
@@ -372,8 +372,8 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                 )
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
-            info("interrupted by user, please wait to stop the containers and\
-                 remove the containers and images")
+            info("interrupted by user, please wait to stop the containers and"+
+                 "remove the containers and images")
             break
     return True
 
