@@ -13,7 +13,7 @@ def __log_into_file(filename, mode, data):
         True if success otherwise None
     """
     log = ''
-    if version() is 2:
+    if version() == 2:
         if isinstance(data, str):
             try:
                 log = json.loads(data)
