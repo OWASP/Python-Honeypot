@@ -57,7 +57,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     """
     rules = []
     for ip_address in ignore_ip_addresses:
-        rules.append("-Y ip.dst != {0}".format(ip_address))
+        rules.append("-Y ip.dst!={0}".format(ip_address))
     return rules
 
 
@@ -169,7 +169,7 @@ def new_network_events(configuration):
                                     )
                                 )
                     except Exception:
-                        del _
+                        pass
                     # check if event shows an IP
             time.sleep(0.001)
             # todo: is sleep(0.001) fastest/best?
