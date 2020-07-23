@@ -58,8 +58,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
     if is_verbose_mode():
         verbose_info(
             "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}"
-            .format(
+            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
                 honeypot_event.ip_dest,
                 honeypot_event.port_dest,
                 honeypot_event.ip_src,
@@ -100,8 +99,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
     if is_verbose_mode():
         verbose_info(
             "Received network event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, machine_name:{4}"
-            .format(
+            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
                 network_event.ip_dest,
                 network_event.port_dest,
                 network_event.ip_src,
@@ -200,17 +198,13 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
-def insert_to_events_data_collection(
-        event_data: EventData):
+def insert_to_events_data_collection(event_data: EventData):
     """
     Insert data collected from module processors of modules such as-
     ICS module
 
     Args:
-        ip : client ip used for putting the data
-        module_name : on which module client accessed
-        date : datetime of the events
-        data : Data which is obtained from the client
+        event_data: contain ip, module_name, machine_name, date, data
 
     Returns:
         inserted_id
@@ -226,8 +220,7 @@ def insert_to_events_data_collection(
     if is_verbose_mode():
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
-            "machine_name:{2}, data:{3}"
-            .format(
+            "machine_name:{2}, data:{3}".format(
                 event_data.ip,
                 event_data.module_name,
                 event_data.machine_name,
