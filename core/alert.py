@@ -3,7 +3,7 @@
 
 import os
 import sys
-# import json
+import json
 from core import color
 from core.compatible import version
 from core.time_helper import now
