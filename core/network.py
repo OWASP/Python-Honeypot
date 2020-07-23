@@ -41,9 +41,11 @@ def get_gateway_ip_addresses(configuration):
             ).read().rsplit()[0].replace("\'", "")
             gateway_ips.append(gateway_ip)
         except IndexError:
-            warn("unable to get container {0} IP address".format(
-                                                            container_name
-                                                            ))
+            warn(
+                "unable to get container {0} IP address".format(
+                    container_name
+                )
+            )
     return list(set(gateway_ips))
 
 
@@ -91,12 +93,12 @@ def process_packet(packet):
                 port_dest = packet.udp.dstport
                 port_src = packet.udp.srcport
 
-            if (netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest)):
+            if netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest):
                 # ignored ip addresses and ports in python - fix later
                 # check if the port is in selected module
 
                 if port_dest in honeypot_ports.keys() or \
-                                    port_src in honeypot_ports.keys():
+                        port_src in honeypot_ports.keys():
 
                     if port_dest in honeypot_ports.keys():
                         insert_to_honeypot_events_queue(
@@ -148,7 +150,7 @@ def new_network_events(configuration):
     # get ip addresses
     virtual_machine_ip_addresses = \
         [configuration[selected_module]["ip_address"]
-            for selected_module in configuration]
+         for selected_module in configuration]
 
     # Ignore VM IPs + IPs in config.py
     # VM = virtual machine, RM = real machine
@@ -170,18 +172,9 @@ def new_network_events(configuration):
     store_captured_traffic = network_config["store_network_captured_files"]
 
     # Display filter to be applied to the Live Captured network traffic
-    display_filter = ""
-
-    for ip in ignore_ip_addresses:
-        display_filter += "ip.src != " + ip +\
-                     " and ip.dst != " + ip + " and "
-
-    for port in ignore_ports:
-        display_filter += "tcp.srcport != " + port +\
-                     " and tcp.dstport != " + port + " and "
-
-    # Remove the last " and " substring from the display_filter string
-    display_filter = display_filter[:-5]
+    display_filter = ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ip_addresses])
+    display_filter += ' and ' if ignore_ip_addresses else ""
+    display_filter += ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ports])
 
     # File path of the network capture file with the timestamp
     output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
@@ -191,15 +184,15 @@ def new_network_events(configuration):
 
         if store_captured_traffic:
             capture = pyshark.LiveCapture(
-                                        interface='any',
-                                        display_filter=display_filter,
-                                        output_file=output_file_path
-                                    )
+                interface='any',
+                display_filter=display_filter,
+                output_file=output_file_path
+            )
         else:
             capture = pyshark.LiveCapture(
-                                        interface='any',
-                                        display_filter=display_filter
-                                    )
+                interface='any',
+                display_filter=display_filter
+            )
         # Debug option for pyshark capture
         # capture.set_debug()
 
