@@ -173,8 +173,8 @@ def new_network_events(configuration):
 
     # Display filter to be applied to the Live Captured network traffic
     display_filter = ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ip_addresses])
-    display_filter += ' and ' if ignore_ip_addresses else ""
-    display_filter += ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ports])
+    display_filter += ' and ' if ignore_ports else ""
+    display_filter += ' and '.join(['tcp.srcport!={0} and tcp.dstport!={0}'.format(_) for _ in ignore_ports])
 
     # File path of the network capture file with the timestamp
     output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
