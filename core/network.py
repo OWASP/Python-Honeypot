@@ -173,7 +173,7 @@ def new_network_events(configuration):
 
     # Display filter to be applied to the Live Captured network traffic
     display_filter = ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ip_addresses])
-    display_filter += ' and ' if ignore_ports else ""
+    display_filter += ' and ' if ignore_ip_addresses and ignore_ports else ""
     display_filter += ' and '.join(['tcp.srcport!={0} and tcp.dstport!={0}'.format(_) for _ in ignore_ports])
 
     # File path of the network capture file with the timestamp
@@ -200,8 +200,8 @@ def new_network_events(configuration):
         capture.apply_on_packets(process_packet)
 
     except Exception as _e:
-        error(_e)
-        del _e
+        # _e is Runtime, we've to convert it to str before calling error()
+        error(str(_e))
 
     finally:
         capture.clear()
