@@ -169,8 +169,6 @@ def new_network_events(configuration):
     # Ignore ports
     ignore_ports = network_config["ignore_real_machine_ports"]
 
-    store_captured_traffic = network_config["store_network_captured_files"]
-
     # Display filter to be applied to the Live Captured network traffic
     display_filter = ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ip_addresses])
     display_filter += ' and ' if ignore_ip_addresses and ignore_ports else ""
@@ -181,22 +179,15 @@ def new_network_events(configuration):
     output_file_path = os.path.join("tmp", output_file_name)
 
     try:
-
-        if store_captured_traffic:
-            capture = pyshark.LiveCapture(
-                interface='any',
-                display_filter=display_filter,
-                output_file=output_file_path
-            )
-        else:
-            capture = pyshark.LiveCapture(
-                interface='any',
-                display_filter=display_filter
-            )
+        capture = pyshark.LiveCapture(
+            interface='any',
+            display_filter=display_filter,
+            output_file=output_file_path if network_config["store_network_captured_files"] else None
+        )
         # Debug option for pyshark capture
         # capture.set_debug()
-
         # Applied on every packet captured by pyshark LiveCapture
+
         capture.apply_on_packets(process_packet)
 
     except Exception as _e:
