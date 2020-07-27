@@ -326,9 +326,8 @@ def containers_are_unhealthy(configuration):
             if containter not in current_running_containers]
 
 
-def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
-                         configuration,
-                         new_network_events_thread):
+def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration,
+                         new_network_events_thread, run_as_test):
     """
     wait for opened threads/honeypots modules
 
@@ -364,6 +363,8 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
+            if run_as_test:
+                break
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
             info("interrupted by user, please wait to stop the containers and " +
@@ -668,7 +669,7 @@ def load_honeypot_engine():
     # Check if the script is running with sudo
     if not os.geteuid() == 0:
         exit_failure("The script must be run as root!")
-    
+
     # check selected modules
     if argv_options.selected_modules:
         selected_modules = list(set(argv_options.selected_modules.rsplit(",")))
@@ -753,14 +754,13 @@ def load_honeypot_engine():
     # run module processors
     run_modules_processors(configuration)
 
-    # check if it's not a test
-    if not run_as_test:
-        # wait forever! in case user can send ctrl + c to interrupt
-        wait_until_interrupt(
-            virtual_machine_container_reset_factory_time_seconds,
-            configuration,
-            new_network_events_thread
-        )
+    # wait forever! in case user can send ctrl + c to interrupt
+    wait_until_interrupt(
+        virtual_machine_container_reset_factory_time_seconds,
+        configuration,
+        new_network_events_thread,
+        run_as_test
+    )
     # kill the network events thread
     terminate_thread(new_network_events_thread)
     terminate_thread(bulk_events_thread)
