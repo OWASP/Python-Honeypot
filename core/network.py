@@ -194,8 +194,8 @@ def new_network_events(configuration):
         # _e is Runtime, we've to convert it to str before calling error()
         error(str(_e))
 
-    finally:
-        capture.clear()
-        capture.close()
+    # finally:
+    #     capture.clear()
+    #     capture.close()
 
     return True
