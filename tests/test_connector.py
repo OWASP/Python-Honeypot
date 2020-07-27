@@ -24,6 +24,7 @@ class TestConnector(unittest.TestCase):
             port_dest=80,
             ip_src="12.23.34.45",
             port_src=1010,
+            protocol='TCP',
             module_name="http/basic_auth_weak_password",
             machine_name="stockholm_server_1"
         )
@@ -33,6 +34,7 @@ class TestConnector(unittest.TestCase):
             port_dest=8090,
             ip_src="22.33.44.55",
             port_src=1100,
+            protocol='UDP',
             machine_name="stockholm_server_1"
         )
 
