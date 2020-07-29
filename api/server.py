@@ -2,33 +2,24 @@
 # -*- coding: utf-8 -*-
 
 import os
-from flask import Flask
-from flask import render_template
-from flask import Response
-from flask import abort
+
+from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
-from flask import jsonify
+
+from api.database_queries import (group_by_ip_dest,
+                                  group_by_ip_dest_and_password,
+                                  group_by_ip_dest_and_username, sort_by_count,
+                                  sort_by_count_and_id, top_countries_groupby,
+                                  top_ip_dests_groupby,
+                                  top_machine_names_groupby,
+                                  top_port_dests_groupby)
+from api.utility import (aggregate_function, all_mime_types, fix_date,
+                         fix_limit, fix_skip, flask_null_array_response,
+                         msg_structure, root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
 from database import connector
-from api.database_queries import top_ip_dests_groupby
-from api.database_queries import top_machine_names_groupby
-from api.database_queries import top_port_dests_groupby
-from api.database_queries import top_countries_groupby
-from api.database_queries import sort_by_count
-from api.database_queries import sort_by_count_and_id
-from api.database_queries import group_by_ip_dest
-from api.database_queries import group_by_ip_dest_and_password
-from api.database_queries import group_by_ip_dest_and_username
-from api.utility import msg_structure
-from api.utility import all_mime_types
-from api.utility import root_dir
-from api.utility import fix_date
-from api.utility import fix_limit
-from api.utility import fix_skip
-from api.utility import flask_null_array_response
-from api.utility import aggregate_function
 
 template_dir = os.path.join(
     os.path.join(
@@ -61,7 +52,7 @@ def get_file(filename):
     try:
         src = os.path.join(root_dir(), filename)
         return open(src, 'rb').read()
-    except IOError as _:
+    except IOError:
         abort(404)
 
 
@@ -75,21 +66,20 @@ def get_value_from_request(_key):
     Returns:
         the value content if found otherwise None
     """
-    global flask_request
     try:
-        key = flask_request.args[_key]
-    except Exception as _:
+        value = flask_request.args[_key]
+    except Exception:
         try:
-            key = flask_request.form[_key]
-        except Exception as _:
+            value = flask_request.form[_key]
+        except Exception:
             try:
-                key = flask_request.cookies[_key]
-            except Exception as _:
-                key = None
-    if key:
+                value = flask_request.cookies[_key]
+            except Exception:
+                value = None
+    if value:
         # todo: fix it later
-        key = key.replace("\\\"", "\"").replace("\\\'", "\'")
-    return key
+        value = value.replace("\\\"", "\"").replace("\\\'", "\'")
+    return value
 
 
 def is_authorized():
@@ -100,9 +90,11 @@ def is_authorized():
         200 HTTP code if it's valid otherwise 401 error
 
     """
-    global app
-    if app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] is not None \
-            and app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"] != get_value_from_request("key"):
+    api_access_key = app.config["OWASP_HONEYPOT_CONFIG"]["api_access_key"]
+
+    key_from_request = get_value_from_request("key")
+
+    if api_access_key is not None and api_access_key != key_from_request:
         abort(401, "invalid API key")
     return True
 
@@ -175,16 +167,24 @@ def error_404(error):
 @app.before_request
 def authorization_check():
     """
-    check if IP filtering applied and API address is in whitelist also API Key is valid
+    check if IP filtering applied and API address is in whitelist also
+    API Key is valid
 
     Returns:
         None or Abort(403) or Abort(401)
     """
     # IP Limitation
-    if app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]:
-        if flask_request.remote_addr not in app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]:
+    white_list_enabled = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]
+    white_list_ips = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]
+    api_access_without_key = \
+        app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]
+
+    if white_list_enabled:
+        if flask_request.remote_addr not in white_list_ips:
             abort(403, "unauthorized IP")
-    if not app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]:
+    if not api_access_without_key:
         is_authorized()
     return
 
@@ -216,7 +216,8 @@ def get_static_files(path):
     return Response(
         get_file(
             os.path.join(
-                root_dir(), path
+                root_dir(),
+                path
             )
         ),
         mimetype=static_types.get(
@@ -260,19 +261,20 @@ def count_all_events():
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
                     "count_all_events": (
-                            connector.honeypot_events.estimated_document_count() +
+                            connector.honeypot_events.estimated_document_count()
+                            +
                             connector.network_events.estimated_document_count()
                     )
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -291,27 +293,29 @@ def count_honeypot_events():
         try:
             return jsonify(
                 {
-                    "count_honeypot_events_by_date": connector.honeypot_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
+                    "count_honeypot_events_by_date":
+                        connector.honeypot_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
                             }
-                        }
-                    ),
+                        ),
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
-                    "count_honeypot_events": connector.honeypot_events.estimated_document_count()
+                    "count_honeypot_events":
+                        connector.honeypot_events.estimated_document_count()
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -330,28 +334,30 @@ def count_network_events():
         try:
             return jsonify(
                 {
-                    "count_network_events_by_date": connector.network_events.count_documents(
-                        {
-                            "date":
-                                {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                        }
-                    ),
+                    "count_network_events_by_date":
+                        connector.network_events.count_documents(
+                            {
+                                "date":
+                                    {
+                                        "$gte": date[0],
+                                        "$lte": date[1]
+                                    }
+                            }
+                        ),
                     "date": date
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
             return jsonify(
                 {
-                    "count_network_events": connector.network_events.estimated_document_count()
+                    "count_network_events":
+                        connector.network_events.estimated_document_count()
                 }
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -422,7 +428,7 @@ def top_ten_ips_in_honeypot_events():
                 top_ips_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -495,7 +501,7 @@ def top_ten_ips_in_network_events():
                 top_ips_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -563,7 +569,7 @@ def top_ten_ports_in_honeypot_events():
                 top_ports_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -631,7 +637,7 @@ def top_ten_ports_in_network_events():
                 top_ports_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -673,7 +679,7 @@ def get_honeypot_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
@@ -696,7 +702,7 @@ def get_honeypot_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -738,7 +744,7 @@ def get_network_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
     else:
         try:
@@ -761,7 +767,7 @@ def get_network_events():
                     )
                 ]
             ), 200
-        except Exception as _:
+        except Exception:
             return flask_null_array_response()
 
 
@@ -822,7 +828,7 @@ def top_ten_countries_in_honeypot_events():
                 top_countries_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -883,7 +889,7 @@ def top_ten_countries_in_network_events():
                 top_countries_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -930,7 +936,7 @@ def top_network_machine_names():
                 top_machinenames_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -976,7 +982,7 @@ def top_honeypot_machine_names():
                 top_machinenames_query
             )
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1008,7 +1014,7 @@ def module_events():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1040,7 +1046,7 @@ def top_usernames_used():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1072,7 +1078,7 @@ def top_passwords_used():
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1089,7 +1095,7 @@ def all_module_names():
         return jsonify(
             {"module_names": module_names}
         ), 200
-    except Exception as _:
+    except Exception:
         return flask_null_array_response()
 
 
@@ -1102,20 +1108,36 @@ def start_api_server():
     """
     # Starting the API
     my_api_configuration = api_configuration()
+    api_access_key = my_api_configuration["api_access_key"]
+    api_access_without_key = my_api_configuration["api_access_without_key"]
+
     write_to_api_console(
         " * API access key: {0}\n".format(
-            my_api_configuration["api_access_key"] if not my_api_configuration["api_access_without_key"]
+            api_access_key
+            if not api_access_without_key
             else "NOT REQUIRED!"
         )
     )
-    global app
+
     app.config["OWASP_HONEYPOT_CONFIG"] = {
-        "api_access_key": my_api_configuration["api_access_key"],
-        "api_client_white_list": my_api_configuration["api_client_white_list"]["enabled"],
-        "api_client_white_list_ips": my_api_configuration["api_client_white_list"]["ips"],
-        "api_access_log": my_api_configuration["api_access_log"]["enabled"],
-        "api_access_log_filename": my_api_configuration["api_access_log"]["filename"],
-        "api_access_without_key": my_api_configuration["api_access_without_key"],
+        "api_access_key":
+            api_access_key,
+
+        "api_client_white_list":
+            my_api_configuration["api_client_white_list"]["enabled"],
+
+        "api_client_white_list_ips":
+            my_api_configuration["api_client_white_list"]["ips"],
+
+        "api_access_log":
+            my_api_configuration["api_access_log"]["enabled"],
+
+        "api_access_log_filename":
+            my_api_configuration["api_access_log"]["filename"],
+
+        "api_access_without_key":
+            api_access_without_key,
+
         "language": "en"
     }
     app.run(

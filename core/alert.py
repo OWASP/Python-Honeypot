@@ -3,7 +3,7 @@
 
 import os
 import sys
-import json
+# import json
 from core import color
 from core.compatible import version
 from core.time_helper import now
@@ -16,7 +16,8 @@ def is_not_run_from_api():
     Returns:
         True if run from API otherwise False
     """
-    if "--start-api-server" in sys.argv or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
+    if "--start-api-server" in sys.argv \
+            or (len(sys.argv) == 4 and "transforms" in sys.argv[1]):
         return False
     return True
 
@@ -30,10 +31,12 @@ def messages(language, msg_id):
         msg_id: message id
 
     Returns:
-        the message content in the selected language if message found otherwise return message in English
+        the message content in the selected language if message found \
+        otherwise return message in English
     """
     # Returning selected language
-    if language is -1:
+    # todo: fix -1 to a variable name or add comment
+    if language == -1:
         return list(
             set(
                 [
@@ -58,7 +61,7 @@ def messages(language, msg_id):
             ),
             "all_messages"
         )()[str(msg_id)]
-    except Exception as _:
+    except Exception:
         msgs = getattr(
             __import__(
                 "lib.language.messages_en",
@@ -66,7 +69,7 @@ def messages(language, msg_id):
             ),
             "all_messages"
         )()[str(msg_id)]
-    if version() is 2:
+    if version() == 2:
         return msgs.decode("utf8")
     return msgs
 
@@ -81,25 +84,27 @@ def input_msg(content):
     Returns:
         the message in input structure
     """
-    if version() is 2:
-        return color.color("yellow") + \
+    if version() == 2:
+        return color.color_cmd("yellow") + \
                "[+] " + \
-               color.color("green") + \
+               color.color_cmd("green") + \
                content.encode("utf8") + \
-               color.color("reset")
+               color.color_cmd("reset")
     else:
         return bytes(
-            color.color("yellow") +
-            "[+] " + color.color("green") +
+            color.color_cmd("yellow") +
+            "[+] " + color.color_cmd("green") +
             content +
-            color.color("reset"),
+            color.color_cmd("reset"),
             "utf8"
         )
 
 
-def info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
+def info(content, log_in_file=None, mode=None,
+         event=None, language=None, thread_tmp_filename=None):
     """
-    build the info message, log the message in database if requested, rewrite the thread temporary file
+    build the info message, log the message in
+    database if requested, rewrite the thread temporary file
 
     Args:
         content: content of the message
@@ -113,33 +118,35 @@ def info(content, log_in_file=None, mode=None, event=None, language=None, thread
         None
     """
     if is_not_run_from_api():  # prevent to stdout if run from API
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
-                color.color("yellow") +
+                color.color_cmd("yellow") +
                 "[+] [{0}] ".format(now()) +
-                color.color("green") +
+                color.color_cmd("green") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("yellow") +
+                    color.color_cmd("yellow") +
                     "[+] [{0}] ".format(now()) +
-                    color.color("green") +
+                    color.color_cmd("green") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8"
                 )
             )
             sys.stdout.flush()
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event), language)
-        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
-            __log_into_file(thread_tmp_filename, "w", "0", language)
+    # TODO: implement log functionality later
+    # if event:  # if an event is present log it
+    #     from core.log import __log_into_file
+    #     __log_into_file(log_in_file, mode, json.dumps(event), language)
+    #     # if thread temporary filename present, rewrite it
+    #     if thread_tmp_filename:
+    #         __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
 
@@ -154,7 +161,7 @@ def write(content):
         None
     """
     if is_not_run_from_api():
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
                 content.encode("utf8")
             )
@@ -177,23 +184,23 @@ def warn(content):
         the message in warn structure - None
     """
     if is_not_run_from_api():
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
-                color.color("blue") +
+                color.color_cmd("blue") +
                 "[!] [{0}] ".format(now()) +
-                color.color("yellow") +
+                color.color_cmd("yellow") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("blue") +
+                    color.color_cmd("blue") +
                     "[!] [{0}] ".format(now()) +
-                    color.color("yellow") +
+                    color.color_cmd("yellow") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8")
             )
@@ -201,9 +208,11 @@ def warn(content):
     return
 
 
-def verbose_info(content, log_in_file=None, mode=None, event=None, language=None, thread_tmp_filename=None):
+def verbose_info(content, log_in_file=None, mode=None,
+                 event=None, language=None, thread_tmp_filename=None):
     """
-    build the info message, log the message in database if requested, rewrite the thread temporary file
+    build the info message, log the message in database
+    if requested, rewrite the thread temporary file
 
     Args:
         content: content of the message
@@ -217,33 +226,35 @@ def verbose_info(content, log_in_file=None, mode=None, event=None, language=None
         None
     """
     if is_not_run_from_api():  # prevent to stdout if run from API
-        if version() is 2:
+        if version() == 2:
             sys.stdout.write(
-                color.color("cyan") +
+                color.color_cmd("cyan") +
                 "[v] [{0}] ".format(now()) +
-                color.color("grey") +
+                color.color_cmd("grey") +
                 content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("reset") +
                 "\n"
             )
         else:
             sys.stdout.buffer.write(
                 bytes(
-                    color.color("cyan") +
+                    color.color_cmd("cyan") +
                     "[v] [{0}] ".format(now()) +
-                    color.color("grey") +
+                    color.color_cmd("grey") +
                     content +
-                    color.color("reset") +
+                    color.color_cmd("reset") +
                     "\n",
                     "utf8"
                 )
             )
             sys.stdout.flush()
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event), language)
-        if thread_tmp_filename:  # if thread temporary filename present, rewrite it
-            __log_into_file(thread_tmp_filename, "w", "0", language)
+    # TODO: implement log functionality later
+    # if event:  # if an event is present log it
+    #     from core.log import __log_into_file
+    #     __log_into_file(log_in_file, mode, json.dumps(event), language)
+    #     # if thread temporary filename present, rewrite it
+    #     if thread_tmp_filename:
+    #         __log_into_file(thread_tmp_filename, "w", "0", language)
     return
 
 
@@ -257,27 +268,27 @@ def error(content):
     Returns:
         the message in error structure - None
     """
-    if is_not_run_from_api():
-        if version() is 2:
-            sys.stdout.write(
-                color.color("red") +
+
+    if version() == 2:
+        sys.stdout.write(
+            color.color_cmd("red") +
+            "[X] [{0}] ".format(now()) +
+            color.color_cmd("yellow") +
+            content.encode("utf8") +
+            color.color_cmd("reset") +
+            "\n"
+        )
+    else:
+        sys.stdout.buffer.write(
+            (
+                color.color_cmd("red") +
                 "[X] [{0}] ".format(now()) +
-                color.color("yellow") +
-                content.encode("utf8") +
-                color.color("reset") +
+                color.color_cmd("yellow") +
+                content + color.color_cmd("reset") +
                 "\n"
-            )
-        else:
-            sys.stdout.buffer.write(
-                (
-                        color.color("red") +
-                        "[X] [{0}] ".format(now()) +
-                        color.color("yellow") +
-                        content + color.color("reset") +
-                        "\n"
-                ).encode("utf8")
-            )
-            sys.stdout.flush()
+            ).encode("utf8")
+        )
+        sys.stdout.flush()
     return
 
 
@@ -291,7 +302,7 @@ def write_to_api_console(content):
     Returns:
         None
     """
-    if version() is 2:
+    if version() == 2:
         sys.stdout.write(
             content.encode("utf8")
         )
