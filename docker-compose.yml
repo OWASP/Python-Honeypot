@@ -18,22 +18,6 @@ services:
     depends_on:
         - mongodb
 
-  modules:
-    build: .
-    command: python3 ohp.py -m all
-    ports:
-      - 8080:80
-    environment:
-      - DOCKER_ENV=1
-      - DOCKER_API_VERSION=1.39
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - .:/OWASP-Honeypot
-    links:
-      - mongodb
-    depends_on:
-      - mongodb
-
   mongodb:
     image: mongo:latest
     container_name: "mongodb"
