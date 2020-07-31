@@ -17,6 +17,13 @@ body {
     text-decoration-color: black;
 }
 
+.log-explorer-label{
+    cursor: pointer;
+    font-size: medium;
+    color: #000;
+    font-weight: bold;
+}
+
 #datatable{
     float: center;
 }

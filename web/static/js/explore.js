@@ -30,7 +30,7 @@ function load_module_options(){
 function get_export_fileName(file_type){
   var d = new Date();
   var n = d.getTime();
-  return './Honeypot-data-' + file_type + '-' + n ;
+  return 'Honeypot-data-' + file_type + '-' + n ;
 }
 
 
@@ -205,5 +205,22 @@ function change_form(){
     }
     
 }
+
+/**
+ * Show the log explorer form and table
+ */
+function get_explorer(){
+  document.getElementById("data-plots").hidden=true;
+  document.getElementById("log-explorer-form").hidden=false;
+  document.getElementById("log-explorer-table").hidden=false;
+}
+
+
+function get_data_plots(){
+  document.getElementById("data-plots").hidden=false;
+  document.getElementById("log-explorer-form").hidden=true;
+  document.getElementById("log-explorer-table").hidden=true;
+}
+
 
 load_module_options();
