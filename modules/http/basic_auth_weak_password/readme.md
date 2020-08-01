@@ -1,7 +1,8 @@
-### Docker apache2
+# Docker apache2
 
 * C-Styled files
 * `.htaccess`
+
 ```
 AuthType Basic
 AuthName "Restricted Content"
