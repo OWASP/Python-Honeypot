@@ -51,7 +51,7 @@ def module_configuration():
     """
     return {
         "username": "root",
-        "password": "123456",
+        "password": generate_token(16),
         "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }
