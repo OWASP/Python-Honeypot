@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Credits : https://github.com/awhitehatter/mailoney
+"""
 
 import socket
 import sys
@@ -11,10 +16,13 @@ import os
 import json
 
 
-MAILSERVER_NAME= 'OWASP Python Honeypot'
+MAILSERVER_NAME = "OWASP Python Honeypot"
 BIND_IP='0.0.0.0'
 BIND_PORT=587
 LOGFILE = '/root/logs/ohp_smtp_honeypot_logs.txt'
+__version__ = 'ESMTP Exim 4.69 #1 Thu, 29 Jul 2010 05:13:48 -0700'
+EMPTYSTRING = ''
+NEWLINE = '\n'
 
 output_lock = threading.Lock()
 hpc,hpfeeds_prefix = None,""
@@ -30,7 +38,8 @@ def log_to_file(ip, port, data):
                     "data": data,
                     "port": port,
                     "module_name": "smtp/mail_honeypot",
-                    'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    'date': datetime.datetime.now().\
+                    strftime("%Y-%m-%d %H:%M:%S")
                 }
             ) + "\n"
         )
@@ -41,11 +50,8 @@ def log_to_file(ip, port, data):
     #with output_lock:
         #with open(file_path, "a") as f:
     message = "[{0}][{1}:{2}] {3}".format(time.time(), ip, port, data)
-    print(message)
+    #print(message)
 
-__version__ = 'ESMTP Exim 4.69 #1 Thu, 29 Jul 2010 05:13:48 -0700'
-EMPTYSTRING = ''
-NEWLINE = '\n'
 
 
 class SMTPChannel(asynchat.async_chat):
@@ -128,7 +134,10 @@ class SMTPChannel(asynchat.async_chat):
                 else:
                     data.append(text)
             self.__data = NEWLINE.join(data)
-            status = self.__server.process_message(self.__peer, self.__mailfrom, self.__rcpttos, self.__data)
+            status = self.__server.process_message(self.__peer, \
+                                                   self.__mailfrom,\
+                                                   self.__rcpttos,\
+                                                   self.__data)
             self.__rcpttos = []
             self.__mailfrom = None
             self.__state = self.COMMAND
@@ -157,7 +166,8 @@ class SMTPChannel(asynchat.async_chat):
             self.push('503 Duplicate HELO/EHLO')
         else:
             self.__greeting = arg
-            self.push('250-{0} Hello {1} [{2}]'.format(self.__fqdn, arg, self.__addr[0]))
+            self.push('250-{0} Hello {1} [{2}]'.format(self.__fqdn, \
+                                                       arg, self.__addr[0]))
             self.push('250-SIZE 52428800')
             self.push('250 AUTH LOGIN PLAIN')
 
@@ -257,7 +267,9 @@ class SMTPServer(asyncore.dispatcher):
             raise
         else:
             pass
-            #print >> DEBUGSTREAM, '%s started at %s\n\tLocal addr: %s\n\tRemote addr:%s' % (self.__class__.__name__, time.ctime(time.time()), localaddr, remoteaddr)
+            #print (DEBUGSTREAM, '%s started at %s\n\tLocal addr: \
+            #    %s\n\t\Remote addr:%s' % (self.__class__.__name__,\
+            #time.ctime(time.time()), localaddr, remoteaddr)
 
     def handle_accept(self):
         pair = self.accept()
@@ -305,7 +317,8 @@ def module():
             log_to_file(peer[0], peer[1], '')
             log_to_file(peer[0], peer[1], '*' * 50)
             log_to_file(peer[0], peer[1], 'Mail from: {0}'.format(mailfrom))
-            log_to_file(peer[0], peer[1], 'Mail to: {0}'.format(", ".join(rcpttos)))
+            log_to_file(peer[0], peer[1], 'Mail to: {0}'.format(", ".\
+                                                                join(rcpttos)))
             log_to_file(peer[0], peer[1], data)
 
             loghpfeeds = {}
