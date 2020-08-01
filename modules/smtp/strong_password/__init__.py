@@ -5,8 +5,8 @@ import time
 import os
 import json
 from core.compatible import generate_token
-from database.connector import \
-    insert_honeypot_events_data_from_module_processor
+from database.connector import insert_to_events_data_collection
+from database.datatypes import EventData
 
 
 class ModuleProcessor:
@@ -32,11 +32,13 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    insert_honeypot_events_data_from_module_processor(
-                        data['ip'],
-                        data['module_name'],
-                        data['date'],
-                        data['data'],
+                    insert_to_events_data_collection(
+                        EventData(
+                            ip= data['ip'],
+                            module_name = data['module_name'],
+                            date = data['date'],
+                            data = data['data'],
+                        )
                     )
                 os.remove(self.log_filename_dump)
             time.sleep(0.1)
