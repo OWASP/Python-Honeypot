@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  app:
+    network_mode: host
+    build:
+      context: .
+      dockerfile: "Dockerfile.api"
+    command: python3 ohp.py --start-api-server
+    environment:
+      - FLASK_ENV=development
+    ports:
+      -  5000:5000
+    volumes:
+      - .:/OWASP-Honeypot
