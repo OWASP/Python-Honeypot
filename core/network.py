@@ -179,25 +179,28 @@ def network_traffic_capture(configuration):
 
     store_to_file = network_config["store_network_captured_files"]
 
-    # File path of the network capture file with the timestamp
-    output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
-    output_file_path = os.path.join("tmp", output_file_name)
+    while True:
+        # File path of the network capture file with the timestamp
+        output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
+        output_file_path = os.path.join("tmp", output_file_name)
 
-    try:
-        capture = pyshark.LiveCapture(
-                interface='any',
-                display_filter=display_filter,
-                output_file=output_file_path if store_to_file else None
-            )
+        if store_to_file:
+            info("Network capture is getting stored in, {}".format(output_file_path))
 
-        # Debug option for pyshark capture
-        # capture.set_debug()
+        try:
+            capture = pyshark.LiveCapture(
+                    interface='any',
+                    display_filter=display_filter,
+                    output_file=output_file_path if store_to_file else None
+                )
 
-        # Applied on every packet captured by pyshark LiveCapture
-        capture.apply_on_packets(process_packet)
+            # Debug option for pyshark capture
+            # capture.set_debug()
 
-    except Exception as _e:
-        # _e is Runtime, we've to convert it to str before calling error()
-        error(str(_e))
+            # Applied on every packet captured by pyshark LiveCapture
+            capture.apply_on_packets(process_packet, timeout=3600)
+
+        except Exception as _e:
+            pass
 
     return True
