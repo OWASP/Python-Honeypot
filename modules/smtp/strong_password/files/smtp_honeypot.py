@@ -46,12 +46,6 @@ def log_to_file(ip, port, data):
         logfile_handle.close()
     finally:
         output_lock.release()
-    #print(file_path,ip,port,data)
-    #with output_lock:
-        #with open(file_path, "a") as f:
-    message = "[{0}][{1}:{2}] {3}".format(time.time(), ip, port, data)
-    #print(message)
-
 
 
 class SMTPChannel(asynchat.async_chat):
@@ -276,7 +270,7 @@ class SMTPServer(asyncore.dispatcher):
         if pair is not None:
             conn, addr = pair
             #print >> DEBUGSTREAM, 'Incoming connection from %s' % repr(addr)
-            channel = SMTPChannel(self, conn, addr)
+            SMTPChannel(self, conn, addr)
 
     def handle_close(self):
         self.close()
@@ -333,7 +327,7 @@ def module():
 
 
     def run():
-        honeypot = SchizoOpenRelay((BIND_IP, BIND_PORT), None)
+        SchizoOpenRelay((BIND_IP, BIND_PORT), None)
         print ('[*] Mail Relay listening on {}:{}'.format(BIND_IP,BIND_PORT))
         try:
             asyncore.loop()
