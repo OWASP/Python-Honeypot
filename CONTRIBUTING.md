@@ -1,15 +1,15 @@
 # Contributing to OWASP-Honeypot
 
 First off, thanks for taking the time to contribute!
-We gladly support and appreciate anyone is interested to contribute to the OWASP Honeypot Project. Overall developers may focus on developing core framework or modules. Please consider that we are using PEP8 python code style and using Codacy to figure the code quality. In addition, Travis-CI will check your PR automatically on several Python versions (3.x). Before sending your PR, make sure you added code-based documentation to your codes. If you use any code/library/module with a license, add the license into external license file.
+We gladly support and appreciate anyone is interested to contribute to the OWASP Honeypot Project. Overall developers may focus on developing core framework or modules. Please consider that we are using PEP8 python code style and using Codacy to figure the code quality. In addition, Github Actions will test your PR automatically on several Python versions (3.x). Before sending your PR, make sure you have added code-based documentation to your codes. If you use any code/library/module with a license, add the license into external license file.
 
-We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:
+We love your input! We want to make contributing to this project as easy and transparent as possible.
 
 ## Steps to follow :scroll:
 
 ### 1. Fork it :fork_and_knife:
 
-You can get your own fork/copy of [OWASP-Honeypot]( https://github.com/zdresearch/OWASP-Honeypot) by using the <kbd><b>Fork</b></kbd></a> button.
+You can get your own fork/copy of [OWASP-Honeypot]( https://github.com/zdresearch/OWASP-Honeypot) by using the <kbd><b>Fork</b></kbd> button.
 
  [![Fork Button](https://help.github.com/assets/images/help/repository/fork_button.jpg)](https://github.com/zdresearch/OWASP-Honeypot)
 
@@ -85,14 +85,14 @@ Once you have completed these steps, you are ready to start contributing by chec
 
 ### 6. Create a new branch :bangbang:
 
-Whenever you are going to make contribution. Please create separate branch using command and keep your `master` branch clean (i.e. synced with remote branch).
+Whenever you are going to make contribution. Please create separate branch using the following command and keep your `master` branch clean (i.e. synced with remote branch).
 
 ```sh
 # It will create a new branch with name Branch_Name and will switch to that branch.
 git checkout -b Branch_Name
 ```
 
-Create a separate branch for contribution and try to use same name of branch as of folder.
+Create a separate branch for every contribution and try to use the same name of the branch as of folder.
 
 To switch to desired branch
 
@@ -101,14 +101,43 @@ To switch to desired branch
 git checkout Branch_Name
 ```
 
-To add the changes to the branch. Use
+Now make your changes in this branch.
+
+If your changes required addition of functions/ API endpoints/ features that are not being tested in the unit tests, then add corresponding tests to it in the `tests` directory.
+
+### 7. Local Testing
+
+Once you are finished implementing your changes, test your changes locally using the following commands:
+
+```sh
+# Run Modules Test
+python3 ohp.py -m all --test
+```
+
+The above command will take some time, so be patient. When it ends, ensure that no errors were printed on the terminal.
+
+```sh
+# Run API
+python3 ohp.py --start-api-server
+```
+
+```sh
+# Run Unit tests on a separate terminal
+python3 -m pytest -rPp
+```
+
+Ensure that all the units tests passed before creating a pull request.
+
+### 8. Push a commit
+
+To add the changes to the branch use:
 
 ```sh
 # To add all files to branch Branch_Name
 git add .
 ```
 
-Type in a message relevant for the code reviewer using
+Type in a message explaining the changes in brief using:
 
 ```sh
 # This message gets associated with all files you have changed
@@ -122,7 +151,18 @@ Now, Push your awesome work to your remote repository using
 git push -u origin Branch_Name
 ```
 
-Finally, go to your repository in browser and click on `compare and pull requests`.
+
+### 9. Create a Pull Request
+
+Finally, go to your repository in browser and click on `compare and pull requests` and select the `compare across forks` option.
+
+[![Compare across Forks](https://docs.github.com/assets/images/help/pull_requests/compare-across-forks-link.png)](https://github.com/zdresearch/OWASP-Honeypot)
+
+
+Change the base fork branch to `development` branch.
+
+[![Pull Request Base](https://docs.github.com/assets/images/help/pull_requests/choose-base-fork-and-branch.png)](https://github.com/zdresearch/OWASP-Honeypot)
+
 Add a title and description to your pull request that explains your precious effort.
 
 Sit and relax till we review your PR, you've made your contribution to our project.
