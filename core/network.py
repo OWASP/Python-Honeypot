@@ -3,8 +3,6 @@
 
 import os
 import time
-import multiprocessing as mp
-import sys
 
 import netaddr
 import pyshark
