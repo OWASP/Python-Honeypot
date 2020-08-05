@@ -5,6 +5,7 @@ import time
 import os
 import json
 import socket
+import multiprocessing as mp
 
 from config import (user_configuration, docker_configuration,
                     network_configuration)
@@ -17,7 +18,7 @@ from core.exit_helper import (exit_success, exit_failure)
 from core.compatible import make_tmp_thread_dir
 from core.get_modules import (virtual_machine_names_to_container_names,
                               virtual_machine_name_to_container_name)
-from core.network import new_network_events
+from core.network import network_traffic_capture
 from core.exit_helper import terminate_thread
 from api.server import start_api_server
 from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
@@ -356,7 +357,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
                 return error("Interrupting the application because network " +
-                             "capturing thread is not alive!")
+                             "capturing process is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
@@ -729,13 +730,14 @@ def load_honeypot_engine():
     create_ohp_networks()
     # start containers based on selected modules
     configuration = start_containers(configuration)
-    # start network monitoring thread
-    new_network_events_thread = Thread(
-        target=new_network_events,
+    # start network monitoring process
+    mp.set_start_method('fork')
+    network_traffic_capture_process = mp.Process(
+        target=network_traffic_capture,
         args=(configuration,),
-        name="new_network_events_thread"
+        name="network_traffic_capture_process"
     )
-    new_network_events_thread.start()
+    network_traffic_capture_process.start()
     info(
         "all selected modules started: {0}".format(
             ", ".join(
@@ -758,11 +760,13 @@ def load_honeypot_engine():
     wait_until_interrupt(
         virtual_machine_container_reset_factory_time_seconds,
         configuration,
-        new_network_events_thread,
+        network_traffic_capture_process,
         run_as_test
     )
     # kill the network events thread
-    terminate_thread(new_network_events_thread)
+    network_traffic_capture_process.terminate()
+    network_traffic_capture_process.join()
+
     terminate_thread(bulk_events_thread)
     # if in case any events that were not inserted from thread
     push_events_queues_to_database()

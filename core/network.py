@@ -76,8 +76,6 @@ def process_packet(packet):
     """
     # set machine name
     machine_name = network_configuration()["real_machine_identifier_name"]
-    print(packet)
-    sys.stdout.flush()
 
     try:
         # Check if packet contains IP layer
@@ -133,41 +131,7 @@ def process_packet(packet):
         del _e
 
 
-def capture_traffic(display_filter, store_to_file):
-    """
-    Capture the Live network traffic using pyshark
-
-    Args:
-        display_filters: Fiters to apply on the live capture
-        network_config: network configuration
-    """
-
-    # File path of the network capture file with the timestamp
-    output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
-    output_file_path = os.path.join("tmp", output_file_name)
-
-    print(output_file_path if store_to_file else None)
-    sys.stdout.flush()
-
-    try:
-        capture = pyshark.LiveCapture(
-                interface='any',
-                display_filter=display_filter,
-                output_file=output_file_path if store_to_file else None
-            )
-
-        # Debug option for pyshark capture
-        capture.set_debug()
-
-        # Applied on every packet captured by pyshark LiveCapture
-        capture.apply_on_packets(process_packet)
-
-    except Exception as _e:
-        # _e is Runtime, we've to convert it to str before calling error()
-        error(str(_e))
-
-
-def new_network_events(configuration):
+def network_traffic_capture(configuration):
     """
     get and submit new network events
 
@@ -177,7 +141,7 @@ def new_network_events(configuration):
     Returns:
         True
     """
-    info("new_network_events thread started")
+    info("network_traffic_capture process started")
 
     for selected_module in configuration:
         port_number = \
@@ -215,20 +179,25 @@ def new_network_events(configuration):
 
     store_to_file = network_config["store_network_captured_files"]
 
-    while True:
-        try:
-            # Multiprocess
-            mp.set_start_method('fork')
-            capture_process = mp.Process(target=capture_traffic, args=(display_filter, store_to_file))
-            capture_process.start()
-            print(capture_process)
-            capture_process.terminate()
-            capture_process.join()
+    # File path of the network capture file with the timestamp
+    output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
+    output_file_path = os.path.join("tmp", output_file_name)
 
-        except Exception:
-            capture_process.terminate()
-        
-        except SystemExit:
-            capture_process.terminate()
+    try:
+        capture = pyshark.LiveCapture(
+                interface='any',
+                display_filter=display_filter,
+                output_file=output_file_path if store_to_file else None
+            )
+
+        # Debug option for pyshark capture
+        # capture.set_debug()
+
+        # Applied on every packet captured by pyshark LiveCapture
+        capture.apply_on_packets(process_packet)
+
+    except Exception as _e:
+        # _e is Runtime, we've to convert it to str before calling error()
+        error(str(_e))
 
     return True
