@@ -9,6 +9,7 @@ import pyshark
 
 from config import network_configuration, protocol_table
 from core.alert import error, info, warn
+from core.compatible import is_verbose_mode
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue)
@@ -193,7 +194,8 @@ def network_traffic_capture(configuration):
                 )
 
             # Debug option for pyshark capture
-            # capture.set_debug()
+            if is_verbose_mode():
+                capture.set_debug()
 
             # Applied on every packet captured by pyshark LiveCapture
             capture.apply_on_packets(process_packet, timeout=3600)
