@@ -1,30 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-import os
 import json
-import socket
 import multiprocessing as mp
+import os
+import socket
+import time
 
-from config import (user_configuration, docker_configuration,
-                    network_configuration)
-from terminable_thread import (Thread, threading)
-from core.get_modules import load_all_modules
-from core.alert import (info, error, messages)
-from core.color import reset_cmd_color
-from core.compatible import (logo, version, is_windows)
-from core.exit_helper import (exit_success, exit_failure)
-from core.compatible import make_tmp_thread_dir
-from core.get_modules import (virtual_machine_names_to_container_names,
-                              virtual_machine_name_to_container_name)
-from core.network import network_traffic_capture
-from core.exit_helper import terminate_thread
+from terminable_thread import Thread, threading
+
 from api.server import start_api_server
-from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
-                             get_module_dir_path, is_verbose_mode)
-from database.connector import (push_events_to_database_from_thread,
-                                push_events_queues_to_database)
+from config import (docker_configuration, network_configuration,
+                    user_configuration)
+from core.alert import error, info, messages
+from core.color import reset_cmd_color
+from core.compatible import (check_for_requirements, copy_dir_tree,
+                             get_module_dir_path, is_verbose_mode, is_windows,
+                             logo, make_tmp_thread_dir, mkdir, version)
+from core.exit_helper import exit_failure, exit_success, terminate_thread
+from core.get_modules import (load_all_modules,
+                              virtual_machine_name_to_container_name,
+                              virtual_machine_names_to_container_names)
+from core.network import network_traffic_capture
+from database.connector import (push_events_queues_to_database,
+                                push_events_to_database_from_thread)
 
 # temporary use fixed version of argparse
 if is_windows():
@@ -763,7 +762,7 @@ def load_honeypot_engine():
         network_traffic_capture_process,
         run_as_test
     )
-    # kill the network events thread
+    # kill the network traffic capture process
     network_traffic_capture_process.terminate()
     network_traffic_capture_process.join()
 
