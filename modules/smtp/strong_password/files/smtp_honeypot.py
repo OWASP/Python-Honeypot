@@ -15,10 +15,9 @@ import asynchat
 import os
 import json
 
-
-MAILSERVER_NAME = "OWASP Python Honeypot"
+MAILSERVER_NAME = os.environ["MAILSERVER_NAME"]
 BIND_IP='0.0.0.0'
-BIND_PORT=587
+BIND_PORT=25
 LOGFILE = '/root/logs/ohp_smtp_honeypot_logs.txt'
 __version__ = 'ESMTP Exim 4.69 #1 Thu, 29 Jul 2010 05:13:48 -0700'
 EMPTYSTRING = ''
