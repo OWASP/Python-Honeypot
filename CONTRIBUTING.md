@@ -126,3 +126,80 @@ Finally, go to your repository in browser and click on `compare and pull request
 Add a title and description to your pull request that explains your precious effort.
 
 Sit and relax till we review your PR, you've made your contribution to our project.
+
+
+## Adding a Module
+
+OWASP Python Honeypot currently supports 7 modules namely FTP - strong and weak password, SSH - strong and weak password , HTTP - basic auth strong passsword and basic auth weak password and ICS honeypot module.
+
+### To add a new module on can create a new folder inside the modules directory of the project.
+
+### Set up module files
+Each module has an init.py file  which has the module category configuration, below shown is the template for the same.
+```
+def category_configuration():
+    """
+    category configuration
+    Returns:
+        JSON/Dict category configuration
+    """
+    return {
+        "virtual_machine_name": OHP_Module name,
+        "virtual_machine_port_number": PORT NUMBER,
+        "virtual_machine_internet_access": Bool,
+        "real_machine_port_number": DOCKER HOST PORT NUMBER
+    }
+```
+
+Then if the module has sub parts like weak and strong password then two separate folders should be created.
+Inside the module folder there should be:
+- files folder
+if the modules require some extra scripts/config files which needs to be moved to the module containers.
+- init.py
+contains module processor and module configuration
+```
+
+class ModuleProcessor:
+    """
+    this is the processor to run after docker machine is up to grab the
+    log files or do other needed process...
+    """
+
+    def __init__(self):
+        self.kill_flag = False
+
+    def processor(self):
+        """
+        processor function will be called as a new thread and will
+        be die when kill_flag is True
+        """
+        while not self.kill_flag:
+            LOGGING INSTRUCTIONS go here
+            time.sleep(0.1)
+
+
+def module_configuration():
+    """
+    module configuration
+    Returns:
+        JSON/Dict module configuration
+    """
+    return {
+        "virtual_machine_port_number": PORT NUMBER,
+        "real_machine_port_number": PORT NUMBER FOR DOCKER HOST,
+        "extra_docker_options": [""],
+        "module_processor": ModuleProcessor()
+    }
+```
+- readme.md
+Describing about the module
+- Dockerfile
+For setting up all the packages,libraries,scripts to run by the module.
+
+
+### Testing the module
+
+For testing the module run the command
+```
+python3 ohp.py -m module_name/subpart
+```
