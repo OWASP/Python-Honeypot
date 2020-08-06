@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime
+from multiprocessing import Queue
 
 from database.connector import (credential_events, events_data,
                                 honeypot_events,
@@ -38,11 +39,14 @@ class TestConnector(unittest.TestCase):
             machine_name="stockholm_server_1"
         )
 
-        # Insert events to queues
-        insert_to_honeypot_events_queue(honeypot_event)
-        insert_to_network_events_queue(network_event)
+        honeypot_events_queue = Queue()
+        network_events_queue = Queue()
 
-        push_events_queues_to_database()
+        # Insert events to queues
+        insert_to_honeypot_events_queue(honeypot_event, honeypot_events_queue)
+        insert_to_network_events_queue(network_event, network_events_queue)
+
+        push_events_queues_to_database(honeypot_events_queue, network_events_queue)
 
         # Find the records in the DB
         honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
@@ -91,7 +95,7 @@ class TestConnector(unittest.TestCase):
         # Delete test events from the database
         # credential_events.delete_one(credential_event.__dict__)
 
-    def test_insert_eventss_data(self):
+    def test_insert_events_data(self):
         """
         Test the data insertion to the events_data collection
         """
