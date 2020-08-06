@@ -731,9 +731,13 @@ def load_honeypot_engine():
     configuration = start_containers(configuration)
     # start network monitoring process
     mp.set_start_method('fork')
+    # Event queues
+    honeypot_events_queue = mp.Queue()
+    network_events_queue = mp.Queue()
+
     network_traffic_capture_process = mp.Process(
         target=network_traffic_capture,
-        args=(configuration,),
+        args=(configuration, honeypot_events_queue, network_events_queue, ),
         name="network_traffic_capture_process"
     )
     network_traffic_capture_process.start()
@@ -747,7 +751,7 @@ def load_honeypot_engine():
 
     bulk_events_thread = Thread(
         target=push_events_to_database_from_thread,
-        args=(),
+        args=(honeypot_events_queue, network_events_queue, ),
         name="insert_events_in_bulk_thread"
     )
     bulk_events_thread.start()
@@ -762,13 +766,15 @@ def load_honeypot_engine():
         network_traffic_capture_process,
         run_as_test
     )
+
+    # if in case any events that were not inserted from thread
+    push_events_queues_to_database(honeypot_events_queue, network_events_queue)
     # kill the network traffic capture process
     network_traffic_capture_process.terminate()
     network_traffic_capture_process.join()
-
+    info("killing network capture process")
+    # Kill bulk events thread
     terminate_thread(bulk_events_thread)
-    # if in case any events that were not inserted from thread
-    push_events_queues_to_database()
     # stop created containers
     stop_containers(configuration)
     # stop module processor

@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import inspect
+from multiprocessing import Queue
 import os
+import sys
 import time
 
 import pymongo
@@ -30,10 +32,6 @@ honeypot_events = database.honeypot_events
 network_events = database.network_events
 events_data = database.events_data
 
-# Event queues
-honeypot_events_queue = list()
-network_events_queue = list()
-
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -45,7 +43,7 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
+def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_events_queue: Queue):
     """
     insert selected modules event to honeypot_events collection
 
@@ -80,12 +78,12 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
             honeypot_event.ip_dest
         ))
 
-    honeypot_events_queue.append(honeypot_event.__dict__)
+    honeypot_events_queue.put(honeypot_event.__dict__)
 
     return
 
 
-def insert_to_network_events_queue(network_event: NetworkEvent):
+def insert_to_network_events_queue(network_event: NetworkEvent, network_events_queue: Queue):
     """
     insert other network events (port scan, etc..) to network_events
     collection
@@ -120,12 +118,12 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
             network_event.ip_dest
         ))
 
-    network_events_queue.append(network_event.__dict__)
-
+    network_events_queue.put(network_event.__dict__)
+    
     return
 
 
-def push_events_queues_to_database():
+def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     """
     Pushes all honeypot and network events collected in the
     honeypot_events_queue and network_events_queue to honeypot_events
@@ -136,20 +134,19 @@ def push_events_queues_to_database():
         verbose_info("Submitting new events to database")
 
     # Insert all honeypot events to database (honeypot_events collection)
-    if honeypot_events_queue:
-        new_events = honeypot_events_queue[:]
-        honeypot_events_queue.clear()
-        honeypot_events.insert_many(new_events)
+    while not honeypot_events_queue.empty():
+        new_event = honeypot_events_queue.get()
+        honeypot_events.insert_one(new_event)
 
     # Insert all network events to database (network_events collection)
-    if network_events_queue:
-        new_events = network_events_queue[:]
-        network_events_queue.clear()
-        network_events.insert_many(new_events)
+    while not network_events_queue.empty():
+        new_event = network_events_queue.get()
+        network_events.insert_one(new_event)
+
     return
 
 
-def push_events_to_database_from_thread():
+def push_events_to_database_from_thread(honeypot_events_queue, network_events_queue):
     """
     Thread function for inserting bulk events in a thread
 
@@ -157,7 +154,7 @@ def push_events_to_database_from_thread():
         True/None
     """
     while True:
-        push_events_queues_to_database()
+        push_events_queues_to_database(honeypot_events_queue, network_events_queue)
         time.sleep(3)
     return True
 

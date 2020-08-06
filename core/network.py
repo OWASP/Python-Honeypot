@@ -66,7 +66,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def process_packet(packet):
+def process_packet(packet, honeypot_events_queue, network_events_queue):
     """
     Callback function called from the apply_on_packets function.
 
@@ -112,7 +112,8 @@ def process_packet(packet):
                                 protocol,
                                 honeypot_ports[port_dest],
                                 machine_name
-                            )
+                            ),
+                            honeypot_events_queue
                         )
                 else:
                     insert_to_network_events_queue(
@@ -123,14 +124,15 @@ def process_packet(packet):
                             port_src,
                             protocol,
                             machine_name
-                        )
+                        ),
+                        network_events_queue
                     )
 
     except Exception as _e:
         del _e
 
 
-def network_traffic_capture(configuration):
+def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue):
     """
     get and submit new network events
 
@@ -178,6 +180,14 @@ def network_traffic_capture(configuration):
 
     store_to_file = network_config["store_network_captured_files"]
 
+    
+    def packet_callback(packet):
+        """
+        Callback function, called by apply_on_packets
+        """
+        process_packet(packet, honeypot_events_queue, network_events_queue)
+
+    # Run loop in hourly manner to split the capture in multiple files
     while True:
         # File path of the network capture file with the timestamp
         output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
@@ -198,7 +208,10 @@ def network_traffic_capture(configuration):
                 capture.set_debug()
 
             # Applied on every packet captured by pyshark LiveCapture
-            capture.apply_on_packets(process_packet, timeout=3600)
+            capture.apply_on_packets(packet_callback, timeout=3600)
+
+        except KeyboardInterrupt:
+            capture.close()
 
         except Exception as _e:
             pass
