@@ -34,10 +34,10 @@ class ModuleProcessor:
                     data = json.loads(data)
                     insert_to_events_data_collection(
                         EventData(
-                            ip= data['ip'],
-                            module_name = data['module_name'],
-                            date = data['date'],
-                            data = data['data'],
+                            ip=data['ip'],
+                            module_name=data['module_name'],
+                            date=data['date'],
+                            data=data['data'],
                         )
                     )
                 os.remove(self.log_filename_dump)
@@ -54,7 +54,9 @@ def module_configuration():
     return {
         "username": "root",
         "password": generate_token(16),
-        "extra_docker_options": ["--volume {0}/tmp:/root/logs/".format(os.getcwd()),
-                                 "--env MAILSERVER_NAME=OWASP\ Python\ Honeypot"],
+        "extra_docker_options": [
+            "--volume {0}/tmp:/root/logs/".format(os.getcwd()),
+            "--env MAILSERVER_NAME=OWASP\ Python\ Honeypot"
+        ],
         "module_processor": ModuleProcessor()
     }
