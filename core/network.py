@@ -180,7 +180,6 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
     store_to_file = network_config["store_network_captured_files"]
 
-    
     def packet_callback(packet):
         """
         Callback function, called by apply_on_packets
@@ -198,10 +197,10 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         try:
             capture = pyshark.LiveCapture(
-                    interface='any',
-                    display_filter=display_filter,
-                    output_file=output_file_path if store_to_file else None
-                )
+                interface='any',
+                display_filter=display_filter,
+                output_file=output_file_path if store_to_file else None
+            )
 
             # Debug option for pyshark capture
             if is_verbose_mode():
@@ -211,9 +210,13 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             capture.apply_on_packets(packet_callback, timeout=3600)
 
         except KeyboardInterrupt:
-            capture.close()
+            try:
+                capture.close()
+                break
+            except Exception as _:
+                break
 
         except Exception as _e:
-            pass
+            break
 
     return True

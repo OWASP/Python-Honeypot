@@ -737,7 +737,7 @@ def load_honeypot_engine():
 
     network_traffic_capture_process = mp.Process(
         target=network_traffic_capture,
-        args=(configuration, honeypot_events_queue, network_events_queue, ),
+        args=(configuration, honeypot_events_queue, network_events_queue,),
         name="network_traffic_capture_process"
     )
     network_traffic_capture_process.start()
@@ -751,7 +751,7 @@ def load_honeypot_engine():
 
     bulk_events_thread = Thread(
         target=push_events_to_database_from_thread,
-        args=(honeypot_events_queue, network_events_queue, ),
+        args=(honeypot_events_queue, network_events_queue,),
         name="insert_events_in_bulk_thread"
     )
     bulk_events_thread.start()

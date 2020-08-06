@@ -119,7 +119,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
         ))
 
     network_events_queue.put(network_event.__dict__)
-    
+
     return
 
 

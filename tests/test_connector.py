@@ -80,17 +80,24 @@ class TestConnector(unittest.TestCase):
 
         # Find the record in the DB
         credential_record = credential_events.find_one(
-                                        credential_event.__dict__)
+            credential_event.__dict__
+        )
 
         # Compare the record found in the DB with the one pushed
-        self.assertEqual(credential_record["ip"],
-                         credential_event.ip)
+        self.assertEqual(
+            credential_record["ip"],
+            credential_event.ip
+        )
 
-        self.assertEqual(credential_record["username"],
-                         credential_event.username)
+        self.assertEqual(
+            credential_record["username"],
+            credential_event.username
+        )
 
-        self.assertEqual(credential_record["password"],
-                         credential_event.password)
+        self.assertEqual(
+            credential_record["password"],
+            credential_event.password
+        )
 
         # Delete test events from the database
         # credential_events.delete_one(credential_event.__dict__)
@@ -113,8 +120,10 @@ class TestConnector(unittest.TestCase):
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip"], event_data.ip)
-        self.assertEqual(event_record_data["data"],
-                         event_data.data)
+        self.assertEqual(
+            event_record_data["data"],
+            event_data.data
+        )
 
         events_data.delete_one(event_data.__dict__)
 
