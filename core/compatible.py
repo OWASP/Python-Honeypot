@@ -113,9 +113,9 @@ def check_for_requirements(start_api_server):
     # check mongodb
     try:
         connection = pymongo.MongoClient(
-                            api_config["api_database"],
-                            serverSelectionTimeoutMS=connection_timeout
-                        )
+            api_config["api_database"],
+            serverSelectionTimeoutMS=connection_timeout
+        )
         connection.list_database_names()
     except Exception:
         exit_failure("cannot connect to mongodb")
@@ -147,9 +147,13 @@ def make_tmp_thread_dir():
     lowercase_string = string.ascii_lowercase
     digits = string.digits
     combined_string = uppercase_string + lowercase_string + digits
-    random_digit = random.randint(0, len(combined_string) - 1)
-    return mkdir("tmp/thread_" +
-                 "".join([combined_string[random_digit] for i in range(15)]))
+    return mkdir(
+        "tmp/thread_".join(
+            [
+                combined_string[random.randint(0, len(combined_string) - 1)] for _ in range(15)
+            ]
+        )
+    )
 
 
 def mkdir(dir):
