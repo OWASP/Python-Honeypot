@@ -223,7 +223,7 @@ def generate_token(length=32):
     Returns:
         token string
     """
-    return "".join(random.choice("0123456789abcdef") for _ in range(32))
+    return "".join(random.choice("0123456789abcdef") for _ in range(length))
 
 
 def byte_to_str(data):
