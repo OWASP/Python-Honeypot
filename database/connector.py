@@ -12,7 +12,7 @@ from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
 from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent)
+                                EventData, NetworkEvent, FileEventsData)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -29,7 +29,12 @@ database = client[api_config["api_database_name"]]
 credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
+file_change_events = database.file_change_events
 events_data = database.events_data
+
+# Event queues
+honeypot_events_queue = list()
+network_events_queue = list()
 
 IP2Location = IP2Location.IP2Location(
     os.path.join(
@@ -192,6 +197,39 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         )
 
     return credential_events.insert_one(credential_event.__dict__).inserted_id
+
+
+def insert_to_file_change_events_collection(file_change_event_data: FileEventsData):
+    """
+    insert file change events which are obtained from ftp/ssh weak_password
+    module
+
+    Args:
+    file_path : the path of the file which is changed
+    status: status of the file would be added/modified/deleted
+    module_name : on which module client accessed
+    date : datetime of the event
+
+    Returns:
+        inserted_id
+    """
+    file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
+    file_change_event_data.file_content = open(
+        file_change_event_data.file_path,
+        'rb'
+    ).read() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
+
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot file change event, file_path:{0}, status:{1}, "
+            "module_name:{2}, module_name:{3}, machine_name:{3}".format(
+                file_change_event_data.file_path,
+                file_change_event_data.status,
+                file_change_event_data.module_name,
+                file_change_event_data.machine_name,
+            )
+        )
+    return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
 
 
 def insert_to_events_data_collection(event_data: EventData):
