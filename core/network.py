@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import asyncio
 import os
 import time
 
@@ -207,7 +208,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                 capture.set_debug()
 
             # Applied on every packet captured by pyshark LiveCapture
-            capture.apply_on_packets(packet_callback, timeout=3600)
+            capture.apply_on_packets(packet_callback, timeout=10)
 
         except KeyboardInterrupt:
             try:
@@ -216,7 +217,10 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             except Exception as _:
                 break
 
-        except Exception as _e:
+        except asyncio.exceptions.TimeoutError:
             pass
+
+        except Exception as _e:
+            break
 
     return True
