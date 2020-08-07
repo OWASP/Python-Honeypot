@@ -2,3 +2,4 @@ pymongo==3.11.0
 netaddr==0.8.0
 flask==1.1.2
 terminable_thread==0.7.1
+pyshark==0.4.2.11

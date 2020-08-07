@@ -2,6 +2,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import asyncio
+import concurrent
 import sys
 import os
 import subprocess
@@ -88,6 +90,20 @@ def is_windows():
     if "win32" == os_name() or "win64" == os_name():
         return True
     return False
+
+
+def get_timeout_error():
+    """
+    Get the timeout error thrown by pyshark apply_on_packets
+    funtion
+    """
+    try:
+        # If asyncio timeout error exists, this will be returned
+        return asyncio.exceptions.TimeoutError
+    except:
+        # For older python versions, where asyncio timeout error
+        # doesn't exist, this one will be returned.
+        return concurrent.futures._base.TimeoutError
 
 
 def check_for_requirements(start_api_server):
