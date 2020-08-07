@@ -39,7 +39,8 @@ class ContainerFilesHandler(FileSystemEventHandler):
                     status=byte_to_str(event.event_type),
                     module_name=self.module_name,
                     date=now()
-                ))
+                )
+            )
             info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 
