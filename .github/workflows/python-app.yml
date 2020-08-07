@@ -14,11 +14,26 @@ on:
     branches:
       - master
       - development
-    
+
     paths-ignore:
       - 'lib/**'
-    
-    types: [ opened, edited, review_requested , ready_for_review, reopened]
+
+    types: [
+      assigned,
+      unassigned,
+      labeled,
+      unlabeled,
+      opened,
+      edited,
+      closed,
+      reopened,
+      synchronize,
+      ready_for_review,
+      locked,
+      unlocked,
+      review_requested,
+      review_request_removed
+    ]
 
 jobs:
   build:
@@ -28,49 +43,50 @@ jobs:
       mongodb:
         image: mongo
         ports:
-        - 27017:27017
+          - 27017:27017
     strategy:
       matrix:
-        python-version: [3.5, 3.6, 3.7, 3.8]
+        python-version: [3.5.9, 3.6.11, 3.7.8, 3.8.5]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip3 install flake8 pytest wheel requests
-        if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
-    - name: Install OS dependencies
-      run: |
-        sudo yes | sudo apt-get install libpcap-dev libnet-dev tshark
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="lib/argparse/*,lib/ip2location/*"
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics --exclude="lib/argparse/*,lib/ip2location/*"
-    - name: wait for mongodb
-      run: |
-        sleep 15
-    - name: Run modules test
-      run: |
-        python3 ohp.py -m all --test
-    - name: Run API server
-      run: |
-        nohup python3 ohp.py --start-api-server & >/tmp/ohp
-    - name: Wait for API server
-      run: |
-        sleep 5
-    - name: Test with pytest
-      run: |
-        python3 -m pytest -rpP
-    - name: Kill API Server
-      run: |
-        killall python3
-    - name: Check API server logs
-      run: |
-        cat /tmp/ohp
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          sudo pip3 install flake8 pytest wheel requests setuptools
+          if [ -f requirements.txt ]; then sudo pip3 install -r requirements.txt; fi
+      - name: Install OS dependencies
+        run: |
+          sudo yes | sudo apt-get update && sudo apt-get install libpcap-dev libnet-dev tshark --fix-missing
+      - name: Lint with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="lib/argparse/*,lib/ip2location/*"
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics --exclude="lib/argparse/*,lib/ip2location/*"
+      - name: wait for mongodb
+        run: |
+          sleep 15
+      - name: Run modules test
+        run: |
+          sudo python3 ohp.py -m all --test
+      - name: Run API server
+        run: |
+          sudo nohup python3 ohp.py --start-api-server & >/tmp/ohp
+      - name: Wait for API server
+        run: |
+          sleep 5
+      - name: Test with pytest
+        run: |
+          sudo python3 -m pytest -rpP
+      - name: Kill API Server
+        run: |
+          sudo killall python3
+      - name: Check API server logs
+        run: |
+          cat /tmp/ohp
+
