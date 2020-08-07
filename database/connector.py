@@ -4,7 +4,6 @@
 import inspect
 from multiprocessing import Queue
 import os
-import sys
 import time
 
 import pymongo
