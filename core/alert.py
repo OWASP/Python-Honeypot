@@ -268,27 +268,27 @@ def error(content):
     Returns:
         the message in error structure - None
     """
-    if is_not_run_from_api():
-        if version() == 2:
-            sys.stdout.write(
+
+    if version() == 2:
+        sys.stdout.write(
+            color.color_cmd("red") +
+            "[X] [{0}] ".format(now()) +
+            color.color_cmd("yellow") +
+            content.encode("utf8") +
+            color.color_cmd("reset") +
+            "\n"
+        )
+    else:
+        sys.stdout.buffer.write(
+            (
                 color.color_cmd("red") +
                 "[X] [{0}] ".format(now()) +
                 color.color_cmd("yellow") +
-                content.encode("utf8") +
-                color.color_cmd("reset") +
+                content + color.color_cmd("reset") +
                 "\n"
-            )
-        else:
-            sys.stdout.buffer.write(
-                (
-                        color.color_cmd("red") +
-                        "[X] [{0}] ".format(now()) +
-                        color.color_cmd("yellow") +
-                        content + color.color_cmd("reset") +
-                        "\n"
-                ).encode("utf8")
-            )
-            sys.stdout.flush()
+            ).encode("utf8")
+        )
+        sys.stdout.flush()
     return
 
 

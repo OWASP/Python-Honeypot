@@ -24,11 +24,12 @@ class HoneypotEvent(object):
 
     def __init__(
             self, ip_dest, port_dest, ip_src,
-            port_src, module_name, machine_name):
+            port_src, protocol, module_name, machine_name):
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
         self.port_src = port_src
+        self.protocol = protocol
         self.module_name = module_name
         self.machine_name = machine_name
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -54,11 +55,12 @@ class NetworkEvent(object):
 
     def __init__(
             self, ip_dest, port_dest,
-            ip_src, port_src, machine_name):
+            ip_src, port_src, protocol, machine_name):
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
         self.port_src = port_src
+        self.protocol = protocol
         self.machine_name = machine_name
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.country_ip_src = None
