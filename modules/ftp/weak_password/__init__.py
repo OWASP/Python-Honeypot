@@ -60,6 +60,6 @@ def module_configuration():
     return {
         "username": "admin",
         "password": "admin",
-        "extra_docker_options": ["--volume {0}/tmp/ohp_ftp_weak_container/:/root".format(os.getcwd())],
+        "extra_docker_options": ["--volume {0}/tmp/ohp_ftp_weak_container/:/root:z".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

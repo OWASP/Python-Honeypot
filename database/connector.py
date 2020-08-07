@@ -214,6 +214,10 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
         inserted_id
     """
     file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
+    file_change_event_data.file_content = open(
+        file_change_event_data.file_path,
+        'rb'
+    ).read() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
 
     if is_verbose_mode():
         verbose_info(
@@ -225,7 +229,6 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
                 file_change_event_data.machine_name,
             )
         )
-
     return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
 
 

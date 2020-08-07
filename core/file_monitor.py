@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import oschmod
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from database.connector import insert_to_file_change_events_collection
@@ -32,13 +33,15 @@ class ContainerFilesHandler(FileSystemEventHandler):
         self.module_name = None
 
     def on_any_event(self, event):
-        if not (event.event_type == 'modified' and event.is_directory) and is_excluded(event.src_path, self.EXCLUDES):
+        if not (event.event_type == 'modified' and event.is_directory) \
+                and not is_excluded(event.src_path, self.EXCLUDES):
             insert_to_file_change_events_collection(
                 FileEventsData(
                     file_path=byte_to_str(event.src_path),
                     status=byte_to_str(event.event_type),
                     module_name=self.module_name,
-                    date=now()
+                    date=now(),
+                    is_directory=event.is_directory
                 )
             )
             info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
@@ -63,6 +66,9 @@ class FileMonitor:
         event_handler.log_filename = self.log_filename
         event_handler.EXCLUDES = self.EXCLUDES
         event_handler.module_name = self.module_name
+
+        # set 777 permission and allow container read/write/execute
+        oschmod.set_mode(self.DIRECTORY_TO_WATCH, '777')
 
         self.observer.schedule(event_handler, self.DIRECTORY_TO_WATCH, recursive=True)
         self.observer.start()
