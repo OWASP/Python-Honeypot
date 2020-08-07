@@ -115,7 +115,8 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     network_event.country_ip_dest = byte_to_str(
         IP2Location.get_country_short(
             network_event.ip_dest
-        ))
+        )
+    )
 
     network_events_queue.put(network_event.__dict__)
 

@@ -1,11 +1,23 @@
 version: '3'
 
 services:
-  app:
+  mongodb:
+    image: mongo:latest
+    container_name: "mongodb"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod --logpath=/dev/null # --quiet
+
+  ohp:
     build:
       context: .
       dockerfile: "Dockerfile.api"
-    command: python3 ohp.py --start-api-server
+    command: bash -c "sleep 5 && python3 ohp.py --start-api-server"
     environment:
       - FLASK_ENV=development
       - DOCKER_ENV=true
@@ -17,15 +29,3 @@ services:
         - mongodb
     depends_on:
         - mongodb
-
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
-    environment:
-        - MONGO_DATA_DIR=/data/db
-        - MONGO_LOG_DIR=/dev/null
-    volumes:
-        - ./data/db:/data/db
-    ports:
-        - 27017:27017
-    command: mongod --logpath=/dev/null # --quiet
