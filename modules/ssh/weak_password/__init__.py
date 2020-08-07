@@ -60,6 +60,8 @@ def module_configuration():
     return {
         "username": "root",
         "password": "123456",
-        "extra_docker_options": ["--volume {0}/tmp/ohp_ssh_weak_container:/root".format(os.getcwd())],
+        "extra_docker_options": [
+            "--mount \"type=bind,source={0}/tmp/ohp_ssh_weak_container,target=/root\":z".format(os.getcwd())
+        ],
         "module_processor": ModuleProcessor()
     }
