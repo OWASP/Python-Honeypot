@@ -31,16 +31,15 @@ class ContainerFilesHandler(FileSystemEventHandler):
         self.EXCLUDES = None
         self.module_name = None
 
-
-    def on_any_event(self,event):
+    def on_any_event(self, event):
         if not (event.event_type == 'modified' and event.is_directory) and is_excluded(event.src_path, self.EXCLUDES):
             insert_to_file_change_events_collection(
                 FileEventsData(
-                file_path = byte_to_str(event.src_path),
-                status = byte_to_str(event.event_type),
-                module_name= self.module_name,
-                date = now()
-            ))
+                    file_path=byte_to_str(event.src_path),
+                    status=byte_to_str(event.event_type),
+                    module_name=self.module_name,
+                    date=now()
+                ))
             info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 

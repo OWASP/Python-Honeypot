@@ -36,7 +36,6 @@ events_data = database.events_data
 honeypot_events_queue = list()
 network_events_queue = list()
 
-
 IP2Location = IP2Location.IP2Location(
     os.path.join(
         os.path.dirname(
@@ -200,8 +199,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
-def insert_to_file_change_events_collection(file_change_event_data: \
-                                            FileEventsData):
+def insert_to_file_change_events_collection(file_change_event_data: FileEventsData):
     """
     insert file change events which are obtained from ftp/ssh weak_password
     module
@@ -215,8 +213,7 @@ def insert_to_file_change_events_collection(file_change_event_data: \
     Returns:
         inserted_id
     """
-    file_change_event_data.machine_name = \
-        network_config["real_machine_identifier_name"]
+    file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
 
     if is_verbose_mode():
         verbose_info(
@@ -229,8 +226,7 @@ def insert_to_file_change_events_collection(file_change_event_data: \
             )
         )
 
-    return file_change_events.insert_one(file_change_event_data.\
-                                         __dict__).inserted_id
+    return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
 
 
 def insert_to_events_data_collection(event_data: EventData):
