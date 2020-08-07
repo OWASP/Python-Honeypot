@@ -3,6 +3,7 @@
 
 import asyncio
 import os
+import sys
 import time
 
 import netaddr
@@ -190,8 +191,11 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
     # Run loop in hourly manner to split the capture in multiple files
     while True:
         # File path of the network capture file with the timestamp
-        output_file_name = "captured-traffic-" + str(int(time.time())) + ".pcap"
-        output_file_path = os.path.join("tmp", output_file_name)
+        output_file_path = os.path.join(
+            os.path.join(
+                sys.path[0], "tmp"
+            ), "captured-traffic-" + str(int(time.time())) + ".pcap"
+        )
 
         if store_to_file:
             info("Network capture is getting stored in, {}".format(output_file_path))
@@ -208,7 +212,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                 capture.set_debug()
 
             # Applied on every packet captured by pyshark LiveCapture
-            capture.apply_on_packets(packet_callback, timeout=10)
+            capture.apply_on_packets(packet_callback, timeout=3600)
 
         except KeyboardInterrupt:
             try:
@@ -220,7 +224,8 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
         except asyncio.exceptions.TimeoutError:
             pass
 
-        except Exception as _e:
+        except Exception as e:
+            error(e)
             break
 
     return True
