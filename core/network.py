@@ -217,6 +217,6 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                 break
 
         except Exception as _e:
-            break
+            pass
 
     return True
