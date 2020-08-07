@@ -11,7 +11,7 @@ import pyshark
 
 from config import protocol_table
 from core.alert import error, info, warn
-from core.compatible import is_verbose_mode, get_timeout_error
+from core.compatible import is_verbose_mode, get_timeout_error, mkdir
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue)
@@ -184,6 +184,10 @@ def network_traffic_capture(configuration, honeypot_events_queue,
     store_pcap = network_config["store_network_captured_files"]
     timeout = network_config["timeout"]
 
+    # Make the pcapfiles directory for storing the Network captured files
+    base_dir_path =  os.path.join(sys.path[0], "pcapfiles")
+    mkdir(base_dir_path)
+
     def packet_callback(packet):
         """
         Callback function, called by apply_on_packets
@@ -194,9 +198,8 @@ def network_traffic_capture(configuration, honeypot_events_queue,
     while True:
         # File path of the network capture file with the timestamp
         output_file_path = os.path.join(
-            os.path.join(
-                sys.path[0], "tmp"
-            ), "captured-traffic-" + str(int(time.time())) + ".pcap"
+            base_dir_path,
+            "captured-traffic-" + str(int(time.time())) + ".pcap"
         )
 
         if store_pcap:

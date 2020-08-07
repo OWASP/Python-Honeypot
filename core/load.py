@@ -761,7 +761,7 @@ def load_honeypot_engine():
     # start containers based on selected modules
     configuration = start_containers(configuration)
     # start network monitoring process
-    mp.set_start_method('fork')
+    mp.set_start_method('spawn')
     # Event queues
     honeypot_events_queue = mp.Queue()
     network_events_queue = mp.Queue()
