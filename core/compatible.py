@@ -148,7 +148,7 @@ def make_tmp_thread_dir():
     digits = string.digits
     combined_string = uppercase_string + lowercase_string + digits
     return mkdir(
-        "tmp/thread_".join(
+        "tmp/thread_" + "".join(
             [
                 combined_string[random.randint(0, len(combined_string) - 1)] for _ in range(15)
             ]
