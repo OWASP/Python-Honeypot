@@ -11,7 +11,7 @@ import pyshark
 
 from config import network_configuration, protocol_table
 from core.alert import error, info, warn
-from core.compatible import is_verbose_mode
+from core.compatible import is_verbose_mode, get_timeout_error
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue)
@@ -214,15 +214,16 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             # Applied on every packet captured by pyshark LiveCapture
             capture.apply_on_packets(packet_callback, timeout=3600)
 
+        except get_timeout_error():
+            # Catches the timeout error thrown by apply_on_packets
+            pass
+
         except KeyboardInterrupt:
             try:
                 capture.close()
                 break
             except Exception as _:
                 break
-
-        except asyncio.exceptions.TimeoutError:
-            pass
 
         except Exception as e:
             error(e)
