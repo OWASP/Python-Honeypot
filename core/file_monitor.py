@@ -44,7 +44,6 @@ class ContainerFilesHandler(FileSystemEventHandler):
                     is_directory=event.is_directory
                 )
             )
-            info("Event on a file: " + byte_to_str(event.event_type) + " , path: " + byte_to_str(event.src_path))
 
 
 class FileMonitor:
