@@ -46,8 +46,7 @@ jobs:
           if [ -f requirements.txt ]; then sudo pip3 install -r requirements.txt; fi
       - name: Install OS dependencies
         run: |
-          sudo apt-get update
-          sudo yes | sudo apt-get install libpcap-dev libnet-dev tshark
+          sudo yes | sudo apt-get update && sudo apt-get install libpcap-dev libnet-dev tshark --fix-missing
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
@@ -75,3 +74,4 @@ jobs:
       - name: Check API server logs
         run: |
           cat /tmp/ohp
+
