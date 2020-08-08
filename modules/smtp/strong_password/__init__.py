@@ -4,9 +4,10 @@
 import time
 import os
 import json
+import binascii
 from core.compatible import generate_token
-from database.connector import insert_to_events_data_collection
-from database.datatypes import EventData
+from database.connector import insert_to_credential_events_collection
+from database.datatypes import CredentialEvent
 
 
 class ModuleProcessor:
@@ -32,12 +33,22 @@ class ModuleProcessor:
                 data_dump = open(self.log_filename_dump).readlines()
                 for data in data_dump:
                     data = json.loads(data)
-                    insert_to_events_data_collection(
-                        EventData(
-                            ip=data['ip'],
-                            module_name=data['module_name'],
-                            date=data['date'],
-                            data=data['data'],
+                    authorization = data['authorization']
+                    try:
+                        authorization = binascii.a2b_base64(authorization).\
+                                        decode('utf-8')
+                        username = authorization.split(" ")[0]
+                        password = authorization.split(" ")[1]
+                    except Exception as e:
+                        username = ""
+                        password = ""
+                    insert_to_credential_events_collection(
+                        CredentialEvent(
+                            ip= data['ip'],
+                            module_name = data['module_name'],
+                            date = data['date'],
+                            username = username,
+                            password = password,
                         )
                     )
                 os.remove(self.log_filename_dump)
