@@ -130,12 +130,12 @@ Sit and relax till we review your PR, you've made your contribution to our proje
 
 ## Adding a Module
 
-OWASP Python Honeypot currently supports 7 modules namely FTP - strong and weak password, SSH - strong and weak password , HTTP - basic auth strong passsword and basic auth weak password and ICS honeypot module.
+OWASP Python Honeypot currently supports multiple types of protocols with different types and modules for various purposes like getting credentials, network events, files, honeypot events, and custom data coming from each module.
 
-### To add a new module on can create a new folder inside the modules directory of the project.
+### To add a new protocol on can create a new folder inside the /OWASP-Honeypot/modules directory of the project.
 
-### Set up module files
-Each module has an init.py file  which has the module category configuration, below shown is the template for the same.
+### Set up protocol files
+Each protocol has an \_\_init_\_\.py file  which has the category configuration, below shown is the template for the same.
 ```
 def category_configuration():
     """
@@ -151,11 +151,11 @@ def category_configuration():
     }
 ```
 
-Then if the module has sub parts like weak and strong password then two separate folders should be created.
+Then if the protocol has modules like weak and strong password then two separate folders should be created.
 Inside the module folder there should be:
 - files folder
 if the modules require some extra scripts/config files which needs to be moved to the module containers.
-- init.py
+- \_\_init_\_\.py
 contains module processor and module configuration
 ```
 
@@ -194,12 +194,17 @@ def module_configuration():
 - readme.md
 Describing about the module
 - Dockerfile
-For setting up all the packages,libraries,scripts to run by the module.
+For setting up all the packages, libraries, scripts to run by the module.
 
 
 ### Testing the module
 
 For testing the module run the command
 ```
-python3 ohp.py -m module_name/subpart
+python3 ohp.py -m protocol/moduleOrType
+```
+
+Also one must make sure that the test for the module is passing.
+```
+python3 ohp.py -m protocol/moduleOrType --test
 ```
