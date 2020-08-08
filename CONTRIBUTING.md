@@ -132,10 +132,10 @@ Sit and relax till we review your PR, you've made your contribution to our proje
 
 OWASP Python Honeypot currently supports multiple types of protocols with different types and modules for various purposes like getting credentials, network events, files, honeypot events, and custom data coming from each module.
 
-### To add a new protocol on can create a new folder inside the /OWASP-Honeypot/modules directory of the project.
+### To add a new protocol you should create a new folder inside the `/OWASP-Honeypot/modules` directory of the project.
 
 ### Set up protocol files
-Each protocol has an \_\_init_\_\.py file  which has the category configuration, below shown is the template for the same.
+Each protocol has an `__init__.py` file  which has the category configuration, below shown is the template for the same.
 ```
 def category_configuration():
     """
@@ -155,7 +155,7 @@ Then if the protocol has modules like weak and strong password then two separate
 Inside the module folder there should be:
 - files folder
 if the modules require some extra scripts/config files which needs to be moved to the module containers.
-- \_\_init_\_\.py
+- `__init__.py`
 contains module processor and module configuration
 ```
 
@@ -191,10 +191,8 @@ def module_configuration():
         "module_processor": ModuleProcessor()
     }
 ```
-- readme.md
-Describing about the module
-- Dockerfile
-For setting up all the packages, libraries, scripts to run by the module.
+- readme.md : Describing about the module
+- Dockerfile : For setting up all the packages, libraries, scripts to run by the module.
 
 
 ### Testing the module
