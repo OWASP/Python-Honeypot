@@ -1,15 +1,15 @@
 # Compiled python files
 *.pyc
 
-#ignore IDE settings
+# ignore IDE settings
 *.idea*
 
-#setup
+# setup
 build/*
 dist/*
 *egg-info*
 
-#tmp files
+# tmp files
 tmp/*
 *.py~
 *.log
@@ -17,6 +17,9 @@ results.*
 *.DS_Store
 *.swp
 
-#codacy
+# codacy
 .coverage
 coverage.xml
+
+# docker compose
+data/*

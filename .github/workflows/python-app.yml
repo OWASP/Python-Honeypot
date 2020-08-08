@@ -18,7 +18,22 @@ on:
     paths-ignore:
       - 'lib/**'
 
-    types: [ assigned, opened, edited, labeled, review_requested ,ready_for_review, reopened ]
+    types: [
+      assigned,
+      unassigned,
+      labeled,
+      unlabeled,
+      opened,
+      edited,
+      closed,
+      reopened,
+      synchronize,
+      ready_for_review,
+      locked,
+      unlocked,
+      review_requested,
+      review_request_removed
+    ]
 
 jobs:
   build:
