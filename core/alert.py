@@ -5,9 +5,11 @@ import os
 import sys
 import json
 from core import color
+from core.log import get_logger
 from core.compatible import version
 from core.time_helper import now
 
+logger = get_logger("ohp_core")
 
 def is_not_run_from_api():
     """
@@ -117,6 +119,7 @@ def info(content, log_in_file=None, mode=None,
     Returns:
         None
     """
+    logger.info(content)
     if is_not_run_from_api():  # prevent to stdout if run from API
         if version() == 2:
             sys.stdout.write(
@@ -140,13 +143,6 @@ def info(content, log_in_file=None, mode=None,
                 )
             )
             sys.stdout.flush()
-
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event))
-        # if thread temporary filename present, rewrite it
-        if thread_tmp_filename:
-            __log_into_file(thread_tmp_filename, "w", "0")
     return
 
 
@@ -183,6 +179,7 @@ def warn(content):
     Returns:
         the message in warn structure - None
     """
+    logger.warning(content)
     if is_not_run_from_api():
         if version() == 2:
             sys.stdout.write(
@@ -225,6 +222,7 @@ def verbose_info(content, log_in_file=None, mode=None,
     Returns:
         None
     """
+    logger.info(content)
     if is_not_run_from_api():  # prevent to stdout if run from API
         if version() == 2:
             sys.stdout.write(
@@ -248,13 +246,6 @@ def verbose_info(content, log_in_file=None, mode=None,
                 )
             )
             sys.stdout.flush()
-
-    if event:  # if an event is present log it
-        from core.log import __log_into_file
-        __log_into_file(log_in_file, mode, json.dumps(event))
-        # if thread temporary filename present, rewrite it
-        if thread_tmp_filename:
-            __log_into_file(thread_tmp_filename, "w", "0")
     return
 
 
@@ -268,7 +259,7 @@ def error(content):
     Returns:
         the message in error structure - None
     """
-
+    logger.error(content)
     if version() == 2:
         sys.stdout.write(
             color.color_cmd("red") +

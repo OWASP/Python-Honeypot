@@ -1,35 +1,22 @@
-import json
-from core.compatible import version
+import logging
+from config import user_configuration
+from logging.handlers import RotatingFileHandler
 
-def __log_into_file(filename, mode, data):
-    """
-    write a content into a file (support unicode).
-    Args:
-        filename: the filename
-        mode: writing mode (a, ab, w, wb, etc.)
-        data: content
-        language: language
-    Returns:
-        True if success otherwise None
-    """
-    log = ''
-    if version() == 2:
-        if isinstance(data, str):
-            try:
-                log = json.loads(data)
-            except ValueError:
-                log = ''
+FORMATTER = logging.Formatter("%(asctime)s — %(name)s — " +
+                              "%(levelname)s — %(filename)s:%(lineno)d — "+
+                              "%(message)s")
+LOG_FILE = user_configuration()["events_log_file"]
 
-        with open(filename, mode) as save:
-            save.write(data + '\n')
-    else:
-        if isinstance(data, str):
-            try:
-                log = json.loads(data)
-            except ValueError:
-                log = ''
+def get_file_handler():
+    file_handler = RotatingFileHandler(LOG_FILE)
+    file_handler.setFormatter(FORMATTER)
+    return file_handler
 
+def get_logger(logger_name):
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG) # highest level
+    logger.addHandler(get_file_handler())
+    # with this pattern, it's rarely necessary to propagate error upto parent
+    logger.propagate = False
 
-        with open(filename, mode, encoding='utf-8') as save:
-            save.write(data + '\n')
-    return True
+    return logger

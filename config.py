@@ -78,6 +78,7 @@ def user_configuration():
     """
     return {
         "language": "en",
+        "events_log_file" : "/OWASP-Honeypot/tmp/ohp.log",
         "default_selected_modules": "all",  # or select one or multiple (e.g. ftp/strong_password,ssh/strong_password)
         "default_excluded_modules": None  # or any module name separated with comma
     }
