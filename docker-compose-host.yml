@@ -12,4 +12,3 @@ services:
       - 5000:5000
     volumes:
       - .:/OWASP-Honey
-      - pot
