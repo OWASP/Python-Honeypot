@@ -8,8 +8,8 @@ services:
     command: bash -c "sleep 5 && python3 ohp.py --start-api-server"
     environment:
       - FLASK_ENV=development
+      - CI_ENV=true
     ports:
       - 5000:5000
     volumes:
-      - .:/OWASP-Honey
-      - pot
+      - .:/OWASP-Honeypot

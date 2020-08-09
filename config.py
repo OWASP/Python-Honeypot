@@ -24,8 +24,12 @@ def api_configuration():
         a JSON with API configuration
     """
     # DOCKER_ENV variable is set in the docker-compose file.
-    if os.environ.get('DOCKER_ENV') == "true":
+    if os.environ.get('MONGODB_DOCKER_ENV') == "true":
         db_url = "mongodb://mongodb:27017/"
+    elif os.environ.get('CI_ENV') == "true":
+        db_url = "mongodb://{gateway_ip}:27017/".format(
+            gateway_ip=os.popen("route -n | grep 'UG[ \t]' | awk '{print $2}'").read().strip()
+        )
     else:
         db_url = "mongodb://127.0.0.1:27017/"
 

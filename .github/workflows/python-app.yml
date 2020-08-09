@@ -57,8 +57,9 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          sudo pip3 install flake8 pytest wheel requests setuptools
-          if [ -f requirements.txt ]; then sudo pip3 install -r requirements.txt; fi
+          sudo pip3 install setuptools
+          sudo pip3 install -r requirements.txt
+          sudo pip3 install -r requirements-dev.txt
       - name: Install OS dependencies
         run: |
           sudo yes | sudo apt-get update && sudo apt-get install libpcap-dev libnet-dev tshark --fix-missing
@@ -68,25 +69,25 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude="lib/argparse/*,lib/ip2location/*"
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics --exclude="lib/argparse/*,lib/ip2location/*"
-      - name: wait for mongodb
-        run: |
-          sleep 15
       - name: Run modules test
         run: |
           sudo python3 ohp.py -m all --test
-      - name: Run API server
+      - name: Run API server via docker daemon
         run: |
-          sudo nohup python3 ohp.py --start-api-server & >/tmp/ohp
+          docker-compose -f docker-compose-host-ci.yml up -d --build
       - name: Wait for API server
         run: |
           sleep 5
+      - name: Check API server logs
+        run: |
+          docker logs owasp-honeypot_ohp_1
       - name: Test with pytest
         run: |
           sudo python3 -m pytest -rpP
-      - name: Kill API Server
-        run: |
-          sudo killall python3
       - name: Check API server logs
         run: |
-          cat /tmp/ohp
+          docker logs owasp-honeypot_ohp_1
+      - name: Kill API Server
+        run: |
+          docker-compose down
 
