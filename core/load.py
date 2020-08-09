@@ -1,29 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
-import os
 import json
+import multiprocessing as mp
+import os
 import socket
+import time
 
-from config import (user_configuration, docker_configuration,
-                    network_configuration)
-from terminable_thread import (Thread, threading)
-from core.get_modules import load_all_modules
-from core.alert import (info, error, messages)
-from core.color import reset_cmd_color
-from core.compatible import (logo, version, is_windows)
-from core.exit_helper import (exit_success, exit_failure)
-from core.compatible import make_tmp_thread_dir
-from core.get_modules import (virtual_machine_names_to_container_names,
-                              virtual_machine_name_to_container_name)
-from core.network import new_network_events
-from core.exit_helper import terminate_thread
+from terminable_thread import Thread, threading
+
 from api.server import start_api_server
-from core.compatible import (check_for_requirements, copy_dir_tree, mkdir,
-                             get_module_dir_path, is_verbose_mode)
-from database.connector import (push_events_to_database_from_thread,
-                                push_events_queues_to_database)
+from config import (docker_configuration, network_configuration,
+                    user_configuration)
+from core.alert import error, info, messages
+from core.color import reset_cmd_color
+from core.compatible import (check_for_requirements, copy_dir_tree,
+                             get_module_dir_path, is_verbose_mode, is_windows,
+                             logo, make_tmp_thread_dir, mkdir, version)
+from core.exit_helper import exit_failure, exit_success, terminate_thread
+from core.get_modules import (load_all_modules,
+                              virtual_machine_name_to_container_name,
+                              virtual_machine_names_to_container_names)
+from core.network import network_traffic_capture
+from database.connector import (push_events_queues_to_database,
+                                push_events_to_database_from_thread)
 
 # temporary use fixed version of argparse
 if is_windows():
@@ -326,9 +326,8 @@ def containers_are_unhealthy(configuration):
             if containter not in current_running_containers]
 
 
-def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
-                         configuration,
-                         new_network_events_thread):
+def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, configuration,
+                         new_network_events_thread, run_as_test):
     """
     wait for opened threads/honeypots modules
 
@@ -357,13 +356,15 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds,
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
                 return error("Interrupting the application because network " +
-                             "capturing thread is not alive!")
+                             "capturing process is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
+            if run_as_test:
+                break
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
             info("interrupted by user, please wait to stop the containers and " +
@@ -664,6 +665,11 @@ def load_honeypot_engine():
     if argv_options.start_api_server:
         start_api_server()
         exit_success()
+
+    # Check if the script is running with sudo
+    if not os.geteuid() == 0:
+        exit_failure("The script must be run as root!")
+
     # check selected modules
     if argv_options.selected_modules:
         selected_modules = list(set(argv_options.selected_modules.rsplit(",")))
@@ -723,13 +729,18 @@ def load_honeypot_engine():
     create_ohp_networks()
     # start containers based on selected modules
     configuration = start_containers(configuration)
-    # start network monitoring thread
-    new_network_events_thread = Thread(
-        target=new_network_events,
-        args=(configuration,),
-        name="new_network_events_thread"
+    # start network monitoring process
+    mp.set_start_method('fork')
+    # Event queues
+    honeypot_events_queue = mp.Queue()
+    network_events_queue = mp.Queue()
+
+    network_traffic_capture_process = mp.Process(
+        target=network_traffic_capture,
+        args=(configuration, honeypot_events_queue, network_events_queue,),
+        name="network_traffic_capture_process"
     )
-    new_network_events_thread.start()
+    network_traffic_capture_process.start()
     info(
         "all selected modules started: {0}".format(
             ", ".join(
@@ -740,7 +751,7 @@ def load_honeypot_engine():
 
     bulk_events_thread = Thread(
         target=push_events_to_database_from_thread,
-        args=(),
+        args=(honeypot_events_queue, network_events_queue,),
         name="insert_events_in_bulk_thread"
     )
     bulk_events_thread.start()
@@ -748,19 +759,22 @@ def load_honeypot_engine():
     # run module processors
     run_modules_processors(configuration)
 
-    # check if it's not a test
-    if not run_as_test:
-        # wait forever! in case user can send ctrl + c to interrupt
-        wait_until_interrupt(
-            virtual_machine_container_reset_factory_time_seconds,
-            configuration,
-            new_network_events_thread
-        )
-    # kill the network events thread
-    terminate_thread(new_network_events_thread)
-    terminate_thread(bulk_events_thread)
+    # wait forever! in case user can send ctrl + c to interrupt
+    wait_until_interrupt(
+        virtual_machine_container_reset_factory_time_seconds,
+        configuration,
+        network_traffic_capture_process,
+        run_as_test
+    )
+
     # if in case any events that were not inserted from thread
-    push_events_queues_to_database()
+    push_events_queues_to_database(honeypot_events_queue, network_events_queue)
+    # kill the network traffic capture process
+    network_traffic_capture_process.terminate()
+    network_traffic_capture_process.join()
+    info("killing network capture process")
+    # Kill bulk events thread
+    terminate_thread(bulk_events_thread)
     # stop created containers
     stop_containers(configuration)
     # stop module processor
