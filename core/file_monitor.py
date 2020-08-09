@@ -7,7 +7,6 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from database.connector import insert_to_file_change_events_collection
 from database.datatypes import FileEventsData
-from core.alert import info
 from core.compatible import byte_to_str
 from core.time_helper import now
 
