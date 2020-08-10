@@ -268,9 +268,10 @@ def count_all_events():
             return jsonify(
                 {
                     "count_all_events": (
-                            connector.honeypot_events.estimated_document_count()
-                            +
-                            connector.network_events.estimated_document_count()
+                            connector.honeypot_events.estimated_document_count() +
+                            connector.network_events.estimated_document_count() +
+                            connector.credential_events.estimated_document_count() +
+                            connector.file_change_events.estimated_document_count()
                     )
                 }
             ), 200
@@ -652,6 +653,7 @@ def get_honeypot_events():
     date = fix_date(
         get_value_from_request("date")
     )
+
     if date:
         try:
             return jsonify(
@@ -717,6 +719,7 @@ def get_network_events():
     date = fix_date(
         get_value_from_request("date")
     )
+
     if date:
         try:
             return jsonify(
@@ -753,6 +756,100 @@ def get_network_events():
                     i for i in
                     connector.network_events.find(
                         {},
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception:
+            return flask_null_array_response()
+
+
+@app.route("/api/events/get-events-data", methods=["GET"])
+def get_events_data():
+    """
+    get events data
+
+    Returns:
+        an array contain event data
+    """
+    event_type = get_value_from_request("event_type")
+    module_name = get_value_from_request("module_name")
+    start_date = fix_date(
+        get_value_from_request("start_date")
+    )
+    end_date = fix_date(
+        get_value_from_request("end_date")
+    )
+
+    if event_type == "honeypot-event":
+        db_collection_name = connector.honeypot_events
+    elif event_type == "network-event":
+        db_collection_name = connector.network_events
+    elif event_type == "credential-event":
+        db_collection_name = connector.credential_events
+    elif event_type == "ics-honeypot-event":
+        db_collection_name = connector.events_data
+    elif event_type == "file-change-event":
+        db_collection_name = connector.file_change_events
+    else:
+        return flask_null_array_response()
+
+    if start_date and end_date:
+        try:
+            query = {
+                "date":
+                    {
+                        "$gte": start_date[0],
+                        "$lte": end_date[1]
+                    }
+            }
+            if module_name:
+                query["module_name"] = module_name
+
+            return jsonify(
+                [
+                    i for i in
+                    db_collection_name.find(
+                        query,
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            ), 200
+        except Exception:
+            return flask_null_array_response()
+    else:
+        try:
+            query = {}
+            if module_name:
+                query = {
+                    "module_name": module_name,
+                }
+
+            return jsonify(
+                [
+                    i for i in
+                    db_collection_name.find(
+                        query,
                         {
                             "_id": 0
                         }

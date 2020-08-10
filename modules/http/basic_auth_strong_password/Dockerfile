@@ -3,7 +3,7 @@ FROM phusion/baseimage:0.9.19
 
 # update and install apache + python
 
-RUN apt-get update && apt-get install -y apache2 apache2-utils python
+RUN apt-get update && apt-get install -y apache2 apache2-utils
 
 # create credential
 RUN htpasswd -b -c /var/www/html/.htpasswd {username} {password}
