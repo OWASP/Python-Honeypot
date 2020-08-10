@@ -3,7 +3,6 @@
 
 import os
 import sys
-import json
 from core import color
 from core.log import get_logger
 from core.compatible import version
