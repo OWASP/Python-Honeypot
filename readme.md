@@ -12,7 +12,9 @@ We've setup a live API on a few servers in Stockholm area, you can use API calls
 ______
 
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
+
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
+
 ##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
 
 * Running Example (I sent `ctrl + c` to close and remove honeypot service correctly!)
@@ -68,5 +70,18 @@ ______
 * Please visit [API Actions](https://github.com/zdresearch/OWASP-Honeypot/wiki/API) in wiki page to find more information
 * Use `python ohp.py --start-api-server` to start API Server with [default configuration](https://github.com/zdresearch/OWASP-Honeypot/blob/master/config.py).
 
-![image_2018-07-17_01-48-26](https://user-images.githubusercontent.com/7676267/42784742-63f95a2e-8965-11e8-8d64-435f6182dcf2.png)
+#### Run Dockerized API
 
+* To run the API with _MongoDB_ running on the host, use the command given below:
+
+```sh
+docker-compose -f docker-compose-host.yml up
+```
+
+* To run the API with _MongoDB_ also running on a docker container, use the following commands:
+
+```sh
+docker-compose up
+```
+
+![image_2018-07-17_01-48-26](https://user-images.githubusercontent.com/7676267/42784742-63f95a2e-8965-11e8-8d64-435f6182dcf2.png)

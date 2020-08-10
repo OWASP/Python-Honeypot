@@ -2,6 +2,8 @@
 # !/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import asyncio
+import concurrent
 import sys
 import os
 import subprocess
@@ -90,6 +92,20 @@ def is_windows():
     return False
 
 
+def get_timeout_error():
+    """
+    Get the timeout error thrown by pyshark apply_on_packets
+    funtion
+    """
+    try:
+        # If asyncio timeout error exists, this will be returned
+        return asyncio.exceptions.TimeoutError
+    except:
+        # For older python versions, where asyncio timeout error
+        # doesn't exist, this one will be returned.
+        return concurrent.futures._base.TimeoutError
+
+
 def check_for_requirements(start_api_server):
     """
     check if requirements exist
@@ -113,9 +129,9 @@ def check_for_requirements(start_api_server):
     # check mongodb
     try:
         connection = pymongo.MongoClient(
-                            api_config["api_database"],
-                            serverSelectionTimeoutMS=connection_timeout
-                        )
+            api_config["api_database"],
+            serverSelectionTimeoutMS=connection_timeout
+        )
         connection.list_database_names()
     except Exception:
         exit_failure("cannot connect to mongodb")
@@ -147,9 +163,13 @@ def make_tmp_thread_dir():
     lowercase_string = string.ascii_lowercase
     digits = string.digits
     combined_string = uppercase_string + lowercase_string + digits
-    random_digit = random.randint(0, len(combined_string) - 1)
-    return mkdir("tmp/thread_" +
-                 "".join([combined_string[random_digit] for i in range(15)]))
+    return mkdir(
+        "tmp/thread_" + "".join(
+            [
+                combined_string[random.randint(0, len(combined_string) - 1)] for _ in range(15)
+            ]
+        )
+    )
 
 
 def mkdir(dir):
@@ -219,7 +239,7 @@ def generate_token(length=32):
     Returns:
         token string
     """
-    return "".join(random.choice("0123456789abcdef") for _ in range(32))
+    return "".join(random.choice("0123456789abcdef") for _ in range(length))
 
 
 def byte_to_str(data):
