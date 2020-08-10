@@ -268,9 +268,10 @@ def count_all_events():
             return jsonify(
                 {
                     "count_all_events": (
-                        connector.honeypot_events.estimated_document_count()
-                        +
-                        connector.network_events.estimated_document_count()
+                            connector.honeypot_events.estimated_document_count() +
+                            connector.network_events.estimated_document_count() +
+                            connector.credential_events.estimated_document_count() +
+                            connector.file_change_events.estimated_document_count()
                     )
                 }
             ), 200
@@ -806,12 +807,12 @@ def get_events_data():
     if start_date and end_date:
         try:
             query = {
-                        "date":
-                            {
-                                "$gte": start_date[0],
-                                "$lte": end_date[1]
-                            }
+                "date":
+                    {
+                        "$gte": start_date[0],
+                        "$lte": end_date[1]
                     }
+            }
             if module_name:
                 query["module_name"] = module_name
 
@@ -841,8 +842,8 @@ def get_events_data():
             query = {}
             if module_name:
                 query = {
-                            "module_name": module_name,
-                        }
+                    "module_name": module_name,
+                }
 
             return jsonify(
                 [
