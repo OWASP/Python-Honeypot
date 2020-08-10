@@ -26,10 +26,6 @@ def api_configuration():
     # DOCKER_ENV variable is set in the docker-compose file.
     if os.environ.get('MONGODB_DOCKER_ENV') == "true":
         db_url = "mongodb://mongodb:27017/"
-    elif os.environ.get('CI_ENV') == "true":
-        db_url = "mongodb://{gateway_ip}:27017/".format(
-            gateway_ip=os.popen("route -n | grep 'UG[ \t]' | awk '{print $2}'").read().strip()
-        )
     else:
         db_url = "mongodb://127.0.0.1:27017/"
 
@@ -96,6 +92,7 @@ def user_configuration():
     """
     return {
         "language": "en",
+        "events_log_file": "tmp/ohp.log",
         "default_selected_modules": "all",  # or select one or multiple (e.g. ftp/strong_password,ssh/strong_password)
         "default_excluded_modules": None  # or any module name separated with comma
     }

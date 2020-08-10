@@ -2,6 +2,129 @@ body {
     background: url("/img/background.jpeg")
 }
 
+.dt-button.btn{
+    background-color: rgba(1, 19, 16, 0.6);
+}
+
+#logo {
+    height: 50px;
+    width: auto;
+    filter: contrast(150%);
+}
+
+#titlebar{
+    background-color: rgba(24, 102, 90, 0.6);
+    text-decoration-color: black;
+}
+
+.log-explorer-label{
+    cursor: pointer;
+    font-size: medium;
+    color: #000;
+    font-weight: bold;
+}
+
+#datatable{
+    float: center;
+}
+
+div.material-table {
+    padding: 20;
+}
+
+div.material-table .table-title {
+    font-size: 20px;
+    color: #000;
+}
+
+div.material-table table tr td {
+    padding: 0 0 0 56px;
+    height: 48px;
+    width: auto;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.87);
+    border-bottom: solid 1px #DDDDDD;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+div.material-table table tr td a {
+    color: inherit;
+}
+
+div.material-table table tr td a i {
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+div.material-table table tr {
+    font-size: 12px;
+}
+
+div.material-table table th {
+    font-size: 12px;
+    font-weight: bold;
+    color: #3f3e3e;
+    cursor: pointer;
+    white-space: nowrap;
+    padding: 0;
+    height: 40px;
+    width: auto;
+    padding-left: 26px;
+    vertical-align: middle;
+    outline: none !important;
+    background-color: #c2c4c3;
+    -webkit-column-width: auto;
+}
+
+div.material-table table th.sorting_asc,
+div.material-table table th.sorting_desc {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+div.material-table table th.sorting:after,
+div.material-table table th.sorting_asc:after,
+div.material-table table th.sorting_desc:after {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  word-wrap: normal;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  display: none;
+  vertical-align: middle;
+}
+
+div.material-table table th.sorting:hover:after,
+div.material-table table th.sorting_asc:after,
+div.material-table table th.sorting_desc:after {
+  display: inline-block;
+}
+
+div.material-table table th.sorting_desc:after {
+  content: "";
+}
+
+div.material-table table tbody tr:hover {
+  background-color: #EEE;
+}
+
+div.material-table table th:first-child,
+div.material-table table td:first-child {
+  padding: 0 0 0 24px;
+}
+
+div.material-table table th:last-child,
+div.material-table table td:last-child {
+  padding: 0 14px 0 0;
+}
+
 [am-TopLogo] {
     max-height: 70px;
     max-width: 210px;
