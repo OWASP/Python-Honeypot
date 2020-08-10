@@ -74,7 +74,7 @@ jobs:
           sudo python3 ohp.py -m all --test
       - name: Run API server via docker daemon
         run: |
-          docker-compose -f docker-compose-host-ci.yml up -d --build
+          docker-compose -f docker-compose-host.yml up -d --build
       - name: Wait for API server
         run: |
           sleep 5
