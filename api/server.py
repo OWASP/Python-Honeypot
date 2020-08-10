@@ -797,7 +797,9 @@ def get_events_data():
     elif event_type == "credential-event":
         db_collection_name = connector.credential_events
     elif event_type == "ics-honeypot-event":
-        db_collection_name = connector.honeypot_events_data
+        db_collection_name = connector.events_data
+    elif event_type == "file-change-event":
+        db_collection_name = connector.file_change_events
     else:
         return flask_null_array_response()
 

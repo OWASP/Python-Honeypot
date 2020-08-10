@@ -154,6 +154,15 @@ function load_data(event_type, module_name, start_date, end_date) {
       { data: 'machine_name', defaultContent: '', title: "Machine Name"},
       { data: 'country', defaultContent: '', title: "Country"}];
   }
+  else if( event_type == "file-change-event"){
+    columns = [
+      { data: 'date', defaultContent: '', title: "Date"},
+      { data: 'module_name', defaultContent: '', title: "Module Name"},
+      { data: 'file_path', defaultContent: '', title: "File Path"},
+      { data: 'status', defaultContent: '', title: "Status"},
+      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+      { data: 'is_directory', defaultContent: '', title: "Is Directory"}]
+  }
 
   // Set API call parameters
   api_params = {event_type: event_type, start_date: start_date, end_date: end_date, limit:limit}
@@ -193,7 +202,11 @@ function search() {
  * Form update based on event type selected
  */
 function change_form(){
-    var events_with_module = new Array("honeypot-event", "credential-event")
+    var events_with_module = new Array(
+      "honeypot-event",
+      "credential-event",
+      "file-change-event"
+      )
     var event_type=$("select[name='event_type'] option:selected").val();
 
     if(events_with_module.indexOf(event_type)>-1){
