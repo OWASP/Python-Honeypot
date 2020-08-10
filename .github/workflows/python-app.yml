@@ -77,7 +77,7 @@ jobs:
           docker-compose -f docker-compose-host.yml up -d --build
       - name: Wait for API server
         run: |
-          sleep 5
+          sleep 10
       - name: Check API server logs
         run: |
           docker logs owasp-honeypot_ohp_1
