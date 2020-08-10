@@ -10,6 +10,7 @@ from core.time_helper import now
 
 logger = get_logger("ohp_core")
 
+
 def is_not_run_from_api():
     """
     check if framework run from API to prevent any alert
@@ -271,11 +272,11 @@ def error(content):
     else:
         sys.stdout.buffer.write(
             (
-                color.color_cmd("red") +
-                "[X] [{0}] ".format(now()) +
-                color.color_cmd("yellow") +
-                content + color.color_cmd("reset") +
-                "\n"
+                    color.color_cmd("red") +
+                    "[X] [{0}] ".format(now()) +
+                    color.color_cmd("yellow") +
+                    content + color.color_cmd("reset") +
+                    "\n"
             ).encode("utf8")
         )
         sys.stdout.flush()
