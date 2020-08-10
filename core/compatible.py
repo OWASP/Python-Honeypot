@@ -100,7 +100,7 @@ def get_timeout_error():
     try:
         # If asyncio timeout error exists, this will be returned
         return asyncio.exceptions.TimeoutError
-    except:
+    except Exception as _:
         # For older python versions, where asyncio timeout error
         # doesn't exist, this one will be returned.
         return concurrent.futures._base.TimeoutError
