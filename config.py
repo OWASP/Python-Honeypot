@@ -58,7 +58,7 @@ def network_configuration():
         "ignore_real_machine_ip_addresses": list(set([real_machine_ip_address, "127.0.0.1"])),
         # e.g. ["10.0.0.1", "192.168.1.1"]
         "ignore_real_machine_ports": [],  # e.g. [22, 80, 5000]
-        "timeout": 3600 # Default value
+        "split_pcap_file_timeout": 3600 # Default value
     }
 
 

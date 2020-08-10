@@ -591,7 +591,7 @@ def set_network_configuration(argv_options):
     network_config = network_configuration()
     # Set the values of the network configuration based on CLI input
     network_config["store_network_captured_files"] = argv_options.store_pcap
-    network_config["timeout"] = argv_options.timeout_value
+    network_config["split_pcap_file_timeout"] = argv_options.timeout_value
 
     return network_config
 
@@ -643,7 +643,7 @@ def argv_parser():
                            dest="store_pcap", default=False,
                            help="store network traffic as pcap files")
     # Set Timeout value for splitting network captured files
-    engineOpt.add_argument("--timeout", type=int,
+    engineOpt.add_argument("-t", "--split-pcap-file-timeout", type=int,
                            dest="timeout_value", default=3600,
                            help="timeout value used to split network captured files")
     # enable verbose mode (debug mode)

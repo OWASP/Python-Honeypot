@@ -182,7 +182,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
     display_filter += ' and '.join(['tcp.srcport!={0} and tcp.dstport!={0}'.format(_) for _ in ignore_ports])
 
     store_pcap = network_config["store_network_captured_files"]
-    timeout = network_config["timeout"]
+    timeout = network_config["split_pcap_file_timeout"]
 
     # Make the pcapfiles directory for storing the Network captured files
     base_dir_path =  os.path.join(sys.path[0], "pcapfiles")
