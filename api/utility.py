@@ -168,8 +168,8 @@ def fix_limit(limit):
     if limit:
         try:
             return int(limit)
-        except Exception as _:
-            del _
+        except Exception:
+            pass
     return 10
 
 
@@ -186,8 +186,8 @@ def fix_skip(skip):
     if skip:
         try:
             return int(skip)
-        except Exception as _:
-            del _
+        except Exception:
+            pass
     return 0
 
 

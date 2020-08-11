@@ -3,9 +3,9 @@ from config import user_configuration
 from logging.handlers import RotatingFileHandler
 
 FORMATTER = logging.Formatter(
-    "%(asctime)s — %(name)s — " +
-    "%(levelname)s — %(filename)s:%(lineno)d — " +
-    "%(message)s"
+    "%(asctime)s — %(name)s — "
+    + "%(levelname)s — %(filename)s:%(lineno)d — "
+    + "%(message)s"
 )
 LOG_FILE = user_configuration()["events_log_file"]
 
