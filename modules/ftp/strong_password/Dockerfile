@@ -5,7 +5,7 @@ FROM phusion/baseimage:0.9.19
 CMD ["/sbin/my_init"]
 
 # update and install python3 and pip3
-RUN apt-get update && apt-get install -y python3.5 python3-pip python3-dev
+RUN apt-get update && apt-get install -y python3.5 python3-pip
 
 RUN pip3 install datetime
 COPY files/ftp_sniffer.py /root/ftp_sniffer.py

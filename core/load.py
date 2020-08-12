@@ -512,8 +512,8 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                     info("port {0} selected for {1}".format(
                         real_machine_port, module_name))
                     return real_machine_port
-        except Exception:
-            pass
+        except Exception as e:
+            del e
         real_machine_port += 1
 
 

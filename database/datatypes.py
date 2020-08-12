@@ -22,9 +22,8 @@ class HoneypotEvent(object):
 
     """
 
-    def __init__(
-            self, ip_dest, port_dest, ip_src,
-            port_src, protocol, module_name, machine_name):
+    def __init__(self, ip_dest, port_dest, ip_src,
+                 port_src, protocol, module_name, machine_name):
         self.ip_dest = ip_dest
         self.port_dest = port_dest
         self.ip_src = ip_src
@@ -110,3 +109,25 @@ class EventData(object):
         self.data = data
         self.machine_name = None
         self.country = None
+
+
+class FileEventsData(object):
+    """
+    Object to store file changes events data collected from
+    modules such as ftp/ssh weak_password module.
+
+    Attributes:
+        file_path : the path of the file which is changed
+        status: status of the file would be added/modified/deleted
+        module_name : on which module client accessed
+        date : datetime of the event
+        is_directory: is directory?
+    """
+
+    def __init__(self, file_path, status, module_name, date, is_directory):
+        self.file_path = file_path
+        self.module_name = module_name
+        self.date = date
+        self.status = status
+        self.machine_name = None
+        self.is_directory = is_directory
