@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import inspect
 from multiprocessing import Queue
 import os
@@ -13,7 +14,8 @@ from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
 from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent, FileEventsData)
+                                EventData, NetworkEvent, FileEventsData,
+                                FileArchive)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -270,7 +272,7 @@ def insert_to_events_data_collection(event_data: EventData):
     return events_data.insert_one(event_data.__dict__).inserted_id
 
 
-def insert_pcap_files_to_collection(filepath):
+def insert_pcap_files_to_collection(file_archive: FileArchive):
     """
     Insert the pcap files containing the captured network traffic to
     mongodb collection
@@ -283,17 +285,23 @@ def insert_pcap_files_to_collection(filepath):
     """
     if is_verbose_mode():
         verbose_info(
-            "Received network traffic file:{0}. Inserting it in the File\
-            Archive".format(
-                filepath
+            "Received network traffic file:{0}, generation_time:{1}. "
+            "Inserting it in the File Archive".format(
+                file_archive.file_path,
+                file_archive.generation_time
             )
         )
     
     # Get the name of the file without the path
-    filename = os.path.split(filepath)[1]
+    filename = os.path.split(file_archive.file_path)[1]
     
     # Get file-like object by reading the pcap file as binary
-    pcap_file = open(filepath, "rb")
+    pcap_file = open(file_archive.file_path, "rb")
 
     # Enters the file in the database and returns the _id
-    return ohp_file_archive_gridfs.put(pcap_file, filename=filename)
+    return ohp_file_archive_gridfs.put(
+        pcap_file,
+        filename=filename,
+        generationTime=file_archive.generation_time,
+        splitTimeout=file_archive.split_timeout
+    )

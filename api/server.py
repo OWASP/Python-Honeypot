@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 
+from bson import ObjectId, json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
 
@@ -225,6 +227,35 @@ def get_static_files(path):
             "text/html"
         )
     )
+
+
+@app.route("/api/file-archive/get-files-list", methods=["GET"])
+def get_files_list():
+    """
+    Get the list of pcap files stored in the file archive
+
+    Returns:
+        JSON/Dict of files
+    """
+    date = fix_date(
+        get_value_from_request("date")
+    )
+
+    files_list ={
+        "stored_files" : [
+            i for i in connector.ohp_file_archive.fs.files.find(
+                {
+                    "generationTime":
+                        {
+                            "$gte": date[0],
+                            "$lte": date[1]
+                        }
+                }
+            )
+        ]
+    }
+
+    return json.loads(json_util.dumps(files_list)), 200
 
 
 @app.route("/api/events/count-all-events", methods=["GET"])

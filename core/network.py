@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import os
 import sys
 import time
@@ -15,7 +16,7 @@ from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue,
                                 insert_pcap_files_to_collection)
-from database.datatypes import HoneypotEvent, NetworkEvent
+from database.datatypes import HoneypotEvent, NetworkEvent, FileArchive
 
 # honeypot ports
 honeypot_ports = dict()
@@ -201,10 +202,13 @@ def network_traffic_capture(configuration, honeypot_events_queue,
 
     # Run loop in hourly manner to split the capture in multiple files
     while True:
+        # Timestamp to be used in file name
+        file_timestamp = int(time.time())
+        generation_time = datetime.fromtimestamp(file_timestamp).strftime("%Y-%m-%d %H:%M:%S")
         # File path of the network capture file with the timestamp
         output_file_path = os.path.join(
             base_dir_path,
-            "captured-traffic-" + str(int(time.time())) + ".pcap"
+            "captured-traffic-" + str(file_timestamp) + ".pcap"
         )
 
         if store_pcap:
@@ -230,11 +234,23 @@ def network_traffic_capture(configuration, honeypot_events_queue,
 
         except get_timeout_error():
             # Catches the timeout error thrown by apply_on_packets
-            insert_pcap_files_to_collection(output_file_path)
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
             pass
 
         except KeyboardInterrupt:
-            insert_pcap_files_to_collection(output_file_path)
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
             try:
                 capture.close()
                 break
@@ -242,7 +258,13 @@ def network_traffic_capture(configuration, honeypot_events_queue,
                 break
 
         except Exception as e:
-            insert_pcap_files_to_collection(output_file_path)
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
             error(str(e))
             break
    
