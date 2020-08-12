@@ -14,7 +14,8 @@ from core.alert import error, info, warn
 from core.compatible import is_verbose_mode, get_timeout_error, mkdir
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
-                                insert_to_network_events_queue)
+                                insert_to_network_events_queue,
+                                insert_pcap_files_to_collection)
 from database.datatypes import HoneypotEvent, NetworkEvent
 
 # honeypot ports
@@ -192,7 +193,12 @@ def network_traffic_capture(configuration, honeypot_events_queue,
         """
         Callback function, called by apply_on_packets
         """
-        process_packet(packet, honeypot_events_queue, network_events_queue, network_config)
+        process_packet(
+            packet,
+            honeypot_events_queue,
+            network_events_queue,
+            network_config
+        )
 
     # Run loop in hourly manner to split the capture in multiple files
     while True:
@@ -203,7 +209,11 @@ def network_traffic_capture(configuration, honeypot_events_queue,
         )
 
         if store_pcap:
-            info("Network capture is getting stored in, {}".format(output_file_path))
+            info(
+                "Network capture is getting stored in, {}".format(
+                    output_file_path
+                )
+            )
 
         try:
             capture = pyshark.LiveCapture(
@@ -221,9 +231,11 @@ def network_traffic_capture(configuration, honeypot_events_queue,
 
         except get_timeout_error():
             # Catches the timeout error thrown by apply_on_packets
+            insert_pcap_files_to_collection(output_file_path)
             pass
 
         except KeyboardInterrupt:
+            insert_pcap_files_to_collection(output_file_path)
             try:
                 capture.close()
                 break
@@ -231,7 +243,8 @@ def network_traffic_capture(configuration, honeypot_events_queue,
                 break
 
         except Exception as e:
-            error(e)
+            insert_pcap_files_to_collection(output_file_path)
+            error(str(e))
             break
-
+   
     return True

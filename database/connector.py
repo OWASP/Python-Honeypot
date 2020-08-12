@@ -6,6 +6,7 @@ from multiprocessing import Queue
 import os
 import time
 
+import gridfs
 import pymongo
 
 from config import api_configuration, network_configuration
@@ -30,6 +31,9 @@ credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
 events_data = database.events_data
+# Database for storing network traffic files
+ohp_file_archive = client.ohp_file_archive
+ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
 
 IP2Location = IP2Location.IP2Location(
     os.path.join(
@@ -225,3 +229,32 @@ def insert_to_events_data_collection(event_data: EventData):
         )
 
     return events_data.insert_one(event_data.__dict__).inserted_id
+
+
+def insert_pcap_files_to_collection(filepath):
+    """
+    Insert the pcap files containing the captured network traffic to
+    mongodb collection
+
+    Args:
+        filepath: path of the file
+
+    Returns:
+        file_id
+    """
+    if is_verbose_mode():
+        verbose_info(
+            "Received network traffic file:{0}. Inserting it in the File\
+            Archive".format(
+                filepath
+            )
+        )
+    
+    # Get the name of the file without the path
+    filename = os.path.split(filepath)[1]
+    
+    # Get file-like object by reading the pcap file as binary
+    pcap_file = open(filepath, "rb")
+
+    # Enters the file in the database and returns the _id
+    return ohp_file_archive_gridfs.put(pcap_file, filename=filename)
