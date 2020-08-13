@@ -240,22 +240,25 @@ def get_files_list():
     date = fix_date(
         get_value_from_request("date")
     )
-
-    files_list ={
-        "stored_files" : [
-            i for i in connector.ohp_file_archive.fs.files.find(
-                {
-                    "generationTime":
-                        {
-                            "$gte": date[0],
-                            "$lte": date[1]
-                        }
-                }
-            )
-        ]
-    }
-
-    return json.loads(json_util.dumps(files_list)), 200
+    try:
+        files_list ={
+            "storedFiles" : [
+                i for i in connector.ohp_file_archive.fs.files.find(
+                    {
+                        "generationTime":
+                            {
+                                "$gte": date[0],
+                                "$lte": date[1]
+                            }
+                    }
+                )
+            ]
+        }
+        print(files_list)
+        return json.loads(json_util.dumps(files_list)), 200
+    
+    except Exception:
+        return flask_null_array_response()
 
 
 @app.route("/api/events/count-all-events", methods=["GET"])

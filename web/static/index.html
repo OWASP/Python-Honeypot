@@ -31,7 +31,10 @@
         <a class="navbar-brand" onclick="get_data_plots()"><img src="img/owasp.png" id="logo"></a>
         <ul class="navbar-nav">
             <li class="nav-item">
-                <label class="log-explorer-label label" onclick="get_explorer()">Log Explorer</label>
+                <label class="log-explorer-label label" onclick="get_log_explorer()">Log Explorer</label>
+            </li>
+            <li class="nav-item">
+                <label class="file-archive-explorer-label label" onclick="get_file_explorer()">File Archive</label>
             </li>
         </ul>
     </nav>
@@ -119,19 +122,38 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-info btn-sm" onclick="search()">Search</button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="search_database()">Search</button>
                     </div>
                 </form>
             </div>
+        </div>
+        <div id="file-archive-explorer" hidden=true>
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="archive-date">Retreive Network Files Stored On: </label>
+                        <input type="date" class="form-control" id="archive-date">
+                        <button type="button" class="btn btn-info btn-sm" onclick="search_file_archive()">Search</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <hr>
     <div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
         <div class="col s12">
             <div class="card material-table">
-                <table id="datatable" class="table striped responsive" style="float:center">
+                <table id="log-datatable" class="table striped responsive" style="float:center">
                 </table>
             </div>
+            </div>
+        </div>
+    </div>
+    <div id="file-archive-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
+        <div class="col s12">
+            <div class="card material-table">
+                <table id="file-datatable" class="table striped responsive" style="float:center">
+                </table>
             </div>
         </div>
     </div>

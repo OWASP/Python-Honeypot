@@ -37,13 +37,13 @@ function get_export_fileName(file_type){
 /**
  * Call the API to get event data from the database
  * @param {*} api_endpoint : API endpoint URL
- * @param {*} columns_def : Column definition for the selected event type
+ * @param {*} column_list : List of Columns for the selected event type
  * @param {*} api_params  : GET parameters for the API call
  */
-function call_api(api_endpoint, columns_def, api_params){
+function call_events_api_endpoint(api_endpoint, column_list, api_params){
   $(document).ready(function() {
 
-    var table = $('#datatable').dataTable({
+    var table = $(api_params.datatable_id).dataTable({
       ajax: {
             type: "GET",
             url: api_endpoint,
@@ -68,7 +68,7 @@ function call_api(api_endpoint, columns_def, api_params){
           className: "btn btn-info btn-sm"
         }
       ],
-      columns:columns_def,
+      columns: column_list,
       destroy: true,
       order: [0, 'desc'],
       sort: true,
@@ -94,6 +94,60 @@ function call_api(api_endpoint, columns_def, api_params){
   });
 }
 
+/**
+ * 
+ * @param {*} api_endpoint 
+ * @param {*} column_list 
+ * @param {*} column_defs 
+ * @param {*} api_params 
+ */
+function call_file_archive_api_endpoint(api_endpoint, column_list, column_defs, api_params){
+  console.log(api_endpoint);
+  console.log(api_params);
+  $(document).ready(function() {
+
+    var table = $(api_params.datatable_id).dataTable({
+      ajax: {
+            type: "GET",
+            url: api_endpoint,
+            contentType:'application/json; charset=utf-8',
+            data: api_params,
+            dataType: "json",
+            dataSrc: "storedFiles"
+        },
+      autoWidth: true,
+      dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
+      "<'row'<'col-sm-12'tr>>" +
+      "<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
+      columns: column_list,
+      columnDefs: column_defs,
+      destroy: true,
+      select: {
+          style: 'multi'
+      },
+      order: [[1, 'asc']],
+      sort: true,
+      info: true,
+      paging: true,
+      oLanguage: {
+        sStripClasses: "",
+        sSearch: "",
+        sSearchPlaceholder: "Search filter...",
+        sInfo: "_START_ -_END_ of _TOTAL_",
+        sLengthMenu: '<span>Rows per page:</span><select class="browser-default">' +
+          '<option value="10">10</option>' +
+          '<option value="20">20</option>' +
+          '<option value="30">30</option>' +
+          '<option value="40">40</option>' +
+          '<option value="50">50</option>' +
+          '<option value="-1">All</option>' +
+          '</select></div>'
+      },
+      searching:true,
+      responsive: true
+    });
+  });
+}
 
 /**
  * Load data to the table based on user selected filters.
@@ -102,94 +156,125 @@ function call_api(api_endpoint, columns_def, api_params){
  * @param {*} start_date 
  * @param {*} end_date 
  */
-function load_data(event_type, module_name, start_date, end_date) {
-  if ( $.fn.dataTable.isDataTable( '#datatable' ) ) {
-    $('#datatable').DataTable().clear().destroy();
-    $('#datatable').empty();
+function load_data(api_endpoint, search_parameters) {
+  if ($.fn.dataTable.isDataTable(search_parameters.datatable_id)) {
+    $(search_parameters.datatable_id).DataTable().clear().destroy();
+    $(search_parameters.datatable_id).empty();
   }
   var columns = [];
-  var api_endpoint = "/api/events/get-events-data";
   var limit = 1000;
 
-  // Define table columns based on selected event type
-  if(event_type == "honeypot-event"){
-    columns = [
-      { data: 'date', defaultContent: '', title: "Date"},
-      { data: 'ip_src', defaultContent: '', title: "Src IP"},
-      { data: 'port_src', defaultContent: '', title: "Src Port"},
-      { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
-      { data: 'port_dest', defaultContent: '', title: "Dest Port"},
-      { data: 'module_name', defaultContent: '', title: "Module Name"},
-      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
-      { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
-      { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
-  }
-  else if( event_type == "network-event"){
-    columns = [
-      { data: 'date', defaultContent: '', title: "Date"},
-      { data: 'ip_src', defaultContent: '', title: "Src IP"},
-      { data: 'port_src', defaultContent: '', title: "Src Port"},
-      { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
-      { data: 'port_dest', defaultContent: '', title: "Dest Port"},
-      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
-      { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
-      { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
-  }
-  else if( event_type == "credential-event"){
-    columns = [
-      { data: 'date', defaultContent: '', title: "Date"},
-      { data: 'ip', defaultContent: '', title: "IP"},
-      { data: 'module_name', defaultContent: '', title: "Module Name"},
-      { data: 'username', defaultContent: '', title: "Username"},
-      { data: 'password', defaultContent: '', title: "Password"},
-      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
-      { data: 'country', defaultContent: '', title: "Country"}];
-  }
-  else if( event_type == "ics-honeypot-event"){
-    columns = [
-      { data: 'date', defaultContent: '', title: "Date"},
-      { data: 'ip', defaultContent: '', title: "IP"},
-      { data: 'module_name', defaultContent: '', title: "Module Name"},
-      { data: 'data', defaultContent: '', title: "Data"},
-      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
-      { data: 'country', defaultContent: '', title: "Country"}];
-  }
-  else if( event_type == "file-change-event"){
-    columns = [
-      { data: 'date', defaultContent: '', title: "Date"},
-      { data: 'module_name', defaultContent: '', title: "Module Name"},
-      { data: 'file_path', defaultContent: '', title: "File Path"},
-      { data: 'status', defaultContent: '', title: "Status"},
-      { data: 'machine_name', defaultContent: '', title: "Machine Name"},
-      { data: 'is_directory', defaultContent: '', title: "Is Directory"}]
-  }
+  if(search_parameters.datatable_id == "#log-datatable"){
+    // Define table columns based on selected event type
+    if(search_parameters.event_type == "honeypot-event"){
+      columns = [
+        { data: 'date', defaultContent: '', title: "Date"},
+        { data: 'ip_src', defaultContent: '', title: "Src IP"},
+        { data: 'port_src', defaultContent: '', title: "Src Port"},
+        { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
+        { data: 'port_dest', defaultContent: '', title: "Dest Port"},
+        { data: 'module_name', defaultContent: '', title: "Module Name"},
+        { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+        { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
+        { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
+    }
+    else if(search_parameters.event_type == "network-event"){
+      columns = [
+        { data: 'date', defaultContent: '', title: "Date"},
+        { data: 'ip_src', defaultContent: '', title: "Src IP"},
+        { data: 'port_src', defaultContent: '', title: "Src Port"},
+        { data: 'ip_dest', defaultContent: '', title: "Dest IP"},
+        { data: 'port_dest', defaultContent: '', title: "Dest Port"},
+        { data: 'protocol', defaultContent: '', title: "Protocol"},
+        { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+        { data: 'country_ip_src', defaultContent: '', title: "Src Country"},
+        { data: 'country_ip_dest', defaultContent: '', title: "Dest Country"}];
+    }
+    else if(search_parameters.event_type == "credential-event"){
+      columns = [
+        { data: 'date', defaultContent: '', title: "Date"},
+        { data: 'ip', defaultContent: '', title: "IP"},
+        { data: 'module_name', defaultContent: '', title: "Module Name"},
+        { data: 'username', defaultContent: '', title: "Username"},
+        { data: 'password', defaultContent: '', title: "Password"},
+        { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+        { data: 'country', defaultContent: '', title: "Country"}];
+    }
+    else if(search_parameters.event_type == "ics-honeypot-event"){
+      columns = [
+        { data: 'date', defaultContent: '', title: "Date"},
+        { data: 'ip', defaultContent: '', title: "IP"},
+        { data: 'module_name', defaultContent: '', title: "Module Name"},
+        { data: 'data', defaultContent: '', title: "Data"},
+        { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+        { data: 'country', defaultContent: '', title: "Country"}];
+    }
+    else if(search_parameters.event_type == "file-change-event"){
+      columns = [
+        { data: 'date', defaultContent: '', title: "Date"},
+        { data: 'module_name', defaultContent: '', title: "Module Name"},
+        { data: 'file_path', defaultContent: '', title: "File Path"},
+        { data: 'status', defaultContent: '', title: "Status"},
+        { data: 'machine_name', defaultContent: '', title: "Machine Name"},
+        { data: 'is_directory', defaultContent: '', title: "Is Directory"}];
+    }
 
-  // Set API call parameters
-  api_params = {event_type: event_type, start_date: start_date, end_date: end_date, limit:limit}
-
-  if(module_name != ""){
-    api_params.module_name = module_name;
+    if(search_parameters.module_name == ""){
+      delete search_parameters.module_name;
+    }
+    // Set API call parameters, delete datatable ID as it is not required in API call
+    delete search_parameters.datatable_id;
+    search_parameters.limit = limit;
+    
+    call_events_api_endpoint(api_endpoint, columns, search_parameters);
   }
-  
-  call_api(api_endpoint, columns, api_params);
+  else if (search_parameters.datatable_id == "#file-datatable"){
+    columns = [
+      { data: '', defaultContent:'', title: 'Select'},
+      { data: 'generationTime', defaultContent: '', title: "Generation Time"},
+      { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
+      { data: 'filename', defaultContent: '', title: "Filename"},
+      { data: 'length', defaultContent: '', title: "File Size"},
+      { data: 'md5', defaultContent: '', title: "MD5"}];
+    column_defs = [
+      {
+        orderable: false,
+        className: 'select-checkbox',
+        targets: [0]
+      }
+    ]
+    search_parameters.limit = limit;
+    
+    call_file_archive_api_endpoint(api_endpoint, columns, column_defs, search_parameters);
+  }
 }
 
 
 /**
- * Function called when "submit" button is clicked.
+ * Function called when "search" button is clicked in the "Log explorer" display
  */
-function search() {
+function search_database() {
+    var api_endpoint = "/api/events/get-events-data";
     var event_type=$("select[name='event_type'] option:selected").val();
     var module_name=$("select[name='module_names'] option:selected").val();
     var start_date=$("#start_date").val();
     var end_date=$("#end_date").val();
 
     if(start_date == "" || end_date == ""){
-      alert("Either Start Date or End date missing!")
+      alert("Either Start Date or End date missing!");
     }
     else{
       if(start_date <= end_date){
-        load_data(event_type, module_name, start_date, end_date);
+          load_data(
+            api_endpoint,
+            {
+              datatable_id: "#log-datatable",
+              event_type: event_type,
+              module_name: module_name,
+              start_date: start_date,
+              end_date: end_date
+          }
+        );
       }
       else{
         alert("Start date is greater than End date!")
@@ -197,6 +282,23 @@ function search() {
     }
 }
 
+/**
+ * Function called when "search" button is clickec in the "File Archive" display
+ */
+function search_file_archive() {
+  var api_endpoint = "/api/file-archive/get-files-list";
+  var archive_date=$("#archive-date").val();
+  if(archive_date == ""){
+    alert("Date not provided!");
+  }
+  load_data(
+    api_endpoint,
+    {
+      datatable_id: "#file-datatable",
+      date: archive_date
+    }
+  );
+}
 
 /**
  * Form update based on event type selected
@@ -222,10 +324,12 @@ function change_form(){
 /**
  * Show the log explorer form and table
  */
-function get_explorer(){
-  document.getElementById("data-plots").hidden=true;
+function get_log_explorer(){
   document.getElementById("log-explorer-form").hidden=false;
   document.getElementById("log-explorer-table").hidden=false;
+  document.getElementById("data-plots").hidden=true;
+  document.getElementById("file-archive-explorer").hidden=true;
+  document.getElementById("file-archive-explorer-table").hidden=true;
 }
 
 
@@ -233,7 +337,16 @@ function get_data_plots(){
   document.getElementById("data-plots").hidden=false;
   document.getElementById("log-explorer-form").hidden=true;
   document.getElementById("log-explorer-table").hidden=true;
+  document.getElementById("file-archive-explorer").hidden=true;
+  document.getElementById("file-archive-explorer-table").hidden=true;
 }
 
+function get_file_explorer(){
+  document.getElementById("file-archive-explorer").hidden=false;
+  document.getElementById("file-archive-explorer-table").hidden=false;
+  document.getElementById("data-plots").hidden=true;
+  document.getElementById("log-explorer-form").hidden=true;
+  document.getElementById("log-explorer-table").hidden=true;
+}
 
 load_module_options();
