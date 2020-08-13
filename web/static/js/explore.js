@@ -118,14 +118,15 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, column_defs, 
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
       "<'row'<'col-sm-12'tr>>" +
-      "<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
+      "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
       columns: column_list,
       columnDefs: column_defs,
-      destroy: true,
       select: {
-          style: 'multi'
+        style:    'multi',
+        selector: 'td:first-child'
       },
-      order: [[1, 'asc']],
+      destroy: true,
+      order: [1, 'desc'],
       sort: true,
       info: true,
       paging: true,
@@ -223,25 +224,31 @@ function load_data(api_endpoint, search_parameters) {
       delete search_parameters.module_name;
     }
     // Set API call parameters, delete datatable ID as it is not required in API call
-    delete search_parameters.datatable_id;
     search_parameters.limit = limit;
     
     call_events_api_endpoint(api_endpoint, columns, search_parameters);
   }
   else if (search_parameters.datatable_id == "#file-datatable"){
     columns = [
-      { data: '', defaultContent:'', title: 'Select'},
+      { data: '', defaultContent: '', title: "Select"},
       { data: 'generationTime', defaultContent: '', title: "Generation Time"},
       { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
       { data: 'filename', defaultContent: '', title: "Filename"},
       { data: 'length', defaultContent: '', title: "File Size"},
-      { data: 'md5', defaultContent: '', title: "MD5"}];
+      { data: 'md5', defaultContent: '', title: "MD5"},
+      { data: 'uploadDate.$date', defaultContent: '', title: "Upload Time"},
+      { data: '_id.$oid', defaultContent: '', title: "File ID"}
+    ];
     column_defs = [
       {
+        targets: 0,
+        searchable: false,
         orderable: false,
-        className: 'select-checkbox',
-        targets: [0]
-      }
+        className: 'dt-body-center',
+        render: function (data, type, full, meta){
+            return '<input type="checkbox" name="id[]" value="' + $('<div/>').text(data).html() + '">';
+        }
+     }
     ]
     search_parameters.limit = limit;
     

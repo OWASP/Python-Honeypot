@@ -27,7 +27,8 @@ body {
     margin-right: 7px;
 }
 
-#datatable{
+#file-datatable,
+#log-datatable{
     float: center;
 }
 

@@ -254,7 +254,6 @@ def get_files_list():
                 )
             ]
         }
-        print(files_list)
         return json.loads(json_util.dumps(files_list)), 200
     
     except Exception:
