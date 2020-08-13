@@ -102,11 +102,9 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
  * @param {*} api_params 
  */
 function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
-  console.log(api_endpoint);
-  console.log(api_params);
-  $(document).ready(function () {
 
-    var table = $(api_params.datatable_id).dataTable({
+  $(document).ready(function () {
+    var table = $(api_params.datatable_id).DataTable({
       ajax: {
         type: "GET",
         url: api_endpoint,
@@ -126,6 +124,13 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
           searchable: false,
           orderable: false,
           className : 'select-checkbox',
+          checkboxes: {
+            'selectRow': true
+          }
+       },
+       {
+         targets: [7],
+         visible: false
        },
       ],
       retrieve : true,
@@ -155,6 +160,14 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       searching: true,
       responsive: true
     });
+    document.getElementById("download-file-btn").hidden = false;
+
+    // $("#download-file").hidden = false;
+    $("#download-file-btn").on('click', function(e){
+      var rows_selected =  table.column(0).checkboxes.selected();
+      console.log(rows_selected);
+    });
+
   });
 }
 
@@ -245,7 +258,7 @@ function load_data(api_endpoint, search_parameters) {
       { data: 'length', defaultContent: '', title: "File Size"},
       { data: 'md5', defaultContent: '', title: "MD5"},
       { data: 'uploadDate.$date', defaultContent: '', title: "Upload Time"},
-      { data: '_id.$oid', defaultContent: '', title: "File ID"}
+      { data: '_id.$oid', defaultContent: '', title: "File ID", hidden: true}
     ];
     search_parameters.limit = limit;
 
