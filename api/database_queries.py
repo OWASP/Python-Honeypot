@@ -8,6 +8,9 @@ for querying mongodb using pymongo.
 Created this file because the queries are repeated over the URI's.
 """
 from bson.son import SON
+from api.utility import (fix_date,
+                         fix_limit,
+                         fix_skip)
 
 top_ip_dests_groupby = {
     "$group":
@@ -125,3 +128,25 @@ group_by_ip_dest_and_password = {
                 }
         }
 }
+
+
+def filter_by_date(date):
+    date = fix_date(date)
+    return {
+        "date": {
+            "$gte": date[0],
+            "$lte": date[1]
+        }
+    }
+
+
+def filter_by_skip(skip):
+    return {
+        "$skip": fix_skip(skip)
+    }
+
+
+def filter_by_limit(limit):
+    return {
+        "$limit": fix_limit(limit)
+    }

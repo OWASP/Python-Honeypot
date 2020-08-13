@@ -12,7 +12,10 @@ from api.database_queries import (group_by_ip_dest,
                                   sort_by_count_and_id, top_countries_groupby,
                                   top_ip_dests_groupby,
                                   top_machine_names_groupby,
-                                  top_port_dests_groupby)
+                                  top_port_dests_groupby,
+                                  filter_by_date,
+                                  filter_by_skip,
+                                  filter_by_limit)
 from api.utility import (aggregate_function, all_mime_types, fix_date,
                          fix_limit, fix_skip, flask_null_array_response,
                          msg_structure, root_dir)
@@ -232,60 +235,36 @@ def count_all_events():
     Returns:
         JSON/Dict number of all events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-    if date:
-        try:
-            return jsonify(
-                {
-                    "count_all_events_by_date":
-                        connector.honeypot_events.count_documents(
-                            {
-                                "date": {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                            }
-                        ) + connector.network_events.count_documents(
-                            {
-                                "date": {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                            }
-                        ) + connector.credential_events.count_documents(
-                            {
-                                "date": {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                            }
-                        ) + connector.file_change_events.count_documents(
-                            {
-                                "date": {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                            }
-                        ),
-                    "date": date
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
-    else:
-        try:
-            return jsonify(
-                {
-                    "count_all_events": (connector.honeypot_events.estimated_document_count()
-                                         + connector.network_events.estimated_document_count()
-                                         + connector.credential_events.estimated_document_count()
-                                         + connector.file_change_events.estimated_document_count())
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
+    date = get_value_from_request("date")
+    try:
+        return jsonify(
+            {
+                "count_all_events_by_date": connector.honeypot_events.count_documents(
+                    {
+                        **filter_by_date(date)
+                    }
+                ) if date else connector.honeypot_events.estimated_document_count()
+                               + connector.network_events.count_documents(
+                    {
+                        **filter_by_date(date)
+                    }
+                ) if date else connector.network_events.estimated_document_count()
+                               + connector.credential_events.count_documents(
+                    {
+                        **filter_by_date(date)
+                    }
+                ) if date else connector.credential_event.estimated_document_count()
+                               + connector.file_change_events.count_documents(
+                    {
+                        **filter_by_date(date)
+                    }
+                ) if date else connector.file_change_events.count_documents()
+                ,
+                "date": date
+            }
+        ), 200
+    except Exception:
+        return flask_null_array_response()
 
 
 @app.route("/api/events/count-honeypot-events", methods=["GET"])
@@ -296,37 +275,21 @@ def count_honeypot_events():
     Returns:
         JSON/Dict number of honeypot events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-    if date:
-        try:
-            return jsonify(
-                {
-                    "count_honeypot_events_by_date":
-                        connector.honeypot_events.count_documents(
-                            {
-                                "date": {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
-                            }
-                        ),
-                    "date": date
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
-    else:
-        try:
-            return jsonify(
-                {
-                    "count_honeypot_events":
-                        connector.honeypot_events.estimated_document_count()
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
+    date = get_value_from_request("date")
+    try:
+        return jsonify(
+            {
+                "count_honeypot_events_by_date":
+                    connector.honeypot_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.honeypot_events.estimated_document_count(),
+                "date": date
+            }
+        ), 200
+    except Exception:
+        return flask_null_array_response()
 
 
 @app.route("/api/events/count-network-events", methods=["GET"])
@@ -337,38 +300,21 @@ def count_network_events():
     Returns:
         JSON/Dict number of network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-    if date:
-        try:
-            return jsonify(
-                {
-                    "count_network_events_by_date":
-                        connector.network_events.count_documents(
-                            {
-                                "date":
-                                    {
-                                        "$gte": date[0],
-                                        "$lte": date[1]
-                                    }
-                            }
-                        ),
-                    "date": date
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
-    else:
-        try:
-            return jsonify(
-                {
-                    "count_network_events":
-                        connector.network_events.estimated_document_count()
-                }
-            ), 200
-        except Exception:
-            return flask_null_array_response()
+    date = get_value_from_request("date")
+    try:
+        return jsonify(
+            {
+                "count_network_events_by_date":
+                    connector.network_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.network_events.estimated_document_count(),
+                "date": date
+            }
+        ), 200
+    except Exception:
+        return flask_null_array_response()
 
 
 @app.route("/api/events/honeypot-events-ips", methods=["GET"])
@@ -379,28 +325,19 @@ def top_ten_ips_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     country_ip_dest = get_value_from_request("country_ip_dest")
     top_ips_query = [
         top_ip_dests_groupby,
-        {
-            "$skip": fix_skip(get_value_from_request("skip"))
-        },
-        {
-            "$limit": fix_limit(get_value_from_request("limit"))
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
 
     if country_ip_dest and date:
         match_by_country_and_date = {
             "$match": {
                 "country_ip_dest": country_ip_dest,
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_ips_query.insert(0, match_by_country_and_date)
@@ -419,10 +356,7 @@ def top_ten_ips_in_honeypot_events():
     elif date:
         match_by_date = {
             "$match": {
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_ips_query.insert(0, match_by_date)
@@ -450,31 +384,18 @@ def top_ten_ips_in_network_events():
     Returns:
         JSON/Dict top ten repeated ips in network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     country_ip_dest = get_value_from_request("country_ip_dest")
     top_ips_query = [
         top_ip_dests_groupby,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
         match_by_country_and_date = {
             "$match": {
                 "country_ip_dest": country_ip_dest,
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_ips_query.insert(0, match_by_country_and_date)
@@ -492,10 +413,7 @@ def top_ten_ips_in_network_events():
     elif date:
         match_by_date = {
             "$match": {
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_ips_query.insert(0, match_by_date)
@@ -523,28 +441,19 @@ def top_ten_ports_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated ports in honeypot events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     country_ip_dest = get_value_from_request("country_ip_dest")
     top_ports_query = [
         top_port_dests_groupby,
-        {
-            "$skip": fix_skip(get_value_from_request("skip"))
-        },
-        {
-            "$limit": fix_limit(get_value_from_request("limit"))
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
         match_by_country_and_date = {
             "$match":
                 {
                     "country_ip_dest": country_ip_dest,
-                    "date": {
-                        "$gte": date[0],
-                        "$lte": date[1]
-                    }
+                    **filter_by_date(date)
                 }
         }
         top_ports_query.insert(0, match_by_country_and_date)
@@ -561,11 +470,7 @@ def top_ten_ports_in_honeypot_events():
     elif date:
         match_by_date = {
             "$match": {
-                "date":
-                    {
-                        "$gte": date[0],
-                        "$lte": date[1]
-                    }
+                **filter_by_date(date)
             }
         }
         top_ports_query.insert(0, match_by_date)
@@ -591,28 +496,19 @@ def top_ten_ports_in_network_events():
     Returns:
         JSON/Dict top ten repeated ports in network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     country_ip_dest = get_value_from_request("country_ip_dest")
     top_ports_query = [
         top_port_dests_groupby,
-        {
-            "$skip": fix_skip(get_value_from_request("skip"))
-        },
-        {
-            "$limit": fix_limit(get_value_from_request("limit"))
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
         match_by_country_and_date = {
             "$match":
                 {
                     "country_ip_dest": country_ip_dest,
-                    "date": {
-                        "$gte": date[0],
-                        "$lte": date[1]
-                    }
+                    **filter_by_date(date)
                 }
         }
         top_ports_query.insert(0, match_by_country_and_date)
@@ -629,11 +525,7 @@ def top_ten_ports_in_network_events():
     elif date:
         match_by_date = {
             "$match": {
-                "date":
-                    {
-                        "$gte": date[0],
-                        "$lte": date[1]
-                    }
+                **filter_by_date(date)
             }
         }
         top_ports_query.insert(0, match_by_date)
@@ -659,10 +551,7 @@ def get_honeypot_events():
     Returns:
         an array contain honeypot events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-
+    date = get_value_from_request("date")
     if date:
         try:
             return jsonify(
@@ -670,11 +559,7 @@ def get_honeypot_events():
                     i for i in
                     connector.honeypot_events.find(
                         {
-                            "date":
-                                {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
+                            **filter_by_date(date)
                         },
                         {
                             "_id": 0
@@ -725,10 +610,7 @@ def get_network_events():
     Returns:
         an array contain network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-
+    date = get_value_from_request("date")
     if date:
         try:
             return jsonify(
@@ -736,11 +618,7 @@ def get_network_events():
                     i for i in
                     connector.network_events.find(
                         {
-                            "date":
-                                {
-                                    "$gte": date[0],
-                                    "$lte": date[1]
-                                }
+                            **filter_by_date(date)
                         },
                         {
                             "_id": 0
@@ -793,6 +671,7 @@ def get_events_data():
     """
     event_type = get_value_from_request("event_type")
     module_name = get_value_from_request("module_name")
+    # todo: rename the variable
     start_date = fix_date(
         get_value_from_request("start_date")
     )
@@ -816,11 +695,10 @@ def get_events_data():
     if start_date and end_date:
         try:
             query = {
-                "date":
-                    {
-                        "$gte": start_date[0],
-                        "$lte": end_date[1]
-                    }
+                "$gte": start_date[0],
+                "$lte": end_date[1]
+                # todo: fix
+                # **filter_by_date(date)
             }
             if module_name:
                 query["module_name"] = module_name
@@ -885,22 +763,12 @@ def top_ten_countries_in_honeypot_events():
     Returns:
         JSON/Dict top ten repeated countries honeypot in events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     top_countries_query = [
         top_countries_groupby,
         sort_by_count,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
         match_by_date_and_country = {
@@ -908,10 +776,7 @@ def top_ten_countries_in_honeypot_events():
                 "country_ip_dest": {
                     "$gt": "-"
                 },
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_countries_query.insert(0, match_by_date_and_country)
@@ -944,22 +809,12 @@ def top_ten_countries_in_network_events():
     Returns:
         JSON/Dict top ten repeated countries in network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     top_countries_query = [
         top_countries_groupby,
         sort_by_count,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
         match_by_date_and_country = {
@@ -968,10 +823,7 @@ def top_ten_countries_in_network_events():
                     "country_ip_dest": {
                         "$gt": "-"
                     },
-                    "date": {
-                        "$gte": date[0],
-                        "$lte": date[1]
-                    }
+                    **filter_by_date(date)
                 }
         }
         top_countries_query.insert(0, match_by_date_and_country)
@@ -1004,31 +856,17 @@ def top_network_machine_names():
     Returns:
         JSON/Dict top network machine names in network events
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
-
+    date = get_value_from_request("date")
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
         match_by_date = {
             "$match": {
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_machinenames_query.insert(0, match_by_date)
@@ -1051,30 +889,17 @@ def top_honeypot_machine_names():
     Returns:
         JSON/Dict top honeypot machine names
     """
-    date = fix_date(
-        get_value_from_request("date")
-    )
+    date = get_value_from_request("date")
     top_machinenames_query = [
         top_machine_names_groupby,
         sort_by_count_and_id,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
         match_by_date = {
             "$match": {
-                "date": {
-                    "$gte": date[0],
-                    "$lte": date[1]
-                }
+                **filter_by_date(date)
             }
         }
         top_machinenames_query.insert(0, match_by_date)
@@ -1100,16 +925,8 @@ def module_events():
     module_name = get_value_from_request("module_name")
     module_query = [
         group_by_ip_dest,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if module_name:
         module_query.insert(
@@ -1139,16 +956,8 @@ def top_usernames_used():
     module_name = get_value_from_request("module_name")
     module_query = [
         group_by_ip_dest_and_username,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if module_name:
         module_query.insert(
@@ -1178,16 +987,8 @@ def top_passwords_used():
     module_name = get_value_from_request("module_name")
     module_query = [
         group_by_ip_dest_and_password,
-        {
-            "$skip": fix_skip(
-                get_value_from_request("skip")
-            )
-        },
-        {
-            "$limit": fix_limit(
-                get_value_from_request("limit")
-            )
-        }
+        filter_by_skip(get_value_from_request("skip")),
+        filter_by_limit(get_value_from_request("limit"))
     ]
     if module_name:
         module_query.insert(
