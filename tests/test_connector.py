@@ -2,14 +2,18 @@ import unittest
 from datetime import datetime
 from multiprocessing import Queue
 
-from database.connector import (credential_events, events_data,
+from database.connector import (credential_events,
+                                data_events,
                                 honeypot_events,
                                 insert_to_credential_events_collection,
                                 insert_to_events_data_collection,
                                 insert_to_honeypot_events_queue,
-                                insert_to_network_events_queue, network_events,
+                                insert_to_network_events_queue,
+                                network_events,
                                 push_events_queues_to_database)
-from database.datatypes import (CredentialEvent, EventData, HoneypotEvent,
+from database.datatypes import (CredentialEvent,
+                                EventData,
+                                HoneypotEvent,
                                 NetworkEvent)
 
 
@@ -116,7 +120,7 @@ class TestConnector(unittest.TestCase):
         insert_to_events_data_collection(event_data)
 
         # Find the record in the DB
-        event_record_data = events_data.find_one(event_data.__dict__)
+        event_record_data = data_events.find_one(event_data.__dict__)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip"], event_data.ip)
@@ -125,7 +129,7 @@ class TestConnector(unittest.TestCase):
             event_data.data
         )
 
-        events_data.delete_one(event_data.__dict__)
+        data_events.delete_one(event_data.__dict__)
 
 
 if __name__ == '__main__':
