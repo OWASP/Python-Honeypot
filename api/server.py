@@ -269,7 +269,7 @@ def get_files_list():
 
         except Exception:
             return flask_null_array_response()
-    
+
     else:
         try:
             files_list = {
