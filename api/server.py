@@ -239,35 +239,36 @@ def count_all_events():
         try:
             return jsonify(
                 {
-                    "count_all_events_by_date": connector.honeypot_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
+                    "count_all_events_by_date":
+                        connector.honeypot_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
                             }
-                        }
-                    ) + connector.network_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
+                        ) + connector.network_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
                             }
-                        }
-                    ) + connector.credential_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
+                        ) + connector.credential_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
                             }
-                        }
-                    ) + connector.file_change_events.count_documents(
-                        {
-                            "date": {
-                                "$gte": date[0],
-                                "$lte": date[1]
+                        ) + connector.file_change_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
                             }
-                        }
-                    ),
+                        ),
                     "date": date
                 }
             ), 200
@@ -277,12 +278,10 @@ def count_all_events():
         try:
             return jsonify(
                 {
-                    "count_all_events": int(
-                        connector.honeypot_events.estimated_document_count()
-                        + connector.network_events.estimated_document_count()
-                        + connector.credential_events.estimated_document_count()
-                        + connector.file_change_events.estimated_document_count()
-                    )
+                    "count_all_events": (connector.honeypot_events.estimated_document_count()
+                                         + connector.network_events.estimated_document_count()
+                                         + connector.credential_events.estimated_document_count()
+                                         + connector.file_change_events.estimated_document_count())
                 }
             ), 200
         except Exception:
