@@ -254,7 +254,6 @@ def get_files_list():
                 )
             ]
         }
-        print(files_list["storedFiles"][0]["_id"])
         return json.loads(json_util.dumps(files_list)), 200
 
     except Exception:
@@ -267,25 +266,14 @@ def download_file():
     Download PCAP files
     """
     try:
-        print(flask_request)
         file_id = ObjectId(get_value_from_request("_id"))
-        filename = get_value_from_request("filename")
-        print(file_id, filename)
-        file_path = os.path.join(
-            sys.path[0],
-            "tmp",
-            filename
-        )
-
-        fs = GridFSBucket(connector.ohp_file_archive)
-        file = open(file_path, "wb")
-        fs.download_to_stream(file_id, file)
-        print(file_path)
+        fs = connector.ohp_file_archive_gridfs.get(file_id)
 
         return send_file(
-            file_path,
-            attachment_filename=filename,
-            as_attachment=True
+            fs,
+            attachment_filename=fs.filename,
+            as_attachment=True,
+            mimetype=fs.content_type
         ), 200
 
     except Exception:
