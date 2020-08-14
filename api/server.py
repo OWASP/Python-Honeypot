@@ -3,13 +3,11 @@
 
 import json
 import os
-import sys
 
 from bson import ObjectId, json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
 from flask import send_file
-from gridfs import GridFSBucket
 
 from api.database_queries import (group_by_ip_dest,
                                   group_by_ip_dest_and_password,
