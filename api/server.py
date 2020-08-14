@@ -235,27 +235,63 @@ def get_files_list():
     Returns:
         JSON/Dict of files
     """
-    date = fix_date(
-        get_value_from_request("date")
+    start_date = fix_date(
+        get_value_from_request("start_date")
     )
-    try:
-        files_list = {
-            "storedFiles": [
-                i for i in connector.ohp_file_archive.fs.files.find(
-                    {
-                        "generationTime":
-                            {
-                                "$gte": date[0],
-                                "$lte": date[1]
-                            }
-                    }
-                )
-            ]
-        }
-        return json.loads(json_util.dumps(files_list)), 200
+    end_date = fix_date(
+        get_value_from_request("end_date")
+    )
 
-    except Exception:
-        return flask_null_array_response()
+    if start_date and end_date:
+        try:
+            files_list = {
+                "storedFiles": [
+                    i for i in connector.ohp_file_archive.fs.files.find(
+                        {
+                            "generationTime":
+                                {
+                                    "$gte": start_date[0],
+                                    "$lte": end_date[1]
+                                }
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            }
+            return json.loads(json_util.dumps(files_list)), 200
+
+        except Exception:
+            return flask_null_array_response()
+    
+    else:
+        try:
+            files_list = {
+                "storedFiles": [
+                    i for i in connector.ohp_file_archive.fs.files.find(
+                        {}
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            }
+            return json.loads(json_util.dumps(files_list)), 200
+
+        except Exception:
+            return flask_null_array_response()
+
 
 
 @app.route("/api/file-archive/download-file", methods=["GET"])

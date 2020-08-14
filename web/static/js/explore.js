@@ -35,6 +35,54 @@ function get_export_fileName(file_type) {
 
 
 /**
+ * Taken from https://storiknow.com/download-file-with-jquery-and-web-api-2-0-ihttpactionresult/
+ * @param {*} xhr 
+ * @param {*} blob 
+ */
+function download(xhr, blob) {
+  var downloadLink = document.createElement('a');
+  
+  var url = window.URL || window.webkitURL;
+  var downloadUrl = url.createObjectURL(blob);
+  var fileName = '';
+ 
+  // get the file name from the content disposition
+  var disposition = xhr.getResponseHeader('Content-Disposition');
+  if (disposition && disposition.indexOf('attachment') !== -1) {
+      var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      var matches = filenameRegex.exec(disposition);
+      if (matches != null && matches[1]) {
+          fileName = matches[1].replace(/['"]/g, '');
+      }
+  }
+  // Blob download logic taken from: https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
+  if (typeof window.navigator.msSaveBlob !== 'undefined') {
+    // IE workaround for "HTML7007" and "Access Denied" error.
+    window.navigator.msSaveBlob(blob, fileName);
+  } else {
+      if (fileName) {
+          if (typeof downloadLink.download === 'undefined') {
+              window.location = downloadUrl;
+          } else {
+              downloadLink.href = downloadUrl;
+              downloadLink.download = fileName;
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+          }
+      } else {
+          window.location = downloadUrl;
+      }
+
+      setTimeout(function () {
+            url.revokeObjectURL(downloadUrl);
+        },
+        100
+      );
+  }
+}
+
+
+/**
  * Call the API to get event data from the database
  * @param {*} api_endpoint : API endpoint URL
  * @param {*} column_list : List of Columns for the selected event type
@@ -94,6 +142,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
   });
 }
 
+
 /**
  * Call the API to get the list of Files stored in the database.
  * @param {*} api_endpoint 
@@ -130,7 +179,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
           }
        },
        {
-         targets: [7],
+         targets: [6],
          visible: false
        },
       ],
@@ -199,6 +248,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
     });
   });
 }
+
 
 /**
  * Load data to the table based on user selected filters.
@@ -286,7 +336,6 @@ function load_data(api_endpoint, search_parameters) {
       { data: 'filename', defaultContent: '', title: "Filename"},
       { data: 'length', defaultContent: '', title: "File Size"},
       { data: 'md5', defaultContent: '', title: "MD5"},
-      { data: 'uploadDate.$date', defaultContent: '', title: "Upload Time"},
       { data: '_id.$oid', defaultContent: '', title: "File ID", hidden: true}
     ];
     search_parameters.limit = limit;
@@ -328,79 +377,32 @@ function search_database() {
   }
 }
 
-/**
- * Taken from https://storiknow.com/download-file-with-jquery-and-web-api-2-0-ihttpactionresult/
- * @param {*} xhr 
- * @param {*} blob 
- */
-function download(xhr, blob) {
-  var downloadLink = document.createElement('a');
-  
-  var url = window.URL || window.webkitURL;
-  var downloadUrl = url.createObjectURL(blob);
-  var fileName = '';
- 
-  // get the file name from the content disposition
-  var disposition = xhr.getResponseHeader('Content-Disposition');
-  if (disposition && disposition.indexOf('attachment') !== -1) {
-      var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      var matches = filenameRegex.exec(disposition);
-      if (matches != null && matches[1]) {
-          fileName = matches[1].replace(/['"]/g, '');
-      }
-  }
-  // Blob download logic taken from: https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
-  if (typeof window.navigator.msSaveBlob !== 'undefined') {
-    // IE workaround for "HTML7007" and "Access Denied" error.
-    window.navigator.msSaveBlob(blob, fileName);
-  } else {
-      if (fileName) {
-          if (typeof downloadLink.download === 'undefined') {
-              window.location = downloadUrl;
-          } else {
-              downloadLink.href = downloadUrl;
-              downloadLink.download = fileName;
-              document.body.appendChild(downloadLink);
-              downloadLink.click();
-          }
-      } else {
-          window.location = downloadUrl;
-      }
-
-      setTimeout(function () {
-            url.revokeObjectURL(downloadUrl);
-        },
-        100
-      );
-  }
-
-  // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  // element.setAttribute('download', filename);
-
-  // element.style.display = 'none';
-  // document.body.appendChild(element);
-
-  // element.click();
-
-  // document.body.removeChild(element);
-}
 
 /**
  * Function called when "search" button is clickec in the "File Archive" display
  */
 function search_file_archive() {
   var api_endpoint = "/api/file-archive/get-files-list";
-  var archive_date = $("#archive-date").val();
-  if (archive_date == "") {
-    alert("Date not provided!");
+  var start_date = $("#archive_start_date").val();
+  var end_date = $("#archive_end_date").val();
+  if (start_date == ""|| end_date == "") {
+    alert("Either Start Date or End date missing!");
   }
-  load_data(
-    api_endpoint,
-    {
-      datatable_id: "#file-datatable",
-      date: archive_date
+  else{
+    if(start_date <= end_date){
+      load_data(
+        api_endpoint,
+        {
+          datatable_id: "#file-datatable",
+          start_date: start_date,
+          end_date: end_date
+        }
+      );
     }
-  );
+    else {
+      alert("Start date is greater than End date!")
+    }
+  }
 }
 
 /**
