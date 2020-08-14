@@ -20,72 +20,29 @@ sort_by_count = {
     )
 }
 
-group_by_elements = {
-    "ip": {
+
+def group_by(element_name, element):
+    return {
         "$group":
             {
                 "_id": {
-                    "ip_dest": "$ip_dest"
+                    element_name: element
                 },
                 "count": {
                     "$sum": 1
                 }
             }
-    },
-    "country": {
-        "$group":
-            {
-                "_id": "$country_ip_dest",
-                "count": {
-                    "$sum": 1
-                }
-            }
-    },
-    "port": {
-        "$group":
-            {
-                "_id": "$port_dest",
-                "count": {
-                    "$sum": 1
-                }
-            }
-    },
-    "module_name": {
-        "$group":
-            {
-                "_id": "$module_name",
-                "count": {
-                    "$sum": 1
-                }
-            }
-    },
-    "username": {
-        "$group":
-            {
-                "_id": "$username",
-                "count": {
-                    "$sum": 1
-                }
-            }
-    },
-    "password": {
-        "$group":
-            {
-                "_id": "$password",
-                "count": {
-                    "$sum": 1
-                }
-            }
-    },
-    "machine_name": {
-        "$group":
-            {
-                "_id": "$machine_name",
-                "count": {
-                    "$sum": 1
-                }
-            }
     }
+
+
+group_by_elements = {
+    "ip": group_by("ip", "$ip_dest"),
+    "country": group_by("country", "$country_ip_dest"),
+    "port": group_by("port", "$port_dest"),
+    "module_name": group_by("module_name", "$module_name"),
+    "username": group_by("username", "$username"),
+    "password": group_by("password", "$password"),
+    "machine_name": group_by("machine_name", "$machine_name")
 }
 
 event_types = [
