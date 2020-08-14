@@ -239,27 +239,31 @@ def count_all_events():
     try:
         return jsonify(
             {
-                "count_all_events_by_date": connector.honeypot_events.count_documents(
-                    {
-                        **filter_by_date(date)
-                    }
-                ) if date else connector.honeypot_events.estimated_document_count()
-                               + connector.network_events.count_documents(
-                    {
-                        **filter_by_date(date)
-                    }
-                ) if date else connector.network_events.estimated_document_count()
-                               + connector.credential_events.count_documents(
-                    {
-                        **filter_by_date(date)
-                    }
-                ) if date else connector.credential_event.estimated_document_count()
-                               + connector.file_change_events.count_documents(
-                    {
-                        **filter_by_date(date)
-                    }
-                ) if date else connector.file_change_events.count_documents()
-                ,
+                "count_all_events_by_date": int(
+                    connector.honeypot_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.honeypot_events.estimated_document_count()
+                ) + int(
+                    connector.network_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.network_events.estimated_document_count()
+                ) + int(
+                    connector.credential_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.credential_event.estimated_document_count()
+                ) + int(
+                    connector.file_change_events.count_documents(
+                        {
+                            **filter_by_date(date)
+                        }
+                    ) if date else connector.file_change_events.count_documents()
+                ),
                 "date": date
             }
         ), 200
