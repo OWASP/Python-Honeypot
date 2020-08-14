@@ -150,22 +150,20 @@ def network_traffic_capture(configuration, honeypot_events_queue,
     info("network_traffic_capture process started")
 
     for selected_module in configuration:
-        port_number = \
-            configuration[selected_module]["real_machine_port_number"]
+        port_number = configuration[selected_module]["real_machine_port_number"]
 
         honeypot_ports[port_number] = selected_module
 
     # get ip addresses
-    virtual_machine_ip_addresses = \
-        [configuration[selected_module]["ip_address"]
-         for selected_module in configuration]
+    virtual_machine_ip_addresses = [
+        configuration[selected_module]["ip_address"]
+        for selected_module in configuration
+    ]
 
     # Ignore VM IPs + IPs in config.py
     # VM = virtual machine, RM = real machine
-    ignore_rm_ip_addresses = \
-        network_config["ignore_real_machine_ip_address"]
-    ignore_vm_ip_addresses = \
-        network_config["ignore_virtual_machine_ip_addresses"]
+    ignore_rm_ip_addresses = network_config["ignore_real_machine_ip_address"]
+    ignore_vm_ip_addresses = network_config["ignore_virtual_machine_ip_addresses"]
 
     # Ignore real machine IPs
     ignore_ip_addresses = network_config["ignore_real_machine_ip_addresses"] \
@@ -254,7 +252,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
             try:
                 capture.close()
                 break
-            except Exception as _:
+            except Exception:
                 break
 
         except Exception as e:

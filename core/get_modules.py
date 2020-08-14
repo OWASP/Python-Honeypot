@@ -3,11 +3,10 @@
 
 import os
 import inspect
-
 import modules
-from glob import glob
 
-from core.alert import (warn, messages)
+from glob import glob
+from core.alert import warn
 
 
 def virtual_machine_names_to_container_names(configuration):
@@ -21,9 +20,9 @@ def virtual_machine_names_to_container_names(configuration):
     """
     return [
         "{0}_{1}".format(
-                configuration[selected_module]["virtual_machine_name"],
-                selected_module.rsplit("/")[1]
-                )
+            configuration[selected_module]["virtual_machine_name"],
+            selected_module.rsplit("/")[1]
+        )
         for selected_module in configuration
     ]
 
@@ -64,18 +63,14 @@ def load_all_modules():
     for module in glob(path_pattern):
 
         module_dir = os.path.split(module)[0]
-
         sub_module_name = os.path.split(module_dir)[1]
         category_name = os.path.split(os.path.split(module_dir)[0])[1]
-
         module_name = category_name + '/' + sub_module_name
-
         dockerfile_path = os.path.join(module_dir, "Dockerfile")
 
         if os.path.exists(dockerfile_path):
-
             if module_name not in module_names:
                 module_names.append(module_name)
         else:
-            warn(messages("en", "module_not_available").format(module_name))
+            warn("module {0} is not available".format(module_name))
     return module_names

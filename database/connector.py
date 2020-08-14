@@ -59,6 +59,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
 
     Args:
         honeypot_event: Object of HoneypotEvent class with event parameters
+        honeypot_events_queue: Honeypot queue
 
     Returns:
         ObjectId(inserted_id)
@@ -120,7 +121,8 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     network_event.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
             network_event.ip_src
-        ))
+        )
+    )
 
     # Get country of the destination IP Address
     network_event.country_ip_dest = byte_to_str(
