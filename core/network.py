@@ -70,7 +70,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
 
 
 def process_packet(packet, honeypot_events_queue,
-            network_events_queue, network_config):
+                   network_events_queue, network_config):
     """
     Callback function called from the apply_on_packets function.
 
@@ -184,7 +184,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
     timeout = network_config["split_pcap_file_timeout"]
 
     # Make the pcapfiles directory for storing the Network captured files
-    base_dir_path =  os.path.join(sys.path[0], "pcapfiles")
+    base_dir_path = os.path.join(sys.path[0], "pcapfiles")
     mkdir(base_dir_path)
 
     def packet_callback(packet):
@@ -265,5 +265,5 @@ def network_traffic_capture(configuration, honeypot_events_queue,
             )
             error(str(e))
             break
-   
+
     return True

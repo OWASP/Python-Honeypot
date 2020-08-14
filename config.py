@@ -75,7 +75,7 @@ def network_configuration():
         ),
         # e.g. ["10.0.0.1", "192.168.1.1"]
         "ignore_real_machine_ports": [],  # e.g. [22, 80, 5000]
-        "split_pcap_file_timeout": 3600 # Default value
+        "split_pcap_file_timeout": 3600  # Default value
     }
 
 

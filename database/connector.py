@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 import inspect
 from multiprocessing import Queue
 import os
@@ -293,10 +292,10 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.generation_time
             )
         )
-    
+
     # Get the name of the file without the path
     filename = os.path.split(file_archive.file_path)[1]
-    
+
     # Get file-like object by reading the pcap file as binary
     pcap_file = open(file_archive.file_path, "rb")
 

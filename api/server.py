@@ -4,7 +4,7 @@
 import json
 import os
 
-from bson import ObjectId, json_util
+from bson import json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
 
@@ -238,8 +238,8 @@ def get_files_list():
         get_value_from_request("date")
     )
     try:
-        files_list ={
-            "storedFiles" : [
+        files_list = {
+            "storedFiles": [
                 i for i in connector.ohp_file_archive.fs.files.find(
                     {
                         "generationTime":
@@ -252,7 +252,7 @@ def get_files_list():
             ]
         }
         return json.loads(json_util.dumps(files_list)), 200
-    
+
     except Exception:
         return flask_null_array_response()
 
