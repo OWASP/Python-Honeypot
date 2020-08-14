@@ -22,21 +22,7 @@ def logo():
     """
     # TODO : Fix the cyclic dependency later
     from core.alert import write_to_api_console
-    write_to_api_console("""
-      ______          __      _____ _____  
-     / __ \ \        / /\    / ____|  __ \ 
-    | |  | \ \  /\  / /  \  | (___ | |__) |
-    | |  | |\ \/  \/ / /\ \  \___ \|  ___/  
-    | |__| | \  /\  / ____ \ ____) | |      
-     \____/   \/  \/_/    \_\_____/|_|
-                      _    _                        _____      _   
-                     | |  | |                      |  __ \    | |  
-                     | |__| | ___  _ __   ___ _   _| |__) |__ | |_ 
-                     |  __  |/ _ \| "_ \ / _ \ | | |  ___/ _ \| __|
-                     | |  | | (_) | | | |  __/ |_| | |  | (_) | |_ 
-                     |_|  |_|\___/|_| |_|\___|\__, |_|   \___/ \__|
-                                               __/ |
-                                              |___/   \n\n""")
+    write_to_api_console(open('.owasp_honeypot').read())
     reset_cmd_color()
 
 
@@ -50,26 +36,6 @@ def version():
     return int(sys.version_info[0])
 
 
-def check(language):
-    """
-    check if framework compatible with the OS
-    Args:
-        language: language
-
-    Returns:
-        True if compatible otherwise None
-    """
-    from core.alert import messages
-    if os_name() not in ["linux", "darwin", "win32", "win64"]:
-        exit_failure(messages(language, "error_platform"))
-    if version() == 2 or version() == 3:
-        pass
-    else:
-        exit_failure(messages(language, "python_version_error"))
-    logo()
-    return True
-
-
 def os_name():
     """
     OS name
@@ -80,27 +46,14 @@ def os_name():
     return sys.platform
 
 
-def is_windows():
-    """
-    check if the framework run in Windows OS
-
-    Returns:
-        True if its running on windows otherwise False
-    """
-    if "win32" == os_name() or "win64" == os_name():
-        return True
-    return False
-
-
 def get_timeout_error():
     """
-    Get the timeout error thrown by pyshark apply_on_packets
-    funtion
+    Get the timeout error thrown by pyshark apply_on_packets function
     """
     try:
         # If asyncio timeout error exists, this will be returned
         return asyncio.exceptions.TimeoutError
-    except Exception as _:
+    except Exception:
         # For older python versions, where asyncio timeout error
         # doesn't exist, this one will be returned.
         return concurrent.futures._base.TimeoutError
@@ -114,7 +67,6 @@ def check_for_requirements(start_api_server):
         True if exist otherwise False
     """
     from config import api_configuration
-    from core.alert import messages
     # check external required modules
     api_config = api_configuration()
     connection_timeout = api_config["api_database_connection_timeout"]
@@ -142,11 +94,16 @@ def check_for_requirements(start_api_server):
             subprocess.check_output(["docker", "--help"],
                                     stderr=subprocess.PIPE)
         except Exception:
-            exit_failure(messages("en", "docker_error"))
+            exit_failure("cannot communicate with docker, please install and start the docker service!")
         # check tshark
         try:
-            subprocess.check_output(["tshark", "--help"],
-                                    stderr=subprocess.PIPE)
+            subprocess.check_output(
+                [
+                    "tshark",
+                    "--help"
+                ],
+                stderr=subprocess.PIPE
+            )
         except Exception:
             exit_failure("please install tshark first!")
     return True
@@ -249,8 +206,9 @@ def byte_to_str(data):
     :param data: data
     :return: str(data)
     """
-    return str(data if isinstance(data, str) else data.decode()
-    if isinstance(data, bytes) else data)
+    return str(
+        data if isinstance(data, str) else data.decode()
+    )
 
 
 def is_verbose_mode():
