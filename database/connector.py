@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import inspect
-from multiprocessing import Queue
 import os
 import time
+from multiprocessing import Queue
 
 import gridfs
 import pymongo
@@ -12,9 +12,8 @@ import pymongo
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
-from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent, FileEventsData,
-                                FileArchive)
+from database.datatypes import (CredentialEvent, EventData, FileArchive,
+                                FileEventsData, HoneypotEvent, NetworkEvent)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
