@@ -28,7 +28,6 @@ from api.utility import (aggregate_function,
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
-from database import connector
 
 template_dir = os.path.join(
     os.path.join(
@@ -85,9 +84,6 @@ def get_value_from_request(_key):
                 value = flask_request.cookies[_key]
             except Exception:
                 value = None
-    if value:
-        # todo: fix it later
-        value = value.replace("\\\"", "\"").replace("\\\'", "\'")
     return value
 
 
@@ -241,63 +237,27 @@ def count_events(event_type):
     Returns:
         JSON/Dict number of all events
     """
-    abort(404) if event_type not in event_types else event_type
+    abort(404) if event_type not in event_types and event_type != "all" else event_type
 
     date = get_value_from_request("date")
     try:
         return jsonify(
             {
-                "count": int(
-                    int(
-                        connector.honeypot_events.count_documents(
+                "count": sum(
+                    [
+                        event_types[event_type].count_documents(
                             {
                                 **filter_by_date(date)
                             }
-                        ) if date else connector.honeypot_events.estimated_document_count()
-                    ) + int(
-                        connector.network_events.count_documents(
-                            {
-                                **filter_by_date(date)
-                            }
-                        ) if date else connector.network_events.estimated_document_count()
-                    ) + int(
-                        connector.credential_events.count_documents(
-                            {
-                                **filter_by_date(date)
-                            }
-                        ) if date else connector.credential_events.estimated_document_count()
-                    ) + int(
-                        connector.file_change_events.count_documents(
-                            {
-                                **filter_by_date(date)
-                            }
-                        ) if date else connector.file_change_events.estimated_document_count()
-                    )
+                        ) if date else event_types[event_type].estimated_document_count() for event_type in event_types
+                    ]
                 ) if event_type == "all" else int(
-                    connector.honeypot_events.count_documents(
+                    event_types[event_type].count_documents(
                         {
                             **filter_by_date(date)
                         }
-                    ) if date else connector.honeypot_events.estimated_document_count()
-                ) if event_type == "honeypot" else int(
-                    connector.network_events.count_documents(
-                        {
-                            **filter_by_date(date)
-                        }
-                    ) if date else connector.network_events.estimated_document_count()
-                ) if event_type == "network" else int(
-                    connector.credential_events.count_documents(
-                        {
-                            **filter_by_date(date)
-                        }
-                    ) if date else connector.credential_events.estimated_document_count()
-                ) if event_type == "credential" else int(
-                    connector.file_change_events.count_documents(
-                        {
-                            **filter_by_date(date)
-                        }
-                    ) if date else connector.file_change_events.estimated_document_count()
-                ) if event_type == "file" else abort(404),
+                    ) if date else event_types[event_type].estimated_document_count()
+                ),
                 "date": date
             }
         ), 200
@@ -313,37 +273,30 @@ def groupby_element(event_type, element):
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
-    abort(404) if event_type not in event_types[1:-1] else event_type
+    abort(404) if event_type not in event_types else event_type
 
     date = get_value_from_request("date")
-    country_ip_dest = get_value_from_request("country_ip_dest")
-    top_ips_query = [
-        group_by_elements[element],
-        filter_by_skip(get_value_from_request("skip")),
-        filter_by_limit(get_value_from_request("limit")),
-        sort_by_count
-    ]
-
-    top_ips_query.insert(
-        0,
-        filter_by_match(
-            {
-                **filter_by_country_ip_dest(country_ip_dest),
-                **filter_by_date(date)
-            }
-        ) if country_ip_dest and date else filter_by_match(
-            filter_by_country_ip_dest(country_ip_dest)
-        ) if country_ip_dest else filter_by_match(
-            filter_by_date(date)
-        ) if date else {}
-    )
-
+    country = get_value_from_request("country")
     try:
         return jsonify(
             aggregate_function(
-                connector.honeypot_events if event_types == "honeypot" else connector.network_events if
-                event_type == "network" else connector.credential_events,
-                top_ips_query
+                event_types[event_type],
+                [
+                    filter_by_match(
+                        {
+                            **filter_by_country_ip_dest(country),
+                            **filter_by_date(date)
+                        }
+                    ) if country and date else filter_by_match(
+                        filter_by_country_ip_dest(country)
+                    ) if country else filter_by_match(
+                        filter_by_date(date)
+                    ) if date else sort_by_count,
+                    group_by_elements[element],
+                    filter_by_skip(get_value_from_request("skip")),
+                    filter_by_limit(get_value_from_request("limit")),
+                    sort_by_count
+                ]
             )
         ), 200
     except Exception:
@@ -363,19 +316,6 @@ def get_events_data(event_type):
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
 
-    if event_type == "honeypot":
-        db_collection_name = connector.honeypot_events
-    elif event_type == "network":
-        db_collection_name = connector.network_events
-    elif event_type == "credential":
-        db_collection_name = connector.credential_events
-    elif event_type == "file":
-        db_collection_name = connector.file_change_events
-    elif event_type == "data":
-        db_collection_name = connector.data_events
-    else:
-        abort(404)
-
     try:
         query = filter_by_date(date) if date else {}
         query.update(filter_by_module_name(module_name) if module_name else {})
@@ -383,7 +323,7 @@ def get_events_data(event_type):
         return jsonify(
             [
                 i for i in
-                db_collection_name.find(
+                event_types[event_type].find(
                     query,
                     {
                         "_id": 0

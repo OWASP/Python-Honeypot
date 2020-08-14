@@ -11,6 +11,11 @@ from bson.son import SON
 from api.utility import (fix_date,
                          fix_limit,
                          fix_skip)
+from database.connector import (honeypot_events,
+                                network_events,
+                                credential_events,
+                                file_change_events,
+                                data_events)
 
 sort_by_count = {
     "$sort": SON(
@@ -45,14 +50,13 @@ group_by_elements = {
     "machine_name": group_by("machine_name", "$machine_name")
 }
 
-event_types = [
-    "all",
-    "honeypot",
-    "network",
-    "credential",
-    "file",
-    "data"
-]
+event_types = {
+    "honeypot": honeypot_events,
+    "network": network_events,
+    "credential": credential_events,
+    "file": file_change_events,
+    "data": data_events
+}
 
 
 def filter_by_date(date):
