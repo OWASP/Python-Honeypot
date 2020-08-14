@@ -150,3 +150,29 @@ def filter_by_limit(limit):
     return {
         "$limit": fix_limit(limit)
     }
+
+
+def filter_by_country_ip_dest(country):
+    return {
+        "country_ip_dest": country
+    }
+
+
+def filter_by_module_name(module_name):
+    return {
+        'module_name': module_name
+    }
+
+
+def filter_by_exclude_unknown_country():
+    return {
+        "country_ip_dest": {
+            "$gt": "-"
+        }
+    }
+
+
+def filter_by_match(match_query):
+    return {
+        "$match": match_query
+    }

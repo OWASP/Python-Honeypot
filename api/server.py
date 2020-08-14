@@ -15,7 +15,11 @@ from api.database_queries import (group_by_ip_dest,
                                   top_port_dests_groupby,
                                   filter_by_date,
                                   filter_by_skip,
-                                  filter_by_limit)
+                                  filter_by_limit,
+                                  filter_by_country_ip_dest,
+                                  filter_by_module_name,
+                                  filter_by_exclude_unknown_country,
+                                  filter_by_match)
 from api.utility import (aggregate_function, all_mime_types, fix_date,
                          fix_limit, fix_skip, flask_null_array_response,
                          msg_structure, root_dir)
@@ -338,31 +342,26 @@ def top_ten_ips_in_honeypot_events():
     ]
 
     if country_ip_dest and date:
-        match_by_country_and_date = {
-            "$match": {
-                "country_ip_dest": country_ip_dest,
+        match_by_country_and_date = filter_by_match(
+            {
+                **filter_by_country_ip_dest(country_ip_dest),
                 **filter_by_date(date)
             }
-        }
+        )
         top_ips_query.insert(0, match_by_country_and_date)
         top_ips_query.insert(2, sort_by_count_and_id)
 
     elif country_ip_dest:
-        match_by_country = {
-
-            "$match": {
-                "country_ip_dest": country_ip_dest
-            }
-        }
+        match_by_country = filter_by_match(
+            filter_by_country_ip_dest(country_ip_dest)
+        )
         top_ips_query.insert(0, match_by_country)
         top_ips_query.insert(2, sort_by_count_and_id)
 
     elif date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_ips_query.insert(0, match_by_date)
         top_ips_query.insert(2, sort_by_count)
 
@@ -396,30 +395,26 @@ def top_ten_ips_in_network_events():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
-        match_by_country_and_date = {
-            "$match": {
-                "country_ip_dest": country_ip_dest,
+        match_by_country_and_date = filter_by_match(
+            {
+                **filter_by_country_ip_dest(country_ip_dest),
                 **filter_by_date(date)
             }
-        }
+        )
         top_ips_query.insert(0, match_by_country_and_date)
         top_ips_query.insert(2, sort_by_count_and_id)
 
     elif country_ip_dest:
-        match_by_country = {
-            "$match": {
-                "country_ip_dest": country_ip_dest
-            }
-        }
+        match_by_country = filter_by_match(
+            filter_by_country_ip_dest(country_ip_dest)
+        )
         top_ips_query.insert(0, match_by_country)
         top_ips_query.insert(2, sort_by_count_and_id)
 
     elif date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_ips_query.insert(0, match_by_date)
         top_ips_query.insert(2, sort_by_count)
 
@@ -453,30 +448,24 @@ def top_ten_ports_in_honeypot_events():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
-        match_by_country_and_date = {
-            "$match":
-                {
-                    "country_ip_dest": country_ip_dest,
-                    **filter_by_date(date)
-                }
-        }
+        match_by_country_and_date = filter_by_match(
+            {
+                **filter_by_country_ip_dest(country_ip_dest),
+                **filter_by_date(date)
+            }
+        )
         top_ports_query.insert(0, match_by_country_and_date)
         top_ports_query.insert(2, sort_by_count_and_id)
     elif country_ip_dest:
-        match_by_country = {
-            "$match":
-                {
-                    "country_ip_dest": country_ip_dest,
-                }
-        }
+        match_by_country = filter_by_match(
+            filter_by_country_ip_dest(country_ip_dest)
+        )
         top_ports_query.insert(0, match_by_country)
         top_ports_query.insert(2, sort_by_count_and_id)
     elif date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_ports_query.insert(0, match_by_date)
         top_ports_query.insert(2, sort_by_count)
     else:
@@ -508,30 +497,24 @@ def top_ten_ports_in_network_events():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if country_ip_dest and date:
-        match_by_country_and_date = {
-            "$match":
-                {
-                    "country_ip_dest": country_ip_dest,
-                    **filter_by_date(date)
-                }
-        }
+        match_by_country_and_date = filter_by_match(
+            {
+                **filter_by_country_ip_dest(country_ip_dest),
+                **filter_by_date(date)
+            }
+        )
         top_ports_query.insert(0, match_by_country_and_date)
         top_ports_query.insert(2, sort_by_count_and_id)
     elif country_ip_dest:
-        match_by_country = {
-            "$match":
-                {
-                    "country_ip_dest": country_ip_dest,
-                }
-        }
+        match_by_country = filter_by_match(
+            filter_by_country_ip_dest(country_ip_dest)
+        )
         top_ports_query.insert(0, match_by_country)
         top_ports_query.insert(2, sort_by_count_and_id)
     elif date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_ports_query.insert(0, match_by_date)
         top_ports_query.insert(2, sort_by_count)
     else:
@@ -732,9 +715,7 @@ def get_events_data():
         try:
             query = {}
             if module_name:
-                query = {
-                    "module_name": module_name,
-                }
+                query = filter_by_module_name(module_name)
 
             return jsonify(
                 [
@@ -776,23 +757,14 @@ def top_ten_countries_in_honeypot_events():
     ]
     if date:
         match_by_date_and_country = {
-            "$match": {
-                "country_ip_dest": {
-                    "$gt": "-"
-                },
-                **filter_by_date(date)
-            }
+            **filter_by_match(filter_by_exclude_unknown_country()),
+            **filter_by_date(date)
         }
         top_countries_query.insert(0, match_by_date_and_country)
     else:
-        match_by_country = {
-            "$match":
-                {
-                    "country_ip_dest": {
-                        "$gt": "-"
-                    }
-                }
-        }
+        match_by_country = filter_by_match(
+            filter_by_exclude_unknown_country()
+        )
         top_countries_query.insert(0, match_by_country)
     try:
         return jsonify(
@@ -821,25 +793,17 @@ def top_ten_countries_in_network_events():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
-        match_by_date_and_country = {
-            "$match":
-                {
-                    "country_ip_dest": {
-                        "$gt": "-"
-                    },
-                    **filter_by_date(date)
-                }
-        }
+        match_by_date_and_country = filter_by_match(
+            {
+                **filter_by_exclude_unknown_country(),
+                **filter_by_date(date)
+            }
+        )
         top_countries_query.insert(0, match_by_date_and_country)
     else:
-        match_by_country = {
-            "$match":
-                {
-                    "country_ip_dest": {
-                        "$gt": "-"
-                    }
-                }
-        }
+        match_by_country = filter_by_match(
+            filter_by_exclude_unknown_country()
+        )
         top_countries_query.insert(0, match_by_country)
     try:
         return jsonify(
@@ -868,11 +832,9 @@ def top_network_machine_names():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
@@ -901,11 +863,9 @@ def top_honeypot_machine_names():
         filter_by_limit(get_value_from_request("limit"))
     ]
     if date:
-        match_by_date = {
-            "$match": {
-                **filter_by_date(date)
-            }
-        }
+        match_by_date = filter_by_match(
+            filter_by_date(date)
+        )
         top_machinenames_query.insert(0, match_by_date)
     try:
         return jsonify(
@@ -935,11 +895,9 @@ def module_events():
     if module_name:
         module_query.insert(
             0,
-            {
-                "$match": {
-                    'module_name': module_name
-                }
-            }
+            filter_by_match(
+                filter_by_module_name(module_name)
+            )
         )
     try:
         return jsonify(
@@ -966,11 +924,9 @@ def top_usernames_used():
     if module_name:
         module_query.insert(
             0,
-            {
-                "$match": {
-                    'module_name': module_name
-                }
-            }
+            filter_by_match(
+                filter_by_module_name(module_name)
+            )
         )
     try:
         return jsonify(
@@ -997,11 +953,9 @@ def top_passwords_used():
     if module_name:
         module_query.insert(
             0,
-            {
-                "$match": {
-                    'module_name': module_name
-                }
-            }
+            filter_by_match(
+                filter_by_module_name(module_name)
+            )
         )
     try:
         return jsonify(
