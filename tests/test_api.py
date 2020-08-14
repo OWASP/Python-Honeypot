@@ -74,18 +74,15 @@ class TestApi(unittest.TestCase):
         Test if honeypot-events, honeypot-events-countries,
         honeypot-events-machinenames end-points returns lists.
         """
-        response_honeypot = \
-            requests.get(API_URL + "/api/events/honeypot-events")
+        response_honeypot = requests.get(API_URL + "/api/events/honeypot-events")
         self.assertGreaterEqual(len(response_honeypot.json()), 0)
         self.assertEqual(response_honeypot.status_code, 200)
 
-        response_honeypot_countries = \
-            requests.get(API_URL + "/api/events/honeypot-events-countries")
+        response_honeypot_countries = requests.get(API_URL + "/api/events/honeypot-events-countries")
         self.assertGreaterEqual(len(response_honeypot_countries.json()), 0)
         self.assertEqual(response_honeypot_countries.status_code, 200)
 
-        response_honeypot_machinenames = \
-            requests.get(API_URL + "/api/events/honeypot-events-machinenames")
+        response_honeypot_machinenames = requests.get(API_URL + "/api/events/honeypot-events-machinenames")
         self.assertGreaterEqual(len(response_honeypot_machinenames.json()), 0)
         self.assertEqual(response_honeypot_machinenames.status_code, 200)
 
@@ -94,18 +91,15 @@ class TestApi(unittest.TestCase):
         Test if network-events, network-events-countries,
         network-events-machinenames end-points returns lists.
         """
-        response_network = \
-            requests.get(API_URL + "/api/events/network-events")
+        response_network = requests.get(API_URL + "/api/events/network-events")
         self.assertGreaterEqual(len(response_network.json()), 0)
         self.assertEqual(response_network.status_code, 200)
 
-        response_network_countries = \
-            requests.get(API_URL + "/api/events/network-events-countries")
+        response_network_countries = requests.get(API_URL + "/api/events/network-events-countries")
         self.assertGreaterEqual(len(response_network_countries.json()), 0)
         self.assertEqual(response_network_countries.status_code, 200)
 
-        response_network_machinenames = \
-            requests.get(API_URL + "/api/events/network-events-machinenames")
+        response_network_machinenames = requests.get(API_URL + "/api/events/network-events-machinenames")
         self.assertGreaterEqual(len(response_network_machinenames.json()), 0)
         self.assertEqual(response_network_machinenames.status_code, 200)
 
@@ -113,13 +107,15 @@ class TestApi(unittest.TestCase):
         """
         Test module-names endpoint
         """
-        module_names = ['ics/veeder_root_guardian_ast',
-                        'http/basic_auth_strong_password',
-                        'http/basic_auth_weak_password',
-                        'ftp/strong_password',
-                        'ftp/weak_password',
-                        'ssh/strong_password',
-                        'ssh/weak_password']
+        module_names = [
+            'ics/veeder_root_guardian_ast',
+            'http/basic_auth_strong_password',
+            'http/basic_auth_weak_password',
+            'ftp/strong_password',
+            'ftp/weak_password',
+            'ssh/strong_password',
+            'ssh/weak_password'
+        ]
         response = requests.get(API_URL + "/api/events/module-names")
         self.assertCountEqual(module_names, response.json()["module_names"])
 
@@ -128,18 +124,15 @@ class TestApi(unittest.TestCase):
         Test module-events, most-usernames-used and most-passwords-used
         end-points
         """
-        response_modules = \
-            requests.get(API_URL + "/api/events/module-events")
+        response_modules = requests.get(API_URL + "/api/events/module-events")
         self.assertGreaterEqual(len(response_modules.json()), 0)
         self.assertEqual(response_modules.status_code, 200)
 
-        response_usernames = \
-            requests.get(API_URL + "/api/events/most-usernames-used")
+        response_usernames = requests.get(API_URL + "/api/events/most-usernames-used")
         self.assertGreaterEqual(len(response_usernames.json()), 0)
         self.assertEqual(response_usernames.status_code, 200)
 
-        response_passwords = \
-            requests.get(API_URL + "/api/events/most-passwords-used")
+        response_passwords = requests.get(API_URL + "/api/events/most-passwords-used")
         self.assertGreaterEqual(len(response_passwords.json()), 0)
         self.assertEqual(response_passwords.status_code, 200)
 

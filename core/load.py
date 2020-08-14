@@ -6,17 +6,18 @@ import multiprocessing as mp
 import os
 import socket
 import time
+import argparse
 
 from terminable_thread import Thread, threading
 
 from api.server import start_api_server
 from config import (docker_configuration, network_configuration,
                     user_configuration)
-from core.alert import error, info, messages
+from core.alert import error, info
 from core.color import reset_cmd_color
 from core.compatible import (check_for_requirements, copy_dir_tree,
-                             get_module_dir_path, is_verbose_mode, is_windows,
-                             logo, make_tmp_thread_dir, mkdir, version)
+                             get_module_dir_path, is_verbose_mode,
+                             logo, make_tmp_thread_dir, mkdir)
 from core.exit_helper import exit_failure, exit_success, terminate_thread
 from core.get_modules import (load_all_modules,
                               virtual_machine_name_to_container_name,
@@ -24,15 +25,6 @@ from core.get_modules import (load_all_modules,
 from core.network import network_traffic_capture
 from database.connector import (push_events_queues_to_database,
                                 push_events_to_database_from_thread)
-
-# temporary use fixed version of argparse
-if is_windows():
-    if version() == 2:
-        from lib.argparse.v2 import argparse
-    else:
-        from lib.argparse.v3 import argparse
-else:
-    import argparse
 
 # tmp dirs
 tmp_directories = []
@@ -122,8 +114,10 @@ def all_existing_images():
     Returns:
         a array with list of all existing images name
     """
-    return [container.rsplit()[0] for container in
-            os.popen("docker images").read().rsplit("\n")[1:-1]]
+    return [
+        container.rsplit()[0] for container in
+        os.popen("docker images").read().rsplit("\n")[1:-1]
+    ]
 
 
 def stop_containers(configuration):
@@ -141,11 +135,15 @@ def stop_containers(configuration):
     if containers_list:
         for container in container_names:
             if container in containers_list:
-                info("killing container {0}".format(
-                    os.popen("docker kill {0}".format(
-                        container
+                info(
+                    "killing container {0}".format(
+                        os.popen(
+                            "docker kill {0}".format(
+                                container
+                            )
+                        ).read().rsplit()[0]
                     )
-                    ).read().rsplit()[0]))
+                )
     return True
 
 
@@ -163,8 +161,13 @@ def remove_old_containers(configuration):
     containers_list = all_existing_containers()
     for container in virtual_machine_names_to_container_names(configuration):
         if container in containers_list:
-            info("removing container {0}".format(
-                os.popen("docker rm {0}".format(container)).read().rsplit()[0]))
+            info(
+                "removing container {0}".format(
+                    os.popen(
+                        "docker rm {0}".format(container)
+                    ).read().rsplit()[0]
+                )
+            )
     return True
 
 
@@ -355,8 +358,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error("Interrupting the application because network " +
-                             "capturing process is not alive!")
+                return error("Interrupting the application because network capturing process is not alive!")
             if containers_are_unhealthy(configuration):
                 return error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
@@ -367,8 +369,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 break
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
-            info("interrupted by user, please wait to stop the containers and " +
-                 "remove the containers and images")
+            info("interrupted by user, please wait to stop the containers and remove the containers and images")
             break
     return True
 
@@ -512,8 +513,8 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                     info("port {0} selected for {1}".format(
                         real_machine_port, module_name))
                     return real_machine_port
-        except Exception as e:
-            del e
+        except Exception:
+            pass
         real_machine_port += 1
 
 
@@ -591,51 +592,94 @@ def argv_parser():
     docker_config = docker_configuration()
     user_config = user_configuration()
     engineOpt = parser.add_argument_group(
-        messages("en", "engine"), messages("en", "engine_input"))
+        "OHP Engine",
+        "OHP Engine input options"
+    )
     # add select module options + list of available modules
-    engineOpt.add_argument("-m", "--select-module", action="store",
-                           dest="selected_modules",
-                           default=user_config["default_selected_modules"],
-                           help=messages("en", "select_module").format(
-                               load_all_modules() + ["all"]))
+    engineOpt.add_argument(
+        "-m", "--select-module",
+        action="store",
+        dest="selected_modules",
+        default=user_config["default_selected_modules"],
+        help="select module(s) {0}".format(
+            load_all_modules() + ["all"]
+        )
+    )
     # by default all modules are selected, in case users can exclude one or
     # some (separated with comma)
-    engineOpt.add_argument("-x", "--exclude-module", action="store",
-                           dest="excluded_modules",
-                           default=user_config["default_excluded_modules"],
-                           help=messages("en", "exclude_module").format(
-                               load_all_modules()))
+    engineOpt.add_argument(
+        "-x",
+        "--exclude-module",
+        action="store",
+        dest="excluded_modules",
+        default=user_config["default_excluded_modules"],
+        help="select modules(s) to exclude {0}".format(
+            load_all_modules()
+        )
+    )
     # limit the virtual machine storage to avoid related abuse
-    engineOpt.add_argument("-s", "--vm-storage-limit", action="store",
-                           dest="virtual_machine_storage_limit", type=float,
-                           default=docker_config["virtual_machine_storage_limit"],
-                           help=messages("en", "vm_storage_limit"))
+    engineOpt.add_argument(
+        "-s",
+        "--vm-storage-limit",
+        action="store",
+        dest="virtual_machine_storage_limit",
+        type=float,
+        default=docker_config["virtual_machine_storage_limit"],
+        help="virtual machine storage limit"
+    )
     # reset the containers once in a time to prevent being continues botnet
     # zombie
-    engineOpt.add_argument("-r", "--vm-reset-factory-time", action="store",
-                           dest="virtual_machine_container_reset_factory_time_seconds", type=int,
-                           default=docker_config["virtual_machine_container_reset_factory_time_seconds"],
-                           help=messages("en", "vm_reset_factory_time"))
+    engineOpt.add_argument(
+        "-r",
+        "--vm-reset-factory-time",
+        action="store",
+        dest="virtual_machine_container_reset_factory_time_seconds",
+        type=int,
+        default=docker_config["virtual_machine_container_reset_factory_time_seconds"],
+        help="virtual machine reset factory time"
+    )
     # start api
-    engineOpt.add_argument("--start-api-server", action="store_true",
-                           dest="start_api_server", default=False,
-                           help="start API server")
+    engineOpt.add_argument(
+        "--start-api-server",
+        action="store_true",
+        dest="start_api_server",
+        default=False,
+        help="start API server"
+    )
     # enable verbose mode (debug mode)
-    engineOpt.add_argument("-v", "--verbose", action="store_true",
-                           dest="verbose_mode", default=False,
-                           help="enable verbose mode")
+    engineOpt.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose_mode",
+        default=False,
+        help="enable verbose mode"
+    )
     # disable color CLI
-    engineOpt.add_argument("--disable-colors", action="store_true",
-                           dest="disable_colors", default=False,
-                           help="disable colors in CLI")
+    engineOpt.add_argument(
+        "--disable-colors",
+        action="store_true",
+        dest="disable_colors",
+        default=False,
+        help="disable colors in CLI"
+    )
     # test CI/ETC
-    engineOpt.add_argument("--test", action="store_true",
-                           dest="run_as_test",
-                           default=False, help="run a test and exit")
+    engineOpt.add_argument(
+        "--test",
+        action="store_true",
+        dest="run_as_test",
+        default=False,
+        help="run a test and exit"
+    )
     # help menu
-    engineOpt.add_argument("-h", "--help", action="store_true", default=False,
-                           dest="show_help_menu",
-                           help=messages("en", "show_help_menu"))
+    engineOpt.add_argument(
+        "-h",
+        "--help",
+        action="store_true",
+        default=False,
+        dest="show_help_menu",
+        help="print this help menu"
+    )
     return parser, parser.parse_args()
 
 
@@ -679,11 +723,11 @@ def load_honeypot_engine():
             selected_modules.remove("")
         # if selected modules are zero
         if not len(selected_modules):
-            exit_failure(messages("en", "zero_module_selected"))
+            exit_failure("no module selected, please select one at least!")
         # if module not found
         for module in selected_modules:
             if module not in load_all_modules():
-                exit_failure(messages("en", "module_not_found").format(module))
+                exit_failure("module {0} not found!".format(module))
     # check excluded modules
     if argv_options.excluded_modules:
         excluded_modules = list(set(argv_options.excluded_modules.rsplit(",")))
@@ -694,7 +738,7 @@ def load_honeypot_engine():
         # remove excluded modules
         for module in excluded_modules:
             if module not in load_all_modules():
-                exit_failure(messages("en", "module_not_found").format(module))
+                exit_failure("module {0} not found!".format(module))
             # ignore if module not selected, it will remove anyway
             try:
                 selected_modules.remove(module)
@@ -702,7 +746,7 @@ def load_honeypot_engine():
                 pass
         # if selected modules are zero
         if not len(selected_modules):
-            exit_failure(messages("en", "zero_module_selected"))
+            exit_failure("no module selected, please select one at least!")
     virtual_machine_container_reset_factory_time_seconds = argv_options. \
         virtual_machine_container_reset_factory_time_seconds
     run_as_test = argv_options.run_as_test
@@ -712,8 +756,8 @@ def load_honeypot_engine():
     # build configuration based on selected modules
     configuration = honeypot_configuration_builder(selected_modules)
 
-    info(messages("en", "honeypot_started"))
-    info(messages("en", "loading_modules").format(", ".join(selected_modules)))
+    info("OWASP Honeypot started ...")
+    info("loading modules {0}".format(", ".join(selected_modules)))
     # check for conflict in real machine ports and pick new ports
     info("checking for conflicts in ports")
     configuration = conflict_ports(configuration)
