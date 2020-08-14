@@ -325,205 +325,59 @@ def count_network_events():
         return flask_null_array_response()
 
 
-@app.route("/api/events/honeypot-events-ips", methods=["GET"])
-def top_ten_ips_in_honeypot_events():
+@app.route("/api/events/<path:path>", defaults={'path': None}, methods=["GET"])
+def top_ten_ips_in_honeypot_events(path):
     """
     get top ten repeated ips in honeypot events
 
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
+    abort(404) if path not in [
+        "network-events-ips",
+        "honeypot-events-ips",
+        "network-events-ports",
+        "honeypot-events-ports"
+    ] else ""
     date = get_value_from_request("date")
     country_ip_dest = get_value_from_request("country_ip_dest")
     top_ips_query = [
-        top_ip_dests_groupby,
+        top_ip_dests_groupby if path in [
+            "network-events-ips",
+            "honeypot-events-ips"
+        ] else top_port_dests_groupby,
         filter_by_skip(get_value_from_request("skip")),
         filter_by_limit(get_value_from_request("limit"))
     ]
 
-    if country_ip_dest and date:
-        match_by_country_and_date = filter_by_match(
+    top_ips_query.insert(
+        0,
+        filter_by_match(
             {
                 **filter_by_country_ip_dest(country_ip_dest),
                 **filter_by_date(date)
             }
-        )
-        top_ips_query.insert(0, match_by_country_and_date)
-        top_ips_query.insert(2, sort_by_count_and_id)
-
-    elif country_ip_dest:
-        match_by_country = filter_by_match(
+        ) if country_ip_dest and date else filter_by_match(
             filter_by_country_ip_dest(country_ip_dest)
-        )
-        top_ips_query.insert(0, match_by_country)
-        top_ips_query.insert(2, sort_by_count_and_id)
-
-    elif date:
-        match_by_date = filter_by_match(
+        ) if country_ip_dest else filter_by_match(
             filter_by_date(date)
-        )
-        top_ips_query.insert(0, match_by_date)
-        top_ips_query.insert(2, sort_by_count)
+        ) if date else {}
+    )
 
-    else:
-        top_ips_query.insert(1, sort_by_count)
+    top_ips_query.insert(
+        2,
+        sort_by_count_and_id if ((country_ip_dest and date) or country_ip_dest)
+        else sort_by_count if date else sort_by_count
+    )
 
     try:
         return jsonify(
             aggregate_function(
-                connector.honeypot_events,
+                connector.honeypot_events if path in [
+                    "honeypot-events-ips",
+                    "honeypot-events-ports"
+                ] else connector.network_events,
                 top_ips_query
-            )
-        ), 200
-    except Exception:
-        return flask_null_array_response()
-
-
-@app.route("/api/events/network-events-ips", methods=["GET"])
-def top_ten_ips_in_network_events():
-    """
-    get top ten repeated ips in network events
-
-    Returns:
-        JSON/Dict top ten repeated ips in network events
-    """
-    date = get_value_from_request("date")
-    country_ip_dest = get_value_from_request("country_ip_dest")
-    top_ips_query = [
-        top_ip_dests_groupby,
-        filter_by_skip(get_value_from_request("skip")),
-        filter_by_limit(get_value_from_request("limit"))
-    ]
-    if country_ip_dest and date:
-        match_by_country_and_date = filter_by_match(
-            {
-                **filter_by_country_ip_dest(country_ip_dest),
-                **filter_by_date(date)
-            }
-        )
-        top_ips_query.insert(0, match_by_country_and_date)
-        top_ips_query.insert(2, sort_by_count_and_id)
-
-    elif country_ip_dest:
-        match_by_country = filter_by_match(
-            filter_by_country_ip_dest(country_ip_dest)
-        )
-        top_ips_query.insert(0, match_by_country)
-        top_ips_query.insert(2, sort_by_count_and_id)
-
-    elif date:
-        match_by_date = filter_by_match(
-            filter_by_date(date)
-        )
-        top_ips_query.insert(0, match_by_date)
-        top_ips_query.insert(2, sort_by_count)
-
-    else:
-        top_ips_query.insert(1, sort_by_count)
-
-    try:
-        return jsonify(
-            aggregate_function(
-                connector.network_events,
-                top_ips_query
-            )
-        ), 200
-    except Exception:
-        return flask_null_array_response()
-
-
-@app.route("/api/events/honeypot-events-ports", methods=["GET"])
-def top_ten_ports_in_honeypot_events():
-    """
-    get top ten repeated ports in honeypot events
-
-    Returns:
-        JSON/Dict top ten repeated ports in honeypot events
-    """
-    date = get_value_from_request("date")
-    country_ip_dest = get_value_from_request("country_ip_dest")
-    top_ports_query = [
-        top_port_dests_groupby,
-        filter_by_skip(get_value_from_request("skip")),
-        filter_by_limit(get_value_from_request("limit"))
-    ]
-    if country_ip_dest and date:
-        match_by_country_and_date = filter_by_match(
-            {
-                **filter_by_country_ip_dest(country_ip_dest),
-                **filter_by_date(date)
-            }
-        )
-        top_ports_query.insert(0, match_by_country_and_date)
-        top_ports_query.insert(2, sort_by_count_and_id)
-    elif country_ip_dest:
-        match_by_country = filter_by_match(
-            filter_by_country_ip_dest(country_ip_dest)
-        )
-        top_ports_query.insert(0, match_by_country)
-        top_ports_query.insert(2, sort_by_count_and_id)
-    elif date:
-        match_by_date = filter_by_match(
-            filter_by_date(date)
-        )
-        top_ports_query.insert(0, match_by_date)
-        top_ports_query.insert(2, sort_by_count)
-    else:
-        top_ports_query.insert(1, sort_by_count)
-    try:
-        return jsonify(
-            aggregate_function(
-                connector.honeypot_events,
-                top_ports_query
-            )
-        ), 200
-    except Exception:
-        return flask_null_array_response()
-
-
-@app.route("/api/events/network-events-ports", methods=["GET"])
-def top_ten_ports_in_network_events():
-    """
-    get top ten repeated ports in network events
-
-    Returns:
-        JSON/Dict top ten repeated ports in network events
-    """
-    date = get_value_from_request("date")
-    country_ip_dest = get_value_from_request("country_ip_dest")
-    top_ports_query = [
-        top_port_dests_groupby,
-        filter_by_skip(get_value_from_request("skip")),
-        filter_by_limit(get_value_from_request("limit"))
-    ]
-    if country_ip_dest and date:
-        match_by_country_and_date = filter_by_match(
-            {
-                **filter_by_country_ip_dest(country_ip_dest),
-                **filter_by_date(date)
-            }
-        )
-        top_ports_query.insert(0, match_by_country_and_date)
-        top_ports_query.insert(2, sort_by_count_and_id)
-    elif country_ip_dest:
-        match_by_country = filter_by_match(
-            filter_by_country_ip_dest(country_ip_dest)
-        )
-        top_ports_query.insert(0, match_by_country)
-        top_ports_query.insert(2, sort_by_count_and_id)
-    elif date:
-        match_by_date = filter_by_match(
-            filter_by_date(date)
-        )
-        top_ports_query.insert(0, match_by_date)
-        top_ports_query.insert(2, sort_by_count)
-    else:
-        top_ports_query.insert(1, sort_by_count)
-    try:
-        return jsonify(
-            aggregate_function(
-                connector.network_events,
-                top_ports_query
             )
         ), 200
     except Exception:
