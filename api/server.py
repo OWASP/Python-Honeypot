@@ -260,13 +260,13 @@ def count_all_events():
                         {
                             **filter_by_date(date)
                         }
-                    ) if date else connector.credential_event.estimated_document_count()
+                    ) if date else connector.credential_events.estimated_document_count()
                 ) + int(
                     connector.file_change_events.count_documents(
                         {
                             **filter_by_date(date)
                         }
-                    ) if date else connector.file_change_events.count_documents()
+                    ) if date else connector.file_change_events.estimated_document_count()
                 ),
                 "date": date
             }

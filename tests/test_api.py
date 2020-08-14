@@ -22,7 +22,6 @@ class TestApi(unittest.TestCase):
         greater than or equal to zero.
         """
         response = requests.get(API_URL + "/api/events/count-all-events")
-        print(response.content)
         self.assertGreaterEqual(response.json()["count_all_events"], 0)
         self.assertEqual(response.status_code, 200)
 
