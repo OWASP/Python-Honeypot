@@ -273,31 +273,39 @@ def groupby_element(event_type, element):
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
-    abort(404) if event_type not in event_types else event_type
+    abort(404) if (
+            event_type not in event_types or
+            element not in group_by_elements
+    ) else True
 
     date = get_value_from_request("date")
     country = get_value_from_request("country")
     try:
         return jsonify(
-            aggregate_function(
-                event_types[event_type],
-                [
-                    filter_by_match(
-                        {
-                            **filter_by_country_ip_dest(country),
-                            **filter_by_date(date)
-                        }
-                    ) if country and date else filter_by_match(
-                        filter_by_country_ip_dest(country)
-                    ) if country else filter_by_match(
-                        filter_by_date(date)
-                    ) if date else sort_by_count,
-                    group_by_elements[element],
-                    filter_by_skip(get_value_from_request("skip")),
-                    filter_by_limit(get_value_from_request("limit")),
-                    sort_by_count
-                ]
-            )
+            [
+                {
+                    data['_id'][element]: data['count']
+                } for data in
+                aggregate_function(
+                    event_types[event_type],
+                    [
+                        filter_by_match(
+                            {
+                                **filter_by_country_ip_dest(country),
+                                **filter_by_date(date)
+                            }
+                        ) if country and date else filter_by_match(
+                            filter_by_country_ip_dest(country)
+                        ) if country else filter_by_match(
+                            filter_by_date(date)
+                        ) if date else sort_by_count,
+                        group_by_elements[element],
+                        filter_by_skip(get_value_from_request("skip")),
+                        filter_by_limit(get_value_from_request("limit")),
+                        sort_by_count
+                    ]
+                )
+            ]
         ), 200
     except Exception:
         return flask_null_array_response()

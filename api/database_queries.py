@@ -89,7 +89,7 @@ def filter_by_country_ip_dest(country):
 
 def filter_by_module_name(module_name):
     return {
-        'module_name': module_name
+        "module_name": module_name
     }
 
 
