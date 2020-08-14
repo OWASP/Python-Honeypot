@@ -1,4 +1,5 @@
 import unittest
+import time
 from datetime import datetime
 from multiprocessing import Queue
 
@@ -51,6 +52,9 @@ class TestConnector(unittest.TestCase):
         # Find the records in the DB
         honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
         network_record = network_events.find_one(network_event.__dict__)
+        
+        # wait for queue to be empty
+        time.sleep(3.5)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
