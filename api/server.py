@@ -243,7 +243,7 @@ def count_all_events():
     try:
         return jsonify(
             {
-                "count_all_events_by_date": int(
+                "count_all_events_by_date" if date else "count_all_events": int(
                     connector.honeypot_events.count_documents(
                         {
                             **filter_by_date(date)
