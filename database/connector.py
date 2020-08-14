@@ -184,8 +184,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         )
     )
 
-    credential_event.machine_name = \
-        network_config["real_machine_identifier_name"]
+    credential_event.machine_name = network_config["real_machine_identifier_name"]
 
     if is_verbose_mode():
         verbose_info(
