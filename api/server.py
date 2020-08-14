@@ -8,7 +8,7 @@ import sys
 from bson import ObjectId, json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
-from flask import send_from_directory
+from flask import send_file
 from gridfs import GridFSBucket
 
 from api.database_queries import (group_by_ip_dest,
@@ -273,7 +273,8 @@ def download_file():
         print(file_id, filename)
         file_path = os.path.join(
             sys.path[0],
-            "tmp"
+            "tmp",
+            filename
         )
 
         fs = GridFSBucket(connector.ohp_file_archive)
@@ -281,9 +282,8 @@ def download_file():
         fs.download_to_stream(file_id, file)
         print(file_path)
 
-        return send_from_directory(
+        return send_file(
             file_path,
-            filename,
             attachment_filename=filename,
             as_attachment=True
         ), 200
