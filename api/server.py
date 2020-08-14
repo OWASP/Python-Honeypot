@@ -3,10 +3,13 @@
 
 import json
 import os
+import sys
 
-from bson import json_util
+from bson import ObjectId, json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
+from flask import send_from_directory
+from gridfs import GridFSBucket
 
 from api.database_queries import (group_by_ip_dest,
                                   group_by_ip_dest_and_password,
@@ -251,7 +254,39 @@ def get_files_list():
                 )
             ]
         }
+        print(files_list["storedFiles"][0]["_id"])
         return json.loads(json_util.dumps(files_list)), 200
+
+    except Exception:
+        return flask_null_array_response()
+
+
+@app.route("/api/file-archive/download-file", methods=["GET"])
+def download_file():
+    """
+    Download PCAP files
+    """
+    try:
+        print(flask_request)
+        file_id = ObjectId(get_value_from_request("_id"))
+        filename = get_value_from_request("filename")
+        print(file_id, filename)
+        file_path = os.path.join(
+            sys.path[0],
+            "tmp"
+        )
+
+        fs = GridFSBucket(connector.ohp_file_archive)
+        file = open(file_path, "wb")
+        fs.download_to_stream(file_id, file)
+        print(file_path)
+
+        return send_from_directory(
+            file_path,
+            filename,
+            attachment_filename=filename,
+            as_attachment=True
+        ), 200
 
     except Exception:
         return flask_null_array_response()
