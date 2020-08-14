@@ -678,7 +678,7 @@ class TestApi(unittest.TestCase):
         """
         module_names = load_all_modules()
         response = requests.get(API_URL + "/api/core/list/modules")
-        self.assertCountEqual(module_names, response.json()["module_names"])
+        self.assertCountEqual(module_names, response.json())
 
 
 if __name__ == '__main__':
