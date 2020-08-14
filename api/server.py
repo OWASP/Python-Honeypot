@@ -3,9 +3,12 @@
 
 import os
 
-from flask import Flask, Response, abort, jsonify, render_template
+from flask import (Flask,
+                   Response,
+                   abort,
+                   jsonify,
+                   render_template)
 from flask import request as flask_request
-
 from api.database_queries import (sort_by_count,
                                   filter_by_date,
                                   filter_by_skip,
@@ -15,9 +18,13 @@ from api.database_queries import (sort_by_count,
                                   filter_by_match,
                                   event_types,
                                   group_by_elements)
-from api.utility import (aggregate_function, all_mime_types, fix_date,
-                         fix_limit, fix_skip, flask_null_array_response,
-                         msg_structure, root_dir)
+from api.utility import (aggregate_function,
+                         all_mime_types,
+                         fix_limit,
+                         fix_skip,
+                         flask_null_array_response,
+                         msg_structure,
+                         root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
@@ -353,88 +360,47 @@ def get_events_data(event_type):
     """
     abort(404) if event_type not in event_types else event_type
 
-    event_type = get_value_from_request("event_type")
     module_name = get_value_from_request("module_name")
-    # todo: rename the variable
-    start_date = fix_date(
-        get_value_from_request("start_date")
-    )
-    end_date = fix_date(
-        get_value_from_request("end_date")
-    )
+    date = get_value_from_request("date")
 
-    if event_type == "honeypot-event":
+    if event_type == "honeypot":
         db_collection_name = connector.honeypot_events
-    elif event_type == "network-event":
+    elif event_type == "network":
         db_collection_name = connector.network_events
-    elif event_type == "credential-event":
+    elif event_type == "credential":
         db_collection_name = connector.credential_events
-    elif event_type == "ics-honeypot-event":
-        db_collection_name = connector.events_data
-    elif event_type == "file-change-event":
+    elif event_type == "file":
         db_collection_name = connector.file_change_events
+    elif event_type == "data":
+        db_collection_name = connector.data_events
     else:
+        abort(404)
+
+    try:
+        query = filter_by_date(date) if date else {}
+        query.update(filter_by_module_name(module_name) if module_name else {})
+
+        return jsonify(
+            [
+                i for i in
+                db_collection_name.find(
+                    query,
+                    {
+                        "_id": 0
+                    }
+                ).skip(
+                    fix_skip(
+                        get_value_from_request("skip")
+                    )
+                ).limit(
+                    fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )
+            ]
+        ), 200
+    except Exception:
         return flask_null_array_response()
-
-    if start_date and end_date:
-        try:
-            query = {
-                "$gte": start_date[0],
-                "$lte": end_date[1]
-                # todo: fix
-                # **filter_by_date(date)
-            }
-            if module_name:
-                query["module_name"] = module_name
-
-            return jsonify(
-                [
-                    i for i in
-                    db_collection_name.find(
-                        query,
-                        {
-                            "_id": 0
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
-            ), 200
-        except Exception:
-            return flask_null_array_response()
-    else:
-        try:
-            query = {}
-            if module_name:
-                query = filter_by_module_name(module_name)
-
-            return jsonify(
-                [
-                    i for i in
-                    db_collection_name.find(
-                        query,
-                        {
-                            "_id": 0
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
-            ), 200
-        except Exception:
-            return flask_null_array_response()
 
 
 @app.route("/api/core/list/modules", methods=["GET"])
@@ -483,8 +449,7 @@ def start_api_server():
     app.run(
         host=my_api_configuration["api_host"],
         port=my_api_configuration["api_port"],
-        # debug=my_api_configuration["api_debug_mode"],
-        debug=True,
+        debug=my_api_configuration["api_debug_mode"],
         threaded=True
     )
     return True

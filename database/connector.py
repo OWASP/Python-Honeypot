@@ -30,7 +30,7 @@ credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
 file_change_events = database.file_change_events
-events_data = database.events_data
+data_events = database.data_events
 
 # Event queues
 honeypot_events_queue = list()
@@ -246,13 +246,13 @@ def insert_to_events_data_collection(event_data: EventData):
     Returns:
         inserted_id
     """
-    event_data.machine_name = \
-        network_config["real_machine_identifier_name"]
+    event_data.machine_name = network_config["real_machine_identifier_name"]
 
     event_data.country = byte_to_str(
         IP2Location.get_country_short(
             event_data.ip
-        ))
+        )
+    )
 
     if is_verbose_mode():
         verbose_info(
@@ -265,4 +265,4 @@ def insert_to_events_data_collection(event_data: EventData):
             )
         )
 
-    return events_data.insert_one(event_data.__dict__).inserted_id
+    return data_events.insert_one(event_data.__dict__).inserted_id

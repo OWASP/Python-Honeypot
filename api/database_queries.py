@@ -50,7 +50,8 @@ event_types = [
     "honeypot",
     "network",
     "credential",
-    "file"
+    "file",
+    "data"
 ]
 
 
