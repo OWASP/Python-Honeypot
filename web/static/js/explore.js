@@ -95,7 +95,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
 }
 
 /**
- * 
+ * Call the API to get the list of Files stored in the database.
  * @param {*} api_endpoint 
  * @param {*} column_list 
  * @param {*} column_defs 
@@ -125,7 +125,8 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
           orderable: false,
           className : 'select-checkbox',
           checkboxes: {
-            'selectRow': true
+            selectRow: true,
+            stateSave: false
           }
        },
        {
@@ -135,8 +136,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       ],
       retrieve : true,
       select: {
-        style: 'multi',
-        selector: 'td:first-child'
+        style: 'single'
       },
       destroy: true,
       order: [[1, 'desc']],
@@ -160,14 +160,43 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       searching: true,
       responsive: true
     });
+    // Make the download button visible.
     document.getElementById("download-file-btn").hidden = false;
-
-    // $("#download-file").hidden = false;
+    
+    // On click function for the download button
     $("#download-file-btn").on('click', function(e){
-      var rows_selected =  table.column(0).checkboxes.selected();
-      console.log(rows_selected);
-    });
+      var selected_row_data =  table.rows({ selected: true }).data();
+      console.log(selected_row_data);
+      api_params = {
+        "_id": selected_row_data[0]["_id"]["$oid"]
+      }
 
+      // Call the download-file API endpoint with the file ID
+      $.ajax({
+        type: "GET",
+        url: "/api/file-archive/download-file",
+        data: api_params,
+        xhrFields:{
+          responseType: "arraybuffer"
+        },
+        success: function(result,status,xhr){
+          console.log(status, result, xhr);
+          var blob = new Blob([result],
+            {
+              type: xhr.getResponseHeader('Content-Type')
+            });
+          download(xhr, blob);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          if (errorThrown == "BAD REQUEST") {
+            alert(jqXHR.responseText)
+          }
+          if (errorThrown == "UNAUTHORIZED") {
+            alert(jqXHR.responseText)
+          }
+        }
+      });
+    });
   });
 }
 
@@ -297,6 +326,63 @@ function search_database() {
       alert("Start date is greater than End date!")
     }
   }
+}
+
+/**
+ * Taken from https://storiknow.com/download-file-with-jquery-and-web-api-2-0-ihttpactionresult/
+ * @param {*} xhr 
+ * @param {*} blob 
+ */
+function download(xhr, blob) {
+  var downloadLink = document.createElement('a');
+  
+  var url = window.URL || window.webkitURL;
+  var downloadUrl = url.createObjectURL(blob);
+  var fileName = '';
+ 
+  // get the file name from the content disposition
+  var disposition = xhr.getResponseHeader('Content-Disposition');
+  if (disposition && disposition.indexOf('attachment') !== -1) {
+      var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      var matches = filenameRegex.exec(disposition);
+      if (matches != null && matches[1]) {
+          fileName = matches[1].replace(/['"]/g, '');
+      }
+  }
+  // Blob download logic taken from: https://stackoverflow.com/questions/16086162/handle-file-download-from-ajax-post
+  if (typeof window.navigator.msSaveBlob !== 'undefined') {
+    // IE workaround for "HTML7007" and "Access Denied" error.
+    window.navigator.msSaveBlob(blob, fileName);
+  } else {
+      if (fileName) {
+          if (typeof downloadLink.download === 'undefined') {
+              window.location = downloadUrl;
+          } else {
+              downloadLink.href = downloadUrl;
+              downloadLink.download = fileName;
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+          }
+      } else {
+          window.location = downloadUrl;
+      }
+
+      setTimeout(function () {
+            url.revokeObjectURL(downloadUrl);
+        },
+        100
+      );
+  }
+
+  // element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  // element.setAttribute('download', filename);
+
+  // element.style.display = 'none';
+  // document.body.appendChild(element);
+
+  // element.click();
+
+  // document.body.removeChild(element);
 }
 
 /**
