@@ -44,8 +44,8 @@ class ModuleProcessor:
         while not self.kill_flag:
             try:
                 time.sleep(0.1)
-            except Exception as _:
-                del _
+            except Exception:
+                pass
         new_file_handler.stop()
         terminate_thread(thread)
 

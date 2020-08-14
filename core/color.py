@@ -32,26 +32,27 @@ def color_cmd(color):
     from core.compatible import os_name
     if "--disable-colors" in sys.argv:
         return ""
-    if "linux" in os_name() or \
-            os_name() == "darwin":
+    if "linux" in os_name() or os_name() == "darwin":
         if color == "reset":
             return "\033[0m"
-        if color == "grey":
+        elif color == "grey":
             return "\033[1;30m"
-        if color == "red":
+        elif color == "red":
             return "\033[1;31m"
-        if color == "green":
+        elif color == "green":
             return "\033[1;32m"
-        if color == "yellow":
+        elif color == "yellow":
             return "\033[1;33m"
-        if color == "blue":
+        elif color == "blue":
             return "\033[1;34m"
-        if color == "purple":
+        elif color == "purple":
             return "\033[1;35m"
-        if color == "cyan":
+        elif color == "cyan":
             return "\033[1;36m"
-        if color == "white":
+        elif color == "white":
             return "\033[1;37m"
+        else:
+            return ""
     else:
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
         handle = std_out_handle
