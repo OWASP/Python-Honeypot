@@ -35,7 +35,7 @@ def terminate_thread(thread, verbose=True):
 
     Args:
         thread: an alive thread
-        output: print while killing
+        verbose: verbose mode/boolean
 
     Returns:
         True/None

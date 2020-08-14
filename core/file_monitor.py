@@ -73,5 +73,5 @@ class FileMonitor:
         while not self.stop_execution:
             try:
                 time.sleep(0.1)
-            except Exception as _:
-                del _
+            except Exception:
+                pass

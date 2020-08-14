@@ -174,12 +174,9 @@ def authorization_check():
         None or Abort(403) or Abort(401)
     """
     # IP Limitation
-    white_list_enabled = \
-        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]
-    white_list_ips = \
-        app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]
-    api_access_without_key = \
-        app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]
+    white_list_enabled = app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list"]
+    white_list_ips = app.config["OWASP_HONEYPOT_CONFIG"]["api_client_white_list_ips"]
+    api_access_without_key = app.config["OWASP_HONEYPOT_CONFIG"]["api_access_without_key"]
 
     if white_list_enabled:
         if flask_request.remote_addr not in white_list_ips:
@@ -257,6 +254,20 @@ def count_all_events():
                                     "$lte": date[1]
                                 }
                             }
+                        ) + connector.credential_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                            }
+                        ) + connector.file_change_events.count_documents(
+                            {
+                                "date": {
+                                    "$gte": date[0],
+                                    "$lte": date[1]
+                                }
+                            }
                         ),
                     "date": date
                 }
@@ -267,12 +278,10 @@ def count_all_events():
         try:
             return jsonify(
                 {
-                    "count_all_events": (
-                            connector.honeypot_events.estimated_document_count() +
-                            connector.network_events.estimated_document_count() +
-                            connector.credential_events.estimated_document_count() +
-                            connector.file_change_events.estimated_document_count()
-                    )
+                    "count_all_events": (connector.honeypot_events.estimated_document_count()
+                                         + connector.network_events.estimated_document_count()
+                                         + connector.credential_events.estimated_document_count()
+                                         + connector.file_change_events.estimated_document_count())
                 }
             ), 200
         except Exception:
@@ -895,17 +904,15 @@ def top_ten_countries_in_honeypot_events():
     ]
     if date:
         match_by_date_and_country = {
-            "$match":
-                {
-                    "country_ip_dest": {
-                        "$gt": "-"
-                    },
-                    "date":
-                        {
-                            "$gte": date[0],
-                            "$lte": date[1]
-                        }
+            "$match": {
+                "country_ip_dest": {
+                    "$gt": "-"
+                },
+                "date": {
+                    "$gte": date[0],
+                    "$lte": date[1]
                 }
+            }
         }
         top_countries_query.insert(0, match_by_date_and_country)
     else:
@@ -961,11 +968,10 @@ def top_ten_countries_in_network_events():
                     "country_ip_dest": {
                         "$gt": "-"
                     },
-                    "date":
-                        {
-                            "$gte": date[0],
-                            "$lte": date[1]
-                        }
+                    "date": {
+                        "$gte": date[0],
+                        "$lte": date[1]
+                    }
                 }
         }
         top_countries_query.insert(0, match_by_date_and_country)
@@ -1106,7 +1112,14 @@ def module_events():
         }
     ]
     if module_name:
-        module_query.insert(0, {"$match": {'module_name': module_name}})
+        module_query.insert(
+            0,
+            {
+                "$match": {
+                    'module_name': module_name
+                }
+            }
+        )
     try:
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
@@ -1138,7 +1151,14 @@ def top_usernames_used():
         }
     ]
     if module_name:
-        module_query.insert(0, {"$match": {'module_name': module_name}})
+        module_query.insert(
+            0,
+            {
+                "$match": {
+                    'module_name': module_name
+                }
+            }
+        )
     try:
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
@@ -1170,7 +1190,14 @@ def top_passwords_used():
         }
     ]
     if module_name:
-        module_query.insert(0, {"$match": {'module_name': module_name}})
+        module_query.insert(
+            0,
+            {
+                "$match": {
+                    'module_name': module_name
+                }
+            }
+        )
     try:
         return jsonify(
             aggregate_function(connector.credential_events, module_query)
@@ -1190,7 +1217,9 @@ def all_module_names():
     module_names = load_all_modules()
     try:
         return jsonify(
-            {"module_names": module_names}
+            {
+                "module_names": module_names
+            }
         ), 200
     except Exception:
         return flask_null_array_response()
@@ -1210,31 +1239,17 @@ def start_api_server():
 
     write_to_api_console(
         " * API access key: {0}\n".format(
-            api_access_key
-            if not api_access_without_key
-            else "NOT REQUIRED!"
+            api_access_key if not api_access_without_key else "NOT REQUIRED!"
         )
     )
 
     app.config["OWASP_HONEYPOT_CONFIG"] = {
-        "api_access_key":
-            api_access_key,
-
-        "api_client_white_list":
-            my_api_configuration["api_client_white_list"]["enabled"],
-
-        "api_client_white_list_ips":
-            my_api_configuration["api_client_white_list"]["ips"],
-
-        "api_access_log":
-            my_api_configuration["api_access_log"]["enabled"],
-
-        "api_access_log_filename":
-            my_api_configuration["api_access_log"]["filename"],
-
-        "api_access_without_key":
-            api_access_without_key,
-
+        "api_access_key": api_access_key,
+        "api_client_white_list": my_api_configuration["api_client_white_list"]["enabled"],
+        "api_client_white_list_ips": my_api_configuration["api_client_white_list"]["ips"],
+        "api_access_log": my_api_configuration["api_access_log"]["enabled"],
+        "api_access_log_filename": my_api_configuration["api_access_log"]["filename"],
+        "api_access_without_key": api_access_without_key,
         "language": "en"
     }
     app.run(
