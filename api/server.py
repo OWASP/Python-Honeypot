@@ -287,7 +287,7 @@ def count_honeypot_events():
     try:
         return jsonify(
             {
-                "count_honeypot_events_by_date":
+                "count_honeypot_events_by_date" if date else "count_honeypot_events":
                     connector.honeypot_events.count_documents(
                         {
                             **filter_by_date(date)
@@ -312,7 +312,7 @@ def count_network_events():
     try:
         return jsonify(
             {
-                "count_network_events_by_date":
+                "count_network_events_by_date" if date else "count_network_events":
                     connector.network_events.count_documents(
                         {
                             **filter_by_date(date)
