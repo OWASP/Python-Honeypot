@@ -281,7 +281,8 @@ def groupby_element(event_type, element):
         return jsonify(
             [
                 {
-                    data['_id'][element]: data['count']
+                    element: data['_id'][element],
+                    "count": data["count"]
                 } for data in
                 aggregate_function(
                     event_types[event_type],
