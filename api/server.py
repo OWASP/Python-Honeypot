@@ -382,7 +382,6 @@ def get_files_list():
             ]
         ), 200
     except Exception as e:
-        print(e)
         return flask_null_array_response()
 
 
