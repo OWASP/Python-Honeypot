@@ -107,14 +107,16 @@ class TestApi(unittest.TestCase):
         """
         Test module-names endpoint
         """
-        module_names = ['ics/veeder_root_guardian_ast',
-                        'http/basic_auth_strong_password',
-                        'http/basic_auth_weak_password',
-                        'ftp/strong_password',
-                        'ftp/weak_password',
-                        'ssh/strong_password',
-                        'ssh/weak_password',
-                        'smtp/strong_password']
+        module_names = [
+            'ics/veeder_root_guardian_ast',
+            'http/basic_auth_strong_password',
+            'http/basic_auth_weak_password',
+            'ftp/strong_password',
+            'ftp/weak_password',
+            'ssh/strong_password',
+            'ssh/weak_password',
+            'smtp/strong_password'
+        ]
         response = requests.get(API_URL + "/api/events/module-names")
         self.assertCountEqual(module_names, response.json()["module_names"])
 

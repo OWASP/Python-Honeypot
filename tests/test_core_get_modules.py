@@ -13,14 +13,16 @@ class TestCoreGetModules(unittest.TestCase):
         config = honeypot_configuration_builder(modules_list)
         container_names = virtual_machine_names_to_container_names(config)
         # list of all modules available
-        all_modules = ['ohp_ftpserver_weak_password',
-                       'ohp_ftpserver_strong_password',
-                       'ohp_icsserver_veeder_root_guardian_ast',
-                       'ohp_sshserver_weak_password',
-                       'ohp_sshserver_strong_password',
-                       'ohp_smtpserver_strong_password',
-                       'ohp_httpserver_basic_auth_strong_password',
-                       'ohp_httpserver_basic_auth_weak_password']
+        all_modules = [
+            'ohp_ftpserver_weak_password',
+            'ohp_ftpserver_strong_password',
+            'ohp_icsserver_veeder_root_guardian_ast',
+            'ohp_sshserver_weak_password',
+            'ohp_sshserver_strong_password',
+            'ohp_smtpserver_strong_password',
+            'ohp_httpserver_basic_auth_strong_password',
+            'ohp_httpserver_basic_auth_weak_password'
+        ]
         self.assertCountEqual(container_names, all_modules)
 
     def test_load_all_modules(self):
