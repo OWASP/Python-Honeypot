@@ -207,7 +207,7 @@ def byte_to_str(data):
     :return: str(data)
     """
     return str(
-        data if isinstance(data, str) else data.decode()
+        data if isinstance(data, str) else data.decode() if data is not None else ""
     )
 
 

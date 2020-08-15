@@ -273,10 +273,7 @@ def groupby_element(event_type, element):
     Returns:
         JSON/Dict top ten repeated ips in honeypot events
     """
-    abort(404) if (
-            event_type not in event_types or
-            element not in group_by_elements
-    ) else True
+    abort(404) if (event_type not in event_types or element not in group_by_elements) else True
 
     date = get_value_from_request("date")
     country = get_value_from_request("country")

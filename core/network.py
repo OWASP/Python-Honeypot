@@ -99,23 +99,21 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
             if netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest):
                 # ignored ip addresses and ports in python - fix later
                 # check if the port is in selected module
-
+                print(port_src, port_dest, honeypot_ports.keys())
                 if port_dest in honeypot_ports.keys() or \
                         port_src in honeypot_ports.keys():
-
-                    if port_dest in honeypot_ports.keys():
-                        insert_to_honeypot_events_queue(
-                            HoneypotEvent(
-                                ip_dest,
-                                port_dest,
-                                ip_src,
-                                port_src,
-                                protocol,
-                                honeypot_ports[port_dest],
-                                machine_name
-                            ),
-                            honeypot_events_queue
-                        )
+                    insert_to_honeypot_events_queue(
+                        HoneypotEvent(
+                            ip_dest,
+                            port_dest,
+                            ip_src,
+                            port_src,
+                            protocol,
+                            honeypot_ports[port_dest],
+                            machine_name
+                        ),
+                        honeypot_events_queue
+                    )
                 else:
                     insert_to_network_events_queue(
                         NetworkEvent(

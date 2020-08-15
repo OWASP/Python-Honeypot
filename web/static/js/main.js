@@ -46,10 +46,10 @@ function load_graphs() {
     // get number of all events
     $.ajax({
         type: "GET",
-        url: "/api/events/count-all-events",
+        url: "/api/events/count/all",
     }).done(function (res) {
-        new_number_of_total_events = res["count_all_events"];
-        document.getElementById('count_all_events').innerHTML = res["count_all_events"];
+        new_number_of_total_events = res["count"];
+        document.getElementById('count_all_events').innerHTML = res["count"];
     }).fail(function (jqXHR, textStatus, errorThrown) {
         document.getElementById('error_msg').innerHTML = jqXHR.responseText;
         if (errorThrown == "BAD REQUEST") {
@@ -76,9 +76,9 @@ function load_graphs() {
             // request honeypot related events number
             $.ajax({
                 type: "GET",
-                url: "/api/events/count-honeypot-events",
+                url: "/api/events/count/honeypot",
             }).done(function (res) {
-                document.getElementById('count_honeypot_events').innerHTML = res["count_honeypot_events"];
+                document.getElementById('count_honeypot_events').innerHTML = res["count"];
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 document.getElementById('error_msg').innerHTML = jqXHR.responseText;
                 if (errorThrown == "BAD REQUEST") {
@@ -89,9 +89,9 @@ function load_graphs() {
             // request network related events number
             $.ajax({
                 type: "GET",
-                url: "/api/events/count-network-events",
+                url: "/api/events/count/network",
             }).done(function (res) {
-                document.getElementById('count_network_events').innerHTML = res["count_network_events"];
+                document.getElementById('count_network_events').innerHTML = res["count"];
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 document.getElementById('error_msg').innerHTML = jqXHR.responseText;
                 if (errorThrown == "BAD REQUEST") {
@@ -103,13 +103,13 @@ function load_graphs() {
             // request top ten ips in honeypot events
             $.ajax({
                 type: "GET",
-                url: "/api/events/honeypot-events-ips",
+                url: "/api/events/count/groupby/honeypot/ip",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_honeypot_events_graph_data_keys.push(
-                        res[i]["_id"]["ip_dest"] + " (" + res[i]["_id"]["country_ip_dest"] + ")"
+                        res[i][Object.keys(res[i])[0]]
                     );
-                    top_ten_ips_in_honeypot_events_graph_data_values.push(res[i]["count"]);
+                    top_ten_ips_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ips_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
 
@@ -159,13 +159,15 @@ function load_graphs() {
             // request top ten ips in network events
             $.ajax({
                 type: "GET",
-                url: "/api/events/network-events-ips",
+                url: "/api/events/count/groupby/network/ip",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
+
+
                     top_ten_ips_in_network_events_graph_data_keys.push(
-                        res[i]["_id"]["ip_dest"] + " (" + res[i]["_id"]["country_ip_dest"] + ")"
+                        Object.keys(res[i])[0]
                        );
-                    top_ten_ips_in_network_events_graph_data_values.push(res[i]["count"]);
+                    top_ten_ips_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ips_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
 
@@ -215,11 +217,11 @@ function load_graphs() {
             // request top ten ports in honeypot events
             $.ajax({
                 type: "GET",
-                url: "/api/events/honeypot-events-ports",
+                url: "/api/events/count/groupby/honeypot/port",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i]["_id"]["port_dest"]);
-                    top_ten_ports_in_honeypot_events_graph_data_values.push(res[i]["count"]);
+                    top_ten_ports_in_honeypot_events_graph_data_keys.push(Object.keys(res[i])[0]);
+                    top_ten_ports_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ports_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
 
@@ -269,11 +271,11 @@ function load_graphs() {
             // request top ten ports in network events
             $.ajax({
                 type: "GET",
-                url: "/api/events/network-events-ports",
+                url: "/api/events/count/groupby/network/port",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_network_events_graph_data_keys.push(res[i]["_id"]["port_dest"]);
-                    top_ten_ports_in_network_events_graph_data_values.push(res[i]["count"]);
+                    top_ten_ports_in_network_events_graph_data_keys.push(Object.keys(res[i])[0]);
+                    top_ten_ports_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ports_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
 
@@ -326,9 +328,9 @@ function load_graphs() {
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/count-all-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count/all?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_all_events_json[res["date"].toString().split(" ")[0]] = res["count_all_events_by_date"];
+                    dates_all_events_json[res["date"].toString().split(" ")[0]] = res["count"];
 
                     var past_week_events_graph_config = {
                         type: 'line',
@@ -431,9 +433,9 @@ function load_graphs() {
             for (var counter = 0; counter < week_dates_array.length; counter++) {
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/count-network-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count/network?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_network_events_json[res["date"].toString().split(" ")[0]] = res["count_network_events_by_date"];
+                    dates_network_events_json[res["date"].toString().split(" ")[0]] = res["count"];
                     var past_week_events_graph_config = {
                         type: 'line',
                         data: {
@@ -535,9 +537,9 @@ function load_graphs() {
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/events/count-honeypot-events?date=" + week_dates_array[counter],
+                    url: "/api/events/count/honeypot?date=" + week_dates_array[counter],
                 }).done(function (res) {
-                    dates_honeypot_events_json[res["date"].toString().split(" ")[0]] = res["count_honeypot_events_by_date"];
+                    dates_honeypot_events_json[res["date"].toString().split(" ")[0]] = res["count"];
                     var past_week_events_graph_config = {
                         type: 'line',
                         data: {
