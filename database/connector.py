@@ -4,16 +4,20 @@
 import inspect
 import os
 import time
-from multiprocessing import Queue
-
-import gridfs
 import pymongo
+import gridfs
+
+from multiprocessing import Queue
 
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
-from database.datatypes import (CredentialEvent, EventData, FileArchive,
-                                FileEventsData, HoneypotEvent, NetworkEvent)
+from database.datatypes import (CredentialEvent,
+                                HoneypotEvent,
+                                EventData,
+                                NetworkEvent,
+                                FileEventsData,
+                                FileArchive)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -32,7 +36,6 @@ honeypot_events = database.honeypot_events
 network_events = database.network_events
 file_change_events = database.file_change_events
 data_events = database.data_events
-events_data = database.events_data
 # Database for storing network traffic files
 ohp_file_archive = client.ohp_file_archive
 ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
@@ -270,7 +273,6 @@ def insert_to_events_data_collection(event_data: EventData):
         )
 
     return data_events.insert_one(event_data.__dict__).inserted_id
-    return events_data.insert_one(event_data.__dict__).inserted_id
 
 
 def insert_pcap_files_to_collection(file_archive: FileArchive):
