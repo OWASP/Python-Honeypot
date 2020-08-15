@@ -1,5 +1,7 @@
 import unittest
+import time
 from datetime import datetime
+from multiprocessing import Queue
 
 from database.connector import (credential_events, events_data,
                                 honeypot_events,
@@ -24,6 +26,7 @@ class TestConnector(unittest.TestCase):
             port_dest=80,
             ip_src="12.23.34.45",
             port_src=1010,
+            protocol='TCP',
             module_name="http/basic_auth_weak_password",
             machine_name="stockholm_server_1"
         )
@@ -33,18 +36,25 @@ class TestConnector(unittest.TestCase):
             port_dest=8090,
             ip_src="22.33.44.55",
             port_src=1100,
+            protocol='UDP',
             machine_name="stockholm_server_1"
         )
 
-        # Insert events to queues
-        insert_to_honeypot_events_queue(honeypot_event)
-        insert_to_network_events_queue(network_event)
+        honeypot_events_queue = Queue()
+        network_events_queue = Queue()
 
-        push_events_queues_to_database()
+        # Insert events to queues
+        insert_to_honeypot_events_queue(honeypot_event, honeypot_events_queue)
+        insert_to_network_events_queue(network_event, network_events_queue)
+
+        push_events_queues_to_database(honeypot_events_queue, network_events_queue)
 
         # Find the records in the DB
         honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
         network_record = network_events.find_one(network_event.__dict__)
+        
+        # wait for queue to be empty
+        time.sleep(3.5)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
@@ -74,22 +84,29 @@ class TestConnector(unittest.TestCase):
 
         # Find the record in the DB
         credential_record = credential_events.find_one(
-                                        credential_event.__dict__)
+            credential_event.__dict__
+        )
 
         # Compare the record found in the DB with the one pushed
-        self.assertEqual(credential_record["ip"],
-                         credential_event.ip)
+        self.assertEqual(
+            credential_record["ip"],
+            credential_event.ip
+        )
 
-        self.assertEqual(credential_record["username"],
-                         credential_event.username)
+        self.assertEqual(
+            credential_record["username"],
+            credential_event.username
+        )
 
-        self.assertEqual(credential_record["password"],
-                         credential_event.password)
+        self.assertEqual(
+            credential_record["password"],
+            credential_event.password
+        )
 
         # Delete test events from the database
         # credential_events.delete_one(credential_event.__dict__)
 
-    def test_insert_eventss_data(self):
+    def test_insert_events_data(self):
         """
         Test the data insertion to the events_data collection
         """
@@ -107,8 +124,10 @@ class TestConnector(unittest.TestCase):
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip"], event_data.ip)
-        self.assertEqual(event_record_data["data"],
-                         event_data.data)
+        self.assertEqual(
+            event_record_data["data"],
+            event_data.data
+        )
 
         events_data.delete_one(event_data.__dict__)
 

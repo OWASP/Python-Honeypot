@@ -33,6 +33,5 @@ class TestCoreGetModules(unittest.TestCase):
     def test_vm_to_container_name(self):
         vm_name = "ohp_sshserver"
         module_name = "ssh/weak_password"
-        container_name = virtual_machine_name_to_container_name(vm_name,
-                                                                module_name)
+        container_name = virtual_machine_name_to_container_name(vm_name, module_name)
         self.assertEqual(container_name, "ohp_sshserver_weak_password")

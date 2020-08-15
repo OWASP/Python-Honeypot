@@ -2,20 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import os
-import select
-import subprocess
+import sys
 import time
 
 import netaddr
+import pyshark
 
-from config import network_configuration
-from core.alert import info, warn
-from core.compatible import byte_to_str
-from core.exit_helper import exit_failure
+from config import network_configuration, protocol_table
+from core.alert import error, info, warn
+from core.compatible import is_verbose_mode, get_timeout_error
 from core.get_modules import virtual_machine_name_to_container_name
-from database.connector import (insert_to_network_events_queue,
-                                insert_to_honeypot_events_queue)
+from database.connector import (insert_to_honeypot_events_queue,
+                                insert_to_network_events_queue)
 from database.datatypes import HoneypotEvent, NetworkEvent
+
+# honeypot ports
+honeypot_ports = dict()
 
 
 def get_gateway_ip_addresses(configuration):
@@ -41,7 +43,11 @@ def get_gateway_ip_addresses(configuration):
             ).read().rsplit()[0].replace("\'", "")
             gateway_ips.append(gateway_ip)
         except IndexError:
-            warn("unable to get container {0} IP address".format(container_name))
+            warn(
+                "unable to get container {0} IP address".format(
+                    container_name
+                )
+            )
     return list(set(gateway_ips))
 
 
@@ -61,7 +67,73 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def new_network_events(configuration):
+def process_packet(packet, honeypot_events_queue, network_events_queue):
+    """
+    Callback function called from the apply_on_packets function.
+
+    Args:
+        packet: Packet live captured by pyshark
+    """
+    # set machine name
+    machine_name = network_configuration()["real_machine_identifier_name"]
+
+    try:
+        # Check if packet contains IP layer
+        if "IP" in packet:
+            ip_dest = packet.ip.dst
+            ip_src = packet.ip.src
+            protocol = protocol_table[int(packet.ip.proto)]
+            port_dest = int()
+            port_src = int()
+
+            # Check packet protocol and if it contains a layer with the same
+            # name
+            if protocol == "TCP" and "TCP" in packet:
+                port_dest = packet.tcp.dstport
+                port_src = packet.tcp.srcport
+
+            elif protocol == "UDP" and "UDP" in packet:
+                port_dest = packet.udp.dstport
+                port_src = packet.udp.srcport
+
+            if netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest):
+                # ignored ip addresses and ports in python - fix later
+                # check if the port is in selected module
+
+                if port_dest in honeypot_ports.keys() or \
+                        port_src in honeypot_ports.keys():
+
+                    if port_dest in honeypot_ports.keys():
+                        insert_to_honeypot_events_queue(
+                            HoneypotEvent(
+                                ip_dest,
+                                port_dest,
+                                ip_src,
+                                port_src,
+                                protocol,
+                                honeypot_ports[port_dest],
+                                machine_name
+                            ),
+                            honeypot_events_queue
+                        )
+                else:
+                    insert_to_network_events_queue(
+                        NetworkEvent(
+                            ip_dest,
+                            port_dest,
+                            ip_src,
+                            port_src,
+                            protocol,
+                            machine_name
+                        ),
+                        network_events_queue
+                    )
+
+    except Exception as _e:
+        del _e
+
+
+def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue):
     """
     get and submit new network events
 
@@ -71,112 +143,91 @@ def new_network_events(configuration):
     Returns:
         True
     """
-    info("new_network_events thread started")
-    # honeypot ports
-    honeypot_ports = []
-    virtual_machine_ip_addresses = []
-    network_config = network_configuration()
+    info("network_traffic_capture process started")
+
     for selected_module in configuration:
         port_number = configuration[selected_module]["real_machine_port_number"]
-        ip_address = configuration[selected_module]["ip_address"]
-        honeypot_ports.append(port_number)
-        # get ip addresses
-        virtual_machine_ip_addresses.append(ip_address)
-    # set machine name
-    machine_name = network_config["real_machine_identifier_name"]
-    # ignore vm ips + ips in config.py
-    # vm = virtual machine, rm = real machine
+
+        honeypot_ports[port_number] = selected_module
+
+    network_config = network_configuration()
+    # get ip addresses
+    virtual_machine_ip_addresses = [
+        configuration[selected_module]["ip_address"]
+        for selected_module in configuration
+    ]
+
+    # Ignore VM IPs + IPs in config.py
+    # VM = virtual machine, RM = real machine
     ignore_rm_ip_addresses = network_config["ignore_real_machine_ip_address"]
     ignore_vm_ip_addresses = network_config["ignore_virtual_machine_ip_addresses"]
+
+    # Ignore real machine IPs
     ignore_ip_addresses = network_config["ignore_real_machine_ip_addresses"] \
         if ignore_rm_ip_addresses else [] + virtual_machine_ip_addresses \
         if ignore_vm_ip_addresses else []
+
     ignore_ip_addresses.extend(get_gateway_ip_addresses(configuration))
-    # ign
-    # ore ports
+
+    # Ignore ports
     ignore_ports = network_config["ignore_real_machine_ports"]
-    # start tshark to capture network
-    # tshark -Y "ip.dst != 192.168.1.1" -T fields -e ip.dst -e tcp.srcport
-    run_tshark = ["tshark", "-l", "-V"]
-    run_tshark.extend(ignore_ip_addresses_rule_generator(ignore_ip_addresses))
-    run_tshark.extend(
-        [
-            "-T", "fields", "-e", "ip.dst", "-e", "ip.src",
-            "-e", "tcp.dstport", "-e", "tcp.srcport", "-ni", "any"
-        ]
-    )
-    process = subprocess.Popen(
-        run_tshark,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    # wait 3 seconds if process terminated?
-    time.sleep(3)
-    if process.poll() is not None:
-        exit_failure("tshark couldn't capture network, maybe run as root!")
-    # todo: replace tshark with python port sniffing -
-    # e.g https://www.binarytides.com/python-packet-sniffer-code-linux/
-    # it will be easier to apply filters and analysis packets with python
-    # if it requires to be run as root,
-    # please add a uid checker in framework startup
 
-    # readline timeout bug fix: https://stackoverflow.com/a/10759061
-    pull_object = select.poll()
-    pull_object.register(process.stdout, select.POLLIN)
-    # while True, read tshark output
-    try:
-        while True:
-            if pull_object.poll(0):
-                line = process.stdout.readline()
-                # check if new IP and Port printed
-                if len(line) > 0:
-                    # split the IP and Port
-                    try:
-                        line = line.rsplit()
-                        ip_dest = byte_to_str(line[0])
-                        ip_src = byte_to_str(line[1])
-                        port_dest = int(line[2])
-                        port_src = int(line[3])
-                        if (netaddr.valid_ipv4(ip_dest) or
-                            netaddr.valid_ipv6(ip_dest)) \
-                                and ip_dest not in ignore_ip_addresses \
-                                and ip_src not in ignore_ip_addresses \
-                                and port_dest not in ignore_ports \
-                                and port_src not in ignore_ports:
-                            # ignored ip addresses and ports in python -fix later
-                            # check if the port is in selected module
+    # Display filter to be applied to the Live Captured network traffic
+    display_filter = ' and '.join(['ip.src!={0} and ip.dst!={0}'.format(_) for _ in ignore_ip_addresses])
+    display_filter += ' and ' if ignore_ip_addresses and ignore_ports else ""
+    display_filter += ' and '.join(['tcp.srcport!={0} and tcp.dstport!={0}'.format(_) for _ in ignore_ports])
 
-                            if (port_dest in honeypot_ports or
-                                    port_src in honeypot_ports):
-                                if port_dest in honeypot_ports:
-                                    insert_to_honeypot_events_queue(
-                                        HoneypotEvent(
-                                            ip_dest=ip_dest,
-                                            port_dest=port_dest,
-                                            ip_src=ip_src,
-                                            port_src=port_src,
-                                            module_name=selected_module,
-                                            machine_name=machine_name
-                                        )
-                                    )
-                            else:
-                                insert_to_network_events_queue(
-                                    NetworkEvent(
-                                        ip_dest=ip_dest,
-                                        port_dest=port_dest,
-                                        ip_src=ip_src,
-                                        port_src=port_src,
-                                        machine_name=machine_name
-                                    )
-                                )
-                    except Exception:
-                        pass
-                    # check if event shows an IP
-            time.sleep(0.001)
-            # todo: is sleep(0.001) fastest/best?
-            # it means it could get 1000 packets per second(maximum) from
-            # tshark
-            # how could we prevent the DDoS attacks in here
-            # and avoid submitting in MongoDB? should we?
-    except Exception as _:
-        del _
+    store_to_file = network_config["store_network_captured_files"]
+
+    def packet_callback(packet):
+        """
+        Callback function, called by apply_on_packets
+        """
+        process_packet(
+            packet,
+            honeypot_events_queue,
+            network_events_queue
+        )
+
+    # Run loop in hourly manner to split the capture in multiple files
+    while True:
+        # File path of the network capture file with the timestamp
+        output_file_path = os.path.join(
+            os.path.join(
+                sys.path[0], "tmp"
+            ), "captured-traffic-" + str(int(time.time())) + ".pcap"
+        )
+
+        if store_to_file:
+            info("Network capture is getting stored in, {}".format(output_file_path))
+
+        try:
+            capture = pyshark.LiveCapture(
+                interface='any',
+                display_filter=display_filter,
+                output_file=output_file_path if store_to_file else None
+            )
+
+            # Debug option for pyshark capture
+            if is_verbose_mode():
+                capture.set_debug()
+
+            # Applied on every packet captured by pyshark LiveCapture
+            capture.apply_on_packets(packet_callback, timeout=3600)
+
+        except get_timeout_error():
+            # Catches the timeout error thrown by apply_on_packets
+            pass
+
+        except KeyboardInterrupt:
+            try:
+                capture.close()
+                break
+            except Exception:
+                break
+
+        except Exception as e:
+            error(e)
+            break
+
     return True

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import inspect
+from multiprocessing import Queue
 import os
 import time
 
@@ -11,7 +12,7 @@ from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
 from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent)
+                                EventData, NetworkEvent, FileEventsData)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -28,6 +29,7 @@ database = client[api_config["api_database_name"]]
 credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
+file_change_events = database.file_change_events
 events_data = database.events_data
 
 # Event queues
@@ -45,12 +47,13 @@ IP2Location = IP2Location.IP2Location(
 
 # todo: write documentation about machine_name
 
-def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
+def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_events_queue: Queue):
     """
     insert selected modules event to honeypot_events collection
 
     Args:
         honeypot_event: Object of HoneypotEvent class with event parameters
+        honeypot_events_queue: Honeypot queue
 
     Returns:
         ObjectId(inserted_id)
@@ -58,8 +61,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
     if is_verbose_mode():
         verbose_info(
             "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}"
-                .format(
+            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
                 honeypot_event.ip_dest,
                 honeypot_event.port_dest,
                 honeypot_event.ip_src,
@@ -81,12 +83,12 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent):
             honeypot_event.ip_dest
         ))
 
-    honeypot_events_queue.append(honeypot_event.__dict__)
+    honeypot_events_queue.put(honeypot_event.__dict__)
 
     return
 
 
-def insert_to_network_events_queue(network_event: NetworkEvent):
+def insert_to_network_events_queue(network_event: NetworkEvent, network_events_queue: Queue):
     """
     insert other network events (port scan, etc..) to network_events
     collection
@@ -100,8 +102,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
     if is_verbose_mode():
         verbose_info(
             "Received network event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, machine_name:{4}"
-                .format(
+            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
                 network_event.ip_dest,
                 network_event.port_dest,
                 network_event.ip_src,
@@ -114,20 +115,22 @@ def insert_to_network_events_queue(network_event: NetworkEvent):
     network_event.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
             network_event.ip_src
-        ))
+        )
+    )
 
     # Get country of the destination IP Address
     network_event.country_ip_dest = byte_to_str(
         IP2Location.get_country_short(
             network_event.ip_dest
-        ))
+        )
+    )
 
-    network_events_queue.append(network_event.__dict__)
+    network_events_queue.put(network_event.__dict__)
 
     return
 
 
-def push_events_queues_to_database():
+def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     """
     Pushes all honeypot and network events collected in the
     honeypot_events_queue and network_events_queue to honeypot_events
@@ -138,20 +141,19 @@ def push_events_queues_to_database():
         verbose_info("Submitting new events to database")
 
     # Insert all honeypot events to database (honeypot_events collection)
-    if honeypot_events_queue:
-        new_events = honeypot_events_queue[:]
-        honeypot_events_queue.clear()
-        honeypot_events.insert_many(new_events)
+    while not honeypot_events_queue.empty():
+        new_event = honeypot_events_queue.get()
+        honeypot_events.insert_one(new_event)
 
     # Insert all network events to database (network_events collection)
-    if network_events_queue:
-        new_events = network_events_queue[:]
-        network_events_queue.clear()
-        network_events.insert_many(new_events)
+    while not network_events_queue.empty():
+        new_event = network_events_queue.get()
+        network_events.insert_one(new_event)
+
     return
 
 
-def push_events_to_database_from_thread():
+def push_events_to_database_from_thread(honeypot_events_queue, network_events_queue):
     """
     Thread function for inserting bulk events in a thread
 
@@ -159,7 +161,7 @@ def push_events_to_database_from_thread():
         True/None
     """
     while True:
-        push_events_queues_to_database()
+        push_events_queues_to_database(honeypot_events_queue, network_events_queue)
         time.sleep(3)
     return True
 
@@ -200,17 +202,46 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
-def insert_to_events_data_collection(
-        event_data: EventData):
+def insert_to_file_change_events_collection(file_change_event_data: FileEventsData):
+    """
+    insert file change events which are obtained from ftp/ssh weak_password
+    module
+
+    Args:
+    file_path : the path of the file which is changed
+    status: status of the file would be added/modified/deleted
+    module_name : on which module client accessed
+    date : datetime of the event
+
+    Returns:
+        inserted_id
+    """
+    file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
+    file_change_event_data.file_content = open(
+        file_change_event_data.file_path,
+        'rb'
+    ).read() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
+
+    if is_verbose_mode():
+        verbose_info(
+            "Received honeypot file change event, file_path:{0}, status:{1}, "
+            "module_name:{2}, module_name:{3}, machine_name:{3}".format(
+                file_change_event_data.file_path,
+                file_change_event_data.status,
+                file_change_event_data.module_name,
+                file_change_event_data.machine_name,
+            )
+        )
+    return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
+
+
+def insert_to_events_data_collection(event_data: EventData):
     """
     Insert data collected from module processors of modules such as-
     ICS module
 
     Args:
-        ip : client ip used for putting the data
-        module_name : on which module client accessed
-        date : datetime of the events
-        data : Data which is obtained from the client
+        event_data: contain ip, module_name, machine_name, date, data
 
     Returns:
         inserted_id
@@ -226,8 +257,7 @@ def insert_to_events_data_collection(
     if is_verbose_mode():
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
-            "machine_name:{2}, data:{3}"
-                .format(
+            "machine_name:{2}, data:{3}".format(
                 event_data.ip,
                 event_data.module_name,
                 event_data.machine_name,

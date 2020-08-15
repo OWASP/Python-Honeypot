@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch
 import sys
-from core.alert import (is_not_run_from_api, messages, info, write, warn)
+from core.alert import (is_not_run_from_api, info, write, warn)
 
 
 class TestCoreAlert(unittest.TestCase):
@@ -19,14 +19,6 @@ class TestCoreAlert(unittest.TestCase):
         with patch.object(sys, 'argv', testargs):
             returned_value = is_not_run_from_api()
             self.assertEqual(returned_value, True)
-
-    def test_messages(self):
-        help_menu_msg = messages("en", "show_help_menu")
-        self.assertEqual("print this help menu", help_menu_msg)
-        started_msg = messages("en", "honeypot_started")
-        self.assertEqual("OWASP Honeypot started ...", started_msg)
-        available_languages = messages(-1, "show_help_menu")
-        self.assertEqual(['en'], available_languages)
 
     def test_info(self):
         msg_content = "Hello"
