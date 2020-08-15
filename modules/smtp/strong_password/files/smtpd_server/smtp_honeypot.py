@@ -7,6 +7,7 @@ import datetime
 
 LOGFILE = '/root/logs/ohp_smtp_honeypot_logs.txt'
 
+
 class FakeCredentialValidator(object):
     def __init__(self):
         self.output_lock = threading.Lock()
@@ -30,9 +31,11 @@ class FakeCredentialValidator(object):
             logfile_handle.close()
         finally:
             self.output_lock.release()
+
     def validate(self, username, password, fromaddr):
-        self.log_to_file(fromaddr[0],fromaddr[1],username,password)
+        self.log_to_file(fromaddr[0], fromaddr[1], username, password)
         return False
+
 
 try:
     SMTPServer(

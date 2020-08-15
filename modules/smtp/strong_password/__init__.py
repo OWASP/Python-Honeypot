@@ -16,7 +16,7 @@ class ModuleProcessor:
 
     def __init__(self):
         self.kill_flag = False
-        self.log_filename = 'tmp/ohp_smtp_honeypot_logs.txt'
+        self.log_filename = 'tmp/ohp_sssmtp_honeypot_logs.txt'
         self.log_filename_dump = 'tmp/ohp_smtp_honeypot_logs.json'
 
     def processor(self):
@@ -34,11 +34,11 @@ class ModuleProcessor:
                     data = json.loads(data)
                     insert_to_credential_events_collection(
                         CredentialEvent(
-                            ip= data['ip'],
-                            module_name = data['module_name'],
-                            date = data['date'],
-                            username = data['username'],
-                            password = data['password'],
+                            ip=data['ip'],
+                            module_name=data['module_name'],
+                            date=data['date'],
+                            username=data['username'],
+                            password=data['password'],
                         )
                     )
                 os.remove(self.log_filename_dump)
@@ -57,7 +57,7 @@ def module_configuration():
         "password": generate_token(16),
         "extra_docker_options": [
             "--volume {0}/tmp:/root/logs/".format(os.getcwd()),
-            "--env MAILSERVER_NAME=OWASP\ Python\ Honeypot"
+            "--env MAILSERVER_NAME=localhost"
         ],
         "module_processor": ModuleProcessor()
     }
