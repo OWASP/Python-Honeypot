@@ -690,7 +690,7 @@ class TestApi(unittest.TestCase):
             'ssh/weak_password',
             'smtp/strong_password'
         ]
-        self.assertCountEqual(module_names, response.json()["module_names"])
+        self.assertCountEqual(module_names, response.json())
 
     def test_credential_events(self):
         """
