@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import inspect
-from multiprocessing import Queue
 import os
 import time
+from multiprocessing import Queue
 
+import gridfs
 import pymongo
 
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
-from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent, FileEventsData)
+from database.datatypes import (CredentialEvent, EventData, FileArchive,
+                                FileEventsData, HoneypotEvent, NetworkEvent)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -31,6 +32,10 @@ honeypot_events = database.honeypot_events
 network_events = database.network_events
 file_change_events = database.file_change_events
 data_events = database.data_events
+events_data = database.events_data
+# Database for storing network traffic files
+ohp_file_archive = client.ohp_file_archive
+ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
 
 # Event queues
 honeypot_events_queue = list()
@@ -265,3 +270,33 @@ def insert_to_events_data_collection(event_data: EventData):
         )
 
     return data_events.insert_one(event_data.__dict__).inserted_id
+    return events_data.insert_one(event_data.__dict__).inserted_id
+
+
+def insert_pcap_files_to_collection(file_archive: FileArchive):
+    """
+    Insert the pcap files containing the captured network traffic to
+    mongodb collection
+
+    Args:
+        file_archive: path of the file
+
+    Returns:
+        file_id
+    """
+    if is_verbose_mode():
+        verbose_info(
+            "Received network traffic file:{0}, generation_time:{1}. "
+            "Inserting it in the File Archive".format(
+                file_archive.file_path,
+                file_archive.generation_time
+            )
+        )
+
+    return ohp_file_archive_gridfs.put(
+        open(file_archive.file_path, "rb"),
+        filename=os.path.split(file_archive.file_path)[1],
+        machine_name=network_configuration()["real_machine_identifier_name"],
+        generationTime=file_archive.generation_time,
+        splitTimeout=file_archive.split_timeout
+    )

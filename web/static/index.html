@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="/css/buttons.dataTables.min.css">
     <!-- style.css used as general css file for index.html -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/datatables.min.css"/>
+    <link rel="stylesheet" href="/css/dataTables.checkboxes.css">
     <!-- import js files -->
     <script src="/js/jquery.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
@@ -19,6 +21,8 @@
     <script src="/js/dataTables.buttons.min.js"></script>
     <script src="/js/jszip.min.js"></script>
     <script src="/js/buttons.html5.min.js"></script>
+    <script src="/js/datatables.min.js"></script>
+    <script src="/js/dataTables.checkboxes.min.js"></script>
     <!-- main.js used as general js file for index.html -->
     <script src="/js/main.js"></script>
     <script src="/js/explore.js"></script>
@@ -31,7 +35,10 @@
         <a class="navbar-brand" onclick="get_data_plots()"><img src="img/owasp.png" id="logo"></a>
         <ul class="navbar-nav">
             <li class="nav-item">
-                <label class="log-explorer-label label" onclick="get_explorer()">Log Explorer</label>
+                <label class="log-explorer-label label" onclick="get_log_explorer()">Log Explorer</label>
+            </li>
+            <li class="nav-item">
+                <label class="file-archive-explorer-label label" onclick="get_file_explorer()">File Explorer</label>
             </li>
         </ul>
     </nav>
@@ -119,19 +126,47 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-info btn-sm" onclick="search()">Search</button>
+                        <button type="button" class="btn btn-info btn-sm" onclick="search_database()">Search</button>
                     </div>
                 </form>
             </div>
+        </div>
+        <div id="file-archive-explorer" hidden=true>
+            <form>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="archive_start_date">Start Date</label>
+                        <input type="date" class="form-control" id="archive_start_date">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="archive_end_date">End Date: </label>
+                        <input type="date" class="form-control" id="archive_end_date">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-info btn-sm" onclick="search_file_archive()">Search</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <hr>
     <div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
         <div class="col s12">
             <div class="card material-table">
-                <table id="datatable" class="table striped responsive" style="float:center">
+                <table id="log-datatable" class="table striped responsive" style="float:center">
                 </table>
             </div>
+            </div>
+        </div>
+    </div>
+    <div id="file-archive-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
+        <div class="col s12">
+            <div class="card material-table">
+                <form>
+                    <table id="file-datatable" class="table striped responsive" style="float:center">
+                    </table>
+                    <button id="download-file-btn" type="button" class="btn btn-info btn-sm" hidden=true>Download</button>
+                </form>
             </div>
         </div>
     </div>

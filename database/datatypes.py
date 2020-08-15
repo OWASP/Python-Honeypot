@@ -131,3 +131,15 @@ class FileEventsData(object):
         self.status = status
         self.machine_name = None
         self.is_directory = is_directory
+
+
+class FileArchive(object):
+    """
+    Object to store details about captured network traffic files
+    to be stored in the File Archive
+    """
+
+    def __init__(self, file_path, generation_time, split_timeout):
+        self.file_path = file_path
+        self.generation_time = generation_time
+        self.split_timeout = split_timeout

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import os
 import sys
 import time
@@ -8,13 +9,14 @@ import time
 import netaddr
 import pyshark
 
-from config import network_configuration, protocol_table
+from config import protocol_table
 from core.alert import error, info, warn
-from core.compatible import is_verbose_mode, get_timeout_error
+from core.compatible import is_verbose_mode, get_timeout_error, mkdir
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
-                                insert_to_network_events_queue)
-from database.datatypes import HoneypotEvent, NetworkEvent
+                                insert_to_network_events_queue,
+                                insert_pcap_files_to_collection)
+from database.datatypes import HoneypotEvent, NetworkEvent, FileArchive
 
 # honeypot ports
 honeypot_ports = dict()
@@ -67,7 +69,8 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def process_packet(packet, honeypot_events_queue, network_events_queue):
+def process_packet(packet, honeypot_events_queue,
+                   network_events_queue, network_config):
     """
     Callback function called from the apply_on_packets function.
 
@@ -75,7 +78,7 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
         packet: Packet live captured by pyshark
     """
     # set machine name
-    machine_name = network_configuration()["real_machine_identifier_name"]
+    machine_name = network_config["real_machine_identifier_name"]
 
     try:
         # Check if packet contains IP layer
@@ -126,7 +129,8 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
         del _e
 
 
-def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue):
+def network_traffic_capture(configuration, honeypot_events_queue,
+                            network_events_queue, network_config):
     """
     get and submit new network events
 
@@ -143,7 +147,6 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         honeypot_ports[port_number] = selected_module
 
-    network_config = network_configuration()
     # get ip addresses
     virtual_machine_ip_addresses = [
         configuration[selected_module]["ip_address"]
@@ -170,7 +173,12 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
     display_filter += ' and ' if ignore_ip_addresses and ignore_ports else ""
     display_filter += ' and '.join(['tcp.srcport!={0} and tcp.dstport!={0}'.format(_) for _ in ignore_ports])
 
-    store_to_file = network_config["store_network_captured_files"]
+    store_pcap = network_config["store_network_captured_files"]
+    timeout = network_config["split_pcap_file_timeout"]
+
+    # Make the pcapfiles directory for storing the Network captured files
+    base_dir_path = os.path.join(sys.path[0], "pcapfiles")
+    mkdir(base_dir_path)
 
     def packet_callback(packet):
         """
@@ -179,26 +187,33 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
         process_packet(
             packet,
             honeypot_events_queue,
-            network_events_queue
+            network_events_queue,
+            network_config
         )
 
     # Run loop in hourly manner to split the capture in multiple files
     while True:
+        # Timestamp to be used in file name
+        file_timestamp = int(time.time())
+        generation_time = datetime.fromtimestamp(file_timestamp).strftime("%Y-%m-%d %H:%M:%S")
         # File path of the network capture file with the timestamp
         output_file_path = os.path.join(
-            os.path.join(
-                sys.path[0], "tmp"
-            ), "captured-traffic-" + str(int(time.time())) + ".pcap"
+            base_dir_path,
+            "captured-traffic-" + str(file_timestamp) + ".pcap"
         )
 
-        if store_to_file:
-            info("Network capture is getting stored in, {}".format(output_file_path))
+        if store_pcap:
+            info(
+                "Network capture is getting stored in, {}".format(
+                    output_file_path
+                )
+            )
 
         try:
             capture = pyshark.LiveCapture(
                 interface='any',
                 display_filter=display_filter,
-                output_file=output_file_path if store_to_file else None
+                output_file=output_file_path if store_pcap else None
             )
 
             # Debug option for pyshark capture
@@ -206,13 +221,27 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                 capture.set_debug()
 
             # Applied on every packet captured by pyshark LiveCapture
-            capture.apply_on_packets(packet_callback, timeout=3600)
+            capture.apply_on_packets(packet_callback, timeout=timeout)
 
         except get_timeout_error():
             # Catches the timeout error thrown by apply_on_packets
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
             pass
 
         except KeyboardInterrupt:
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
             try:
                 capture.close()
                 break
@@ -220,7 +249,14 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                 break
 
         except Exception as e:
-            error(e)
+            insert_pcap_files_to_collection(
+                FileArchive(
+                    output_file_path,
+                    generation_time,
+                    timeout
+                )
+            )
+            error(str(e))
             break
 
     return True
