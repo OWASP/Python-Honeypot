@@ -299,6 +299,6 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
         open(file_archive.file_path, "rb"),
         filename=os.path.split(file_archive.file_path)[1],
         machine_name=network_configuration()["real_machine_identifier_name"],
-        generationTime=file_archive.generation_time,
+        date=file_archive.generation_time,
         splitTimeout=file_archive.split_timeout
     )

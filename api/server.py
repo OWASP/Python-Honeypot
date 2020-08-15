@@ -4,20 +4,17 @@
 import json
 import os
 
-from bson import ObjectId, json_util
-from flask import Flask, Response, abort, jsonify, render_template
-from flask import request as flask_request
-from flask import send_file
+from bson import (ObjectId,
+                  json_util)
 
-from api.database_queries import (group_by_ip_dest,
-                                  group_by_ip_dest_and_password,
-                                  group_by_ip_dest_and_username,
-                                  sort_by_count,
-                                  sort_by_count_and_id,
-                                  top_countries_groupby,
-                                  top_ip_dests_groupby,
-                                  top_machine_names_groupby,
-                                  top_port_dests_groupby,
+from flask import (Flask,
+                   Response,
+                   abort,
+                   jsonify,
+                   render_template,
+                   send_file)
+from flask import request as flask_request
+from api.database_queries import (sort_by_count,
                                   filter_by_date,
                                   filter_by_skip,
                                   filter_by_limit,
@@ -26,12 +23,17 @@ from api.database_queries import (group_by_ip_dest,
                                   filter_by_match,
                                   event_types,
                                   group_by_elements)
-from api.utility import (aggregate_function, all_mime_types, fix_date,
-                         fix_limit, fix_skip, flask_null_array_response,
-                         msg_structure, root_dir)
+from api.utility import (aggregate_function,
+                         all_mime_types,
+                         fix_limit,
+                         fix_skip,
+                         flask_null_array_response,
+                         msg_structure,
+                         root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
+from database import connector
 
 template_dir = os.path.join(
     os.path.join(
@@ -235,96 +237,6 @@ def get_static_files(path):
 
 @app.route("/api/events/count/<event_type>", methods=["GET"])
 def count_events(event_type):
-
-
-@app.route("/api/file-archive/get-files-list", methods=["GET"])
-def get_files_list():
-    """
-    Get the list of pcap files stored in the file archive
-
-    Returns:
-        JSON/Dict of files
-    """
-    start_date = fix_date(
-        get_value_from_request("start_date")
-    )
-    end_date = fix_date(
-        get_value_from_request("end_date")
-    )
-
-    if start_date and end_date:
-        try:
-            files_list = {
-                "storedFiles": [
-                    i for i in connector.ohp_file_archive.fs.files.find(
-                        {
-                            "generationTime":
-                                {
-                                    "$gte": start_date[0],
-                                    "$lte": end_date[1]
-                                }
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
-            }
-            return json.loads(json_util.dumps(files_list)), 200
-
-        except Exception:
-            return flask_null_array_response()
-
-    else:
-        try:
-            files_list = {
-                "storedFiles": [
-                    i for i in connector.ohp_file_archive.fs.files.find(
-                        {}
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
-            }
-            return json.loads(json_util.dumps(files_list)), 200
-
-        except Exception:
-            return flask_null_array_response()
-
-
-@app.route("/api/file-archive/download-file", methods=["GET"])
-def download_file():
-    """
-    Download PCAP files
-    """
-    try:
-        file_id = ObjectId(get_value_from_request("_id"))
-        fs = connector.ohp_file_archive_gridfs.get(file_id)
-
-        return send_file(
-            fs,
-            attachment_filename=fs.filename,
-            as_attachment=True,
-            mimetype=fs.content_type
-        ), 200
-
-    except Exception:
-        return flask_null_array_response()
-
-
-@app.route("/api/events/count-all-events", methods=["GET"])
-def count_all_events():
     """
     Get total number of events
 
@@ -425,9 +337,7 @@ def get_events_data(event_type):
                 i for i in
                 event_types[event_type].find(
                     query,
-                    {
-                        "_id": 0
-                    }
+                    {}
                 ).skip(
                     fix_skip(
                         get_value_from_request("skip")
@@ -439,6 +349,59 @@ def get_events_data(event_type):
                 )
             ]
         ), 200
+    except Exception:
+        return flask_null_array_response()
+
+
+@app.route("/api/pcap/explore", methods=["GET"])
+def get_files_list():
+    """
+    Get the list of pcap files stored in the file archive
+
+    Returns:
+        JSON/Dict of files
+    """
+    date = get_value_from_request("date")
+
+    try:
+        query = filter_by_date(date) if date else {}
+        return jsonify(
+            [
+                i for i in
+                connector.ohp_file_archive_gridfs.find(
+                    query,
+                ).skip(
+                    fix_skip(
+                        get_value_from_request("skip")
+                    )
+                ).limit(
+                    fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )
+            ]
+        ), 200
+    except Exception as e:
+        print(e)
+        return flask_null_array_response()
+
+
+@app.route("/api/pcap/download", methods=["GET"])
+def download_file():
+    """
+    Download PCAP files
+    """
+    try:
+        file_id = ObjectId(get_value_from_request("_id"))
+        fs = event_types['pcap'].ohp_file_archive_gridfs.get(file_id)
+
+        return send_file(
+            fs,
+            attachment_filename=fs.filename,
+            as_attachment=True,
+            mimetype=fs.content_type
+        ), 200
+
     except Exception:
         return flask_null_array_response()
 
