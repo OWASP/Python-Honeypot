@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 
+from bson import ObjectId, json_util
 from flask import Flask, Response, abort, jsonify, render_template
 from flask import request as flask_request
+from flask import send_file
 
 from api.database_queries import (group_by_ip_dest,
                                   group_by_ip_dest_and_password,
@@ -222,6 +225,93 @@ def get_static_files(path):
             "text/html"
         )
     )
+
+
+@app.route("/api/file-archive/get-files-list", methods=["GET"])
+def get_files_list():
+    """
+    Get the list of pcap files stored in the file archive
+
+    Returns:
+        JSON/Dict of files
+    """
+    start_date = fix_date(
+        get_value_from_request("start_date")
+    )
+    end_date = fix_date(
+        get_value_from_request("end_date")
+    )
+
+    if start_date and end_date:
+        try:
+            files_list = {
+                "storedFiles": [
+                    i for i in connector.ohp_file_archive.fs.files.find(
+                        {
+                            "generationTime":
+                                {
+                                    "$gte": start_date[0],
+                                    "$lte": end_date[1]
+                                }
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            }
+            return json.loads(json_util.dumps(files_list)), 200
+
+        except Exception:
+            return flask_null_array_response()
+
+    else:
+        try:
+            files_list = {
+                "storedFiles": [
+                    i for i in connector.ohp_file_archive.fs.files.find(
+                        {}
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
+                    )
+                ]
+            }
+            return json.loads(json_util.dumps(files_list)), 200
+
+        except Exception:
+            return flask_null_array_response()
+
+
+
+@app.route("/api/file-archive/download-file", methods=["GET"])
+def download_file():
+    """
+    Download PCAP files
+    """
+    try:
+        file_id = ObjectId(get_value_from_request("_id"))
+        fs = connector.ohp_file_archive_gridfs.get(file_id)
+
+        return send_file(
+            fs,
+            attachment_filename=fs.filename,
+            as_attachment=True,
+            mimetype=fs.content_type
+        ), 200
+
+    except Exception:
+        return flask_null_array_response()
 
 
 @app.route("/api/events/count-all-events", methods=["GET"])
