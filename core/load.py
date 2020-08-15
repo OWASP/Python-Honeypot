@@ -824,7 +824,6 @@ def load_honeypot_engine():
             configuration,
             honeypot_events_queue,
             network_events_queue,
-            network_config,
         ),
         name="network_traffic_capture_process"
     )
