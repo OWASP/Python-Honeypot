@@ -19,6 +19,7 @@ class TestCoreGetModules(unittest.TestCase):
             'ohp_icsserver_veeder_root_guardian_ast',
             'ohp_sshserver_weak_password',
             'ohp_sshserver_strong_password',
+            'ohp_smtpserver_strong_password',
             'ohp_httpserver_basic_auth_strong_password',
             'ohp_httpserver_basic_auth_weak_password'
         ]
@@ -29,7 +30,7 @@ class TestCoreGetModules(unittest.TestCase):
         checking total number of modules
         """
         modules_list = load_all_modules()
-        self.assertEqual(len(modules_list), 7)
+        self.assertEqual(len(modules_list), 8)
 
     def test_vm_to_container_name(self):
         vm_name = "ohp_sshserver"
