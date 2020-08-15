@@ -402,7 +402,7 @@ def download_file():
         ), 200
 
     except Exception:
-        return flask_null_array_response()
+        return abort(404)
 
 
 @app.route("/api/core/list/modules", methods=["GET"])
