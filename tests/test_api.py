@@ -680,6 +680,35 @@ class TestApi(unittest.TestCase):
         response = requests.get(API_URL + "/api/core/list/modules")
         self.assertCountEqual(module_names, response.json())
 
+        module_names = [
+            'ics/veeder_root_guardian_ast',
+            'http/basic_auth_strong_password',
+            'http/basic_auth_weak_password',
+            'ftp/strong_password',
+            'ftp/weak_password',
+            'ssh/strong_password',
+            'ssh/weak_password',
+            'smtp/strong_password'
+        ]
+        self.assertCountEqual(module_names, response.json()["module_names"])
+
+    def test_credential_events(self):
+        """
+        Test module-events, most-usernames-used and most-passwords-used
+        end-points
+        """
+        response_modules = requests.get(API_URL + "/api/events/module-events")
+        self.assertGreaterEqual(len(response_modules.json()), 0)
+        self.assertEqual(response_modules.status_code, 200)
+
+        response_usernames = requests.get(API_URL + "/api/events/most-usernames-used")
+        self.assertGreaterEqual(len(response_usernames.json()), 0)
+        self.assertEqual(response_usernames.status_code, 200)
+
+        response_passwords = requests.get(API_URL + "/api/events/most-passwords-used")
+        self.assertGreaterEqual(len(response_passwords.json()), 0)
+        self.assertEqual(response_passwords.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
