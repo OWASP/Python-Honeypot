@@ -89,13 +89,12 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
             # Check packet protocol and if it contains a layer with the same
             # name
             if protocol == "TCP" and "TCP" in packet:
-                port_dest = packet.tcp.dstport
-                port_src = packet.tcp.srcport
+                port_dest = int(packet.tcp.dstport)
+                port_src = int(packet.tcp.srcport)
 
             elif protocol == "UDP" and "UDP" in packet:
-                port_dest = packet.udp.dstport
-                port_src = packet.udp.srcport
-
+                port_dest = int(packet.udp.dstport)
+                port_src = int(packet.udp.srcport)
             if netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest):
                 # ignored ip addresses and ports in python - fix later
                 # check if the port is in selected module
