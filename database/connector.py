@@ -278,7 +278,7 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
     mongodb collection
 
     Args:
-        filepath: path of the file
+        file_archive: path of the file
 
     Returns:
         file_id
@@ -292,16 +292,10 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
             )
         )
 
-    # Get the name of the file without the path
-    filename = os.path.split(file_archive.file_path)[1]
-
-    # Get file-like object by reading the pcap file as binary
-    pcap_file = open(file_archive.file_path, "rb")
-
-    # Enters the file in the database and returns the _id
     return ohp_file_archive_gridfs.put(
-        pcap_file,
-        filename=filename,
+        open(file_archive.file_path, "rb"),
+        filename=os.path.split(file_archive.file_path)[1],
+        machine_name=network_configuration()["real_machine_identifier_name"],
         generationTime=file_archive.generation_time,
         splitTimeout=file_archive.split_timeout
     )
