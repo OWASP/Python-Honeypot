@@ -692,23 +692,6 @@ class TestApi(unittest.TestCase):
         ]
         self.assertCountEqual(module_names, response.json())
 
-    def test_credential_events(self):
-        """
-        Test module-events, most-usernames-used and most-passwords-used
-        end-points
-        """
-        response_modules = requests.get(API_URL + "/api/events/module-events")
-        self.assertGreaterEqual(len(response_modules.json()), 0)
-        self.assertEqual(response_modules.status_code, 200)
-
-        response_usernames = requests.get(API_URL + "/api/events/most-usernames-used")
-        self.assertGreaterEqual(len(response_usernames.json()), 0)
-        self.assertEqual(response_usernames.status_code, 200)
-
-        response_passwords = requests.get(API_URL + "/api/events/most-passwords-used")
-        self.assertGreaterEqual(len(response_passwords.json()), 0)
-        self.assertEqual(response_passwords.status_code, 200)
-
 
 if __name__ == '__main__':
     unittest.main()
