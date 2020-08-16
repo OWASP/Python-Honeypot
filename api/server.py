@@ -24,7 +24,6 @@ from api.utility import (aggregate_function,
                          all_mime_types,
                          fix_limit,
                          fix_skip,
-                         flask_null_array_response,
                          msg_structure,
                          root_dir)
 from config import api_configuration
