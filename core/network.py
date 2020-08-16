@@ -133,7 +133,7 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
         del _e
 
 
-def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue):
+def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue, network_config):
     """
     get and submit new network events
 
@@ -150,7 +150,6 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         honeypot_ports[port_number] = selected_module
 
-    network_config = network_configuration()
     # get ip addresses
     virtual_machine_ip_addresses = [
         configuration[selected_module]["ip_address"]
@@ -236,6 +235,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             )
 
         except KeyboardInterrupt:
+            time.sleep(1)
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
@@ -243,11 +243,6 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                     timeout
                 )
             )
-            try:
-                capture.close()
-                break
-            except Exception:
-                break
 
         except Exception as e:
             insert_pcap_files_to_collection(

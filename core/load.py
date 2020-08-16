@@ -793,6 +793,8 @@ def load_honeypot_engine():
     #########################################
     # build configuration based on selected modules
     configuration = honeypot_configuration_builder(selected_modules)
+    # Set network configuration
+    network_config = set_network_configuration(argv_options)
     info("OWASP Honeypot started ...")
     info("loading modules {0}".format(", ".join(selected_modules)))
     # check for conflict in real machine ports and pick new ports
@@ -822,6 +824,7 @@ def load_honeypot_engine():
             configuration,
             honeypot_events_queue,
             network_events_queue,
+            network_config,
         ),
         name="network_traffic_capture_process"
     )
