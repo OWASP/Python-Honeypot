@@ -273,7 +273,7 @@ def count_events(event_type):
             }
         ), 200
     except Exception:
-        return flask_null_array_response()
+        abort(500)
 
 
 @app.route("/api/events/count/groupby/<event_type>/<element>", methods=["GET"])
@@ -317,7 +317,7 @@ def groupby_element(event_type, element):
             ]
         ), 200
     except Exception:
-        return flask_null_array_response()
+        abort(500)
 
 
 @app.route("/api/events/explore/<event_type>", methods=["GET"])
@@ -355,7 +355,7 @@ def get_events_data(event_type):
             ]
         ), 200
     except Exception:
-        return flask_null_array_response()
+        abort(500)
 
 
 @app.route("/api/pcap/explore", methods=["GET"])
@@ -387,7 +387,7 @@ def get_files_list():
             ]
         ), 200
     except Exception:
-        return flask_null_array_response()
+        abort(500)
 
 
 @app.route("/api/pcap/download", methods=["GET"])
@@ -423,7 +423,7 @@ def all_module_names():
             load_all_modules()
         ), 200
     except Exception:
-        return flask_null_array_response()
+        abort(500)
 
 
 def start_api_server():
