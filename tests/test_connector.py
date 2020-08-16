@@ -51,7 +51,7 @@ class TestConnector(unittest.TestCase):
 
         # Find the records in the DB
         honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
-        network_record = network_events.find_one(network_event.__dict__
+        network_record = network_events.find_one(network_event.__dict__)
 
         # wait for queue to be empty
         time.sleep(3.5)
