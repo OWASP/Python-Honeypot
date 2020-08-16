@@ -3,8 +3,6 @@
 
 import os
 
-from flask import jsonify
-
 
 def msg_structure(status="", msg=""):
     """
