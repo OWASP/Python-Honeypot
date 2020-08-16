@@ -579,6 +579,24 @@ def stop_modules_processors(configuration):
     return
 
 
+def set_network_configuration(argv_options):
+    """
+    Set network configuration based on user selections
+
+    Args:
+        argv_options
+
+    Returns:
+        network_config
+    """
+    network_config = network_configuration()
+    # Set the values of the network configuration based on CLI input
+    network_config["store_network_captured_files"] = argv_options.store_pcap
+    network_config["split_pcap_file_timeout"] = argv_options.timeout_value
+
+    return network_config
+
+
 def argv_parser():
     """
     parse ARGVs using argparse
@@ -638,13 +656,30 @@ def argv_parser():
         default=docker_config["virtual_machine_container_reset_factory_time_seconds"],
         help="virtual machine reset factory time"
     )
-    # start api
+    # start API
     engineOpt.add_argument(
         "--start-api-server",
         action="store_true",
         dest="start_api_server",
         default=False,
         help="start API server"
+    )
+    # Store Network captured files
+    engineOpt.add_argument(
+        "--store-pcap",
+        action="store_true",
+        dest="store_pcap",
+        default=False,
+        help="store network traffic as pcap files"
+    )
+    # Set Timeout value for splitting network captured files
+    engineOpt.add_argument(
+        "-t",
+        "--split-pcap-file-timeout",
+        type=int,
+        dest="timeout_value",
+        default=3600,
+        help="timeout value used to split network captured files"
     )
     # enable verbose mode (debug mode)
     engineOpt.add_argument(
@@ -713,6 +748,9 @@ def load_honeypot_engine():
     # Check if the script is running with sudo
     if not os.geteuid() == 0:
         exit_failure("The script must be run as root!")
+    # Check timeout value if provided
+    if argv_options.timeout_value < 1:
+        exit_failure("The timeout value cannot be less than 1 sec!")
 
     # check selected modules
     if argv_options.selected_modules:
@@ -755,7 +793,8 @@ def load_honeypot_engine():
     #########################################
     # build configuration based on selected modules
     configuration = honeypot_configuration_builder(selected_modules)
-
+    # Set network configuration
+    network_config = set_network_configuration(argv_options)
     info("OWASP Honeypot started ...")
     info("loading modules {0}".format(", ".join(selected_modules)))
     # check for conflict in real machine ports and pick new ports
@@ -774,14 +813,19 @@ def load_honeypot_engine():
     # start containers based on selected modules
     configuration = start_containers(configuration)
     # start network monitoring process
-    mp.set_start_method('fork')
+    mp.set_start_method('spawn')
     # Event queues
     honeypot_events_queue = mp.Queue()
     network_events_queue = mp.Queue()
 
     network_traffic_capture_process = mp.Process(
         target=network_traffic_capture,
-        args=(configuration, honeypot_events_queue, network_events_queue,),
+        args=(
+            configuration,
+            honeypot_events_queue,
+            network_events_queue,
+            network_config,
+        ),
         name="network_traffic_capture_process"
     )
     network_traffic_capture_process.start()

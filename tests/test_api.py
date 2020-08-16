@@ -114,7 +114,8 @@ class TestApi(unittest.TestCase):
             'ftp/strong_password',
             'ftp/weak_password',
             'ssh/strong_password',
-            'ssh/weak_password'
+            'ssh/weak_password',
+            'smtp/strong_password'
         ]
         response = requests.get(API_URL + "/api/events/module-names")
         self.assertCountEqual(module_names, response.json()["module_names"])

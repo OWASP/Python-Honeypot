@@ -2,7 +2,7 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install openssh + python
-RUN apt-get update && apt-get install -y python3.5 python3-pip
+RUN apt-get update && apt-get install -y python3.5 python3-pip libffi-dev
 
 RUN pip3 install paramiko
 RUN pip3 install datetime
