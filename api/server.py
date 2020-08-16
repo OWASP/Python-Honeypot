@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import os
 
-from bson import (ObjectId,
-                  json_util)
-
+from bson import ObjectId
 from flask import (Flask,
                    Response,
                    abort,
@@ -173,6 +170,14 @@ def error_404(error):
     return jsonify(
         msg_structure(status="error", msg="file/path not found!")
     ), 404
+
+
+@app.errorhandler(500)
+def error_500(error):
+    del error
+    return jsonify(
+        msg_structure(status="error", msg="something went wrong!")
+    )
 
 
 @app.before_request

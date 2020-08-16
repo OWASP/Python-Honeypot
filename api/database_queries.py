@@ -15,8 +15,7 @@ from database.connector import (honeypot_events,
                                 network_events,
                                 credential_events,
                                 file_change_events,
-                                data_events,
-                                ohp_file_archive_gridfs)
+                                data_events)
 
 sort_by_count = {
     "$sort": SON(
