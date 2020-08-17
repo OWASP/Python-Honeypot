@@ -4,12 +4,12 @@
 function load_module_options() {
   $.ajax({
     type: "GET",
-    url: "/api/events/module-names",
+    url: "/api/core/list/modules",
     data: {},
   }).done(function (res) {
     var tableHtml = '<option value=\"\"> All Modules </option>';
-    for (var i = 0; i < res.module_names.length; i++) {
-      var module_name = res.module_names[i];
+    for (var i = 0; i < res.length; i++) {
+      var module_name = res[i];
       tableHtml += "<option value=" +
         module_name + ">"
         + module_name
@@ -118,7 +118,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
       ],
       columns: column_list,
       destroy: true,
-      order: [0, 'desc'],
+      // order: [[0, 'desc']],
       sort: true,
       info: true,
       paging: true,
@@ -169,7 +169,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       columns: column_list,
       columnDefs: [
         {
-          targets: 0,
+          targets: [0],
           searchable: false,
           orderable: false,
           className : 'select-checkbox',
@@ -215,7 +215,6 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
     // On click function for the download button
     $("#download-file-btn").on('click', function(e){
       var selected_row_data =  table.rows({ selected: true }).data();
-      console.log(selected_row_data);
       api_params = {
         "_id": selected_row_data[0]["_id"]["$oid"]
       }
@@ -223,13 +222,12 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       // Call the download-file API endpoint with the file ID
       $.ajax({
         type: "GET",
-        url: "/api/file-archive/download-file",
+        url: "/api/pcap/download",
         data: api_params,
         xhrFields:{
           responseType: "arraybuffer"
         },
         success: function(result,status,xhr){
-          console.log(status, result, xhr);
           var blob = new Blob([result],
             {
               type: xhr.getResponseHeader('Content-Type')
@@ -267,7 +265,7 @@ function load_data(api_endpoint, search_parameters) {
 
   if (search_parameters.datatable_id == "#log-datatable") {
     // Define table columns based on selected event type
-    if (search_parameters.event_type == "honeypot-event") {
+    if (search_parameters.event_type == "honeypot") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip_src', defaultContent: '', title: "Src IP" },
@@ -279,7 +277,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
         { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
     }
-    else if (search_parameters.event_type == "network-event") {
+    else if (search_parameters.event_type == "network") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip_src', defaultContent: '', title: "Src IP" },
@@ -291,7 +289,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
         { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
     }
-    else if (search_parameters.event_type == "credential-event") {
+    else if (search_parameters.event_type == "credential") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip', defaultContent: '', title: "IP" },
@@ -301,7 +299,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
         { data: 'country', defaultContent: '', title: "Country" }];
     }
-    else if (search_parameters.event_type == "ics-honeypot-event") {
+    else if (search_parameters.event_type == "date") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip', defaultContent: '', title: "IP" },
@@ -310,7 +308,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
         { data: 'country', defaultContent: '', title: "Country" }];
     }
-    else if (search_parameters.event_type == "file-change-event") {
+    else if (search_parameters.event_type == "file") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'module_name', defaultContent: '', title: "Module Name" },
@@ -331,7 +329,7 @@ function load_data(api_endpoint, search_parameters) {
   else if (search_parameters.datatable_id == "#file-datatable") {
     columns = [
       { data: null, defaultContent: ''},
-      { data: 'generationTime', defaultContent: '', title: "Generation Time"},
+      { data: 'date', defaultContent: '', title: "Generation Time"},
       { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
       { data: 'filename', defaultContent: '', title: "Filename"},
       { data: 'length', defaultContent: '', title: "File Size"},
@@ -349,8 +347,7 @@ function load_data(api_endpoint, search_parameters) {
  * Function called when "search" button is clicked in the "Log explorer" display
  */
 function search_database() {
-  var api_endpoint = "/api/events/get-events-data";
-  var event_type = $("select[name='event_type'] option:selected").val();
+  var api_endpoint = "/api/events/explore/" + $("select[name='event_type'] option:selected").val();
   var module_name = $("select[name='module_names'] option:selected").val();
   var start_date = $("#start_date").val();
   var end_date = $("#end_date").val();
@@ -366,8 +363,7 @@ function search_database() {
           datatable_id: "#log-datatable",
           event_type: event_type,
           module_name: module_name,
-          start_date: start_date,
-          end_date: end_date
+          date: start_date + '|' + end_date 
         }
       );
     }
@@ -382,7 +378,7 @@ function search_database() {
  * Function called when "search" button is clickec in the "File Archive" display
  */
 function search_file_archive() {
-  var api_endpoint = "/api/file-archive/get-files-list";
+  var api_endpoint = "/api/pcap/explore";
   var start_date = $("#archive_start_date").val();
   var end_date = $("#archive_end_date").val();
   if (start_date == ""|| end_date == "") {
@@ -394,8 +390,7 @@ function search_file_archive() {
         api_endpoint,
         {
           datatable_id: "#file-datatable",
-          start_date: start_date,
-          end_date: end_date
+          date: start_date + '|' + end_date
         }
       );
     }
@@ -410,9 +405,10 @@ function search_file_archive() {
  */
 function change_form() {
   var events_with_module = new Array(
-    "honeypot-event",
-    "credential-event",
-    "file-change-event"
+    "honeypot",
+    "credential",
+    "file",
+    "data"
   )
   var event_type = $("select[name='event_type'] option:selected").val();
 

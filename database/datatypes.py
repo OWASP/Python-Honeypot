@@ -141,5 +141,5 @@ class FileArchive(object):
 
     def __init__(self, file_path, generation_time, split_timeout):
         self.file_path = file_path
-        self.generation_time = generation_time
+        self.date = generation_time
         self.split_timeout = split_timeout

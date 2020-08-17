@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 
-from bson import ObjectId
+from bson import ObjectId, json_util
 from flask import (Flask,
                    Response,
                    abort,
@@ -331,6 +332,7 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
+    print(date)
 
     try:
         query = filter_by_date(date) if date else {}
@@ -369,10 +371,11 @@ def get_files_list():
 
     try:
         query = filter_by_date(date) if date else {}
-        return jsonify(
-            [
+
+        files_list = {
+            "storedFiles": [
                 i for i in
-                connector.ohp_file_archive_gridfs.find(
+                connector.ohp_file_archive.fs.files.find(
                     query,
                 ).skip(
                     fix_skip(
@@ -384,7 +387,9 @@ def get_files_list():
                     )
                 )
             ]
-        ), 200
+        }
+
+        return json.loads(json_util.dumps(files_list)), 200
     except Exception:
         abort(500)
 
@@ -396,7 +401,7 @@ def download_file():
     """
     try:
         file_id = ObjectId(get_value_from_request("_id"))
-        fs = event_types['pcap'].ohp_file_archive_gridfs.get(file_id)
+        fs = connector.ohp_file_archive_gridfs.get(file_id)
 
         return send_file(
             fs,
