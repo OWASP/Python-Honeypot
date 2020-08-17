@@ -332,7 +332,6 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
-    print(date)
 
     try:
         query = filter_by_date(date) if date else {}
@@ -343,7 +342,9 @@ def get_events_data(event_type):
                 i for i in
                 event_types[event_type].find(
                     query,
-                    {}
+                    {
+                        "_id": 0
+                    }
                 ).skip(
                     fix_skip(
                         get_value_from_request("skip")
@@ -371,7 +372,7 @@ def get_files_list():
 
     try:
         query = filter_by_date(date) if date else {}
-        
+
         # Different because jsonify is not working with Object ID
         # and we need Object ID for file retrieval/download.
         files_list = {
