@@ -160,7 +160,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
         contentType: 'application/json; charset=utf-8',
         data: api_params,
         dataType: "json",
-        dataSrc: "storedFiles"
+        dataSrc: "pcapList"
       },
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +

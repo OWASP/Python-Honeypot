@@ -371,9 +371,11 @@ def get_files_list():
 
     try:
         query = filter_by_date(date) if date else {}
-
+        
+        # Different because jsonify is not working with Object ID
+        # and we need Object ID for file retrieval/download.
         files_list = {
-            "storedFiles": [
+            "pcapList": [
                 i for i in
                 connector.ohp_file_archive.fs.files.find(
                     query,
