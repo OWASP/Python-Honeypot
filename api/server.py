@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import os
 
-from bson import ObjectId, json_util
 from flask import (Flask,
                    Response,
                    abort,
@@ -360,51 +358,17 @@ def get_events_data(event_type):
         abort(500)
 
 
-@app.route("/api/pcap/explore", methods=["GET"])
-def get_files_list():
-    """
-    Get the list of pcap files stored in the file archive
-
-    Returns:
-        JSON/Dict of files
-    """
-    date = get_value_from_request("date")
-
-    try:
-        query = filter_by_date(date) if date else {}
-
-        # Different because jsonify is not working with Object ID
-        # and we need Object ID for file retrieval/download.
-        files_list = {
-            "pcapList": [
-                i for i in
-                connector.ohp_file_archive.fs.files.find(
-                    query,
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
-                    )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        }
-
-        return json.loads(json_util.dumps(files_list)), 200
-    except Exception:
-        abort(500)
-
-
 @app.route("/api/pcap/download", methods=["GET"])
 def download_file():
     """
     Download PCAP files
     """
     try:
-        file_id = ObjectId(get_value_from_request("_id"))
-        fs = connector.ohp_file_archive_gridfs.get(file_id)
+        fs = connector.ohp_file_archive_gridfs.find_one(
+            {
+                "md5": get_value_from_request("md5")
+            }
+        )
 
         return send_file(
             fs,

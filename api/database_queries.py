@@ -15,7 +15,8 @@ from database.connector import (honeypot_events,
                                 network_events,
                                 credential_events,
                                 file_change_events,
-                                data_events)
+                                data_events,
+                                ohp_file_archive)
 
 sort_by_count = {
     "$sort": SON(
@@ -55,7 +56,8 @@ event_types = {
     "network": network_events,
     "credential": credential_events,
     "file": file_change_events,
-    "data": data_events
+    "data": data_events,
+    "pcap": ohp_file_archive.fs.files
 }
 
 
