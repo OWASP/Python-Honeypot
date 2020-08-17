@@ -420,10 +420,10 @@ def download_file():
 @app.route("/api/core/list/modules", methods=["GET"])
 def all_module_names():
     """
-    Get top passwords used according to module
+    Get the list of modules
 
     Returns:
-        JSON/Dict of top passwords used
+        JSON/List of the modules
     """
     try:
         return jsonify(
