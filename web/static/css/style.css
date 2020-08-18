@@ -12,16 +12,14 @@ body {
     filter: contrast(150%);
 }
 
-#titlebar{
-    background-color: rgb(42 109 210 / 35%);
-    text-decoration-color: black;
+#titlebar {
+    background-color: rgb(117 137 167 / 35%);
+    text-decoration-color: #ab81bf59;
 }
 
 .file-archive-explorer-label,
 .log-explorer-label{
     cursor: pointer;
-    font-size: medium;
-    color: #000;
     font-weight: bold;
     margin-left: 7px;
     margin-right: 7px;
