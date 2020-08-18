@@ -40,9 +40,6 @@
             <li class="nav-item">
                 <label class="log-explorer-label btn btn-outline-info" onclick="get_layout('log-explorer')">Log Explorer</label>
             </li>
-            <li class="nav-item">
-                <label class="file-archive-explorer-label btn btn-outline-success" onclick="get_layout('file-explorer')">File Explorer</label>
-            </li>
         </ul>
     </nav>
     <!-- start body -->
@@ -98,9 +95,20 @@
         </div>
 
         <div id="log-explorer-form" hidden=true>
+            <div id="toggle-explorer" class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-outline-secondary active">
+                    <input type="radio" name="explorer-type" id="data-explorer" autocomplete="off" onclick="get_explorer('data')" checked>
+                    Data Explorer
+                </label>
+             
+                <label class="btn btn-outline-secondary">
+                    <input type="radio" name="explorer-type" id="file-explorer" autocomplete="off" onclick="get_explorer('file')">
+                    File Explorer
+                </label>
+            </div>
             <div id="collapseOne" class="collapse show" data-parent="#accordion">
                 <form>
-                    <div class="form-row">
+                    <div class="form-row" id="log-explorer-params" >
                         <div class="form-group col-md-6">
                             <label for="event_type">Event Type: </label>
                             <select class="form-control" name="event_type" id="event_type" onchange="change_form()">
@@ -134,41 +142,16 @@
                 </form>
             </div>
         </div>
-        <div id="file-archive-explorer" hidden=true>
-            <form>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="archive_start_date">Start Date</label>
-                        <input type="date" class="form-control" id="archive_start_date">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="archive_end_date">End Date: </label>
-                        <input type="date" class="form-control" id="archive_end_date">
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-info btn-sm" onclick="search_file_archive()">Search</button>
-                    </div>
-                </div>
-            </form>
-        </div>
     </div>
     <hr>
     <div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
         <div class="col s12">
             <div class="card material-table">
-                <table id="log-datatable" class="table striped responsive" style="float:center">
+                <table id="datatable" class="table striped responsive" style="float:center">
                 </table>
-            </div>
-        </div>
-    </div>
-    <div id="file-archive-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden=true>
-        <div class="col s12">
-            <div class="card material-table">
-                <form>
-                    <table id="file-datatable" class="table striped responsive" style="float:center">
-                    </table>
+                <div class="form-group">
                     <button id="download-file-btn" type="button" class="btn btn-info btn-sm" hidden=true>Download</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>

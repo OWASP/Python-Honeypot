@@ -35,6 +35,13 @@ function get_export_fileName(file_type) {
   return 'Honeypot-data-' + file_type + '-' + n;
 }
 
+function clear_table(){
+  if ($.fn.dataTable.isDataTable("#datatable")) {
+    $("#datatable").DataTable().clear().destroy();
+    $("#datatable").empty();
+  }
+}
+
 
 /**
  * Taken from https://storiknow.com/download-file-with-jquery-and-web-api-2-0-ihttpactionresult/
@@ -91,8 +98,9 @@ function download(xhr, blob) {
  * @param {*} api_params  : GET parameters for the API call
  */
 function call_events_api_endpoint(api_endpoint, column_list, api_params) {
+  
   $(document).ready(function () {
-    var table = $(api_params.datatable_id).dataTable({
+    var table = $("#datatable").DataTable({
       ajax: {
         type: "GET",
         url: api_endpoint,
@@ -154,7 +162,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
 function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
 
   $(document).ready(function () {
-    var table = $(api_params.datatable_id).DataTable({
+    var table = $("#datatable").DataTable({
       ajax: {
         type: "GET",
         url: api_endpoint,
@@ -214,7 +222,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
       var selected_row_data =  table.rows({ selected: true }).data();
       // Check if a row is selected
       if(selected_row_data[0]) {
-        api_params = {
+        download_api_params = {
           "md5": selected_row_data[0]["md5"]
         }
   
@@ -222,7 +230,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
         $.ajax({
           type: "GET",
           url: "/api/pcap/download",
-          data: api_params,
+          data: download_api_params,
           xhrFields:{
             responseType: "arraybuffer"
           },
@@ -257,17 +265,14 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
  * @param {*} start_date 
  * @param {*} end_date 
  */
-function load_data(api_endpoint, search_parameters) {
-  if ($.fn.dataTable.isDataTable(search_parameters.datatable_id)) {
-    $(search_parameters.datatable_id).DataTable().clear().destroy();
-    $(search_parameters.datatable_id).empty();
-  }
+function load_data(api_endpoint, api_params, is_data) {
+  clear_table();
   var columns = [];
   var limit = 1000;
 
-  if (search_parameters.datatable_id == "#log-datatable") {
+  if (is_data) {
     // Define table columns based on selected event type
-    if (search_parameters.event_type == "honeypot") {
+    if (api_params.event_type == "honeypot") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip_src', defaultContent: '', title: "Src IP" },
@@ -279,7 +284,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
         { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
     }
-    else if (search_parameters.event_type == "network") {
+    else if (api_params.event_type == "network") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip_src', defaultContent: '', title: "Src IP" },
@@ -291,7 +296,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
         { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
     }
-    else if (search_parameters.event_type == "credential") {
+    else if (api_params.event_type == "credential") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip', defaultContent: '', title: "IP" },
@@ -301,7 +306,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
         { data: 'country', defaultContent: '', title: "Country" }];
     }
-    else if (search_parameters.event_type == "data") {
+    else if (api_params.event_type == "data") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip', defaultContent: '', title: "IP" },
@@ -310,7 +315,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
         { data: 'country', defaultContent: '', title: "Country" }];
     }
-    else if (search_parameters.event_type == "file") {
+    else if (api_params.event_type == "file") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'module_name', defaultContent: '', title: "Module Name" },
@@ -320,15 +325,15 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'is_directory', defaultContent: '', title: "Is Directory" }];
     }
 
-    if (search_parameters.module_name == "") {
-      delete search_parameters.module_name;
+    if (api_params.module_name == "") {
+      delete api_params.module_name;
     }
     // Set API call parameters, delete datatable ID as it is not required in API call
-    search_parameters.limit = limit;
+    api_params.limit = limit;
 
-    call_events_api_endpoint(api_endpoint, columns, search_parameters);
+    call_events_api_endpoint(api_endpoint, columns, api_params);
   }
-  else if (search_parameters.datatable_id == "#file-datatable") {
+  else {
     columns = [
       { data: null, defaultContent: ''},
       { data: 'date', defaultContent: '', title: "Generation Time"},
@@ -337,9 +342,9 @@ function load_data(api_endpoint, search_parameters) {
       { data: 'length', defaultContent: '', title: "File Size"},
       { data: 'md5', defaultContent: '', title: "MD5"}
     ];
-    search_parameters.limit = limit;
+    api_params.limit = limit;
 
-    call_file_archive_api_endpoint(api_endpoint, columns, search_parameters);
+    call_file_archive_api_endpoint(api_endpoint, columns, api_params);
   }
 }
 
@@ -348,9 +353,23 @@ function load_data(api_endpoint, search_parameters) {
  * Function called when "search" button is clicked in the "Log explorer" display
  */
 function search_database() {
-  var event_type = $("select[name='event_type'] option:selected").val();
-  var api_endpoint = "/api/events/explore/" + event_type;
-  var module_name = $("select[name='module_names'] option:selected").val();
+  var is_data = document.getElementById("data-explorer").checked;
+  var api_endpoint = "/api/events/explore/";
+  var api_params = {};
+  if(is_data){
+    // Get event type and module name if data explorer
+    var event_type = $("select[name='event_type'] option:selected").val(); 
+    var module_name = $("select[name='module_names'] option:selected").val();
+    // Update end point
+    api_endpoint += event_type;
+    // Set the API parameters
+    api_params.event_type = event_type;
+    api_params.module_name = module_name;
+  }
+  else{
+    api_endpoint += "pcap";
+  }
+  // Get date range
   var start_date = $("#start_date").val();
   var end_date = $("#end_date").val();
 
@@ -359,14 +378,13 @@ function search_database() {
   }
   else {
     if (start_date <= end_date) {
+      // Date Range format Eg: 2020-09-10|2020-10-10
+      api_params.date = start_date + '|' + end_date
+      // Call API and load data to table
       load_data(
         api_endpoint,
-        {
-          datatable_id: "#log-datatable",
-          event_type: event_type,
-          module_name: module_name,
-          date: start_date + '|' + end_date 
-        }
+        api_params,
+        is_data
       );
     }
     else {
@@ -375,32 +393,6 @@ function search_database() {
   }
 }
 
-
-/**
- * Function called when "search" button is clickec in the "File Archive" display
- */
-function search_file_archive() {
-  var api_endpoint = "/api/events/explore/pcap";
-  var start_date = $("#archive_start_date").val();
-  var end_date = $("#archive_end_date").val();
-  if (start_date == ""|| end_date == "") {
-    alert("Either Start Date or End date missing!");
-  }
-  else{
-    if(start_date <= end_date){
-      load_data(
-        api_endpoint,
-        {
-          datatable_id: "#file-datatable",
-          date: start_date + '|' + end_date
-        }
-      );
-    }
-    else {
-      alert("Start date is greater than End date!")
-    }
-  }
-}
 
 /**
  * Form update based on event type selected
@@ -431,8 +423,14 @@ function get_layout(layout_type) {
   document.getElementById("data-plots").hidden = (layout_type=="data-plots") ? false : true;
   document.getElementById("log-explorer-form").hidden = (layout_type=="log-explorer") ? false : true;
   document.getElementById("log-explorer-table").hidden = (layout_type=="log-explorer") ? false : true;
-  document.getElementById("file-archive-explorer").hidden = (layout_type=="file-explorer") ? false : true;
-  document.getElementById("file-archive-explorer-table").hidden = (layout_type=="file-explorer") ? false : true;
+}
+
+function get_explorer(explorer_type){
+  document.getElementById("log-explorer-params").hidden = (explorer_type=="data") ? false : true;
+  // Make the download button invisible.
+  document.getElementById("download-file-btn").hidden = (explorer_type=="data") ? true : true;
+  // Clear the table
+  clear_table();
 }
 
 load_module_options();

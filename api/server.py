@@ -375,8 +375,7 @@ def download_file():
         fs = connector.ohp_file_archive_gridfs.find_one(
             {
                 "md5": md5_value
-            },
-            allowDiskUse=True
+            }
         )
 
         return send_file(

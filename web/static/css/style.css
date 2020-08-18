@@ -17,6 +17,13 @@ body {
     text-decoration-color: #ab81bf59;
 }
 
+#toggle-explorer{
+    padding: 10px 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+}
+
 .file-archive-explorer-label,
 .log-explorer-label{
     cursor: pointer;
