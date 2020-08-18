@@ -32,13 +32,13 @@
 <body>
 
     <nav class="navbar navbar-expand-sm navbar-light fixed-top" id="titlebar">
-        <a class="navbar-brand" onclick="get_data_plots()"><img src="img/owasp.png" id="logo"></a>
+        <a class="navbar-brand" onclick="get_layout('data-plots')"><img src="img/owasp.png" id="logo"></a>
         <ul class="navbar-nav">
             <li class="nav-item">
-                <label class="log-explorer-label label" onclick="get_log_explorer()">Log Explorer</label>
+                <label class="log-explorer-label label" onclick="get_layout('log-explorer')">Log Explorer</label>
             </li>
             <li class="nav-item">
-                <label class="file-archive-explorer-label label" onclick="get_file_explorer()">File Explorer</label>
+                <label class="file-archive-explorer-label label" onclick="get_layout('file-explorer')">File Explorer</label>
             </li>
         </ul>
     </nav>

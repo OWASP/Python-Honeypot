@@ -118,6 +118,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
       columns: column_list,
       destroy: true,
       order: [[0, 'desc']],
+      sort: true,
       info: true,
       paging: true,
       oLanguage: {
@@ -417,31 +418,14 @@ function change_form() {
 }
 
 /**
- * Show the log explorer form and table
+ * Change layout based on user selection
  */
-function get_log_explorer() {
-  document.getElementById("log-explorer-form").hidden = false;
-  document.getElementById("log-explorer-table").hidden = false;
-  document.getElementById("data-plots").hidden = true;
-  document.getElementById("file-archive-explorer").hidden = true;
-  document.getElementById("file-archive-explorer-table").hidden = true;
-}
-
-
-function get_data_plots() {
-  document.getElementById("data-plots").hidden = false;
-  document.getElementById("log-explorer-form").hidden = true;
-  document.getElementById("log-explorer-table").hidden = true;
-  document.getElementById("file-archive-explorer").hidden = true;
-  document.getElementById("file-archive-explorer-table").hidden = true;
-}
-
-function get_file_explorer() {
-  document.getElementById("file-archive-explorer").hidden = false;
-  document.getElementById("file-archive-explorer-table").hidden = false;
-  document.getElementById("data-plots").hidden = true;
-  document.getElementById("log-explorer-form").hidden = true;
-  document.getElementById("log-explorer-table").hidden = true;
+function get_layout(layout_type) {
+  document.getElementById("data-plots").hidden = (layout_type=="data-plots") ? false : true;
+  document.getElementById("log-explorer-form").hidden = (layout_type=="log-explorer") ? false : true;
+  document.getElementById("log-explorer-table").hidden = (layout_type=="log-explorer") ? false : true;
+  document.getElementById("file-archive-explorer").hidden = (layout_type=="file-explorer") ? false : true;
+  document.getElementById("file-archive-explorer-table").hidden = (layout_type=="file-explorer") ? false : true;
 }
 
 load_module_options();
