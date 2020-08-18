@@ -24,19 +24,103 @@ var chartColors = window.chartColors;
 var old_number_of_total_events;
 var new_number_of_total_events;
 
+var top_values = new Object();
+
+/**
+ * Function to get total event counts and set the Element value
+ * @param {*} event_type 
+ * @param {*} element_id 
+ */
+function get_event_count(event_type, html_element_id){
+    $.ajax({
+        type: "GET",
+        url: "/api/events/count/" + event_type,
+        success: function(result,status,xhr){
+            new_number_of_total_events = (event_type=="all") ? result["count"] : new_number_of_total_events;
+            document.getElementById(html_element_id).innerHTML = result["count"];
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+            if (errorThrown == "BAD REQUEST") {
+            }
+            if (errorThrown == "UNAUTHORIZED") {
+            }
+        }
+    });
+}
+
+/**
+ * Create object structure for the givent event type and element, if it doesn't already exist
+ * @param {*} event_type 
+ * @param {*} element 
+ */
+function create_object_structure(event_type, element){
+    !(event_type in top_values) ? top_values[event_type] = new Object() : true;
+    !(element in top_values[event_type]) ? top_values[event_type][element] = new Object() : true;
+    !("keys" in top_values[event_type][element]) ? top_values[event_type][element].keys = [] : true;
+    !("values" in top_values[event_type][element]) ? top_values[event_type][element].values = [] : true;
+    !("colors" in top_values[event_type][element]) ? top_values[event_type][element].colors = [] : true;
+}
+
+function get_top_ten_element_in_event(event_type, element, html_element_id){
+    $.ajax({
+        type: "GET",
+        url: "/api/events/count/groupby/"+event_type+"/"+element,
+        success: function(res,status,xhr){
+            create_object_structure(event_type, element);
+            for (var i = 0; i < res.length; i++) {
+                top_values[event_type][element].keys.push(
+                    res[i][Object.keys(res[i])[1]]
+                );
+                top_values[event_type][element].values.push(res[i][Object.keys(res[i])[0]]);
+                top_values[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
+            }
+            var top_ten_graph_config = {
+                data: {
+                    datasets: [{
+                        data: top_values[event_type][element].values,
+                        backgroundColor: top_values[event_type][element].colors,
+                        label: 'Top Ten '+element+'s - '+event_type
+                    }],
+                    labels: top_values[event_type][element].keys
+                },
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'right',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Top Ten '+element+'s - '+event_type
+                    },
+                    scale: {
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        reverse: false
+                    },
+                    animation: {
+                        animateRotate: false,
+                        animateScale: true
+                    }
+                }
+            };
+
+            var ctx = document.getElementById(html_element_id);
+            window.myPolarArea = Chart.PolarArea(ctx, top_ten_graph_config);
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+            if (errorThrown == "BAD REQUEST") {
+            }
+            if (errorThrown == "UNAUTHORIZED") {
+            }
+        }
+    });
+}
+
 function load_graphs() {
-    var top_ten_ips_in_honeypot_events_graph_data_keys = [];
-    var top_ten_ips_in_honeypot_events_graph_data_values = [];
-    var top_ten_ips_in_honeypot_events_graph_data_colors = [];
-    var top_ten_ips_in_network_events_graph_data_keys = [];
-    var top_ten_ips_in_network_events_graph_data_values = [];
-    var top_ten_ips_in_network_events_graph_data_colors = [];
-    var top_ten_ports_in_honeypot_events_graph_data_keys = [];
-    var top_ten_ports_in_honeypot_events_graph_data_values = [];
-    var top_ten_ports_in_honeypot_events_graph_data_colors = [];
-    var top_ten_ports_in_network_events_graph_data_keys = [];
-    var top_ten_ports_in_network_events_graph_data_values = [];
-    var top_ten_ports_in_network_events_graph_data_colors = [];
     // generate past week ago dates (e.g. 2018-07-16)
     var dates_network_events_json = {};
     var dates_honeypot_events_json = {};
@@ -44,19 +128,7 @@ function load_graphs() {
 
 
     // get number of all events
-    $.ajax({
-        type: "GET",
-        url: "/api/events/count/all",
-    }).done(function (res) {
-        new_number_of_total_events = res["count"];
-        document.getElementById('count_all_events').innerHTML = res["count"];
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-        if (errorThrown == "BAD REQUEST") {
-        }
-        if (errorThrown == "UNAUTHORIZED") {
-        }
-    });
+    total_number_of_events =  get_event_count("all", "count_all_events");
 
     // wait 3 seconds to get responded for the request
     setTimeout(function () {
@@ -74,253 +146,17 @@ function load_graphs() {
             // set old events num as new to prevent repeating requests
             old_number_of_total_events = new_number_of_total_events;
             // request honeypot related events number
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/honeypot",
-            }).done(function (res) {
-                document.getElementById('count_honeypot_events').innerHTML = res["count"];
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
+            get_event_count("honeypot", "count_honeypot_events");
             // request network related events number
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/network",
-            }).done(function (res) {
-                document.getElementById('count_network_events').innerHTML = res["count"];
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
+            get_event_count("network", "count_network_events");
             // request top ten ips in honeypot events
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/groupby/honeypot/ip",
-            }).done(function (res) {
-                for (var i = 0; i < res.length; i++) {
-                    top_ten_ips_in_honeypot_events_graph_data_keys.push(
-                        res[i][Object.keys(res[i])[1]]
-                    );
-                    top_ten_ips_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
-                    top_ten_ips_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
-                }
-
-                var top_ten_ips_in_honeypot_events_graph_config = {
-                    data: {
-                        datasets: [{
-                            data: top_ten_ips_in_honeypot_events_graph_data_values,
-                            backgroundColor: top_ten_ips_in_honeypot_events_graph_data_colors,
-                            label: 'Top Ten IPs - Honeypot'
-                        }],
-                        labels: top_ten_ips_in_honeypot_events_graph_data_keys
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top Ten IPs - Honeypot'
-                        },
-                        scale: {
-                            ticks: {
-                                beginAtZero: true
-                            },
-                            reverse: false
-                        },
-                        animation: {
-                            animateRotate: false,
-                            animateScale: true
-                        }
-                    }
-                };
-
-                var ctx = document.getElementById('top_ten_ips_in_honeypot_events_graph');
-                window.myPolarArea = Chart.PolarArea(ctx, top_ten_ips_in_honeypot_events_graph_config);
-
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
-
+            get_top_ten_element_in_event("honeypot", "ip", "top_ten_ips_in_honeypot_events_graph");
             // request top ten ips in network events
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/groupby/network/ip",
-            }).done(function (res) {
-                console.log(res);
-                for (var i = 0; i < res.length; i++) {
-                    top_ten_ips_in_network_events_graph_data_keys.push(
-                        Object.keys(res[i])[1]
-                       );
-                    top_ten_ips_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
-                    top_ten_ips_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
-                }
-
-                var top_ten_ips_in_network_events_graph_config = {
-                    data: {
-                        datasets: [{
-                            data: top_ten_ips_in_network_events_graph_data_values,
-                            backgroundColor: top_ten_ips_in_network_events_graph_data_colors,
-                            label: 'Top Ten IPs - Network'
-                        }],
-                        labels: top_ten_ips_in_network_events_graph_data_keys
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top Ten IPs - Network'
-                        },
-                        scale: {
-                            ticks: {
-                                beginAtZero: true
-                            },
-                            reverse: false
-                        },
-                        animation: {
-                            animateRotate: false,
-                            animateScale: true
-                        }
-                    }
-                };
-
-                var ctx = document.getElementById('top_ten_ips_in_network_events_graph');
-                window.myPolarArea = Chart.PolarArea(ctx, top_ten_ips_in_network_events_graph_config);
-
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
-
+            get_top_ten_element_in_event("network", "ip", "top_ten_ips_in_network_events_graph");
             // request top ten ports in honeypot events
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/groupby/honeypot/port",
-            }).done(function (res) {
-                for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i][Object.keys(res[i])[1]]);
-                    top_ten_ports_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
-                    top_ten_ports_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
-                }
-
-                var top_ten_ports_in_honeypot_events_graph_config = {
-                    data: {
-                        datasets: [{
-                            data: top_ten_ports_in_honeypot_events_graph_data_values,
-                            backgroundColor: top_ten_ports_in_honeypot_events_graph_data_colors,
-                            label: 'Top Ten Ports - Honeypot'
-                        }],
-                        labels: top_ten_ports_in_honeypot_events_graph_data_keys
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top Ten Ports - Honeypot'
-                        },
-                        scale: {
-                            ticks: {
-                                beginAtZero: true
-                            },
-                            reverse: false
-                        },
-                        animation: {
-                            animateRotate: false,
-                            animateScale: true
-                        }
-                    }
-                };
-
-                var ctx = document.getElementById('top_ten_ports_in_honeypot_events_graph');
-                window.myPolarArea = Chart.PolarArea(ctx, top_ten_ports_in_honeypot_events_graph_config);
-
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
-
+            get_top_ten_element_in_event("honeypot", "port", "top_ten_ports_in_honeypot_events_graph");
             // request top ten ports in network events
-            $.ajax({
-                type: "GET",
-                url: "/api/events/count/groupby/network/port",
-            }).done(function (res) {
-                for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_network_events_graph_data_keys.push(res[i][Object.keys(res[i])[1]]);
-                    top_ten_ports_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
-                    top_ten_ports_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
-                }
-
-                var top_ten_ports_in_network_events_graph_config = {
-                    data: {
-                        datasets: [{
-                            data: top_ten_ports_in_network_events_graph_data_values,
-                            backgroundColor: top_ten_ports_in_network_events_graph_data_colors,
-                            label: 'Top Ten Network - Honeypot'
-                        }],
-                        labels: top_ten_ports_in_network_events_graph_data_keys
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'right',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top Ten Ports - Network'
-                        },
-                        scale: {
-                            ticks: {
-                                beginAtZero: true
-                            },
-                            reverse: false
-                        },
-                        animation: {
-                            animateRotate: false,
-                            animateScale: true
-                        }
-                    }
-                };
-
-                var ctx = document.getElementById('top_ten_ports_in_network_events_graph');
-                window.myPolarArea = Chart.PolarArea(ctx, top_ten_ports_in_network_events_graph_config);
-
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                if (errorThrown == "BAD REQUEST") {
-                }
-                if (errorThrown == "UNAUTHORIZED") {
-                }
-            });
-
-
+            get_top_ten_element_in_event("network", "port", "top_ten_ports_in_network_events_graph");
             // 7 days ago config
             // request all events number by date for past week
             for (var counter = 0; counter < week_dates_array.length; counter++) {
