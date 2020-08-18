@@ -170,7 +170,7 @@ def push_events_to_database_from_thread(honeypot_events_queue, network_events_qu
     """
     while True:
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
-        time.sleep(3)
+        time.sleep(1)
     return True
 
 

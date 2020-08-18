@@ -58,7 +58,7 @@ class TestConnector(unittest.TestCase):
         network_record = network_events.find_one(network_event.__dict__)
 
         # wait for queue to be empty
-        time.sleep(3.5)
+        time.sleep(5)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
