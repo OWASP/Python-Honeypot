@@ -139,7 +139,7 @@ class FileArchive(object):
     to be stored in the File Archive
     """
 
-    def __init__(self, file_path, generation_time, split_timeout):
+    def __init__(self, file_path, date, split_timeout):
         self.file_path = file_path
-        self.date = generation_time
+        self.date = date
         self.split_timeout = split_timeout

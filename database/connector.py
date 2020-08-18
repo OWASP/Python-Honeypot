@@ -288,17 +288,16 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
     """
     if is_verbose_mode():
         verbose_info(
-            "Received network traffic file:{0}, generation_time:{1}. "
+            "Received network traffic file:{0}, date:{1}. "
             "Inserting it in the File Archive".format(
                 file_archive.file_path,
-                file_archive.generation_time
+                file_archive.date
             )
         )
-
     return ohp_file_archive_gridfs.put(
         open(file_archive.file_path, "rb"),
         filename=os.path.split(file_archive.file_path)[1],
         machine_name=network_configuration()["real_machine_identifier_name"],
-        date=file_archive.generation_time,
+        date=file_archive.date,
         splitTimeout=file_archive.split_timeout
     )

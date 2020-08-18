@@ -855,12 +855,11 @@ def load_honeypot_engine():
         run_as_test
     )
 
+    # killed the network traffic capture process by ctrl + c... waiting to end.
+    info("killing network capture process")
+    network_traffic_capture_process.join()
     # if in case any events that were not inserted from thread
     push_events_queues_to_database(honeypot_events_queue, network_events_queue)
-    # kill the network traffic capture process
-    network_traffic_capture_process.terminate()
-    network_traffic_capture_process.join()
-    info("killing network capture process")
     # Kill bulk events thread
     terminate_thread(bulk_events_thread)
     # stop created containers

@@ -409,7 +409,7 @@ function change_form() {
     document.getElementById("module_names").selectedIndex = 0;
     document.getElementById("module_names").disabled = true;
   }
-
+  document.getElementById("download-file-btn").hidden = (event_type == "pcap") ? false : true;
 }
 
 /**

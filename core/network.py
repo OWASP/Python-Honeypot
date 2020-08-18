@@ -224,26 +224,25 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             # Applied on every packet captured by pyshark LiveCapture
             capture.apply_on_packets(packet_callback, timeout=timeout)
 
-        except get_timeout_error():
+        except get_timeout_error() as e:
             # Catches the timeout error thrown by apply_on_packets
-            time.sleep(1)
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
                     generation_time,
                     timeout
                 )
-            )
+            ) if store_pcap else e
 
-        except KeyboardInterrupt:
-            time.sleep(1)
+        except KeyboardInterrupt as e:
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
                     generation_time,
                     timeout
                 )
-            )
+            ) if store_pcap else e
+            break
 
         except Exception as e:
             insert_pcap_files_to_collection(
@@ -252,7 +251,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
                     generation_time,
                     timeout
                 )
-            )
+            ) if store_pcap else e
             error(str(e))
             break
 
