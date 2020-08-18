@@ -296,7 +296,7 @@ function load_data(api_endpoint, search_parameters) {
         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
         { data: 'country', defaultContent: '', title: "Country" }];
     }
-    else if (search_parameters.event_type == "date") {
+    else if (search_parameters.event_type == "data") {
       columns = [
         { data: 'date', defaultContent: '', title: "Date" },
         { data: 'ip', defaultContent: '', title: "IP" },
