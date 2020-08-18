@@ -145,7 +145,8 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     and network_events collection respectively
     """
 
-    if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
+    if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
+            and (honeypot_events_queue or network_events_queue):
         verbose_info("Submitting new events to database")
 
     # Insert all honeypot events to database (honeypot_events collection)
