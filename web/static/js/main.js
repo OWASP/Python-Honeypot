@@ -65,7 +65,7 @@ function create_object_structure(event_type, element){
 function get_top_ten_element_in_event(event_type, element, html_element_id){
     $.ajax({
         type: "GET",
-        url: "/api/events/count/groupby/"+event_type+"/"+element,
+        url: "/api/events/count/groupby/"+event_type.toLowerCase()+"/"+element.toLowerCase(),
         success: function(res,status,xhr){
             create_object_structure(event_type, element);
             for (var i = 0; i < res.length; i++) {
@@ -150,13 +150,13 @@ function load_graphs() {
             // request network related events number
             get_event_count("network", "count_network_events");
             // request top ten ips in honeypot events
-            get_top_ten_element_in_event("honeypot", "ip", "top_ten_ips_in_honeypot_events_graph");
+            get_top_ten_element_in_event("Honeypot", "IP", "top_ten_ips_in_honeypot_events_graph");
             // request top ten ips in network events
-            get_top_ten_element_in_event("network", "ip", "top_ten_ips_in_network_events_graph");
+            get_top_ten_element_in_event("Network", "IP", "top_ten_ips_in_network_events_graph");
             // request top ten ports in honeypot events
-            get_top_ten_element_in_event("honeypot", "port", "top_ten_ports_in_honeypot_events_graph");
+            get_top_ten_element_in_event("Honeypot", "Port", "top_ten_ports_in_honeypot_events_graph");
             // request top ten ports in network events
-            get_top_ten_element_in_event("network", "port", "top_ten_ports_in_network_events_graph");
+            get_top_ten_element_in_event("Network", "Port", "top_ten_ports_in_network_events_graph");
             // 7 days ago config
             // request all events number by date for past week
             for (var counter = 0; counter < week_dates_array.length; counter++) {
