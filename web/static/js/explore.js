@@ -342,7 +342,8 @@ function load_data(api_endpoint, search_parameters) {
  * Function called when "search" button is clicked in the "Log explorer" display
  */
 function search_database() {
-  var api_endpoint = "/api/events/explore/" + $("select[name='event_type'] option:selected").val();
+  var event_type = $("select[name='event_type'] option:selected").val();
+  var api_endpoint = "/api/events/explore/" + event_type;
   var module_name = $("select[name='module_names'] option:selected").val();
   var start_date = $("#start_date").val();
   var end_date = $("#end_date").val();

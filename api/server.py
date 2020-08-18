@@ -277,10 +277,13 @@ def count_events(event_type):
 @app.route("/api/events/count/groupby/<event_type>/<element>", methods=["GET"])
 def groupby_element(event_type, element):
     """
-    get top ten repeated ips in honeypot events
+    get top ten repeated "elements" as defined in database_queries
+    in "event type".
+
+    Eg. <API_URL>/api/events/count/groupby/honeypot/ip?date=2020-08-01
 
     Returns:
-        JSON/Dict top ten repeated ips in honeypot events
+        JSON/Dict top ten element in event type
     """
     abort(404) if (event_type not in event_types or element not in group_by_elements) else True
 
