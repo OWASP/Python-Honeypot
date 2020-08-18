@@ -347,8 +347,7 @@ def get_events_data(event_type):
                     query,
                     {
                         "_id": 0
-                    },
-                    allowDiskUse=True
+                    }
                 ).skip(
                     fix_skip(
                         get_value_from_request("skip")
