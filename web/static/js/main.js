@@ -107,7 +107,7 @@ function load_graphs() {
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
                     top_ten_ips_in_honeypot_events_graph_data_keys.push(
-                        res[i][Object.keys(res[i])[0]]
+                        res[i][Object.keys(res[i])[1]]
                     );
                     top_ten_ips_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ips_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
@@ -161,11 +161,10 @@ function load_graphs() {
                 type: "GET",
                 url: "/api/events/count/groupby/network/ip",
             }).done(function (res) {
+                console.log(res);
                 for (var i = 0; i < res.length; i++) {
-
-
                     top_ten_ips_in_network_events_graph_data_keys.push(
-                        Object.keys(res[i])[0]
+                        Object.keys(res[i])[1]
                        );
                     top_ten_ips_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ips_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
@@ -220,7 +219,7 @@ function load_graphs() {
                 url: "/api/events/count/groupby/honeypot/port",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_honeypot_events_graph_data_keys.push(Object.keys(res[i])[0]);
+                    top_ten_ports_in_honeypot_events_graph_data_keys.push(res[i][Object.keys(res[i])[1]]);
                     top_ten_ports_in_honeypot_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ports_in_honeypot_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
@@ -274,7 +273,7 @@ function load_graphs() {
                 url: "/api/events/count/groupby/network/port",
             }).done(function (res) {
                 for (var i = 0; i < res.length; i++) {
-                    top_ten_ports_in_network_events_graph_data_keys.push(Object.keys(res[i])[0]);
+                    top_ten_ports_in_network_events_graph_data_keys.push(res[i][Object.keys(res[i])[1]]);
                     top_ten_ports_in_network_events_graph_data_values.push(res[i][Object.keys(res[i])[0]]);
                     top_ten_ports_in_network_events_graph_data_colors.push(color(colors_array[i]).alpha(0.5).rgbString());
                 }
