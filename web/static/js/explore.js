@@ -212,34 +212,39 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
     // On click function for the download button
     $("#download-file-btn").on('click', function(e){
       var selected_row_data =  table.rows({ selected: true }).data();
-      api_params = {
-        "md5": selected_row_data[0]["md5"]
-      }
-
-      // Call the download-file API endpoint with the file ID
-      $.ajax({
-        type: "GET",
-        url: "/api/pcap/download",
-        data: api_params,
-        xhrFields:{
-          responseType: "arraybuffer"
-        },
-        success: function(result,status,xhr){
-          var blob = new Blob([result],
-            {
-              type: xhr.getResponseHeader('Content-Type')
-            });
-          download(xhr, blob);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          if (errorThrown == "BAD REQUEST") {
-            alert(jqXHR.responseText)
-          }
-          if (errorThrown == "UNAUTHORIZED") {
-            alert(jqXHR.responseText)
-          }
+      // Check if a row is selected
+      if(selected_row_data[0]) {
+        api_params = {
+          "md5": selected_row_data[0]["md5"]
         }
-      });
+  
+        // Call the download-file API endpoint with the file ID
+        $.ajax({
+          type: "GET",
+          url: "/api/pcap/download",
+          data: api_params,
+          xhrFields:{
+            responseType: "arraybuffer"
+          },
+          success: function(result,status,xhr){
+            var blob = new Blob([result],
+              {
+                type: xhr.getResponseHeader('Content-Type')
+              });
+            download(xhr, blob);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            if (errorThrown == "BAD REQUEST") {
+              alert(jqXHR.responseText)
+            }
+            if (errorThrown == "UNAUTHORIZED") {
+              alert(jqXHR.responseText)
+            }
+          }
+        });
+
+      }
+     
     });
   });
 }
