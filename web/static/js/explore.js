@@ -90,7 +90,6 @@ function download(xhr, blob) {
  */
 function call_events_api_endpoint(api_endpoint, column_list, api_params) {
   $(document).ready(function () {
-
     var table = $(api_params.datatable_id).dataTable({
       ajax: {
         type: "GET",
@@ -118,8 +117,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
       ],
       columns: column_list,
       destroy: true,
-      // order: [[0, 'desc']],
-      sort: true,
+      order: [[0, 'desc']],
       info: true,
       paging: true,
       oLanguage: {
@@ -160,7 +158,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
         contentType: 'application/json; charset=utf-8',
         data: api_params,
         dataType: "json",
-        dataSrc: "pcapList"
+        dataSrc: ""
       },
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
@@ -177,10 +175,6 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
             selectRow: true,
             stateSave: false
           }
-       },
-       {
-         targets: [6],
-         visible: false
        },
       ],
       retrieve : true,
@@ -216,7 +210,7 @@ function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
     $("#download-file-btn").on('click', function(e){
       var selected_row_data =  table.rows({ selected: true }).data();
       api_params = {
-        "_id": selected_row_data[0]["_id"]["$oid"]
+        "md5": selected_row_data[0]["md5"]
       }
 
       // Call the download-file API endpoint with the file ID
@@ -262,6 +256,7 @@ function load_data(api_endpoint, search_parameters) {
   }
   var columns = [];
   var limit = 1000;
+  console.log(api_endpoint);
 
   if (search_parameters.datatable_id == "#log-datatable") {
     // Define table columns based on selected event type
@@ -333,8 +328,7 @@ function load_data(api_endpoint, search_parameters) {
       { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
       { data: 'filename', defaultContent: '', title: "Filename"},
       { data: 'length', defaultContent: '', title: "File Size"},
-      { data: 'md5', defaultContent: '', title: "MD5"},
-      { data: '_id.$oid', defaultContent: '', title: "File ID", hidden: true}
+      { data: 'md5', defaultContent: '', title: "MD5"}
     ];
     search_parameters.limit = limit;
 
@@ -378,7 +372,7 @@ function search_database() {
  * Function called when "search" button is clickec in the "File Archive" display
  */
 function search_file_archive() {
-  var api_endpoint = "/api/pcap/explore";
+  var api_endpoint = "/api/events/explore/pcap";
   var start_date = $("#archive_start_date").val();
   var end_date = $("#archive_end_date").val();
   if (start_date == ""|| end_date == "") {
