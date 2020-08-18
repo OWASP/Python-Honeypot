@@ -97,7 +97,7 @@ function download(xhr, blob) {
  * @param {*} column_list : List of Columns for the selected event type
  * @param {*} api_params  : GET parameters for the API call
  */
-function call_events_api_endpoint(api_endpoint, column_list, api_params) {
+function get_event_data(api_endpoint, column_list, api_params) {
   
   $(document).ready(function () {
     var table = $("#datatable").DataTable({
@@ -159,7 +159,7 @@ function call_events_api_endpoint(api_endpoint, column_list, api_params) {
  * @param {*} column_defs 
  * @param {*} api_params 
  */
-function call_file_archive_api_endpoint(api_endpoint, column_list, api_params) {
+function get_pcap_file_data(api_endpoint, column_list, api_params) {
 
   $(document).ready(function () {
     var table = $("#datatable").DataTable({
@@ -331,7 +331,7 @@ function load_data(api_endpoint, api_params, is_data) {
     // Set API call parameters, delete datatable ID as it is not required in API call
     api_params.limit = limit;
 
-    call_events_api_endpoint(api_endpoint, columns, api_params);
+    get_event_data(api_endpoint, columns, api_params);
   }
   else {
     columns = [
@@ -344,7 +344,7 @@ function load_data(api_endpoint, api_params, is_data) {
     ];
     api_params.limit = limit;
 
-    call_file_archive_api_endpoint(api_endpoint, columns, api_params);
+    get_pcap_file_data(api_endpoint, columns, api_params);
   }
 }
 
@@ -428,7 +428,7 @@ function get_layout(layout_type) {
 function get_explorer(explorer_type){
   document.getElementById("log-explorer-params").hidden = (explorer_type=="data") ? false : true;
   // Make the download button invisible.
-  document.getElementById("download-file-btn").hidden = (explorer_type=="data") ? true : true;
+  document.getElementById("download-file-btn").hidden = (explorer_type=="file") ? true : true;
   // Clear the table
   clear_table();
 }
