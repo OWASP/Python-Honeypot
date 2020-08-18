@@ -67,9 +67,6 @@ jobs:
       - name: Lint with flake8
         run: flake8 --count --show-source --statistics .
 
-      - name: Run modules test
-        run: sudo python3 ohp.py -m all --test --store-pcap
-
       - name: Run API server via docker daemon
         run: docker-compose -f docker-compose-host.yml up -d --build
 
@@ -88,3 +85,5 @@ jobs:
       - name: Kill API Server
         run: docker-compose down
 
+      - name: Run modules test
+        run: sudo python3 ohp.py -m all --test --store-pcap
