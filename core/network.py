@@ -112,7 +112,7 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
                         ip_src,
                         port_src,
                         protocol,
-                        honeypot_ports[port_dest],
+                        honeypot_ports[port_dest if port_dest in honeypot_ports.keys() else port_src],
                         machine_name
                     ),
                     honeypot_events_queue
