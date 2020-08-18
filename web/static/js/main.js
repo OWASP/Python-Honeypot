@@ -24,8 +24,11 @@ var chartColors = window.chartColors;
 var old_number_of_total_events;
 var new_number_of_total_events;
 
-var top_values = new Object();
+var week_dates_array = [];
 
+// Data to plot
+var top_values_to_plot = new Object();
+var date_wise_event_counts = new Object();
 /**
  * Function to get total event counts and set the Element value
  * @param {*} event_type 
@@ -54,35 +57,42 @@ function get_event_count(event_type, html_element_id){
  * @param {*} event_type 
  * @param {*} element 
  */
-function create_object_structure(event_type, element){
-    !(event_type in top_values) ? top_values[event_type] = new Object() : true;
-    !(element in top_values[event_type]) ? top_values[event_type][element] = new Object() : true;
-    !("keys" in top_values[event_type][element]) ? top_values[event_type][element].keys = [] : true;
-    !("values" in top_values[event_type][element]) ? top_values[event_type][element].values = [] : true;
-    !("colors" in top_values[event_type][element]) ? top_values[event_type][element].colors = [] : true;
+function create_top_values_to_plot_structure(event_type, element){
+    !(event_type in top_values_to_plot) ? top_values_to_plot[event_type] = new Object() : true;
+    !(element in top_values_to_plot[event_type]) ? top_values_to_plot[event_type][element] = new Object() : true;
+    !("keys" in top_values_to_plot[event_type][element]) ? top_values_to_plot[event_type][element].keys = [] : true;
+    !("values" in top_values_to_plot[event_type][element]) ? top_values_to_plot[event_type][element].values = [] : true;
+    !("colors" in top_values_to_plot[event_type][element]) ? top_values_to_plot[event_type][element].colors = [] : true;
 }
 
+
+/**
+ * Get top 10 element values in the given event type and plot them.
+ * @param {*} event_type 
+ * @param {*} element 
+ * @param {*} html_element_id 
+ */
 function get_top_ten_element_in_event(event_type, element, html_element_id){
     $.ajax({
         type: "GET",
         url: "/api/events/count/groupby/"+event_type.toLowerCase()+"/"+element.toLowerCase(),
         success: function(res,status,xhr){
-            create_object_structure(event_type, element);
+            create_top_values_to_plot_structure(event_type, element);
             for (var i = 0; i < res.length; i++) {
-                top_values[event_type][element].keys.push(
+                top_values_to_plot[event_type][element].keys.push(
                     res[i][Object.keys(res[i])[1]]
                 );
-                top_values[event_type][element].values.push(res[i][Object.keys(res[i])[0]]);
-                top_values[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
+                top_values_to_plot[event_type][element].values.push(res[i][Object.keys(res[i])[0]]);
+                top_values_to_plot[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
             }
             var top_ten_graph_config = {
                 data: {
                     datasets: [{
-                        data: top_values[event_type][element].values,
-                        backgroundColor: top_values[event_type][element].colors,
+                        data: top_values_to_plot[event_type][element].values,
+                        backgroundColor: top_values_to_plot[event_type][element].colors,
                         label: 'Top Ten '+element+'s - '+event_type
                     }],
-                    labels: top_values[event_type][element].keys
+                    labels: top_values_to_plot[event_type][element].keys
                 },
                 options: {
                     responsive: true,
@@ -120,13 +130,119 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
     });
 }
 
+/**
+ * Plot date wise data to the graph
+ * @param {*} event_type 
+ */
+function plot_event_count_by_date(event_type){
+
+    for (var counter = 0; counter < week_dates_array.length; counter++) {
+        $.ajax({
+            type: "GET",
+            url: "/api/events/count/"+event_type,
+            data: {
+                date: week_dates_array[counter]
+            },
+        }).done(function (res) {
+            date_wise_event_counts[event_type][res["date"].toString().split(" ")[0]] = res["count"];
+            var past_week_events_graph_config = {
+                type: 'line',
+                data: {
+                    labels: week_dates_array,
+                    datasets: [{
+                        label: 'All Events',
+                        backgroundColor: window.chartColors.red,
+                        borderColor: window.chartColors.red,
+                        data: [
+                            date_wise_event_counts.all[week_dates_array[0]],
+                            date_wise_event_counts.all[week_dates_array[1]],
+                            date_wise_event_counts.all[week_dates_array[2]],
+                            date_wise_event_counts.all[week_dates_array[3]],
+                            date_wise_event_counts.all[week_dates_array[4]],
+                            date_wise_event_counts.all[week_dates_array[5]],
+                            date_wise_event_counts.all[week_dates_array[6]]
+                        ],
+                        fill: false,
+                    }, {
+                        label: 'Honeypot Events',
+                        fill: false,
+                        backgroundColor: window.chartColors.blue,
+                        borderColor: window.chartColors.blue,
+                        data: [
+                            date_wise_event_counts.honeypot[week_dates_array[0]],
+                            date_wise_event_counts.honeypot[week_dates_array[1]],
+                            date_wise_event_counts.honeypot[week_dates_array[2]],
+                            date_wise_event_counts.honeypot[week_dates_array[3]],
+                            date_wise_event_counts.honeypot[week_dates_array[4]],
+                            date_wise_event_counts.honeypot[week_dates_array[5]],
+                            date_wise_event_counts.honeypot[week_dates_array[6]]
+                        ],
+                    }, {
+                        label: 'Network Events',
+                        fill: false,
+                        backgroundColor: window.chartColors.yellow,
+                        borderColor: window.chartColors.yellow,
+                        data: [
+                            date_wise_event_counts.network[week_dates_array[0]],
+                            date_wise_event_counts.network[week_dates_array[1]],
+                            date_wise_event_counts.network[week_dates_array[2]],
+                            date_wise_event_counts.network[week_dates_array[3]],
+                            date_wise_event_counts.network[week_dates_array[4]],
+                            date_wise_event_counts.network[week_dates_array[5]],
+                            date_wise_event_counts.network[week_dates_array[6]]
+                        ],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'OHP Events'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Past Week Events Graph (update 30 seconds)'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Events Number'
+                            }
+                        }]
+                    }
+                }
+            };
+
+            // hide blink message
+            document.getElementById("blink_loading_graph").hidden = true;
+
+            // place the graph in canvas
+            var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
+            window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+            if (errorThrown == "BAD REQUEST") {
+            }
+            if (errorThrown == "UNAUTHORIZED") {
+            }
+        });
+    }
+}
+
 function load_graphs() {
-    // generate past week ago dates (e.g. 2018-07-16)
-    var dates_network_events_json = {};
-    var dates_honeypot_events_json = {};
-    var dates_all_events_json = {};
-
-
     // get number of all events
     total_number_of_events =  get_event_count("all", "count_all_events");
 
@@ -134,7 +250,7 @@ function load_graphs() {
     setTimeout(function () {
         // if events number updated or its first time to load the graph
         if (old_number_of_total_events != new_number_of_total_events) {
-            var week_dates_array = [];
+            week_dates_array = [];
             // generate days (7 days ago until now)
             for (var days = 6; days >= 0; days--) {
                 var date = new Date();
@@ -158,318 +274,15 @@ function load_graphs() {
             // request top ten ports in network events
             get_top_ten_element_in_event("Network", "Port", "top_ten_ports_in_network_events_graph");
             // 7 days ago config
+            !("all" in date_wise_event_counts) ? date_wise_event_counts.all = new Object() : true;
+            !("honeypot" in date_wise_event_counts) ? date_wise_event_counts.honeypot = new Object() : true;
+            !("network" in date_wise_event_counts) ? date_wise_event_counts.network = new Object() : true;
             // request all events number by date for past week
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count/all?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    dates_all_events_json[res["date"].toString().split(" ")[0]] = res["count"];
-
-                    var past_week_events_graph_config = {
-                        type: 'line',
-                        data: {
-                            labels: week_dates_array,
-                            datasets: [{
-                                label: 'All Events',
-                                backgroundColor: window.chartColors.red,
-                                borderColor: window.chartColors.red,
-                                data: [
-                                    dates_all_events_json[week_dates_array[0]],
-                                    dates_all_events_json[week_dates_array[1]],
-                                    dates_all_events_json[week_dates_array[2]],
-                                    dates_all_events_json[week_dates_array[3]],
-                                    dates_all_events_json[week_dates_array[4]],
-                                    dates_all_events_json[week_dates_array[5]],
-                                    dates_all_events_json[week_dates_array[6]]
-                                ],
-                                fill: false,
-                            }, {
-                                label: 'Honeypot Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.blue,
-                                borderColor: window.chartColors.blue,
-                                data: [
-                                    dates_honeypot_events_json[week_dates_array[0]],
-                                    dates_honeypot_events_json[week_dates_array[1]],
-                                    dates_honeypot_events_json[week_dates_array[2]],
-                                    dates_honeypot_events_json[week_dates_array[3]],
-                                    dates_honeypot_events_json[week_dates_array[4]],
-                                    dates_honeypot_events_json[week_dates_array[5]],
-                                    dates_honeypot_events_json[week_dates_array[6]]
-                                ],
-                            }, {
-                                label: 'Network Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.yellow,
-                                borderColor: window.chartColors.yellow,
-                                data: [
-                                    dates_network_events_json[week_dates_array[0]],
-                                    dates_network_events_json[week_dates_array[1]],
-                                    dates_network_events_json[week_dates_array[2]],
-                                    dates_network_events_json[week_dates_array[3]],
-                                    dates_network_events_json[week_dates_array[4]],
-                                    dates_network_events_json[week_dates_array[5]],
-                                    dates_network_events_json[week_dates_array[6]]
-                                ],
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            title: {
-                                display: true,
-                                text: 'OHP Events'
-                            },
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            hover: {
-                                mode: 'nearest',
-                                intersect: true
-                            },
-                            scales: {
-                                xAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Past Week Events Graph (update 30 seconds)'
-                                    }
-                                }],
-                                yAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Events Number'
-                                    }
-                                }]
-                            }
-                        }
-                    };
-
-                    // hide blink message
-                    document.getElementById("blink_loading_graph").hidden = true;
-
-                    // place the graph in canvas
-                    var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
-                    window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
-
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
-
+            plot_event_count_by_date("all");
             // request network events number by date for past week
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count/network?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    dates_network_events_json[res["date"].toString().split(" ")[0]] = res["count"];
-                    var past_week_events_graph_config = {
-                        type: 'line',
-                        data: {
-                            labels: week_dates_array,
-                            datasets: [{
-                                label: 'All Events',
-                                backgroundColor: window.chartColors.red,
-                                borderColor: window.chartColors.red,
-                                data: [
-                                    dates_all_events_json[week_dates_array[0]],
-                                    dates_all_events_json[week_dates_array[1]],
-                                    dates_all_events_json[week_dates_array[2]],
-                                    dates_all_events_json[week_dates_array[3]],
-                                    dates_all_events_json[week_dates_array[4]],
-                                    dates_all_events_json[week_dates_array[5]],
-                                    dates_all_events_json[week_dates_array[6]]
-                                ],
-                                fill: false,
-                            }, {
-                                label: 'Honeypot Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.blue,
-                                borderColor: window.chartColors.blue,
-                                data: [
-                                    dates_honeypot_events_json[week_dates_array[0]],
-                                    dates_honeypot_events_json[week_dates_array[1]],
-                                    dates_honeypot_events_json[week_dates_array[2]],
-                                    dates_honeypot_events_json[week_dates_array[3]],
-                                    dates_honeypot_events_json[week_dates_array[4]],
-                                    dates_honeypot_events_json[week_dates_array[5]],
-                                    dates_honeypot_events_json[week_dates_array[6]]
-                                ],
-                            }, {
-                                label: 'Network Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.yellow,
-                                borderColor: window.chartColors.yellow,
-                                data: [
-                                    dates_network_events_json[week_dates_array[0]],
-                                    dates_network_events_json[week_dates_array[1]],
-                                    dates_network_events_json[week_dates_array[2]],
-                                    dates_network_events_json[week_dates_array[3]],
-                                    dates_network_events_json[week_dates_array[4]],
-                                    dates_network_events_json[week_dates_array[5]],
-                                    dates_network_events_json[week_dates_array[6]]
-                                ],
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            title: {
-                                display: true,
-                                text: 'OHP Events'
-                            },
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            hover: {
-                                mode: 'nearest',
-                                intersect: true
-                            },
-                            scales: {
-                                xAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Past Week Events Graph (update 30 seconds)'
-                                    }
-                                }],
-                                yAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Events Number'
-                                    }
-                                }]
-                            }
-                        }
-                    };
-
-                    // hide blink message
-                    document.getElementById("blink_loading_graph").hidden = true;
-
-                    // place the graph in canvas
-                    var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
-                    window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
-
+            plot_event_count_by_date("network");
             // request honeypot events number by date for past week
-            for (var counter = 0; counter < week_dates_array.length; counter++) {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/api/events/count/honeypot?date=" + week_dates_array[counter],
-                }).done(function (res) {
-                    dates_honeypot_events_json[res["date"].toString().split(" ")[0]] = res["count"];
-                    var past_week_events_graph_config = {
-                        type: 'line',
-                        data: {
-                            labels: week_dates_array,
-                            datasets: [{
-                                label: 'All Events',
-                                backgroundColor: window.chartColors.red,
-                                borderColor: window.chartColors.red,
-                                data: [
-                                    dates_all_events_json[week_dates_array[0]],
-                                    dates_all_events_json[week_dates_array[1]],
-                                    dates_all_events_json[week_dates_array[2]],
-                                    dates_all_events_json[week_dates_array[3]],
-                                    dates_all_events_json[week_dates_array[4]],
-                                    dates_all_events_json[week_dates_array[5]],
-                                    dates_all_events_json[week_dates_array[6]]
-                                ],
-                                fill: false,
-                            }, {
-                                label: 'Honeypot Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.blue,
-                                borderColor: window.chartColors.blue,
-                                data: [
-                                    dates_honeypot_events_json[week_dates_array[0]],
-                                    dates_honeypot_events_json[week_dates_array[1]],
-                                    dates_honeypot_events_json[week_dates_array[2]],
-                                    dates_honeypot_events_json[week_dates_array[3]],
-                                    dates_honeypot_events_json[week_dates_array[4]],
-                                    dates_honeypot_events_json[week_dates_array[5]],
-                                    dates_honeypot_events_json[week_dates_array[6]]
-                                ],
-                            }, {
-                                label: 'Network Events',
-                                fill: false,
-                                backgroundColor: window.chartColors.yellow,
-                                borderColor: window.chartColors.yellow,
-                                data: [
-                                    dates_network_events_json[week_dates_array[0]],
-                                    dates_network_events_json[week_dates_array[1]],
-                                    dates_network_events_json[week_dates_array[2]],
-                                    dates_network_events_json[week_dates_array[3]],
-                                    dates_network_events_json[week_dates_array[4]],
-                                    dates_network_events_json[week_dates_array[5]],
-                                    dates_network_events_json[week_dates_array[6]]
-                                ],
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            title: {
-                                display: true,
-                                text: 'OHP Events'
-                            },
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            },
-                            hover: {
-                                mode: 'nearest',
-                                intersect: true
-                            },
-                            scales: {
-                                xAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Past Week Events Graph (update 30 seconds)'
-                                    }
-                                }],
-                                yAxes: [{
-                                    display: true,
-                                    scaleLabel: {
-                                        display: true,
-                                        labelString: 'Events Number'
-                                    }
-                                }]
-                            }
-                        }
-                    };
-
-                    // hide blink message
-                    document.getElementById("blink_loading_graph").hidden = true;
-
-                    // place the graph in canvas
-                    var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
-                    window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-                    if (errorThrown == "BAD REQUEST") {
-                    }
-                    if (errorThrown == "UNAUTHORIZED") {
-                    }
-                });
-            }
+            plot_event_count_by_date("honeypot");
 
 
         }
