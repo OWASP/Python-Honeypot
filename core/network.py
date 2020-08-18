@@ -226,6 +226,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         except get_timeout_error():
             # Catches the timeout error thrown by apply_on_packets
+            time.sleep(1)
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
