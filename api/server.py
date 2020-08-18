@@ -369,9 +369,12 @@ def download_file():
     Download PCAP files
     """
     try:
+        md5_value = get_value_from_request("md5")
+        abort(404) if not md5_value else md5_value
+
         fs = connector.ohp_file_archive_gridfs.find_one(
             {
-                "md5": get_value_from_request("md5")
+                "md5": md5_value
             },
             allowDiskUse=True
         )
