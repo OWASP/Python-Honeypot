@@ -257,14 +257,16 @@ def count_events(event_type):
                         event_types[event_type].count_documents(
                             {
                                 **filter_by_date(date)
-                            }
+                            },
+                            allowDiskUse=True
                         ) if date else event_types[event_type].estimated_document_count() for event_type in event_types
                     ]
                 ) if event_type == "all" else int(
                     event_types[event_type].count_documents(
                         {
                             **filter_by_date(date)
-                        }
+                        },
+                        allowDiskUse=True
                     ) if date else event_types[event_type].estimated_document_count()
                 ),
                 "date": date
@@ -345,7 +347,8 @@ def get_events_data(event_type):
                     query,
                     {
                         "_id": 0
-                    }
+                    },
+                    allowDiskUse=True
                 ).skip(
                     fix_skip(
                         get_value_from_request("skip")
@@ -370,7 +373,8 @@ def download_file():
         fs = connector.ohp_file_archive_gridfs.find_one(
             {
                 "md5": get_value_from_request("md5")
-            }
+            },
+            allowDiskUse=True
         )
 
         return send_file(

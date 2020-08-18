@@ -202,6 +202,7 @@ def aggregate_function(data_connection, agr_query):
     """
     return list(
         data_connection.aggregate(
-            agr_query
+            agr_query,
+            allowDiskUse=True
         )
     )
