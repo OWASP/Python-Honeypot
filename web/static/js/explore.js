@@ -6,21 +6,23 @@ function load_module_options() {
     type: "GET",
     url: "/api/core/list/modules",
     data: {},
-  }).done(function (res) {
-    var tableHtml = '<option value=\"\"> All Modules </option>';
-    for (var i = 0; i < res.length; i++) {
-      var module_name = res[i];
-      tableHtml += "<option value=" +
-        module_name + ">"
-        + module_name
-        + "</option>";
-    }
-    $('#module_names').html(tableHtml);
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-    if (errorThrown == "BAD REQUEST") {
-    }
-    if (errorThrown == "UNAUTHORIZED") {
+    success: function(result,status,xhr){
+      var tableHtml = '<option value=\"\"> All Modules </option>';
+      for (var i = 0; i < result.length; i++) {
+        var module_name = result[i];
+        tableHtml += "<option value=" +
+          module_name + ">"
+          + module_name
+          + "</option>";
+      }
+      $('#module_names').html(tableHtml);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+      if (errorThrown == "BAD REQUEST") {
+      }
+      if (errorThrown == "UNAUTHORIZED") {
+      }
     }
   });
 }
@@ -257,7 +259,6 @@ function load_data(api_endpoint, search_parameters) {
   }
   var columns = [];
   var limit = 1000;
-  console.log(api_endpoint);
 
   if (search_parameters.datatable_id == "#log-datatable") {
     // Define table columns based on selected event type

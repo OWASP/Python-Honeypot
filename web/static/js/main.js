@@ -76,13 +76,13 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
     $.ajax({
         type: "GET",
         url: "/api/events/count/groupby/"+event_type.toLowerCase()+"/"+element.toLowerCase(),
-        success: function(res,status,xhr){
+        success: function(result,status,xhr){
             create_top_values_to_plot_structure(event_type, element);
-            for (var i = 0; i < res.length; i++) {
+            for (var i = 0; i < result.length; i++) {
                 top_values_to_plot[event_type][element].keys.push(
-                    res[i][Object.keys(res[i])[1]]
+                    result[i][Object.keys(result[i])[1]]
                 );
-                top_values_to_plot[event_type][element].values.push(res[i][Object.keys(res[i])[0]]);
+                top_values_to_plot[event_type][element].values.push(result[i][Object.keys(result[i])[0]]);
                 top_values_to_plot[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
             }
             var top_ten_graph_config = {
@@ -143,100 +143,102 @@ function plot_event_count_by_date(event_type){
             data: {
                 date: week_dates_array[counter]
             },
-        }).done(function (res) {
-            date_wise_event_counts[event_type][res["date"].toString().split(" ")[0]] = res["count"];
-            var past_week_events_graph_config = {
-                type: 'line',
-                data: {
-                    labels: week_dates_array,
-                    datasets: [{
-                        label: 'All Events',
-                        backgroundColor: window.chartColors.red,
-                        borderColor: window.chartColors.red,
-                        data: [
-                            date_wise_event_counts.all[week_dates_array[0]],
-                            date_wise_event_counts.all[week_dates_array[1]],
-                            date_wise_event_counts.all[week_dates_array[2]],
-                            date_wise_event_counts.all[week_dates_array[3]],
-                            date_wise_event_counts.all[week_dates_array[4]],
-                            date_wise_event_counts.all[week_dates_array[5]],
-                            date_wise_event_counts.all[week_dates_array[6]]
-                        ],
-                        fill: false,
-                    }, {
-                        label: 'Honeypot Events',
-                        fill: false,
-                        backgroundColor: window.chartColors.blue,
-                        borderColor: window.chartColors.blue,
-                        data: [
-                            date_wise_event_counts.honeypot[week_dates_array[0]],
-                            date_wise_event_counts.honeypot[week_dates_array[1]],
-                            date_wise_event_counts.honeypot[week_dates_array[2]],
-                            date_wise_event_counts.honeypot[week_dates_array[3]],
-                            date_wise_event_counts.honeypot[week_dates_array[4]],
-                            date_wise_event_counts.honeypot[week_dates_array[5]],
-                            date_wise_event_counts.honeypot[week_dates_array[6]]
-                        ],
-                    }, {
-                        label: 'Network Events',
-                        fill: false,
-                        backgroundColor: window.chartColors.yellow,
-                        borderColor: window.chartColors.yellow,
-                        data: [
-                            date_wise_event_counts.network[week_dates_array[0]],
-                            date_wise_event_counts.network[week_dates_array[1]],
-                            date_wise_event_counts.network[week_dates_array[2]],
-                            date_wise_event_counts.network[week_dates_array[3]],
-                            date_wise_event_counts.network[week_dates_array[4]],
-                            date_wise_event_counts.network[week_dates_array[5]],
-                            date_wise_event_counts.network[week_dates_array[6]]
-                        ],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: 'OHP Events'
-                    },
-                    tooltips: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    hover: {
-                        mode: 'nearest',
-                        intersect: true
-                    },
-                    scales: {
-                        xAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Past Week Events Graph (update 30 seconds)'
-                            }
-                        }],
-                        yAxes: [{
-                            display: true,
-                            scaleLabel: {
-                                display: true,
-                                labelString: 'Events Number'
-                            }
+            success: function(result,status,xhr){
+                date_wise_event_counts[event_type][result["date"].toString().split(" ")[0]] = result["count"];
+                var past_week_events_graph_config = {
+                    type: 'line',
+                    data: {
+                        labels: week_dates_array,
+                        datasets: [{
+                            label: 'All Events',
+                            backgroundColor: window.chartColors.red,
+                            borderColor: window.chartColors.red,
+                            data: [
+                                date_wise_event_counts.all[week_dates_array[0]],
+                                date_wise_event_counts.all[week_dates_array[1]],
+                                date_wise_event_counts.all[week_dates_array[2]],
+                                date_wise_event_counts.all[week_dates_array[3]],
+                                date_wise_event_counts.all[week_dates_array[4]],
+                                date_wise_event_counts.all[week_dates_array[5]],
+                                date_wise_event_counts.all[week_dates_array[6]]
+                            ],
+                            fill: false,
+                        }, {
+                            label: 'Honeypot Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.blue,
+                            borderColor: window.chartColors.blue,
+                            data: [
+                                date_wise_event_counts.honeypot[week_dates_array[0]],
+                                date_wise_event_counts.honeypot[week_dates_array[1]],
+                                date_wise_event_counts.honeypot[week_dates_array[2]],
+                                date_wise_event_counts.honeypot[week_dates_array[3]],
+                                date_wise_event_counts.honeypot[week_dates_array[4]],
+                                date_wise_event_counts.honeypot[week_dates_array[5]],
+                                date_wise_event_counts.honeypot[week_dates_array[6]]
+                            ],
+                        }, {
+                            label: 'Network Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.yellow,
+                            borderColor: window.chartColors.yellow,
+                            data: [
+                                date_wise_event_counts.network[week_dates_array[0]],
+                                date_wise_event_counts.network[week_dates_array[1]],
+                                date_wise_event_counts.network[week_dates_array[2]],
+                                date_wise_event_counts.network[week_dates_array[3]],
+                                date_wise_event_counts.network[week_dates_array[4]],
+                                date_wise_event_counts.network[week_dates_array[5]],
+                                date_wise_event_counts.network[week_dates_array[6]]
+                            ],
                         }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true,
+                            text: 'OHP Events'
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Past Week Events Graph (update 30 seconds)'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Events Number'
+                                }
+                            }]
+                        }
                     }
+                };
+
+                // hide blink message
+                document.getElementById("blink_loading_graph").hidden = true;
+
+                // place the graph in canvas
+                var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
+                window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                document.getElementById('error_msg').innerHTML = jqXHR.responseText;
+                if (errorThrown == "BAD REQUEST") {
                 }
-            };
-
-            // hide blink message
-            document.getElementById("blink_loading_graph").hidden = true;
-
-            // place the graph in canvas
-            var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
-            window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            document.getElementById('error_msg').innerHTML = jqXHR.responseText;
-            if (errorThrown == "BAD REQUEST") {
-            }
-            if (errorThrown == "UNAUTHORIZED") {
+                if (errorThrown == "UNAUTHORIZED") {
+                }
             }
         });
     }
