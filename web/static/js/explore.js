@@ -181,13 +181,11 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
         "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
       buttons:[
         {
+          extend: 'selectedSingle',
           text: "Download",
           className: "btn btn-info btn-sm",
           action: function(event, data, node, config){
             var selected_row_data =  table.rows({ selected: true }).data();
-
-            // Check if a row is selected
-            if(selected_row_data[0]) {
               download_api_params = {
                 "md5": selected_row_data[0]["md5"]
               }
@@ -216,8 +214,6 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
                   }
                 }
               });
-
-            }
           }
         }
       ],
