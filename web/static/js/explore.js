@@ -35,6 +35,8 @@ function get_export_fileName(file_type) {
   return 'Honeypot-data-' + file_type + '-' + n;
 }
 
+
+// Delete datatable
 function clear_table(){
   if ($.fn.dataTable.isDataTable("#datatable")) {
     $("#datatable").DataTable().clear().destroy();
@@ -131,6 +133,8 @@ function get_event_data(api_endpoint, column_list, api_params) {
       sort: true,
       info: true,
       paging: true,
+      serverSide: true,
+      processing: true,
       oLanguage: {
         sStripClasses: "",
         sSearch: "",
@@ -174,7 +178,49 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
-        "<'row'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
+        "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
+      buttons:[
+        {
+          text: "Download",
+          className: "btn btn-info btn-sm",
+          action: function(event, data, node, config){
+            var selected_row_data =  table.rows({ selected: true }).data();
+
+            // Check if a row is selected
+            if(selected_row_data[0]) {
+              download_api_params = {
+                "md5": selected_row_data[0]["md5"]
+              }
+        
+              // Call the download-file API endpoint with the file ID
+              $.ajax({
+                type: "GET",
+                url: "/api/pcap/download",
+                data: download_api_params,
+                xhrFields:{
+                  responseType: "arraybuffer"
+                },
+                success: function(result,status,xhr){
+                  var blob = new Blob([result],
+                    {
+                      type: xhr.getResponseHeader('Content-Type')
+                    });
+                  download(xhr, blob);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  if (errorThrown == "BAD REQUEST") {
+                    alert(jqXHR.responseText)
+                  }
+                  if (errorThrown == "UNAUTHORIZED") {
+                    alert(jqXHR.responseText)
+                  }
+                }
+              });
+
+            }
+          }
+        }
+      ],
       columns: column_list,
       columnDefs: [
         {
@@ -213,47 +259,7 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
       },
       searching: true,
       responsive: true
-    });
-    // Make the download button visible.
-    document.getElementById("download-file-btn").hidden = false;
-    
-    // On click function for the download button
-    $("#download-file-btn").on('click', function(e){
-      var selected_row_data =  table.rows({ selected: true }).data();
-      // Check if a row is selected
-      if(selected_row_data[0]) {
-        download_api_params = {
-          "md5": selected_row_data[0]["md5"]
-        }
-  
-        // Call the download-file API endpoint with the file ID
-        $.ajax({
-          type: "GET",
-          url: "/api/pcap/download",
-          data: download_api_params,
-          xhrFields:{
-            responseType: "arraybuffer"
-          },
-          success: function(result,status,xhr){
-            var blob = new Blob([result],
-              {
-                type: xhr.getResponseHeader('Content-Type')
-              });
-            download(xhr, blob);
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            if (errorThrown == "BAD REQUEST") {
-              alert(jqXHR.responseText)
-            }
-            if (errorThrown == "UNAUTHORIZED") {
-              alert(jqXHR.responseText)
-            }
-          }
-        });
-
-      }
-     
-    });
+    });  
   });
 }
 
@@ -409,7 +415,6 @@ function change_form() {
     document.getElementById("module_names").selectedIndex = 0;
     document.getElementById("module_names").disabled = true;
   }
-  document.getElementById("download-file-btn").hidden = (event_type == "pcap") ? false : true;
 }
 
 /**
