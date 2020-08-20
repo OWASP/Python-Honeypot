@@ -128,6 +128,136 @@ Add a title and description to your pull request that explains your precious eff
 Sit and relax till we review your PR, you've made your contribution to our project.
 
 
+## Database Explained
+
+OWASP Python Honeypot Project currently uses MongoDB to store the data in the server where the OWASP Honeypot is running. That means the server where OWASP Honeypot is running should have MongoDB installed.
+
+Running the honeypot modules would result in the creation of two databases-
+- `ohp_events`: for storing event data
+- `ohp_file_archive`: for storing network captured files
+
+### OHP Events
+
+The following collections would be created in the database `ohp_events`:
+#### Honeypot Events
+
+There is Honeypot events queue which is being maintained for inserting all the honeypot events in the bulk insert as each bulk insert is faster than instantiating insert for each of the records.
+The format of the data inserted is:
+```
+{
+    "_id" : ObjectId("5d095f03ccda7442f6be6af7"),
+    "ip" : "192.168.0.102",
+    "port" : 80,
+    "module_name" : "http/basic_auth_weak_password",
+    "date" : "2019-06-19 00:00:35",
+    "machine_name" : "stockholm_server_1",
+    "country" : "DE",
+    "event_type" : "honeypot_event"
+}
+```
+
+#### Network Events
+
+All the network events data is separated from the honeypot events as they are not harmful to the server running.
+Network events can also be used for analysis and hence they are stored in a separate table.
+The format of data in the network events collection is:
+```
+{
+    "_id" : ObjectId("5cd155104b23fe10ea88f97e"),
+    "ip" : "54.192.202.206",
+    "port" : 38548,
+    "date" : "2019-05-07 11:51:12",
+    "machine_name" : "stockholm_server_1",
+    "country" : "DE"
+}
+
+```
+
+#### Credential Events
+
+There is a special type of event which stores credentials that are obtained from the modules like ssh/strong_password, ftp/strong_password,  http/basic_auth_strong_password and smtp/strong_password.
+The format of data in the credential events collection is:
+```
+{
+    "_id" : ObjectId("5d504507cb1355b3e3ed7e28"),
+    "ip" : "172.18.0.1",
+    "module_name" : "1",
+    "date" : "22",
+    "username" : "http/basic_auth_strong_password",
+    "password" : "2019-07-24 09:37:40",
+    "country" : "DE",
+    "machine_name" : "stockholm_server_1"
+}
+```
+
+#### File Change Events
+
+These are different type of events which is keeping track of the file path, modified by the hacker on the system as it is very easy to get into the system for weak password modules. Hence the file change events are integrated into modules like ssh/weak_password and ftp/weak_password.
+The format of data in file change events collection is:
+```
+{
+    "_id" : ObjectId("5f18c1c3803c26c76f3c11bd"),
+    "file_path" : "/root/OWASP-Honeypot/tmp/ohp_ssh_weak_container/.bash_history",
+    "module_name" : "ssh/weak_password",
+    "date" : "2020-07-23 00:46:27",
+    "status" : "modified",
+    "machine_name" : "stockholm_server_1",
+    "is_directory" : False
+}
+```
+
+#### Data Events
+These are the events used to store data collected from modules like _smtp_ and _ics_.
+The format of data in the data events collection is:
+```
+{
+    "_id" : ObjectId("5f0904cda26d3357a820d564"),
+    "ip_dest": "172.18.0.1",
+    "module_name": "smtp/mail_honeypot",
+    "date": "2020-07-11 00:16:13",
+    "data": "helo client.mydomain.com",
+    "country": "-",
+    "machine_name": "stockholm_server_1"
+}
+```
+
+### OHP File Archive
+
+The file archive database is used to store the network captured files using the __GridFS__ tool. GridFS is a specification for storing and retrieving large files (exceeding 16 MB). It uses two collections to store a single file:
+- `fs.files`: stores file metadata
+- `fs.chunks`: stores binary chunks of the file
+
+#### Files collection
+
+The format of the data stored here is:
+
+```
+{
+  "_id": ObjectId("5f3453140c86f676b155b473"),
+  "filename": "captured-traffic-1597264650.pcap",
+  "date": "2020-08-12 22:37:30",
+  "splitTimeout": 10,
+  "md5": "c3c8dd5dc29f5ddcef552b6d3d8e2ce3",
+  "chunkSize": 261120,
+  "length": 16384,
+  "uploadDate": "2020-08-12T20:37:40.757+00:00"
+}
+```
+
+
+#### Chunks collection
+
+The format of the data is:
+```
+{
+  "_id" : ObjectId("5f33bab2e938f7803705a6c8"),
+  "files_id" : ObjectId("5f33bab2e938f7803705a6c7"),
+  "n" : 0,
+  "data" : Binary('Cg0NCrQAAABNPCsaAQAAAP//////////AgA2AEludGVsKFIpIENvcmUoVE0pIGk3LTk3NTBIIENQVSBAIDIuNjBHSHogKHdpdGgg...', 0)
+}
+```
+
+
 ## Adding a Module
 
 OWASP Python Honeypot currently supports multiple types of protocols with different types and modules for various purposes like getting credentials, network events, files, honeypot events, and custom data coming from each module.
