@@ -278,7 +278,8 @@ function get_event_data(api_endpoint, column_list, api_params) {
           '<option value="30">30</option>' +
           '<option value="40">40</option>' +
           '<option value="50">50</option>' +
-          '<option value="-1">All</option>' +
+          '<option value="100">100</option>' +
+          '<option value="500">500</option>' +
           '</select></div>'
       },
       searching: true,
@@ -389,7 +390,8 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
           '<option value="30">30</option>' +
           '<option value="40">40</option>' +
           '<option value="50">50</option>' +
-          '<option value="-1">All</option>' +
+          '<option value="100">100</option>' +
+          '<option value="500">500</option>' +
           '</select></div>'
       },
       searching: true,
