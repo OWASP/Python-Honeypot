@@ -340,7 +340,11 @@ def get_events_data(event_type):
         query = filter_by_date(date) if date else {}
         query.update(filter_by_module_name(module_name) if module_name else {})
 
-        return jsonify(
+        return jsonify({
+            "total": event_types[event_type].count(
+                    query
+                ),
+            "data":
             [
                 i for i in
                 event_types[event_type].find(
@@ -358,7 +362,7 @@ def get_events_data(event_type):
                     )
                 )
             ]
-        ), 200
+        }), 200
     except Exception:
         abort(500)
 

@@ -92,6 +92,133 @@ function download(xhr, blob) {
   }
 }
 
+//
+// Pipelining function for DataTables. To be used to the `ajax` option of DataTables
+//
+$.fn.dataTable.pipeline = function ( opts ) {
+  // Configuration options
+  var conf = $.extend( {
+      contentType: null,
+      pages: 5,     // number of pages to cache
+      url: '',      // script url
+      data: null,   // function or object with parameters to send to the server
+                    // matching how `ajax.data` works in DataTables
+      dataSrc: null,
+      method: 'GET' // Ajax HTTP method
+  }, opts );
+  // Private variables for storing the cache
+  var cacheLower = -1;
+  var cacheUpper = null;
+  var cacheLastRequest = null;
+  var cacheLastJson = null;
+
+  return function ( request, drawCallback, settings ) {
+      var ajax          = false;
+      var requestStart  = request.start;
+      var drawStart     = request.start;
+      var requestLength = request.length;
+      var requestEnd    = requestStart + requestLength;
+      console.log(request);
+       
+      if ( settings.clearCache ) {
+          // API requested that the cache be cleared
+          ajax = true;
+          settings.clearCache = false;
+      }
+      else if ( cacheLower < 0 || requestStart < cacheLower || requestEnd > cacheUpper ) {
+          // outside cached data - need to make a request
+          ajax = true;
+      }
+      else if ( JSON.stringify( request.order )   !== JSON.stringify( cacheLastRequest.order ) ||
+                JSON.stringify( request.columns ) !== JSON.stringify( cacheLastRequest.columns ) ||
+                JSON.stringify( request.search )  !== JSON.stringify( cacheLastRequest.search )
+      ) {
+          // properties changed (ordering, columns, searching)
+          ajax = true;
+      }
+       
+      // Store the request for checking next time around
+      cacheLastRequest = $.extend( true, {}, request );
+
+      if ( ajax ) {
+          // Need data from the server
+          if ( requestStart < cacheLower ) {
+              requestStart = requestStart - (requestLength*(conf.pages-1));
+
+              if ( requestStart < 0 ) {
+                  requestStart = 0;
+              }
+          }
+           
+          cacheLower = requestStart;
+          cacheUpper = requestStart + (requestLength * conf.pages);
+
+          request.start = requestStart;
+          request.length = requestLength*conf.pages;
+          conf.data.skip = requestStart;
+          conf.data.limit = request.length;
+
+          // Provide the same `data` options as DataTables.
+          if ( typeof conf.data === 'function' ) {
+              // As a function it is executed with the data object as an arg
+              // for manipulation. If an object is returned, it is used as the
+              // data object to submit
+              var d = conf.data( request );
+              if ( d ) {
+                  $.extend( request, d );
+              }
+          }
+          else if ( $.isPlainObject( conf.data ) ) {
+              // As an object, the data given extends the default
+              $.extend( request, conf.data );
+          }
+
+          return $.ajax( {
+              "type":     conf.method,
+              "url":      conf.url,
+              "contentType": conf.contentType,
+              "data":     conf.data,
+              "dataType": "json",
+              "cache":    false,
+              "dataFilter": function(data){
+                var json = jQuery.parseJSON( data );
+                json.recordsTotal = json.total;
+                json.recordsFiltered = json.total;
+                console.log(json);
+                return JSON.stringify( json );
+              },
+              "success":  function ( json ) {
+                  cacheLastJson = $.extend(true, {}, json);
+
+                  if ( cacheLower != drawStart ) {
+                      json.data.splice( 0, drawStart-cacheLower );
+                  }
+                  if ( requestLength >= -1 ) {
+                      json.data.splice( requestLength, json.data.length );
+                  }
+                   
+                  drawCallback( json );
+              }
+          } );
+      }
+      else {
+          json = $.extend( true, {}, cacheLastJson );
+          json.draw = request.draw; // Update the echo for each response
+          json.data.splice( 0, requestStart-cacheLower );
+          json.data.splice( requestLength, json.data.length );
+
+          drawCallback(json);
+      }
+  }
+};
+
+// Register an API method that will empty the pipelined data, forcing an Ajax
+// fetch on the next draw (i.e. `table.clearPipeline().draw()`)
+$.fn.dataTable.Api.register( 'clearPipeline()', function () {
+  return this.iterator( 'table', function ( settings ) {
+      settings.clearCache = true;
+  } );
+} );
 
 /**
  * Call the API to get event data from the database
@@ -103,14 +230,15 @@ function get_event_data(api_endpoint, column_list, api_params) {
   
   $(document).ready(function () {
     var table = $("#datatable").DataTable({
-      ajax: {
+      ajax: $.fn.dataTable.pipeline({
+        pages: 10,
         type: "GET",
         url: api_endpoint,
         contentType: 'application/json; charset=utf-8',
         data: api_params,
         dataType: "json",
-        dataSrc: ""
-      },
+        dataSrc: "data"
+      }),
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
@@ -135,6 +263,10 @@ function get_event_data(api_endpoint, column_list, api_params) {
       paging: true,
       serverSide: true,
       processing: true,
+      language:{
+          loadingRecords: '&nbsp;',
+          processing: '<div class="spinner">Loading...</div>'
+      },
       oLanguage: {
         sStripClasses: "",
         sSearch: "",
@@ -270,13 +402,10 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
 function load_data(api_endpoint, api_params) {
   clear_table();
   var columns = [];
-  var limit = 1000;
   if (api_params.module_name == "") {
     delete api_params.module_name;
   }
 
-  // Set API call parameters, delete datatable ID as it is not required in API call
-  api_params.limit = limit;
   // Define table columns based on selected event type
   if (api_params.event_type == "honeypot") {
     columns = [
