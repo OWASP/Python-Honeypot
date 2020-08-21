@@ -94,6 +94,8 @@ function download(xhr, blob) {
 
 //
 // Pipelining function for DataTables. To be used to the `ajax` option of DataTables
+// Pipelining data to reduce Ajax calls for paging:
+// https://datatables.net/examples/server_side/pipeline.html
 //
 $.fn.dataTable.pipeline = function ( opts ) {
   // Configuration options
@@ -118,7 +120,6 @@ $.fn.dataTable.pipeline = function ( opts ) {
       var drawStart     = request.start;
       var requestLength = request.length;
       var requestEnd    = requestStart + requestLength;
-      console.log(request);
        
       if ( settings.clearCache ) {
           // API requested that the cache be cleared
@@ -184,7 +185,6 @@ $.fn.dataTable.pipeline = function ( opts ) {
                 var json = jQuery.parseJSON( data );
                 json.recordsTotal = json.total;
                 json.recordsFiltered = json.total;
-                console.log(json);
                 return JSON.stringify( json );
               },
               "success":  function ( json ) {
@@ -299,14 +299,15 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
 
   $(document).ready(function () {
     var table = $("#datatable").DataTable({
-      ajax: {
+      ajax: $.fn.dataTable.pipeline({
+        pages: 5,
         type: "GET",
         url: api_endpoint,
         contentType: 'application/json; charset=utf-8',
         data: api_params,
         dataType: "json",
         dataSrc: ""
-      },
+      }),
       autoWidth: true,
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
@@ -371,6 +372,12 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
       sort: true,
       info: true,
       paging: true,
+      serverSide: true,
+      processing: true,
+      language:{
+          loadingRecords: '&nbsp;',
+          processing: '<div class="spinner">Loading...</div>'
+      },
       oLanguage: {
         sStripClasses: "",
         sSearch: "",
@@ -466,7 +473,6 @@ function load_data(api_endpoint, api_params) {
   }
 
   else if (api_params.event_type == "pcap") {
-
     columns = [
         { data: null, defaultContent: ''},
         { data: 'date', defaultContent: '', title: "Generation Time"},
@@ -475,7 +481,6 @@ function load_data(api_endpoint, api_params) {
         { data: 'length', defaultContent: '', title: "File Size"},
         { data: 'md5', defaultContent: '', title: "MD5"}
     ];
-    api_params.limit = limit;
     get_pcap_file_data(api_endpoint, columns, api_params);
 
   }
