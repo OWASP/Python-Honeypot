@@ -132,43 +132,17 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-12">
-            <div class="panel panel-default panel-table">
-                <div class="panel-heading">
-                    <div class="row">
-                        <!--                        <div class="col col-xs-6 text-right">-->
-                        <!--                            <button type="button" class="btn btn-sm btn-primary btn-create">Create New</button>-->
-                        <!--                        </div>-->
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <table id="explorer_table" class="table table-striped table-bordered table-list">
-                        <thead id="explorer_table_head">
-                        <tr>
-                            <th class="hidden-xs">Search to load...</th>
-                        </tr>
-                        </thead>
-                        <tbody id="explorer_table_body">
-                        </tbody>
-                    </table>
-
-                </div>
-                <div class="panel-footer text-right">
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button class="btn" id="explorer_next_page">«</button>
-                            <btn class="btn btn-primary" id="explorer_skip" value="0">1</btn>
-                            <btn class="btn btn-warning" id="explorer_pages_number" valiue="1">/12</btn>
-                            <button class="btn" id="explorer_previous_page" onclick="explorer_next_page();">»</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
     </div>
 </div>
 
+<div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden="true">
+    <div class="container">
+        <div class="card material-table">
+            <table id="datatable" class="table striped responsive" style="float:center">
+            </table>
+        </div>
+    </div>
+</div>
 
 <!-- end of analytics-->
 <div class="align-content-center text-center">
