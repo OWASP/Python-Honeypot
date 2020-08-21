@@ -93,7 +93,6 @@ function load_data(api_endpoint, api_params) {
   api_params.skip = explorer_skip;
 
   event_types = {
-    // todo; check the order
     "honeypot": ['date', 'ip_src', 'port_src', 'ip_dest', 'port_dest', 'protocol', 'module_name', 'machine_name', 'country_ip_src', 'country_ip_dest'],
     "network":  ['date', 'ip_src', 'port_src', 'ip_dest', 'port_dest', 'protocol', 'machine_name', 'country_ip_src', 'country_ip_dest'],
     "credential": ['date', 'ip', 'module_name', 'username', 'password', 'machine_name', 'country'],
