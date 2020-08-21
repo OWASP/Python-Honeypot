@@ -15,7 +15,7 @@ function updatePagesNumber(event_type){
     success: function(result,status,xhr){
       explorer_pages_number = result["count"];
       document.getElementById("explorer_pages_number").val = parseInt((explorer_pages_number/explorer_limit) - 1);
-      document.getElementById("explorer_pages_number").innerHTML =  parseInt((explorer_pages_number/explorer_limit) - 1);
+      document.getElementById("explorer_pages_number").innerHTML =  "/" + parseInt((explorer_pages_number/explorer_limit) - 1);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       document.getElementById('error_msg').innerHTML = jqXHR.responseText;
@@ -98,7 +98,7 @@ function load_data(api_endpoint, api_params) {
     "credential": ['date', 'ip', 'module_name', 'username', 'password', 'machine_name', 'country'],
     "data": ['date', 'ip', 'module_name', 'data', 'machine_name', 'country'],
     "file": ['date', 'module_name', 'file_path', 'status', 'machine_name', 'is_directory'],
-    "pcap": ['date', 'splitTimeout', 'filename', 'length', 'md5']
+    "pcap": ['chunkSize', 'date', 'filename', 'length', 'machine_name', 'md5', 'splitTimeout', 'uploadDate']
   }
 
   cols = ""
@@ -117,7 +117,10 @@ function load_data(api_endpoint, api_params) {
             for(col_data_res in result){
                 cols_data += "<tr>"
                 for(key in result[col_data_res]){
-                    cols_data += "<th>"+ result[col_data_res][key] +"</th>"
+                    // todo: fix here
+                    // if pcap and md5 then <td><a href="/api/pcap/download?md5=md5">download</a></td>
+                    cols_data += "<td>"+ result[col_data_res][key] +"</td>"
+
                 }
                 cols_data += "</tr>"
             }
@@ -195,6 +198,8 @@ function change_form() {
     document.getElementById("module_names").selectedIndex = 0;
     document.getElementById("module_names").disabled = true;
   }
+  explorer_skip = 0;
+  updatePagesNumber($("select[name='event_type'] option:selected").val());
 }
 
 /**
@@ -207,11 +212,23 @@ function get_layout(layout_type) {
 
 function explorer_next_page() {
     explorer_skip = explorer_skip + explorer_limit;
-    search_database();
+
 
     document.getElementById("explorer_skip").val =  parseInt((explorer_skip/explorer_limit) + 1);
     document.getElementById("explorer_skip").innerHTML =   parseInt((explorer_skip/explorer_limit) + 1);
     updatePagesNumber($("select[name='event_type'] option:selected").val());
+    search_database();
+}
+
+function explorer_previous_page() {
+    explorer_skip = explorer_skip - explorer_limit;
+
+    console.log(parseInt((explorer_skip/explorer_limit) + 1));
+
+    document.getElementById("explorer_skip").val =  parseInt((explorer_skip/explorer_limit) + 1);
+    document.getElementById("explorer_skip").innerHTML =  parseInt((explorer_skip/explorer_limit) + 1);
+    updatePagesNumber($("select[name='event_type'] option:selected").val());
+    search_database();
 
 }
 
