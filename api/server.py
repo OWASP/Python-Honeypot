@@ -340,26 +340,28 @@ def get_events_data(event_type):
         query = filter_by_date(date) if date else {}
         query.update(filter_by_module_name(module_name) if module_name else {})
 
-        return jsonify({
-            "total": event_types[event_type].count(query),
-            "data": [
-                i for i in
-                event_types[event_type].find(
-                    query,
-                    {
-                        "_id": 0
-                    }
-                ).skip(
-                    fix_skip(
-                        get_value_from_request("skip")
+        return jsonify(
+            {
+                "total": event_types[event_type].count(query),
+                "data": [
+                    i for i in
+                    event_types[event_type].find(
+                        query,
+                        {
+                            "_id": 0
+                        }
+                    ).skip(
+                        fix_skip(
+                            get_value_from_request("skip")
+                        )
+                    ).limit(
+                        fix_limit(
+                            get_value_from_request("limit")
+                        )
                     )
-                ).limit(
-                    fix_limit(
-                        get_value_from_request("limit")
-                    )
-                )
-            ]
-        }), 200
+                ]
+            }
+        ), 200
     except Exception:
         abort(500)
 
