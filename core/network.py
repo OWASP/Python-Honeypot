@@ -1,22 +1,27 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 import os
 import sys
 import time
-
 import netaddr
 import pyshark
 
-from config import protocol_table
-from core.alert import error, info, warn
-from core.compatible import is_verbose_mode, get_timeout_error, mkdir
+from datetime import datetime
+from config import (network_configuration,
+                    protocol_table)
+from core.alert import (error,
+                        info,
+                        warn)
+from core.compatible import (is_verbose_mode,
+                             get_timeout_error)
 from core.get_modules import virtual_machine_name_to_container_name
 from database.connector import (insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue,
                                 insert_pcap_files_to_collection)
-from database.datatypes import HoneypotEvent, NetworkEvent, FileArchive
+from database.datatypes import (HoneypotEvent,
+                                NetworkEvent,
+                                FileArchive)
 
 # honeypot ports
 honeypot_ports = dict()
@@ -69,8 +74,7 @@ def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
     return rules
 
 
-def process_packet(packet, honeypot_events_queue,
-                   network_events_queue, network_config):
+def process_packet(packet, honeypot_events_queue, network_events_queue):
     """
     Callback function called from the apply_on_packets function.
 
@@ -78,7 +82,7 @@ def process_packet(packet, honeypot_events_queue,
         packet: Packet live captured by pyshark
     """
     # set machine name
-    machine_name = network_config["real_machine_identifier_name"]
+    machine_name = network_configuration()["real_machine_identifier_name"]
 
     try:
         # Check if packet contains IP layer
@@ -92,52 +96,44 @@ def process_packet(packet, honeypot_events_queue,
             # Check packet protocol and if it contains a layer with the same
             # name
             if protocol == "TCP" and "TCP" in packet:
-                port_dest = packet.tcp.dstport
-                port_src = packet.tcp.srcport
+                port_dest = int(packet.tcp.dstport)
+                port_src = int(packet.tcp.srcport)
 
             elif protocol == "UDP" and "UDP" in packet:
-                port_dest = packet.udp.dstport
-                port_src = packet.udp.srcport
-
+                port_dest = int(packet.udp.dstport)
+                port_src = int(packet.udp.srcport)
             if netaddr.valid_ipv4(ip_dest) or netaddr.valid_ipv6(ip_dest):
                 # ignored ip addresses and ports in python - fix later
                 # check if the port is in selected module
-
-                if port_dest in honeypot_ports.keys() or \
-                        port_src in honeypot_ports.keys():
-
-                    if port_dest in honeypot_ports.keys():
-                        insert_to_honeypot_events_queue(
-                            HoneypotEvent(
-                                ip_dest,
-                                port_dest,
-                                ip_src,
-                                port_src,
-                                protocol,
-                                honeypot_ports[port_dest],
-                                machine_name
-                            ),
-                            honeypot_events_queue
-                        )
-                else:
-                    insert_to_network_events_queue(
-                        NetworkEvent(
-                            ip_dest,
-                            port_dest,
-                            ip_src,
-                            port_src,
-                            protocol,
-                            machine_name
-                        ),
-                        network_events_queue
-                    )
+                insert_to_honeypot_events_queue(
+                    HoneypotEvent(
+                        ip_dest,
+                        port_dest,
+                        ip_src,
+                        port_src,
+                        protocol,
+                        honeypot_ports[port_dest if port_dest in honeypot_ports.keys() else port_src],
+                        machine_name
+                    ),
+                    honeypot_events_queue
+                ) if port_dest in honeypot_ports.keys() or port_src in honeypot_ports \
+                    else insert_to_network_events_queue(
+                    NetworkEvent(
+                        ip_dest,
+                        port_dest,
+                        ip_src,
+                        port_src,
+                        protocol,
+                        machine_name
+                    ),
+                    network_events_queue
+                )
 
     except Exception as _e:
         del _e
 
 
-def network_traffic_capture(configuration, honeypot_events_queue,
-                            network_events_queue, network_config):
+def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue, network_config):
     """
     get and submit new network events
 
@@ -185,7 +181,6 @@ def network_traffic_capture(configuration, honeypot_events_queue,
 
     # Make the pcapfiles directory for storing the Network captured files
     base_dir_path = os.path.join(sys.path[0], "pcapfiles")
-    mkdir(base_dir_path)
 
     def packet_callback(packet):
         """
@@ -194,8 +189,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
         process_packet(
             packet,
             honeypot_events_queue,
-            network_events_queue,
-            network_config
+            network_events_queue
         )
 
     # Run loop in hourly manner to split the capture in multiple files
@@ -230,7 +224,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
             # Applied on every packet captured by pyshark LiveCapture
             capture.apply_on_packets(packet_callback, timeout=timeout)
 
-        except get_timeout_error():
+        except get_timeout_error() as e:
             # Catches the timeout error thrown by apply_on_packets
             insert_pcap_files_to_collection(
                 FileArchive(
@@ -238,22 +232,17 @@ def network_traffic_capture(configuration, honeypot_events_queue,
                     generation_time,
                     timeout
                 )
-            )
-            pass
+            ) if store_pcap else e
 
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as e:
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
                     generation_time,
                     timeout
                 )
-            )
-            try:
-                capture.close()
-                break
-            except Exception:
-                break
+            ) if store_pcap else e
+            break
 
         except Exception as e:
             insert_pcap_files_to_collection(
@@ -262,7 +251,7 @@ def network_traffic_capture(configuration, honeypot_events_queue,
                     generation_time,
                     timeout
                 )
-            )
+            ) if store_pcap else e
             error(str(e))
             break
 
