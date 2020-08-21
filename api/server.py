@@ -341,11 +341,8 @@ def get_events_data(event_type):
         query.update(filter_by_module_name(module_name) if module_name else {})
 
         return jsonify({
-            "total": event_types[event_type].count(
-                    query
-                ),
-            "data":
-            [
+            "total": event_types[event_type].count(query),
+            "data": [
                 i for i in
                 event_types[event_type].find(
                     query,
