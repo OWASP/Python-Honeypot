@@ -2,13 +2,15 @@
 
 ![Build Status](https://github.com/zdresearch/OWASP-Honeypot/workflows/Python%20application/badge.svg?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
 
+OWASP Honeypot is an open-source software in Python language which designed for creating honeypot and honeynet in an easy and secure way! This project is compatible with Python 3.x and tested on Mac OS X, and [Linux](https://github.com/zdresearch/OWASP-Honeypot/actions).
+
 We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org). Please visit [Wiki](https://github.com/zdresearch/OWASP-Honeypot/wiki) page for more information.
 
 ### Live API
 We've setup a live API on a few servers in Stockholm area, you can use API calls and information without any limitation, the service is running on a tiny VPS, please do not send a lot of requests.
 
 * http://ohp-stockholm-live.z3r0d4y.com:5000/
- 
+
 ______
 
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
@@ -85,3 +87,10 @@ docker-compose up
 ```
 
 ![image_2018-07-17_01-48-26](https://user-images.githubusercontent.com/7676267/42784742-63f95a2e-8965-11e8-8d64-435f6182dcf2.png)
+
+![ohp](https://user-images.githubusercontent.com/16983076/90905220-29ab0d00-e3d0-11ea-98e4-6b0d3d9c740a.png)
+
+
+
+## Contributing
+Pull requests are welcome! Feel free to [join us on Slack](https://owasp.slack.com) and discuss the project with the engineers on #owasp-python-honeypot. You are welcome to take any open issue in the tracker labeled 'help wanted' or 'good first issue'. See the [CONTRIBUTORS](https://github.com/zdresearch/OWASP-Honeypot/blob/master/CONTRIBUTING.md) file for details. Other issues are open for contribution as well, but may be less accessible or well defined in comparison to those that are explicitly labeled; you should consider reaching out to us if you are interested in implementing these tickets.
