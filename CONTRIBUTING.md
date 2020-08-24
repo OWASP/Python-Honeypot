@@ -173,26 +173,31 @@ Sit and relax till we review your PR, you've made your contribution to our proje
 OWASP Python Honeypot Project currently uses MongoDB to store the data in the server where the OWASP Honeypot is running. That means the server where OWASP Honeypot is running should have MongoDB installed.
 
 Running the honeypot modules would result in the creation of two databases-
+
 - `ohp_events`: for storing event data
 - `ohp_file_archive`: for storing network captured files
 
 ### OHP Events
 
 The following collections would be created in the database `ohp_events`:
+
 #### Honeypot Events
 
 There is Honeypot events queue which is being maintained for inserting all the honeypot events in the bulk insert as each bulk insert is faster than instantiating insert for each of the records.
 The format of the data inserted is:
 ```
 {
-    "_id" : ObjectId("5d095f03ccda7442f6be6af7"),
-    "ip" : "192.168.0.102",
-    "port" : 80,
-    "module_name" : "http/basic_auth_weak_password",
-    "date" : "2019-06-19 00:00:35",
-    "machine_name" : "stockholm_server_1",
-    "country" : "DE",
-    "event_type" : "honeypot_event"
+    "_id" : ObjectId("5ed54f5c6beff391fc6ee022"),
+    "ip_dest": "140.82.118.4",
+    "port_dest": 22,
+    "ip_src": "192.168.178.15",
+    "port_src": 37638,
+    "module_name": "ssh/weak_password",
+    "date": "2020-06-01 20:56:27",
+    "machine_name": "stockholm_server_1",
+    "event_type": "honeypot_event",
+    "country_ip_src": "-",
+    "country_ip_dest": "US"
 }
 ```
 
@@ -203,12 +208,16 @@ Network events can also be used for analysis and hence they are stored in a sepa
 The format of data in the network events collection is:
 ```
 {
-    "_id" : ObjectId("5cd155104b23fe10ea88f97e"),
-    "ip" : "54.192.202.206",
-    "port" : 38548,
-    "date" : "2019-05-07 11:51:12",
-    "machine_name" : "stockholm_server_1",
-    "country" : "DE"
+    "_id" : ObjectId("5f2bf8918b7a80b68b617ae9"),
+    "ip_dest": "49.12.156.199",
+    "port_dest": "443",
+    "ip_src": "192.168.178.15",
+    "port_src": "59894",
+    "protocol": "TCP",
+    "machine_name": "stockholm_server_1",
+    "date": "2020-08-06 14:33:20",
+    "country_ip_src": "-",
+    "country_ip_dest": "IN"
 }
 
 ```
@@ -247,6 +256,7 @@ The format of data in file change events collection is:
 ```
 
 #### Data Events
+
 These are the events used to store data collected from modules like _smtp_ and _ics_.
 The format of data in the data events collection is:
 ```
@@ -264,6 +274,7 @@ The format of data in the data events collection is:
 ### OHP File Archive
 
 The file archive database is used to store the network captured files using the __GridFS__ tool. GridFS is a specification for storing and retrieving large files (exceeding 16 MB). It uses two collections to store a single file:
+
 - `fs.files`: stores file metadata
 - `fs.chunks`: stores binary chunks of the file
 
@@ -305,6 +316,7 @@ OWASP Python Honeypot currently supports multiple types of protocols with differ
 ### To add a new protocol you should create a new folder inside the `/OWASP-Honeypot/modules` directory of the project.
 
 ### Set up protocol files
+
 Each protocol has an `__init__.py` file  which has the category configuration, below shown is the template for the same.
 ```
 def category_configuration():
@@ -323,9 +335,11 @@ def category_configuration():
 
 Then if the protocol has modules like weak and strong password then two separate folders should be created.
 Inside the module folder there should be:
+
 - files folder
 if the modules require some extra scripts/config files which needs to be moved to the module containers.
 - `__init__.py`
+
 contains module processor and module configuration
 ```
 
@@ -361,9 +375,9 @@ def module_configuration():
         "module_processor": ModuleProcessor()
     }
 ```
+
 - readme.md : Describing about the module
 - Dockerfile : For setting up all the packages, libraries, scripts to run by the module.
-
 
 ### Testing the module
 
