@@ -60,7 +60,7 @@ upstream  https://github.com/zdresearch/OWASP-Honeypot.git    (fetch)
 upstream  https://github.com/zdresearch/OWASP-Honeypot.git    (push)
 ```
 
-### 4. Sync it 
+### 4. Sync it
 
 Always keep your local copy of repository updated with the original repository.
 Before making any changes and/or in an appropriate interval, run the following commands *carefully* to update your local repository.
@@ -79,7 +79,7 @@ git reset --hard upstream/master
 git push origin master
 ```
 
-### 5. Ready Steady Go... 
+### 5. Ready Steady Go...
 
 Once you have completed these steps, you are ready to start contributing by checking our `Help Wanted` Issues and creating [pull requests](https://github.com/zdresearch/OWASP-Honeypot/pulls).
 
@@ -151,13 +151,11 @@ Now, Push your awesome work to your remote repository using
 git push -u origin Branch_Name
 ```
 
-
 ### 9. Create a Pull Request
 
 Finally, go to your repository in browser and click on `compare and pull requests` and select the `compare across forks` option.
 
 [![Compare across Forks](https://docs.github.com/assets/images/help/pull_requests/compare-across-forks-link.png)](https://github.com/zdresearch/OWASP-Honeypot)
-
 
 Change the base fork branch to `development` branch.
 
@@ -166,7 +164,6 @@ Change the base fork branch to `development` branch.
 Add a title and description to your pull request that explains your precious effort.
 
 Sit and relax till we review your PR, you've made your contribution to our project.
-
 
 ## Database Explained
 
@@ -185,7 +182,8 @@ The following collections would be created in the database `ohp_events`:
 
 There is Honeypot events queue which is being maintained for inserting all the honeypot events in the bulk insert as each bulk insert is faster than instantiating insert for each of the records.
 The format of the data inserted is:
-```
+
+```python
 {
     "_id" : ObjectId("5ed54f5c6beff391fc6ee022"),
     "ip_dest": "140.82.118.4",
@@ -206,7 +204,8 @@ The format of the data inserted is:
 All the network events data is separated from the honeypot events as they are not harmful to the server running.
 Network events can also be used for analysis and hence they are stored in a separate table.
 The format of data in the network events collection is:
-```
+
+```python
 {
     "_id" : ObjectId("5f2bf8918b7a80b68b617ae9"),
     "ip_dest": "49.12.156.199",
@@ -226,7 +225,8 @@ The format of data in the network events collection is:
 
 There is a special type of event which stores credentials that are obtained from the modules like ssh/strong_password, ftp/strong_password,  http/basic_auth_strong_password and smtp/strong_password.
 The format of data in the credential events collection is:
-```
+
+```python
 {
     "_id" : ObjectId("5d504507cb1355b3e3ed7e28"),
     "ip" : "172.18.0.1",
@@ -243,7 +243,8 @@ The format of data in the credential events collection is:
 
 These are different type of events which is keeping track of the file path, modified by the hacker on the system as it is very easy to get into the system for weak password modules. Hence the file change events are integrated into modules like ssh/weak_password and ftp/weak_password.
 The format of data in file change events collection is:
-```
+
+```python
 {
     "_id" : ObjectId("5f18c1c3803c26c76f3c11bd"),
     "file_path" : "/root/OWASP-Honeypot/tmp/ohp_ssh_weak_container/.bash_history",
@@ -259,7 +260,8 @@ The format of data in file change events collection is:
 
 These are the events used to store data collected from modules like _smtp_ and _ics_.
 The format of data in the data events collection is:
-```
+
+```python
 {
     "_id" : ObjectId("5f0904cda26d3357a820d564"),
     "ip_dest": "172.18.0.1",
@@ -282,7 +284,7 @@ The file archive database is used to store the network captured files using the 
 
 The format of the data stored here is:
 
-```
+```python
 {
   "_id": ObjectId("5f3453140c86f676b155b473"),
   "filename": "captured-traffic-1597264650.pcap",
@@ -299,7 +301,8 @@ The format of the data stored here is:
 #### Chunks collection
 
 The format of the data is:
-```
+
+```python
 {
   "_id" : ObjectId("5f33bab2e938f7803705a6c8"),
   "files_id" : ObjectId("5f33bab2e938f7803705a6c7"),
@@ -308,17 +311,17 @@ The format of the data is:
 }
 ```
 
-
-## Adding a Module
+## Adding a new Module
 
 OWASP Python Honeypot currently supports multiple types of protocols with different types and modules for various purposes like getting credentials, network events, files, honeypot events, and custom data coming from each module.
 
-### To add a new protocol you should create a new folder inside the `/OWASP-Honeypot/modules` directory of the project.
+__To add a new protocol you should create a new folder inside the `/OWASP-Honeypot/modules` directory of the project.__
 
 ### Set up protocol files
 
-Each protocol has an `__init__.py` file  which has the category configuration, below shown is the template for the same.
-```
+Each protocol has an `__init__.py` file which has the category configuration, below shown is the template for the same.
+
+```python
 def category_configuration():
     """
     category configuration
@@ -337,15 +340,16 @@ Then if the protocol has modules like weak and strong password then two separate
 Inside the module folder there should be:
 
 - files folder
-if the modules require some extra scripts/config files which needs to be moved to the module containers.
+if the modules require some extra scripts/config files which need to be moved to the module containers.
 - `__init__.py`
 
 contains module processor and module configuration
-```
+
+```python
 
 class ModuleProcessor:
     """
-    this is the processor to run after docker machine is up to grab the
+    this is the processor to run after docker-machine is up to grab the
     log files or do other needed process...
     """
 
@@ -376,17 +380,19 @@ def module_configuration():
     }
 ```
 
-- readme.md : Describing about the module
-- Dockerfile : For setting up all the packages, libraries, scripts to run by the module.
+- readme.md: Describing the module
+- Dockerfile: For setting up all the packages, libraries, scripts to run by the module.
 
 ### Testing the module
 
 For testing the module run the command
-```
+
+```sh
 python3 ohp.py -m protocol/moduleOrType
 ```
 
 Also one must make sure that the test for the module is passing.
-```
+
+```sh
 python3 ohp.py -m protocol/moduleOrType --test
 ```
