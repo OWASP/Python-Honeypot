@@ -9,7 +9,6 @@ import json
 from database.connector import insert_to_credential_events_collection
 from database.datatypes import CredentialEvent
 
-
 LOGFILE = 'tmp/access.log'
 LOGFILE_DUMP = 'tmp/ohp_http_strong_password_creds_logs.json'
 
@@ -43,9 +42,7 @@ class ModuleProcessor:
                         authorization = \
                             data_json["authorization"].split(' ')[1]
                         # binascii is returning bytes
-                        authorization = binascii.a2b_base64(
-                                            authorization
-                                        ).decode('utf-8')
+                        authorization = binascii.a2b_base64(authorization).decode('utf-8')
                         username = authorization.split(":")[0]
                         password = ":".join(authorization.split(":")[1:])
                         insert_to_credential_events_collection(
@@ -71,6 +68,6 @@ def module_configuration():
         "username": "admin",
         "password": generate_token(16),
         "extra_docker_options":
-        ["--volume {0}/tmp:/var/log/apache2/".format(os.getcwd())],
+            ["--volume {0}/tmp:/var/log/apache2/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

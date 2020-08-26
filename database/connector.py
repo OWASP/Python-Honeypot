@@ -2,17 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import inspect
-from multiprocessing import Queue
 import os
 import time
-
 import pymongo
+import gridfs
+
+from multiprocessing import Queue
 
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
 from core.compatible import byte_to_str, is_verbose_mode
-from database.datatypes import (CredentialEvent, HoneypotEvent,
-                                EventData, NetworkEvent, FileEventsData)
+from database.datatypes import (CredentialEvent,
+                                HoneypotEvent,
+                                EventData,
+                                NetworkEvent,
+                                FileEventsData,
+                                FileArchive)
 from lib.ip2location import IP2Location
 
 api_config = api_configuration()
@@ -30,7 +35,10 @@ credential_events = database.credential_events
 honeypot_events = database.honeypot_events
 network_events = database.network_events
 file_change_events = database.file_change_events
-events_data = database.events_data
+data_events = database.data_events
+# Database for storing network traffic files
+ohp_file_archive = client.ohp_file_archive
+ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
 
 # Event queues
 honeypot_events_queue = list()
@@ -53,6 +61,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
 
     Args:
         honeypot_event: Object of HoneypotEvent class with event parameters
+        honeypot_events_queue: Honeypot queue
 
     Returns:
         ObjectId(inserted_id)
@@ -114,7 +123,8 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     network_event.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
             network_event.ip_src
-        ))
+        )
+    )
 
     # Get country of the destination IP Address
     network_event.country_ip_dest = byte_to_str(
@@ -135,7 +145,8 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     and network_events collection respectively
     """
 
-    if is_verbose_mode() and (honeypot_events_queue or network_events_queue):
+    if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
+            and (honeypot_events_queue or network_events_queue):
         verbose_info("Submitting new events to database")
 
     # Insert all honeypot events to database (honeypot_events collection)
@@ -160,7 +171,7 @@ def push_events_to_database_from_thread(honeypot_events_queue, network_events_qu
     """
     while True:
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
-        time.sleep(3)
+        time.sleep(1)
     return True
 
 
@@ -182,8 +193,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         )
     )
 
-    credential_event.machine_name = \
-        network_config["real_machine_identifier_name"]
+    credential_event.machine_name = network_config["real_machine_identifier_name"]
 
     if is_verbose_mode():
         verbose_info(
@@ -244,13 +254,13 @@ def insert_to_events_data_collection(event_data: EventData):
     Returns:
         inserted_id
     """
-    event_data.machine_name = \
-        network_config["real_machine_identifier_name"]
+    event_data.machine_name = network_config["real_machine_identifier_name"]
 
     event_data.country = byte_to_str(
         IP2Location.get_country_short(
             event_data.ip
-        ))
+        )
+    )
 
     if is_verbose_mode():
         verbose_info(
@@ -263,4 +273,32 @@ def insert_to_events_data_collection(event_data: EventData):
             )
         )
 
-    return events_data.insert_one(event_data.__dict__).inserted_id
+    return data_events.insert_one(event_data.__dict__).inserted_id
+
+
+def insert_pcap_files_to_collection(file_archive: FileArchive):
+    """
+    Insert the pcap files containing the captured network traffic to
+    mongodb collection
+
+    Args:
+        file_archive: path of the file
+
+    Returns:
+        file_id
+    """
+    if is_verbose_mode():
+        verbose_info(
+            "Received network traffic file:{0}, date:{1}. "
+            "Inserting it in the File Archive".format(
+                file_archive.file_path,
+                file_archive.date
+            )
+        )
+    return ohp_file_archive_gridfs.put(
+        open(file_archive.file_path, "rb"),
+        filename=os.path.split(file_archive.file_path)[1],
+        machine_name=network_configuration()["real_machine_identifier_name"],
+        date=file_archive.date,
+        splitTimeout=file_archive.split_timeout
+    )

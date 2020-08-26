@@ -1,0 +1,5 @@
+[flake8]
+ignore = E303,W503
+exclude = ./modules/smtp/strong_password/files/smtpd_server/*
+max-line-length = 120
+max-complexity = 30

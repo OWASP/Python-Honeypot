@@ -3,8 +3,6 @@
 
 import os
 
-from flask import jsonify
-
 
 def msg_structure(status="", msg=""):
     """
@@ -168,8 +166,8 @@ def fix_limit(limit):
     if limit:
         try:
             return int(limit)
-        except Exception as _:
-            del _
+        except Exception:
+            pass
     return 10
 
 
@@ -186,21 +184,9 @@ def fix_skip(skip):
     if skip:
         try:
             return int(skip)
-        except Exception as _:
-            del _
+        except Exception:
+            pass
     return 0
-
-
-def flask_null_array_response():
-    """
-    null array response for flask
-
-    Returns:
-         null array with 200 status, ([], 200)
-    """
-    return jsonify(
-        []
-    ), 200
 
 
 def aggregate_function(data_connection, agr_query):
@@ -216,6 +202,7 @@ def aggregate_function(data_connection, agr_query):
     """
     return list(
         data_connection.aggregate(
-            agr_query
+            agr_query,
+            allowDiskUse=True
         )
     )

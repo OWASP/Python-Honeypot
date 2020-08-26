@@ -24,7 +24,7 @@ def api_configuration():
         a JSON with API configuration
     """
     # DOCKER_ENV variable is set in the docker-compose file.
-    if os.environ.get('DOCKER_ENV') == "true":
+    if os.environ.get('MONGODB_DOCKER_ENV') == "true":
         db_url = "mongodb://mongodb:27017/"
     else:
         db_url = "mongodb://127.0.0.1:27017/"
@@ -37,7 +37,11 @@ def api_configuration():
         "api_access_key": generate_token(),  # or any string, or None
         "api_client_white_list": {
             "enabled": False,
-            "ips": ["127.0.0.1", "10.0.0.1", "192.168.1.1"]
+            "ips": [
+                "127.0.0.1",
+                "10.0.0.1",
+                "192.168.1.1"
+            ]
         },
         "api_access_log": {
             "enabled": False,
@@ -63,9 +67,15 @@ def network_configuration():
         "ignore_real_machine_ip_address": True,  # or if you want to simulate from local network, save as False
         "ignore_virtual_machine_ip_addresses": True,  # or if you want simulate from local network, save as False
         "real_machine_identifier_name": "stockholm_server_1",  # can be anything e.g. real_machine_ip_address, name, etc
-        "ignore_real_machine_ip_addresses": list(set([real_machine_ip_address, "127.0.0.1"])),
+        "ignore_real_machine_ip_addresses": list(
+            {
+                real_machine_ip_address,
+                "127.0.0.1"
+            }
+        ),
         # e.g. ["10.0.0.1", "192.168.1.1"]
-        "ignore_real_machine_ports": []  # e.g. [22, 80, 5000]
+        "ignore_real_machine_ports": [],  # e.g. [22, 80, 5000]
+        "split_pcap_file_timeout": 3600  # Default value
     }
 
 
@@ -92,6 +102,7 @@ def user_configuration():
     """
     return {
         "language": "en",
+        "events_log_file": "tmp/ohp.log",
         "default_selected_modules": "all",  # or select one or multiple (e.g. ftp/strong_password,ssh/strong_password)
         "default_excluded_modules": None  # or any module name separated with comma
     }

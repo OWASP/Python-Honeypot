@@ -23,8 +23,8 @@ class TestCoreAlert(unittest.TestCase):
         self.assertIsInstance(byte_to_str(content), str)
 
     def test_generate_token(self):
-        self.assertEqual(len(generate_token(16)),16)
-        self.assertEqual(len(generate_token(32)),32)
-        self.assertEqual(len(generate_token(48)),48)
-        self.assertEqual(len(generate_token(1)),1)
-        self.assertEqual(len(generate_token()),32) # default
+        self.assertEqual(len(generate_token(16)), 16)
+        self.assertEqual(len(generate_token(32)), 32)
+        self.assertEqual(len(generate_token(48)), 48)
+        self.assertEqual(len(generate_token(1)), 1)
+        self.assertEqual(len(generate_token()), 32)  # default
