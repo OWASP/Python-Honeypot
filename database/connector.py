@@ -57,11 +57,12 @@ IP2Location = IP2Location.IP2Location(
 
 def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_events_queue: Queue):
     """
-    insert selected modules event to honeypot_events collection
+    insert selected modules event to honeypot_events_queue
 
     Args:
         honeypot_event: Object of HoneypotEvent class with event parameters
-        honeypot_events_queue: Honeypot queue
+        honeypot_events_queue: Multiprocessing queue which stores the list of
+                               honeypot_events in _dict_ format
 
     Returns:
         ObjectId(inserted_id)
@@ -98,11 +99,12 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
 
 def insert_to_network_events_queue(network_event: NetworkEvent, network_events_queue: Queue):
     """
-    insert other network events (port scan, etc..) to network_events
-    collection
+    insert other network events (port scan, etc..) to network_events_queue
 
     Args:
         network_event: Object of NetworkEvent Class with event parameters
+        network_events_queue: Multiprocessing queue which stores the list of
+                              network_events in _dict_ format
 
     Returns:
         ObjectId(inserted_id)
@@ -216,10 +218,8 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
     module
 
     Args:
-    file_path : the path of the file which is changed
-    status: status of the file would be added/modified/deleted
-    module_name : on which module client accessed
-    date : datetime of the event
+        file_change_event_data: Object of FileEventsData Class with file change
+                                parameters
 
     Returns:
         inserted_id
