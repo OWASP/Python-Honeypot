@@ -297,7 +297,6 @@ The format of the data stored here is:
 }
 ```
 
-
 #### Chunks collection
 
 The format of the data is:

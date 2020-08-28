@@ -91,6 +91,6 @@ docker-compose up
 ![ohp](https://user-images.githubusercontent.com/16983076/90905220-29ab0d00-e3d0-11ea-98e4-6b0d3d9c740a.png)
 
 
-
 ## Contributing
+
 Pull requests are welcome! Feel free to [join us on Slack](https://owasp.slack.com) and discuss the project with the engineers on #owasp-python-honeypot. You are welcome to take any open issue in the tracker labeled 'help wanted' or 'good first issue'. See the [CONTRIBUTORS](https://github.com/zdresearch/OWASP-Honeypot/blob/master/CONTRIBUTING.md) file for details. Other issues are open for contribution as well, but may be less accessible or well defined in comparison to those that are explicitly labeled; you should consider reaching out to us if you are interested in implementing these tickets.
