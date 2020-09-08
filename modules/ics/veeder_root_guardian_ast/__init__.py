@@ -4,10 +4,10 @@
 import time
 import os
 import json
+import binascii
 
 from database.connector import insert_to_events_data_collection
 from database.datatypes import EventData
-
 
 LOGFILE = 'tmp/ics_veeder_root_guardian_ast.log'
 
@@ -60,8 +60,12 @@ def module_configuration():
     return {
         "virtual_machine_port_number": 10001,
         "real_machine_port_number": 10001,
-        "company_name_address": "3356234 SL OIL 433234\r\n9346 GLODEN AVE."
-                                "\r\nQUEEN SPRING, MD\r\n",
+        "company_name_address": binascii.b2a_base64(
+            str(
+                "3356234 SL OIL 433234\r\n9346 GLODEN AVE."
+                "\r\nQUEEN SPRING, MD\r\n"
+            ).encode()
+        ).strip().decode(),
         "extra_docker_options": ["--volume {0}/tmp:/tmp/".format(os.getcwd())],
         "module_processor": ModuleProcessor()
     }

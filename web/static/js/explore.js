@@ -173,7 +173,6 @@ $.fn.dataTable.pipeline = function ( opts ) {
               // As an object, the data given extends the default
               $.extend( request, conf.data );
           }
-
           return $.ajax( {
               "type":     conf.method,
               "url":      conf.url,
@@ -185,6 +184,13 @@ $.fn.dataTable.pipeline = function ( opts ) {
                 var json = jQuery.parseJSON( data );
                 json.recordsTotal = json.total;
                 json.recordsFiltered = json.total;
+                tmpj = json
+                if(conf.url.split("/")[4] == "data"){
+                    for(index in tmpj['data']){
+                        tmpj['data'][index]['data'] = JSON.stringify(json['data'][index]['data'])
+                    }
+                }
+                json = tmpj
                 return JSON.stringify( json );
               },
               "success":  function ( json ) {
