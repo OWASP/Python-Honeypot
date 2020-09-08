@@ -11,9 +11,8 @@ import datetime
 import time
 import random
 import json
-
-# import configuration
-from config import module_configuration
+import os
+import binascii
 
 # bind socket use configuration
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,7 +20,7 @@ server_socket.setblocking(0)
 server_socket.bind(
     (
         "0.0.0.0",
-        module_configuration()["virtual_machine_port_number"]
+        int(os.environ.get("virtual_machine_port_number"))
     )
 )
 server_socket.listen(10)
@@ -82,7 +81,7 @@ def I10100():
             '\x01\r\nI10100\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'SYSTEM STATUS REPORT',
             '\r\n\r\n',
@@ -99,7 +98,7 @@ def I10200():
             '\x01\r\nI10200\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'SYSTEM CONFIGURATION',
             '\r\n\r\n',
@@ -204,7 +203,7 @@ def I11100():
             '\x01\r\nI11100\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'PRIORITY ALARM HISTORY\r\n',
             'ID  CATEGORY  DESCRIPTION          ALARM TYPE           STATE    DATE     TIME\r\n',
@@ -320,7 +319,7 @@ def I11200():
             '\x01\r\nI11200\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'NON-PRIORITY ALARM HISTORY\r\n',
             'ID  CATEGORY  DESCRIPTION          ALARM TYPE           STATE    DATE    TIME\r\n',
@@ -386,7 +385,7 @@ def I11300():
             '\x01\r\nI11300\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'ACTIVE ALARMS REPORT',
             '\r\n\r\n',
@@ -404,7 +403,7 @@ def I11400():
             '\x01\r\nI11400\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'CLEARED ALARMS REPORT',
             '\r\n\r\n',
@@ -476,7 +475,7 @@ def I20100():
             "\x01\r\nI20100\r\n",
             now(),
             "\r\n\r\n",
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             "\r\n\r\n",
             "IN-TANK INVENTORY       \r\n",
             "\r\n",
@@ -519,7 +518,7 @@ def I20200():
             '\x01\r\nI20200\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'DELIVERY REPORT',
             '\r\n\r\n',
@@ -1223,7 +1222,7 @@ def I20300():
             '\x01\r\nI20300\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'TANK 1    REGULAR                \r\n',
             '    TEST STATUS: OFF   \r\n',
@@ -1253,7 +1252,7 @@ def I20400():
             '\x01\r\nI20400\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             ' SHIFT REPORT \r\n\r\n',
             'SHIFT 1 TIME: 12:00 AM        \r\n\r\n',
@@ -1352,7 +1351,7 @@ def I20500():
             '\x01\r\nI20500\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'TANK   PRODUCT                 STATUS\r\n\r\n',
             '  1    REGULAR                 NORMAL\r\n\r\n',
@@ -1371,7 +1370,7 @@ def I20600():
             '\x01\r\nI20600\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n\r\n',
             'TANK ALARM HISTORY\r\n\r\n',
             'TANK 1  REGULAR             \r\n\r\n',
@@ -1436,7 +1435,7 @@ def I20700():
             '\x01\r\nI20700\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n\r\n',
             'TANK LEAK TEST HISTORY\r\n\r\n',
             'T 1:REGULAR\r\n\r\n',
@@ -1535,7 +1534,7 @@ def I20900():
             '\x01\r\nI20900\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'TANK 1    REGULAR                \r\n',
             '    TEST STATUS: OFF   \r\n',
@@ -1561,7 +1560,7 @@ def I20C00():
             '\x01\r\nI20C00\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'LAST DELIVERY REPORT\r\n\r\n',
             'T 1:REGULAR\r\n',
@@ -1608,7 +1607,7 @@ def I25100():
             '\x01\r\nI25100\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'CSLD TEST RESULTS\r\n',
             'TANK PRODUCT                RESULT\r\n',
@@ -1624,7 +1623,7 @@ def I30100():
             '\x01\r\nI30100\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'LIQUID STATUS REPORT\r\n\r\n',
             'SENSOR  LOCATION               STATUS\r\n',
@@ -1644,7 +1643,7 @@ def I30200():
             '\x01\r\nI30200\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'LIQUID ALARM HISTORY REPORT\r\n\r\n',
             'SENSOR  LOCATION\r\n',
@@ -3655,7 +3654,7 @@ def IA9100():
             '\x01\r\nIA9100\r\n',
             now(),
             '\r\n\r\n',
-            module_configuration()["company_name_address"],
+            binascii.a2b_base64(os.environ.get("company_name_address")),
             '\r\n\r\n',
             'POWER OUTAGE REPORT\r\n\r\n',
             'T 1:REGULAR             \r\n',
