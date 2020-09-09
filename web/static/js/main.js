@@ -191,6 +191,62 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.network[week_dates_array[5]],
                                 date_wise_event_counts.network[week_dates_array[6]]
                             ],
+                        },{
+                            label: 'Credential Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.purple,
+                            borderColor: window.chartColors.purple,
+                            data: [
+                                date_wise_event_counts.credential[week_dates_array[0]],
+                                date_wise_event_counts.credential[week_dates_array[1]],
+                                date_wise_event_counts.credential[week_dates_array[2]],
+                                date_wise_event_counts.credential[week_dates_array[3]],
+                                date_wise_event_counts.credential[week_dates_array[4]],
+                                date_wise_event_counts.credential[week_dates_array[5]],
+                                date_wise_event_counts.credential[week_dates_array[6]]
+                            ],
+                        },{
+                            label: 'File Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.green,
+                            borderColor: window.chartColors.green,
+                            data: [
+                                date_wise_event_counts.file[week_dates_array[0]],
+                                date_wise_event_counts.file[week_dates_array[1]],
+                                date_wise_event_counts.file[week_dates_array[2]],
+                                date_wise_event_counts.file[week_dates_array[3]],
+                                date_wise_event_counts.file[week_dates_array[4]],
+                                date_wise_event_counts.file[week_dates_array[5]],
+                                date_wise_event_counts.file[week_dates_array[6]]
+                            ],
+                        },{
+                            label: 'Data Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.cyan,
+                            borderColor: window.chartColors.cyan,
+                            data: [
+                                date_wise_event_counts.data[week_dates_array[0]],
+                                date_wise_event_counts.data[week_dates_array[1]],
+                                date_wise_event_counts.data[week_dates_array[2]],
+                                date_wise_event_counts.data[week_dates_array[3]],
+                                date_wise_event_counts.data[week_dates_array[4]],
+                                date_wise_event_counts.data[week_dates_array[5]],
+                                date_wise_event_counts.data[week_dates_array[6]]
+                            ],
+                        },{
+                            label: 'PCAP Events',
+                            fill: false,
+                            backgroundColor: window.chartColors.orange,
+                            borderColor: window.chartColors.orange,
+                            data: [
+                                date_wise_event_counts.pcap[week_dates_array[0]],
+                                date_wise_event_counts.pcap[week_dates_array[1]],
+                                date_wise_event_counts.pcap[week_dates_array[2]],
+                                date_wise_event_counts.pcap[week_dates_array[3]],
+                                date_wise_event_counts.pcap[week_dates_array[4]],
+                                date_wise_event_counts.pcap[week_dates_array[5]],
+                                date_wise_event_counts.pcap[week_dates_array[6]]
+                            ],
                         }]
                     },
                     options: {
@@ -267,6 +323,14 @@ function load_graphs() {
             get_event_count("honeypot", "count_honeypot_events");
             // request network related events number
             get_event_count("network", "count_network_events");
+            // request network related events number
+            get_event_count("credential", "count_credential_events");
+            // request network related events number
+            get_event_count("file", "count_file_events");
+            // request network related events number
+            get_event_count("data", "count_data_events");
+            // request network related events number
+            get_event_count("pcap", "count_pcap_events");
             // request top ten ips in honeypot events
             get_top_ten_element_in_event("Honeypot", "IP", "top_ten_ips_in_honeypot_events_graph");
             // request top ten ips in network events
@@ -279,12 +343,25 @@ function load_graphs() {
             !("all" in date_wise_event_counts) ? date_wise_event_counts.all = new Object() : true;
             !("honeypot" in date_wise_event_counts) ? date_wise_event_counts.honeypot = new Object() : true;
             !("network" in date_wise_event_counts) ? date_wise_event_counts.network = new Object() : true;
+            !("credential" in date_wise_event_counts) ? date_wise_event_counts.credential = new Object() : true;
+            !("file" in date_wise_event_counts) ? date_wise_event_counts.file = new Object() : true;
+            !("data" in date_wise_event_counts) ? date_wise_event_counts.data = new Object() : true;
+            !("pcap" in date_wise_event_counts) ? date_wise_event_counts.pcap = new Object() : true;
             // request all events number by date for past week
             plot_event_count_by_date("all");
             // request network events number by date for past week
             plot_event_count_by_date("network");
             // request honeypot events number by date for past week
             plot_event_count_by_date("honeypot");
+            // request credential events number by date for past week
+            plot_event_count_by_date("credential");
+            // request file events number by date for past week
+            plot_event_count_by_date("file");
+            // request data events number by date for past week
+            plot_event_count_by_date("data");
+            // request pcap events number by date for past week
+            plot_event_count_by_date("pcap");
+
 
 
         }
