@@ -189,6 +189,29 @@ def fix_skip(skip):
     return 0
 
 
+def fix_filter_query(filter):
+    """
+    fix filter query from user
+    Args:
+        filter: filter from users
+
+    Returns:
+        dict
+    """
+    if filter:
+        try:
+            filter = {
+                _.split("=")[0]: _.split("=")[1] for _ in list(
+                    set(
+                        str(filter).split("&")
+                    )
+                )
+            }
+        except Exception:
+            return {}
+    return filter
+
+
 def aggregate_function(data_connection, agr_query):
     """
     uses aggregate function of mongodb

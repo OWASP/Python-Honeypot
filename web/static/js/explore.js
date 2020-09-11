@@ -158,6 +158,9 @@ $.fn.dataTable.pipeline = function ( opts ) {
           request.length = requestLength*conf.pages;
           conf.data.skip = requestStart;
           conf.data.limit = request.length;
+          if($("#datatable_filter > label > input")[0].value){
+            conf.data.filter = $("#datatable_filter > label > input")[0].value;
+          }
 
           // Provide the same `data` options as DataTables.
           if ( typeof conf.data === 'function' ) {
