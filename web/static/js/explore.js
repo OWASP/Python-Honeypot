@@ -447,16 +447,18 @@ function load_data(api_endpoint, api_params) {
 
   // Define table columns based on selected event type
   if (api_params.event_type == "honeypot") {
-    columns = [ /* need to be sorted */
-      { data: 'date', defaultContent: '', title: "Date" },
-      { data: 'ip_src', defaultContent: '', title: "Src IP" },
-      { data: 'port_src', defaultContent: '', title: "Src Port" },
-      { data: 'ip_dest', defaultContent: '', title: "Dest IP" },
-      { data: 'port_dest', defaultContent: '', title: "Dest Port" },
-      { data: 'module_name', defaultContent: '', title: "Module Name" },
-      { data: 'machine_name', defaultContent: '', title: "Machine Name" },
-      { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
-      { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
+    columns = [
+        { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" },
+        { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
+        { data: 'date', defaultContent: '', title: "Date" },
+        { data: 'ip_dest', defaultContent: '', title: "Dest IP" },
+         { data: 'ip_src', defaultContent: '', title: "Src IP" },
+         { data: 'module_name', defaultContent: '', title: "Module Name" },
+         { data: 'machine_name', defaultContent: '', title: "Machine Name" },
+         { data: 'port_dest', defaultContent: '', title: "Dest Port" },
+        { data: 'port_src', defaultContent: '', title: "Src Port" },
+        { data: 'protocol', defaultContent: '', title: "tcp" }
+      ];
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "network") {
@@ -486,23 +488,25 @@ function load_data(api_endpoint, api_params) {
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "data") {
-    columns = [ /* need to be sorted */
-      { data: 'date', defaultContent: '', title: "Date" },
-      { data: 'ip', defaultContent: '', title: "IP" },
-      { data: 'module_name', defaultContent: '', title: "Module Name" },
-      { data: 'data', defaultContent: '', title: "Data" },
-      { data: 'machine_name', defaultContent: '', title: "Machine Name" },
-      { data: 'country', defaultContent: '', title: "Country" }];
+    columns = [
+        { data: 'country', defaultContent: '', title: "Country" },
+        { data: 'date', defaultContent: '', title: "Date" },
+        { data: 'data', defaultContent: '', title: "Data" },
+        { data: 'ip', defaultContent: '', title: "IP" },
+        { data: 'machine_name', defaultContent: '', title: "Machine Name" },
+        { data: 'module_name', defaultContent: '', title: "Module Name" }
+      ];
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "file") {
-    columns = [ /* need to be sorted */
+    columns = [
       { data: 'date', defaultContent: '', title: "Date" },
-      { data: 'module_name', defaultContent: '', title: "Module Name" },
       { data: 'file_path', defaultContent: '', title: "File Path" },
-      { data: 'status', defaultContent: '', title: "Status" },
+      { data: 'module_name', defaultContent: '', title: "Module Name" },
+      { data: 'is_directory', defaultContent: '', title: "Is Directory" },
       { data: 'machine_name', defaultContent: '', title: "Machine Name" },
-      { data: 'is_directory', defaultContent: '', title: "Is Directory" }];
+      { data: 'status', defaultContent: '', title: "Status" }
+      ];
       get_event_data(api_endpoint, columns, api_params);
   }
 
