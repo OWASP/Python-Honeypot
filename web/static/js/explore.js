@@ -120,7 +120,6 @@ $.fn.dataTable.pipeline = function ( opts ) {
       var drawStart     = request.start;
       var requestLength = request.length;
       var requestEnd    = requestStart + requestLength;
-       
       if ( settings.clearCache ) {
           // API requested that the cache be cleared
           ajax = true;
@@ -194,6 +193,28 @@ $.fn.dataTable.pipeline = function ( opts ) {
                     }
                 }
                 json = tmpj
+                index = Object.keys(json['data'][0])[settings.aLastSort[0].col]
+                order = settings.aLastSort[0].dir
+                if (order == "asc"){
+                    json['data'].sort(
+                    (a, b) => {
+                          if (a[index] < b[index])
+                            return -1;
+                          if (a[index] > b[index])
+                            return 1;
+                          return 0;
+                        })
+
+                } else {
+                    json['data'].sort(
+                    (a, b) => {
+                          if (a[index] > b[index])
+                            return -1;
+                          if (a[index] < b[index])
+                            return 1;
+                          return 0;
+                        })
+                }
                 return JSON.stringify( json );
               },
               "success":  function ( json ) {
@@ -426,7 +447,7 @@ function load_data(api_endpoint, api_params) {
 
   // Define table columns based on selected event type
   if (api_params.event_type == "honeypot") {
-    columns = [
+    columns = [ /* need to be sorted */
       { data: 'date', defaultContent: '', title: "Date" },
       { data: 'ip_src', defaultContent: '', title: "Src IP" },
       { data: 'port_src', defaultContent: '', title: "Src Port" },
@@ -440,30 +461,32 @@ function load_data(api_endpoint, api_params) {
   }
   else if (api_params.event_type == "network") {
     columns = [
-      { data: 'date', defaultContent: '', title: "Date" },
-      { data: 'ip_src', defaultContent: '', title: "Src IP" },
-      { data: 'port_src', defaultContent: '', title: "Src Port" },
-      { data: 'ip_dest', defaultContent: '', title: "Dest IP" },
-      { data: 'port_dest', defaultContent: '', title: "Dest Port" },
-      { data: 'protocol', defaultContent: '', title: "Protocol" },
-      { data: 'machine_name', defaultContent: '', title: "Machine Name" },
-      { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
-      { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" }];
+        { data: 'country_ip_dest', defaultContent: '', title: "Dest Country" },
+        { data: 'country_ip_src', defaultContent: '', title: "Src Country" },
+        { data: 'date', defaultContent: '', title: "Date" },
+        { data: 'ip_dest', defaultContent: '', title: "Dest IP" },
+        { data: 'ip_src', defaultContent: '', title: "Src IP" },
+        { data: 'machine_name', defaultContent: '', title: "Machine Name" },
+        { data: 'port_dest', defaultContent: '', title: "Dest Port" },
+        { data: 'port_src', defaultContent: '', title: "Src Port" },
+       { data: 'protocol', defaultContent: '', title: "Protocol" }
+      ];
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "credential") {
     columns = [
+        { data: 'country', defaultContent: '', title: "Country" },
       { data: 'date', defaultContent: '', title: "Date" },
       { data: 'ip', defaultContent: '', title: "IP" },
-      { data: 'module_name', defaultContent: '', title: "Module Name" },
-      { data: 'username', defaultContent: '', title: "Username" },
-      { data: 'password', defaultContent: '', title: "Password" },
       { data: 'machine_name', defaultContent: '', title: "Machine Name" },
-      { data: 'country', defaultContent: '', title: "Country" }];
+      { data: 'module_name', defaultContent: '', title: "Module Name" },
+      { data: 'password', defaultContent: '', title: "Password" },
+      { data: 'username', defaultContent: '', title: "Username" }
+      ];
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "data") {
-    columns = [
+    columns = [ /* need to be sorted */
       { data: 'date', defaultContent: '', title: "Date" },
       { data: 'ip', defaultContent: '', title: "IP" },
       { data: 'module_name', defaultContent: '', title: "Module Name" },
@@ -473,7 +496,7 @@ function load_data(api_endpoint, api_params) {
       get_event_data(api_endpoint, columns, api_params);
   }
   else if (api_params.event_type == "file") {
-    columns = [
+    columns = [ /* need to be sorted */
       { data: 'date', defaultContent: '', title: "Date" },
       { data: 'module_name', defaultContent: '', title: "Module Name" },
       { data: 'file_path', defaultContent: '', title: "File Path" },
@@ -485,12 +508,14 @@ function load_data(api_endpoint, api_params) {
 
   else if (api_params.event_type == "pcap") {
     columns = [
-        { data: null, defaultContent: ''},
+        { data: 'chunkSize', defaultContent: '', title: "Chunk Size"},
         { data: 'date', defaultContent: '', title: "Generation Time"},
-        { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
         { data: 'filename', defaultContent: '', title: "Filename"},
         { data: 'length', defaultContent: '', title: "File Size"},
-        { data: 'md5', defaultContent: '', title: "MD5"}
+        { data: 'machine_name', defaultContent: '', title: "Machine Name" },
+        { data: 'md5', defaultContent: '', title: "MD5" },
+        { data: 'splitTimeout', defaultContent: '', title: "Split Timeout"},
+        { data: 'uploadDate', defaultContent: '', title: "Upload Date"}
     ];
     get_pcap_file_data(api_endpoint, columns, api_params);
 
