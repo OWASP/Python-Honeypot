@@ -17,12 +17,14 @@ from api.database_queries import (sort_by_count,
                                   filter_by_country_ip_dest,
                                   filter_by_module_name,
                                   filter_by_match,
+                                  filter_by_regex,
                                   event_types,
                                   group_by_elements)
 from api.utility import (aggregate_function,
                          all_mime_types,
                          fix_limit,
                          fix_skip,
+                         fix_filter_query,
                          msg_structure,
                          root_dir)
 from config import api_configuration
@@ -335,10 +337,16 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
+    filter = get_value_from_request("filter")
 
     try:
         query = filter_by_date(date) if date else {}
         query.update(filter_by_module_name(module_name) if module_name else {})
+        query.update(
+            {
+                key: filter_by_regex(fix_filter_query(filter)[key]) for key in fix_filter_query(filter)
+            } if filter else {}
+        )
 
         return jsonify(
             {

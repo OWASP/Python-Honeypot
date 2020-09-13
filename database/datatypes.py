@@ -32,7 +32,6 @@ class HoneypotEvent(object):
         self.module_name = module_name
         self.machine_name = machine_name
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.event_type = "honeypot_event"
         self.country_ip_src = None
         self.country_ip_dest = None
 
