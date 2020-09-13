@@ -108,3 +108,9 @@ def filter_by_match(match_query):
     return {
         "$match": match_query
     }
+
+
+def filter_by_regex(regex):
+    return {
+        "$regex": regex
+    }

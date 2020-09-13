@@ -812,12 +812,12 @@ def load_honeypot_engine():
     create_ohp_networks()
     # start containers based on selected modules
     configuration = start_containers(configuration)
-    # start network monitoring process
+    # network capture process
     mp.set_start_method('spawn')
     # Event queues
     honeypot_events_queue = mp.Queue()
     network_events_queue = mp.Queue()
-
+    # start a new process for network capture
     network_traffic_capture_process = mp.Process(
         target=network_traffic_capture,
         args=(
@@ -836,7 +836,7 @@ def load_honeypot_engine():
             )
         )
     )
-
+    # start a thread to push events to database regularly
     bulk_events_thread = Thread(
         target=push_events_to_database_from_thread,
         args=(honeypot_events_queue, network_events_queue,),

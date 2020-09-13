@@ -32,7 +32,6 @@ class HoneypotEvent(object):
         self.module_name = module_name
         self.machine_name = machine_name
         self.date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.event_type = "honeypot_event"
         self.country_ip_src = None
         self.country_ip_dest = None
 
@@ -47,6 +46,7 @@ class NetworkEvent(object):
         ip_src: Source IP address
         port_src: Source port
         date: Date and time of the event
+        protocol: Protocol type of the packet
         machine_name: Real machine name
         country_ip_src: Country of source IP Address
         country_ip_dest: Country of destination IP Address
@@ -129,14 +129,20 @@ class FileEventsData(object):
         self.module_name = module_name
         self.date = date
         self.status = status
-        self.machine_name = None
         self.is_directory = is_directory
+        self.machine_name = None
+        self.file_content = None
 
 
 class FileArchive(object):
     """
     Object to store details about captured network traffic files
     to be stored in the File Archive
+
+    Attributes:
+        file_path: the path of the PCAP file
+        date: generation date and time of the file
+        split_timeout: timeout value to be used to split PCAP files
     """
 
     def __init__(self, file_path, date, split_timeout):

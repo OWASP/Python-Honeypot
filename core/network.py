@@ -29,7 +29,7 @@ honeypot_ports = dict()
 
 def get_gateway_ip_addresses(configuration):
     """
-    get gateway ip addresses
+    Get gateway ip addresses
 
     Args:
         configuration: user final configuration
@@ -58,28 +58,14 @@ def get_gateway_ip_addresses(configuration):
     return list(set(gateway_ips))
 
 
-def ignore_ip_addresses_rule_generator(ignore_ip_addresses):
-    """
-    generate tshark rule to ignore ip addresses
-
-    Args:
-        ignore_ip_addresses: list of ip addresses
-
-    Returns:
-        rule string
-    """
-    rules = []
-    for ip_address in ignore_ip_addresses:
-        rules.append("-Y ip.dst!={0}".format(ip_address))
-    return rules
-
-
 def process_packet(packet, honeypot_events_queue, network_events_queue):
     """
     Callback function called from the apply_on_packets function.
 
     Args:
         packet: Packet live captured by pyshark
+        honeypot_events_queue: multiprocessing queue for storing honeypot events
+        network_events_queue: multiprocessing queue for storing network events
     """
     # set machine name
     machine_name = network_configuration()["real_machine_identifier_name"]
@@ -135,10 +121,13 @@ def process_packet(packet, honeypot_events_queue, network_events_queue):
 
 def network_traffic_capture(configuration, honeypot_events_queue, network_events_queue, network_config):
     """
-    get and submit new network events
+    Capture network traffic and submit new network and honeypot events to the database
 
     Args:
         configuration: user final configuration
+        honeypot_events_queue: multiprocessing queue for storing honeypot events
+        network_events_queue: multiprocessing queue for storing network events
+        network_config: network configuration
 
     Returns:
         True
@@ -185,6 +174,8 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
     def packet_callback(packet):
         """
         Callback function, called by apply_on_packets
+        Args:
+            packet
         """
         process_packet(
             packet,
@@ -192,7 +183,8 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             network_events_queue
         )
 
-    # Run loop in hourly manner to split the capture in multiple files
+    # Run infinite loop and split the capture in multiple files using the timeout set
+    # in the network configuration
     while True:
         # Timestamp to be used in file name
         file_timestamp = int(time.time())
