@@ -74,7 +74,7 @@ jobs:
         run: sleep 15
 
       - name: Check API server logs
-        run: docker logs owasp-honeypot_ohp_1
+        run: docker logs python-honeypot_ohp_1
 
       - name: Test with pytest
         run: sudo python3 -m pytest -rpP
