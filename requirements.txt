@@ -5,5 +5,5 @@ flask==1.1.2
 terminable_thread==0.7.1
 watchdog==0.10.3
 pyshark==0.4.2.11
-oschmod==0.3.11
+oschmod==0.3.12
 argparse==1.4.0
