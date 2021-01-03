@@ -38,7 +38,8 @@ class SSHServerHandler(paramiko.ServerInterface):
             LOGFILE_LOCK.release()
         return paramiko.AUTH_FAILED
 
-    def get_allowed_auths(self, username):
+    @staticmethod
+    def get_allowed_auths(username):
         return 'password'
 
 
