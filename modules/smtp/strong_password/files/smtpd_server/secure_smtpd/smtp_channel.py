@@ -1,4 +1,3 @@
-import secure_smtpd
 import smtpd
 import base64
 import secure_smtpd
