@@ -361,7 +361,8 @@ class IP2Location(object):
             yield self._read_record(low, 6)
             low += 1
 
-    def _parse_addr(self, addr):
+    @staticmethod
+    def _parse_addr(addr):
         """ Parses address and returns IP version. Raises exception on invalid argument """
         ipv = 0
         try:
