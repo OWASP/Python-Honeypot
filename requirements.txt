@@ -1,4 +1,4 @@
-setuptools==51.2.0
+setuptools==51.3.1
 pymongo==3.11.2
 netaddr==0.8.0
 flask==1.1.2
