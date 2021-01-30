@@ -43,7 +43,7 @@ def terminate_thread(thread, verbose=True):
     from core.alert import info
     if verbose:
         info("killing {0}".format(thread.name))
-    if not thread.isAlive():
+    if not thread.is_alive():
         return
 
     exc = ctypes.py_object(SystemExit)

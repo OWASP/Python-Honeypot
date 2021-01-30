@@ -572,7 +572,7 @@ def stop_modules_processors(configuration):
 
     while True:
         if True not in [
-            module_processor_thread.isAlive() for module_processor_thread in processor_threads
+            module_processor_thread.is_alive() for module_processor_thread in processor_threads
         ]:
             break
         time.sleep(0.1)
