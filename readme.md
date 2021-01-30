@@ -1,6 +1,6 @@
 # OWASP Honeypot
 
-![Build Status](https://github.com/zdresearch/OWASP-Honeypot/workflows/Python%20application/badge.svg?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5d4f23ebcfb0417e906ed29441f60050)](https://www.codacy.com/app/zdresearch/OWASP-Honeypot?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zdresearch/OWASP-Honeypot&amp;utm_campaign=Badge_Grade)
+![Build Status](https://github.com/OWASP/Python-Honeypot/workflows/CI/badge.svg?branch=master)
 
 OWASP Honeypot is an open-source software in Python language which designed for creating honeypot and honeynet in an easy and secure way! This project is compatible with Python 3.x and tested on Mac OS X, and [Linux](https://github.com/zdresearch/OWASP-Honeypot/actions).
 
