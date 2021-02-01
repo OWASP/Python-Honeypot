@@ -5,7 +5,8 @@ FROM phusion/baseimage:0.9.19
 CMD ["/sbin/my_init"]
 
 # update and install vsftpd + libs
-RUN apt-get update && apt-get install -y vsftpd libpam-pwdfile apache2-utils
+RUN apt-get update && apt-get install -y vsftpd=3.0.3-3ubuntu2 libpam-pwdfile=1.0-1 \
+    apache2-utils=2.4.18-2ubuntu3.17
 # copy vsftpd.conf to /etc/vsftpd.conf
 COPY files/vsftpd.conf /etc/vsftpd.conf
 

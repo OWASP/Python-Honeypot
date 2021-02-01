@@ -2,7 +2,7 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install openssh + python
-RUN apt-get update && apt-get install -y openssh-server
+RUN apt-get update && apt-get install -y openssh-server=1:7.2p2-4ubuntu2.10
 
 # create credential
 RUN echo {username}:{password} | /usr/sbin/chpasswd
