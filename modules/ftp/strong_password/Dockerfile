@@ -7,7 +7,7 @@ CMD ["/sbin/my_init"]
 # update and install python3 and pip3
 RUN apt-get update && apt-get install -y python3.5 python3-pip
 
-RUN pip3 install datetime
+RUN pip3 install datetime==4.3
 COPY files/ftp_sniffer.py /root/ftp_sniffer.py
 COPY files/server.conf /root/server.conf
 

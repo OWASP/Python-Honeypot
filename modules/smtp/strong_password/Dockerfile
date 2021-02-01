@@ -2,7 +2,7 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install openssh + python
-RUN apt-get update && apt-get install -y  python3
+RUN apt-get update && apt-get install -y  python3.5
 
 COPY files/smtpd_server/ /root/smtpd_server/
 # start the service + wait for container
