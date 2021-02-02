@@ -1,0 +1,7 @@
+python3=3.8.2-0ubuntu2
+python3-pip=20.0.2-5ubuntu1.1
+libffi-dev=3.3-4
+python3-dev=3.8.2-0ubuntu2
+libssl-dev=1.1.1f-1ubuntu2.1
+build-essential=12.8ubuntu1.1
+openssh-client=1:8.2p1-4ubuntu0.1
