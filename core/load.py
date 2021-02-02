@@ -848,13 +848,12 @@ def load_honeypot_engine():
     run_modules_processors(configuration)
 
     # wait forever! in case user can send ctrl + c to interrupt
-    wait_until_interrupt(
+    exit_flag = wait_until_interrupt(
         virtual_machine_container_reset_factory_time_seconds,
         configuration,
         network_traffic_capture_process,
         run_as_test
     )
-
     # killed the network traffic capture process by ctrl + c... waiting to end.
     info("killing network capture process")
     if run_as_test:
@@ -880,4 +879,4 @@ def load_honeypot_engine():
     info("finished.")
     # reset cmd/terminal color
     reset_cmd_color()
-    return True
+    return exit_flag
