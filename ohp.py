@@ -5,5 +5,4 @@ import sys
 from core.load import load_honeypot_engine
 
 if __name__ == "__main__":
-    load_honeypot_engine()  # load the engine
-    sys.exit(0)
+    sys.exit(0 if load_honeypot_engine() is True else 1)

@@ -1,13 +1,16 @@
 # using phusion/baseimage as base image
-FROM phusion/baseimage:0.9.19
+FROM ubuntu:20.04
 
 # use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
 
 # update and install python3 and pip3
-RUN apt-get update && apt-get install -y python3.5 python3-pip
+COPY files/requirements-apt-get.txt files/requirements-pip3.txt ./
 
-RUN pip3 install datetime
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
+
+RUN pip3 install -r requirements-pip3.txt
+
 COPY files/ftp_sniffer.py /root/ftp_sniffer.py
 COPY files/server.conf /root/server.conf
 

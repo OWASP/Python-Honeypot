@@ -1,0 +1,2 @@
+python3=3.8.2-0ubuntu2
+python3-pip=20.0.2-5ubuntu1.1

@@ -2,7 +2,8 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install apache + python
-RUN apt-get update && apt-get install -y python
+COPY files/requirements-apt-get.txt requirements-apt-get.txt
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
 
 # copy gaspot service and config.ini file
 COPY files/veeder_root_guardian_ast_service.py /root/veeder_root_guardian_ast_service.py
