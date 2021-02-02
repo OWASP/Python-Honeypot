@@ -2,11 +2,11 @@
 FROM ubuntu:20.04
 
 # update and install openssh + python
-RUN apt-get update && apt-get install -y python3.5 python3-pip \
-    libffi-dev python3-dev libssl-dev build-essential openssh-client
+COPY files/requirements-apt.txt files/requirements-py.txt ./
 
-RUN pip3 install paramiko
-RUN pip3 install datetime
+RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+
+RUN pip3 install -r requirements-py.txt
 
 COPY files/ssh_listener.py /root/ssh_listener.py
 # create credential

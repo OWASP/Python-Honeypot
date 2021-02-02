@@ -5,9 +5,12 @@ FROM phusion/baseimage:0.9.19
 CMD ["/sbin/my_init"]
 
 # update and install python3 and pip3
-RUN apt-get update && apt-get install -y python3.5 python3-pip
+COPY files/requirements-apt.txt files/requirements-py.txt ./
 
-RUN pip3 install datetime
+RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+
+RUN pip3 install -r requirements-py.txt
+
 COPY files/ftp_sniffer.py /root/ftp_sniffer.py
 COPY files/server.conf /root/server.conf
 
