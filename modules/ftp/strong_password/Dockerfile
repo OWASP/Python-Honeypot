@@ -5,11 +5,11 @@ FROM ubuntu:20.04
 CMD ["/sbin/my_init"]
 
 # update and install python3 and pip3
-COPY files/requirements-apt.txt files/requirements-py.txt ./
+COPY files/requirements-apt-get.txt files/requirements-pip3.txt ./
 
-RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
 
-RUN pip3 install -r requirements-py.txt
+RUN pip3 install -r requirements-pip3.txt
 
 COPY files/ftp_sniffer.py /root/ftp_sniffer.py
 COPY files/server.conf /root/server.conf

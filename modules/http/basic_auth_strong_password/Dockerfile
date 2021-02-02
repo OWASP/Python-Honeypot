@@ -3,8 +3,8 @@ FROM phusion/baseimage:0.9.19
 
 # update and install apache + python
 
-COPY files/requirements-apt.txt requirements-apt.txt
-RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+COPY files/requirements-apt-get.txt requirements-apt-get.txt
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
 
 # create credential
 RUN htpasswd -b -c /var/www/html/.htpasswd {username} {password}
