@@ -2,11 +2,11 @@
 FROM ubuntu:20.04
 
 # update and install openssh + python
-COPY files/requirements-apt.txt files/requirements-py.txt ./
+COPY files/requirements-apt-get.txt files/requirements-pip3.txt ./
 
-RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
 
-RUN pip3 install -r requirements-py.txt
+RUN pip3 install -r requirements-pip3.txt
 
 COPY files/ssh_listener.py /root/ssh_listener.py
 # create credential

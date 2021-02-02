@@ -2,8 +2,10 @@
 FROM phusion/baseimage:0.9.19
 
 # update and install openssh + python
-COPY files/requirements-apt.txt requirements-apt.txt
-RUN apt-get update && xargs apt-get install -y < requirements-apt.txt
+COPY files/requirements-apt-get.txt requirements-ap-gett.txt
+RUN apt-get update && xargs apt-get install -y < requirements-apt-get.txt
+# Remove possible evidence for honeypot
+RUN rm -rf requirements-apt-get.txt
 
 # create credential
 RUN echo {username}:{password} | /usr/sbin/chpasswd
