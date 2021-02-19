@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import time
+import time, datetime
 from core.compatible import generate_token
 import os
 import binascii
@@ -37,7 +37,9 @@ class ModuleProcessor:
                 for data in data_dump:
                     data_json = json.loads(data)
                     ip = data_json["ip"]
-                    time_of_insertion = data_json["time"]
+                    date_log = data_json["time"]
+                    date = datetime.datetime.strptime(date_log[1:12],"%d/%b/%Y").strftime("%Y-%m-%d")
+                    time_of_insertion = date + ' ' + date_log[13:21]
                     if data_json["authorization"] != "-":
                         authorization = \
                             data_json["authorization"].split(' ')[1]
