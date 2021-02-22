@@ -3,7 +3,7 @@ pymongo==3.11.3
 netaddr==0.8.0
 flask==1.1.2
 terminable_thread==0.7.1
-watchdog==1.0.2
+watchdog==2.0.2
 pyshark==0.4.2.11
 oschmod==0.3.12
 argparse==1.4.0
