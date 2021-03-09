@@ -1,7 +1,7 @@
 import time
 from multiprocessing import Process, Queue
 
-class ProcessPool(object):
+class ProcessPool:
     
     def __init__(self, func, process_count=5):
         self.func = func

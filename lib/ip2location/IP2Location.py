@@ -93,7 +93,7 @@ _ELEVATION_POSITION = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 _USAGETYPE_POSITION = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 20)
 
 
-class IP2Location(object):
+class IP2Location:
     """ IP2Location database """
 
     def __init__(self, filename=None):
