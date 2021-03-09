@@ -199,7 +199,6 @@ def authorization_check():
             abort(403, "unauthorized IP")
     if not api_access_without_key:
         is_authorized()
-    return
 
 
 @app.route("/", methods=["GET", "POST"])

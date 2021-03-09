@@ -94,8 +94,6 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
 
     honeypot_events_queue.put(honeypot_event.__dict__)
 
-    return
-
 
 def insert_to_network_events_queue(network_event: NetworkEvent, network_events_queue: Queue):
     """
@@ -137,8 +135,6 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
 
     network_events_queue.put(network_event.__dict__)
 
-    return
-
 
 def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     """
@@ -160,8 +156,6 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     while not network_events_queue.empty():
         new_event = network_events_queue.get()
         network_events.insert_one(new_event)
-
-    return
 
 
 def push_events_to_database_from_thread(honeypot_events_queue, network_events_queue):

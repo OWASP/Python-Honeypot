@@ -45,7 +45,6 @@ def info(content):
         )
     )
     sys.stdout.flush()
-    return
 
 
 def write(content):
@@ -62,7 +61,6 @@ def write(content):
         bytes(content, "utf8") if isinstance(content, str) else content
     )
     sys.stdout.flush()
-    return
 
 
 def warn(content):
@@ -87,8 +85,6 @@ def warn(content):
             "utf8")
     )
     sys.stdout.flush()
-
-    return
 
 
 def verbose_info(content):
@@ -115,7 +111,6 @@ def verbose_info(content):
         )
     )
     sys.stdout.flush()
-    return
 
 
 def error(content):
@@ -138,7 +133,6 @@ def error(content):
          ).encode("utf8")
     )
     sys.stdout.flush()
-    return
 
 
 def write_to_api_console(content):
@@ -155,4 +149,3 @@ def write_to_api_console(content):
         bytes(content, "utf8")
     )
     sys.stdout.flush()
-    return

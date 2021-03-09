@@ -557,7 +557,6 @@ def run_modules_processors(configuration):
         )
         module_processor_thread.start()
         processor_threads.append(module_processor_thread)
-    return
 
 
 def stop_modules_processors(configuration):
@@ -576,7 +575,6 @@ def stop_modules_processors(configuration):
         ]:
             break
         time.sleep(0.1)
-    return
 
 
 def set_network_configuration(argv_options):
