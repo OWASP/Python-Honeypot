@@ -39,11 +39,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo
-        ports:
-          - 27017:27017
     strategy:
       matrix:
         python-version: [3.5.9, 3.6.11, 3.7.8, 3.8.5]
@@ -68,7 +63,7 @@ jobs:
         run: flake8 --count --show-source --statistics .
 
       - name: Run API server via docker daemon
-        run: docker-compose -f docker-compose-host.yml up -d --build
+        run: docker-compose up -d --build
 
       - name: Wait for API server to load
         run: sleep 15
