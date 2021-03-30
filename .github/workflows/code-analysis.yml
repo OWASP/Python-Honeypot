@@ -1,0 +1,47 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+
+        language: ['python']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends apt-utils libmemcached-dev libsasl2-dev libssl-dev libldap2-dev python-dev libfuzzy-dev net-tools git osslsigncode exiftool libpq-dev zlib1g-dev
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install
+        # Set the `CODEQL-PYTHON` environment variable to the Python executable
+        # that includes the dependencies
+        echo "CODEQL_PYTHON=$(which python)" >> $GITHUB_ENV
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: python
+        setup-python-dependencies: false
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
