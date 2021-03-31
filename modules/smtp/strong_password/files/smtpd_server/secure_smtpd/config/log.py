@@ -4,7 +4,7 @@ from logging import StreamHandler
 
 LOG_NAME = 'ohp_smtp_honeypot'
 
-class Log(object):
+class Log:
 
     def __init__(self, log_name):
         self.log_name = log_name

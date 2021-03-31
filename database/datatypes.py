@@ -4,7 +4,7 @@
 from datetime import datetime
 
 
-class HoneypotEvent(object):
+class HoneypotEvent:
     """
     Object to store Honeypot Event Parameters.
 
@@ -36,7 +36,7 @@ class HoneypotEvent(object):
         self.country_ip_dest = None
 
 
-class NetworkEvent(object):
+class NetworkEvent:
     """
     Object to store Network Event Parameters
 
@@ -66,7 +66,7 @@ class NetworkEvent(object):
         self.country_ip_dest = None
 
 
-class CredentialEvent(object):
+class CredentialEvent:
     """
     Object to store Credential Event Parameters
 
@@ -90,7 +90,7 @@ class CredentialEvent(object):
         self.country = None
 
 
-class EventData(object):
+class EventData:
     """
     Object to store Honeypot Event Data collected from
     modules such as ICS Module.
@@ -111,7 +111,7 @@ class EventData(object):
         self.country = None
 
 
-class FileEventsData(object):
+class FileEventsData:
     """
     Object to store file changes events data collected from
     modules such as ftp/ssh weak_password module.
@@ -134,7 +134,7 @@ class FileEventsData(object):
         self.file_content = None
 
 
-class FileArchive(object):
+class FileArchive:
     """
     Object to store details about captured network traffic files
     to be stored in the File Archive

@@ -8,7 +8,7 @@ import datetime
 LOGFILE = '/root/logs/ohp_smtp_honeypot_logs.txt'
 
 
-class FakeCredentialValidator(object):
+class FakeCredentialValidator:
     def __init__(self):
         self.output_lock = threading.Lock()
 
