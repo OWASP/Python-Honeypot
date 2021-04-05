@@ -5,6 +5,7 @@ import inspect
 import os
 import time
 import elasticsearch
+import hashlib
 
 from multiprocessing import Queue
 
@@ -282,10 +283,13 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
+    file_content = open(file_archive.file_path, "rb")
+    file_md5 = hashlib.md5(file_content).hexdigest()
     return elasticsearch_events.index(
         index='ohp_file_archive',
         body={
-            "content": open(file_archive.file_path, "rb"),
+            "md5": file_md5,
+            "content": file_content,
             "filename": os.path.split(file_archive.file_path)[1],
             "machine_name": network_configuration()["real_machine_identifier_name"],
             "date": file_archive.date,

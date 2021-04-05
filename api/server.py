@@ -30,7 +30,7 @@ from api.utility import (aggregate_function,
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
-from database import connector
+from database.connector import elasticsearch_events
 
 template_dir = os.path.join(
     os.path.join(
@@ -256,20 +256,21 @@ def count_events(event_type):
             {
                 "count": sum(
                     [
-                        event_types[event_type].count_documents(
-                            {
-                                **filter_by_date(date)
-                            },
-                            allowDiskUse=True
-                        ) if date else event_types[event_type].estimated_document_count() for event_type in event_types
+                        int(
+                            elasticsearch_events.count(
+                                index=event_types[event_type],
+                                body=filter_by_date
+                            )['count']
+                        ) if date else int(
+                            elasticsearch_events.count(index=event_types[event_type])['count']
+                        ) for event_type in event_types
                     ]
                 ) if event_type == "all" else int(
-                    event_types[event_type].count_documents(
-                        {
-                            **filter_by_date(date)
-                        },
-                        allowDiskUse=True
-                    ) if date else event_types[event_type].estimated_document_count()
+                    elasticsearch_events.search(
+                        index=event_types[event_type],
+                        body=filter_by_date
+                    )['count']
+                    if date else elasticsearch_events.count(index=event_types[event_type])['count']
                 ),
                 "date": date
             }
@@ -383,7 +384,7 @@ def download_file():
         md5_value = get_value_from_request("md5")
         abort(404) if not md5_value else md5_value
 
-        fs = connector.ohp_file_archive_gridfs.find_one(
+        fs = elasticsearch_events(index='ohp_file_archive').find_one(
             {
                 "md5": md5_value
             }
