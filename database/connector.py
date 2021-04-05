@@ -5,7 +5,6 @@ import inspect
 import os
 import time
 import elasticsearch
-import gridfs
 
 from multiprocessing import Queue
 
@@ -23,50 +22,23 @@ from lib.ip2location import IP2Location
 api_config = api_configuration()
 network_config = network_configuration()
 
+
 # ES Client
-client = elasticsearch.Elasticsearch(
-    api_config["api_database"],
-    http_auth=api_config["api_database_http_auth"]
-)
+def elasticsearch_client(index):
+    return elasticsearch.Elasticsearch(
+        api_config["api_database"],
+        http_auth=api_config["api_database_http_auth"],
+        index=index
+    )
 
-database = client[api_config["api_database_name"]]
-
-class database:
-    def __init__(self, index):
-        index = '?'
-    
-    def create_index():
-        client.indices.create(index=self.index, ignore=400)
-    
-    def insert_one(body):
-        return client.index(index=self.index, body=body)
-    
 
 # Event index connections
-# todo: clean here
-credential_events = database()
-credential_events.index = 'credential_events'
-credential_events.create_index()
-
-honeypot_events = database()
-honeypot_events.index = 'honeypot_events'
-honeypot_events.create_index()
-
-network_events = database()
-network_events.index = 'network_events'
-network_events.create_index()
-
-file_change_events = database()
-file_change_events.index = 'file_change_events'
-file_change_events.create_index()
-
-data_events = database()
-data_events.index = 'data_events'
-data_events.create_index()
-
-# Database for storing network traffic files
-ohp_file_archive = client.ohp_file_archive
-ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
+credential_events = elasticsearch_client('credential_events')
+honeypot_events = elasticsearch_client('honeypot_events')
+network_events = elasticsearch_client('network_events')
+file_change_events = elasticsearch_client('file_change_events')
+data_events = elasticsearch_client('data_events')
+ohp_file_archive = elasticsearch_client('ohp_file_archive')
 
 # Event queues
 honeypot_events_queue = list()
@@ -236,7 +208,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
                 credential_event.machine_name
             )
         )
-
+    return credential_events.cre
     return credential_events.insert_one(credential_event.__dict__).inserted_id
 
 
@@ -323,10 +295,12 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
-    return ohp_file_archive_gridfs.put(
-        open(file_archive.file_path, "rb"),
-        filename=os.path.split(file_archive.file_path)[1],
-        machine_name=network_configuration()["real_machine_identifier_name"],
-        date=file_archive.date,
-        splitTimeout=file_archive.split_timeout
+    return ohp_file_archive.insert_one(
+        {
+            "content": open(file_archive.file_path, "rb"),
+            "filename": os.path.split(file_archive.file_path)[1],
+            "machine_name": network_configuration()["real_machine_identifier_name"],
+            "date": file_archive.date,
+            "splitTimeout": file_archive.split_timeout
+        }
     )

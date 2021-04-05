@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: "Dockerfile.api"
-    command: bash -c "sleep 15 && python3 ohp.py --start-api-server"
+    command: bash -c "sleep 30 && python3 ohp.py --start-api-server"
     environment:
       - FLASK_ENV=development
       - ELASTICSEARCH_DOCKER_ENV=true

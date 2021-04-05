@@ -177,7 +177,7 @@ def error_500(error):
     del error
     return jsonify(
         msg_structure(status="error", msg="something went wrong!")
-    )
+    ), 500
 
 
 @app.before_request

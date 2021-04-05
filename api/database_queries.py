@@ -7,7 +7,6 @@ for querying mongodb using pymongo.
 
 Created this file because the queries are repeated over the URI's.
 """
-from bson.son import SON
 from api.utility import (fix_date,
                          fix_limit,
                          fix_skip)
@@ -19,7 +18,7 @@ from database.connector import (honeypot_events,
                                 ohp_file_archive)
 
 sort_by_count = {
-    "$sort": SON(
+    "$sort": (
         [
             ("count", -1)
         ]
@@ -57,7 +56,7 @@ event_types = {
     "credential": credential_events,
     "file": file_change_events,
     "data": data_events,
-    "pcap": ohp_file_archive.fs.files
+    "pcap": ohp_file_archive
 }
 
 
@@ -65,8 +64,8 @@ def filter_by_date(date):
     date = fix_date(date)
     return {
         "date": {
-            "$gte": date[0],
-            "$lte": date[1]
+            "gte": date[0],
+            "lte": date[1]
         }
     }
 

@@ -69,7 +69,6 @@ def check_for_requirements(start_api_server):
     from config import api_configuration
     # check external required modules
     api_config = api_configuration()
-    connection_timeout = api_config["api_database_connection_timeout"]
     try:
         # todo: clean here
         import elasticsearch
