@@ -1,17 +1,16 @@
 version: '3'
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+    container_name: "elasticsearch"
     environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    volumes:
-      - ./data/db:/data/db
+      - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+      - discovery.type=single-node
     ports:
-      - 27017:27017
-    command: mongod --logpath=/dev/null # --quiet
+      - 9200:9200
+    volumes:
+      - ./data/db:/usr/share/elasticsearch/data
 
   ohp:
     build:
@@ -20,12 +19,12 @@ services:
     command: bash -c "sleep 15 && python3 ohp.py --start-api-server"
     environment:
       - FLASK_ENV=development
-      - MONGODB_DOCKER_ENV=true
+      - ELASTICSEARCH_DOCKER_ENV=true
     ports:
       - 5000:5000
     volumes:
       - .:/OWASP-Honeypot
     links:
-      - mongodb
+      - elasticsearch
     depends_on:
-      - mongodb
+      - elasticsearch

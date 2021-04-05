@@ -71,22 +71,23 @@ def check_for_requirements(start_api_server):
     api_config = api_configuration()
     connection_timeout = api_config["api_database_connection_timeout"]
     try:
-        import pymongo
+        # todo: clean here
+        import elasticsearch
         import netaddr
         import flask
         del netaddr
         del flask
     except Exception:
         exit_failure("pip install -r requirements.txt")
-    # check mongodb
+    # check elasticsearch
     try:
-        connection = pymongo.MongoClient(
+        connection = elasticsearch.Elasticsearch(
             api_config["api_database"],
-            serverSelectionTimeoutMS=connection_timeout
+            http_auth=api_config["api_database"]
         )
-        connection.list_database_names()
+        connection.indices.get_alias("*")
     except Exception:
-        exit_failure("cannot connect to mongodb")
+        exit_failure("cannot connect to elasticsearch")
     # check if its honeypot server not api server
     if not start_api_server:
         # check docker
