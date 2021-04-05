@@ -10,12 +10,6 @@ Created this file because the queries are repeated over the URI's.
 from api.utility import (fix_date,
                          fix_limit,
                          fix_skip)
-from database.connector import (honeypot_events,
-                                network_events,
-                                credential_events,
-                                file_change_events,
-                                data_events,
-                                ohp_file_archive)
 
 sort_by_count = {
     "$sort": (
@@ -51,12 +45,12 @@ group_by_elements = {
 }
 
 event_types = {
-    "honeypot": honeypot_events,
-    "network": network_events,
-    "credential": credential_events,
-    "file": file_change_events,
-    "data": data_events,
-    "pcap": ohp_file_archive
+    "honeypot": 'honeypot_events',
+    "network": 'network_events',
+    "credential": 'credential_events',
+    "file": 'file_change_events',
+    "data": 'data_events',
+    "pcap": 'ohp_file_archive'
 }
 
 

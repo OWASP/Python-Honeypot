@@ -22,23 +22,11 @@ from lib.ip2location import IP2Location
 api_config = api_configuration()
 network_config = network_configuration()
 
-
-# ES Client
-def elasticsearch_client(index):
-    return elasticsearch.Elasticsearch(
-        api_config["api_database"],
-        http_auth=api_config["api_database_http_auth"],
-        index=index
-    )
-
-
 # Event index connections
-credential_events = elasticsearch_client('credential_events')
-honeypot_events = elasticsearch_client('honeypot_events')
-network_events = elasticsearch_client('network_events')
-file_change_events = elasticsearch_client('file_change_events')
-data_events = elasticsearch_client('data_events')
-ohp_file_archive = elasticsearch_client('ohp_file_archive')
+elasticsearch_events = elasticsearch.Elasticsearch(
+    api_config["api_database"],
+    http_auth=api_config["api_database_http_auth"],
+)
 
 # Event queues
 honeypot_events_queue = list()
@@ -154,12 +142,12 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     # Insert all honeypot events to database (honeypot_events collection)
     while not honeypot_events_queue.empty():
         new_event = honeypot_events_queue.get()
-        honeypot_events.insert_one(new_event)
+        elasticsearch_events.index(index='honeypot_events', body=new_event)
 
     # Insert all network events to database (network_events collection)
     while not network_events_queue.empty():
         new_event = network_events_queue.get()
-        network_events.insert_one(new_event)
+        elasticsearch_events.index(index='network_events', body=new_event)
 
     return
 
@@ -208,8 +196,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
                 credential_event.machine_name
             )
         )
-    return credential_events.cre
-    return credential_events.insert_one(credential_event.__dict__).inserted_id
+    return elasticsearch_events.index(index='credential_events', body=credential_event.__dict__)
 
 
 def insert_to_file_change_events_collection(file_change_event_data: FileEventsData):
@@ -240,7 +227,7 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
                 file_change_event_data.machine_name,
             )
         )
-    return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
+    return elasticsearch_events.index(index='file_change_events', body=file_change_event_data.__dict__)
 
 
 def insert_to_events_data_collection(event_data: EventData):
@@ -273,7 +260,7 @@ def insert_to_events_data_collection(event_data: EventData):
             )
         )
 
-    return data_events.insert_one(event_data.__dict__).inserted_id
+    return elasticsearch_events.index(index='data_events', body=event_data.__dict__)
 
 
 def insert_pcap_files_to_collection(file_archive: FileArchive):
@@ -295,8 +282,9 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
-    return ohp_file_archive.insert_one(
-        {
+    return elasticsearch_events.index(
+        index='ohp_file_archive',
+        body={
             "content": open(file_archive.file_path, "rb"),
             "filename": os.path.split(file_archive.file_path)[1],
             "machine_name": network_configuration()["real_machine_identifier_name"],
