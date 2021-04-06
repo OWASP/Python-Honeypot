@@ -6,6 +6,7 @@ import os
 import time
 import elasticsearch
 import hashlib
+import binascii
 
 from multiprocessing import Queue
 
@@ -17,8 +18,10 @@ from database.datatypes import (CredentialEvent,
                                 EventData,
                                 NetworkEvent,
                                 FileEventsData,
-                                FileArchive)
+                                FileArchive,
+                                elastic_search_types)
 from lib.ip2location import IP2Location
+from api.database_queries import event_types
 
 api_config = api_configuration()
 network_config = network_configuration()
@@ -28,6 +31,16 @@ elasticsearch_events = elasticsearch.Elasticsearch(
     api_config["api_database"],
     http_auth=api_config["api_database_http_auth"],
 )
+
+event_types_elastic = event_types.copy()
+del event_types_elastic['all']
+
+for event_type in event_types_elastic:
+    elasticsearch_events.indices.create(
+        index=event_types_elastic[event_type],
+        body=elastic_search_types[event_type],
+        ignore=400
+    )
 
 # Event queues
 honeypot_events_queue = list()
@@ -212,6 +225,7 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
     Returns:
         inserted_id
     """
+    # todo: file_content must be base64
     file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
     file_change_event_data.file_content = open(
         file_change_event_data.file_path,
@@ -283,7 +297,8 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
-    file_content = open(file_archive.file_path, "rb")
+    # todo: bug here + file_content must be base64
+    file_content = binascii.b2a_base64(open(file_archive.file_path, "rb").read())
     file_md5 = hashlib.md5(file_content).hexdigest()
     return elasticsearch_events.index(
         index='ohp_file_archive',

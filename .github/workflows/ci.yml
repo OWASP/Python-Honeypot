@@ -81,7 +81,7 @@ jobs:
         run: docker-compose down
       
       - name: Start mongodb
-        run: docker run -p 27017-27019:27017-27019 -d mongo
+        run: docker run -p 9200:9200 -d elasticsearch
 
       - name: Run modules test
         run: sudo python3 ohp.py -m all --test --store-pcap

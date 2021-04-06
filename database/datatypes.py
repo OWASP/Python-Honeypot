@@ -3,6 +3,107 @@
 
 from datetime import datetime
 
+elastic_search_types = {
+    "honeypot": {
+        'mappings': {
+            'properties': {
+                'ip_dest': {'type': 'ip'},
+                'port_dest': {'type': 'integer'},
+                'ip_src': {'type': 'ip'},
+                'port_src': {'type': 'integer'},
+                'protocol': {'type': 'keyword'},
+                'module_name': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'country_ip_src': {'type': 'keyword'},
+                'country_ip_dest': {'type': 'keyword'}
+            }
+        }
+    },
+    "network": {
+        'mappings': {
+            'properties': {
+                'ip_dest': {'type': 'ip'},
+                'port_dest': {'type': 'integer'},
+                'ip_src': {'type': 'ip'},
+                'port_src': {'type': 'integer'},
+                'protocol': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'country_ip_src': {'type': 'keyword'},
+                'country_ip_dest': {'type': 'keyword'}
+            }
+        }
+    },
+    "credential": {
+        'mappings': {
+            'properties': {
+                'ip': {'type': 'ip'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'username': {'type': 'keyword'},
+                'password': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'country': {'type': 'keyword'}
+            }
+        }
+    },
+    "data": {
+        'mappings': {
+            'properties': {
+                'ip': {'type': 'ip'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'data': {'type': 'nested'},
+                'machine_name': {'type': 'keyword'},
+                'country': {'type': 'keyword'}
+            }
+        }
+    },
+    "file": {
+        'mappings': {
+            'properties': {
+                'file_path': {'type': 'text'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'status': {'type': 'keyword'},
+                'is_directory': {'type': 'boolean'},
+                'machine_name': {'type': 'keyword'},
+                'file_content': {'type': 'binary'}
+            }
+        }
+    },
+    "pcap": {
+        'mappings': {
+            'properties': {
+                'file_path': {'type': 'text'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'split_timeout': {'type': 'long'},
+                'md5': {'type': 'keyword'},
+                'file_content': {'type': 'binary'}
+            }
+        }
+    }
+}
+
 
 class HoneypotEvent:
     """
@@ -149,3 +250,5 @@ class FileArchive:
         self.file_path = file_path
         self.date = date
         self.split_timeout = split_timeout
+        self.md5 = None
+        self.file_content = None

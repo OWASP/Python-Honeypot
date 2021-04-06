@@ -45,6 +45,7 @@ group_by_elements = {
 }
 
 event_types = {
+    "all": "*",
     "honeypot": 'honeypot_events',
     "network": 'network_events',
     "credential": 'credential_events',
@@ -57,9 +58,14 @@ event_types = {
 def filter_by_date(date):
     date = fix_date(date)
     return {
-        "date": {
-            "gte": date[0],
-            "lte": date[1]
+        "query": {
+            "range":
+                {
+                    "date": {
+                        "gte": date[0],
+                        "lte": date[1]
+                    }
+                }
         }
     }
 

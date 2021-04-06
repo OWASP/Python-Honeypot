@@ -248,29 +248,19 @@ def count_events(event_type):
     Returns:
         JSON/Dict number of all events
     """
-    abort(404) if event_type not in event_types and event_type != "all" else event_type
+    abort(404) if event_type not in event_types else None
 
     date = get_value_from_request("date")
     try:
         return jsonify(
             {
-                "count": sum(
-                    [
-                        int(
-                            elasticsearch_events.count(
-                                index=event_types[event_type],
-                                body=filter_by_date
-                            )['count']
-                        ) if date else int(
-                            elasticsearch_events.count(index=event_types[event_type])['count']
-                        ) for event_type in event_types
-                    ]
-                ) if event_type == "all" else int(
-                    elasticsearch_events.search(
+                "count": int(
+                    elasticsearch_events.count(
                         index=event_types[event_type],
-                        body=filter_by_date
+                        body=filter_by_date(date)
                     )['count']
-                    if date else elasticsearch_events.count(index=event_types[event_type])['count']
+                    if date else
+                    elasticsearch_events.count(index=event_types[event_type])['count']
                 ),
                 "date": date
             }
