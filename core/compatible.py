@@ -11,9 +11,11 @@ import random
 import string
 import shutil
 import inspect
+import json
 
 from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
+from shutil import which
 
 
 def logo():
@@ -95,17 +97,19 @@ def check_for_requirements(start_api_server):
                                     stderr=subprocess.PIPE)
         except Exception:
             exit_failure("cannot communicate with docker, please install and start the docker service!")
-        # check tshark
-        try:
-            subprocess.check_output(
-                [
-                    "tshark",
-                    "--help"
-                ],
-                stderr=subprocess.PIPE
-            )
-        except Exception:
-            exit_failure("please install tshark first!")
+        # check for commandline requirements
+        commands = {
+            'tshark': which('tshark'),
+            'ps': which('ps'),
+            'grep': which('grep'),
+            'kill': which('kill')
+        }
+        for command in commands:
+            if commands[command] is None:
+                exit_failure(
+                    "please install required tools first!\n"
+                    "{0}".format(json.dumps(commands, indent=4))
+                )
     return True
 
 

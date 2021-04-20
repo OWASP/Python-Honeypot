@@ -225,12 +225,11 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
     Returns:
         inserted_id
     """
-    # todo: file_content must be base64
     file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
-    file_change_event_data.file_content = open(
+    file_change_event_data.file_content = binascii.b2a_base64(open(
         file_change_event_data.file_path,
         'rb'
-    ).read() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
+    ).read()).decode() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
 
     if is_verbose_mode():
         verbose_info(
@@ -297,9 +296,8 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
-    # todo: bug here + file_content must be base64
-    file_content = binascii.b2a_base64(open(file_archive.file_path, "rb").read())
-    file_md5 = hashlib.md5(file_content).hexdigest()
+    file_content = binascii.b2a_base64(open(file_archive.file_path, "rb").read()).decode()
+    file_md5 = hashlib.md5(file_content.encode()).hexdigest()
     return elasticsearch_events.index(
         index='ohp_file_archive',
         body={
