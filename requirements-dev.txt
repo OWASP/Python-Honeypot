@@ -1,6 +1,6 @@
-pytest==6.2.2
+pytest==6.2.3
 codecov==2.1.11
 requests==2.25.1
-flake8==3.9.0
+flake8==3.9.1
 wheel==0.36.2
 requests==2.25.1
