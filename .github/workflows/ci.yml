@@ -77,11 +77,8 @@ jobs:
       - name: Check API server logs
         run: docker-compose logs ohp
 
-      - name: Kill API Server
-        run: docker-compose down
-      
-      - name: Start mongodb
-        run: docker run -p 27017-27019:27017-27019 -d mongo
-
       - name: Run modules test
         run: sudo python3 ohp.py -m all --test --store-pcap
+
+      - name: Kill API Server
+        run: docker-compose down

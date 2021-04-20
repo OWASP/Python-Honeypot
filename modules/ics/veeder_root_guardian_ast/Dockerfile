@@ -1,5 +1,5 @@
 # using phusion/baseimage as base image
-FROM phusion/baseimage:0.9.19
+FROM phusion/baseimage:master
 
 # update and install apache + python
 COPY files/requirements-apt-get.txt requirements-apt-get.txt
