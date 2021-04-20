@@ -464,9 +464,9 @@ def honeypot_configuration_builder(selected_modules):
     return honeypot_configuration
 
 
-def port_is_reserved(real_machine_port):
+def port_is_free(real_machine_port):
     """
-    check if port is reserved
+    check if port is free
 
     Args:
         real_machine_port: port number
@@ -478,14 +478,14 @@ def port_is_reserved(real_machine_port):
         tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         tcp.bind(
             (
-                network_configuration()["real_machine_ip_address"],
+                "0.0.0.0",
                 real_machine_port
             )
         )
         tcp.close()
-        return False
-    except Exception:
         return True
+    except Exception:
+        return False
 
 
 def reserve_tcp_port(real_machine_port, module_name, configuration):
@@ -502,7 +502,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
     """
     while True:
         try:
-            if not port_is_reserved(real_machine_port):
+            if port_is_free(real_machine_port):
                 # unique_port = True
                 configuration[module_name]["real_machine_port_number"] = real_machine_port
                 duplicated_ports = []
@@ -510,8 +510,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                     duplicated_ports.append(
                         configuration[selected_module]["real_machine_port_number"])
                 if duplicated_ports.count(real_machine_port) == 1:
-                    info("port {0} selected for {1}".format(
-                        real_machine_port, module_name))
+                    info("port {0} selected for {1}".format(real_machine_port, module_name))
                     return real_machine_port
         except Exception:
             pass
