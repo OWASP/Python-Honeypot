@@ -191,9 +191,9 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     Returns:
         inserted_id
     """
-    credential_event.country = byte_to_str(
+    credential_event.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
-            credential_event.ip
+            credential_event.ip_src
         )
     )
 
@@ -203,7 +203,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         verbose_info(
             "Received honeypot credential event, ip_dest:{0}, username:{1}, "
             "password:{2}, module_name:{3}, machine_name:{4}".format(
-                credential_event.ip,
+                credential_event.ip_src,
                 credential_event.username,
                 credential_event.password,
                 credential_event.module_name,
@@ -257,9 +257,9 @@ def insert_to_events_data_collection(event_data: EventData):
     """
     event_data.machine_name = network_config["real_machine_identifier_name"]
 
-    event_data.country = byte_to_str(
+    event_data.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
-            event_data.ip
+            event_data.ip_src
         )
     )
 
@@ -267,7 +267,7 @@ def insert_to_events_data_collection(event_data: EventData):
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}".format(
-                event_data.ip,
+                event_data.ip_src,
                 event_data.module_name,
                 event_data.machine_name,
                 event_data.data

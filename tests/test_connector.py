@@ -115,13 +115,13 @@ class TestConnector(unittest.TestCase):
         Test the data insertion to the events_data collection
         """
         event_data = EventData(
-            ip="55.66.77.88",
+            ip_src="55.66.77.88",
             module_name="ics/veeder_root_guardian_ast",
             date=datetime.now(),
             data="Test Data"
         )
 
-        insert_to_events_data_collection(event_data)
+        insert_to_events_data_collection(event_dwata)
 
         # Find the record in the DB
         event_record_data = data_events.find_one(event_data.__dict__)

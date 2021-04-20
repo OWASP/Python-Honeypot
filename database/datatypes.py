@@ -44,7 +44,7 @@ elastic_search_types = {
     "credential": {
         'mappings': {
             'properties': {
-                'ip': {'type': 'ip'},
+                'ip_src': {'type': 'ip'},
                 'module_name': {'type': 'keyword'},
                 'date': {
                     'type': 'date',
@@ -53,14 +53,14 @@ elastic_search_types = {
                 'username': {'type': 'keyword'},
                 'password': {'type': 'keyword'},
                 'machine_name': {'type': 'keyword'},
-                'country': {'type': 'keyword'}
+                'country_ip_src': {'type': 'keyword'}
             }
         }
     },
     "data": {
         'mappings': {
             'properties': {
-                'ip': {'type': 'ip'},
+                'ip_src': {'type': 'ip'},
                 'module_name': {'type': 'keyword'},
                 'date': {
                     'type': 'date',
@@ -68,7 +68,7 @@ elastic_search_types = {
                 },
                 'data': {'type': 'nested'},
                 'machine_name': {'type': 'keyword'},
-                'country': {'type': 'keyword'}
+                'country_ip_src': {'type': 'keyword'}
             }
         }
     },
@@ -181,14 +181,14 @@ class CredentialEvent:
         country: Country corresponding to the IP Address
     """
 
-    def __init__(self, ip, module_name, date, username, password):
-        self.ip = ip
+    def __init__(self, ip_src, module_name, date, username, password):
+        self.ip_src = ip_src
         self.module_name = module_name
         self.date = date
         self.username = username
         self.password = password
         self.machine_name = None
-        self.country = None
+        self.country_ip_src = None
 
 
 class EventData:
@@ -204,12 +204,12 @@ class EventData:
     """
 
     def __init__(self, ip, module_name, date, data):
-        self.ip = ip
+        self.ip_src = ip
         self.module_name = module_name
         self.date = date
         self.data = data
         self.machine_name = None
-        self.country = None
+        self.country_ip_src = None
 
 
 class FileEventsData:
