@@ -1,2 +1,2 @@
-apache2=2.4.18-2ubuntu3.17
-apache2-utils=2.4.18-2ubuntu3.17
+apache2
+apache2-utils

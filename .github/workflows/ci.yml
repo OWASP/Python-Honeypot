@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5.9, 3.6.11, 3.7.8, 3.8.5]
+        python-version: [3.9.4, 3.8.9]
 
     steps:
       - uses: actions/checkout@v2
@@ -77,11 +77,8 @@ jobs:
       - name: Check API server logs
         run: docker-compose logs ohp
 
-      - name: Kill API Server
-        run: docker-compose down
-      
-      - name: Start mongodb
-        run: docker run -p 9200:9200 -d elasticsearch
-
       - name: Run modules test
         run: sudo python3 ohp.py -m all --test --store-pcap
+
+      - name: Kill API Server
+        run: docker-compose down
