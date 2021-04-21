@@ -28,3 +28,15 @@ services:
       - elasticsearch
     depends_on:
       - elasticsearch
+
+  grafana:
+    image: grafana/grafana:latest-ubuntu
+    container_name: "grafana"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    ports:
+      - 3000:3000
+    links:
+      - elasticsearch
+    depends_on:
+      - elasticsearch
