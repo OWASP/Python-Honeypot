@@ -10,7 +10,7 @@ services:
     ports:
       - 9200:9200
     volumes:
-      - ./data/db:/usr/share/elasticsearch/data
+      - ./data/db:/usr/share/elasticsearch/data:Z
 
   ohp:
     build:
@@ -33,7 +33,7 @@ services:
     image: grafana/grafana:latest-ubuntu
     container_name: "grafana"
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - ./data/grafana:/var/lib/grafana:Z
     ports:
       - 3000:3000
     links:
