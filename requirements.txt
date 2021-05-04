@@ -1,5 +1,5 @@
 setuptools==56.0.0
-pymongo==3.11.3
+pymongo==3.11.4
 netaddr==0.8.0
 flask==1.1.2
 terminable_thread==0.7.1
