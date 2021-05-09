@@ -19,7 +19,8 @@ from api.database_queries import (sort_by_count,
                                   filter_by_match,
                                   filter_by_regex,
                                   event_types,
-                                  group_by_elements)
+                                  group_by_elements,
+                                  filter_by_element)
 from api.utility import (aggregate_function,
                          all_mime_types,
                          fix_limit,
@@ -283,36 +284,31 @@ def groupby_element(event_type, element):
     abort(404) if (event_type not in event_types or element not in group_by_elements) else True
 
     date = get_value_from_request("date")
-    country = get_value_from_request("country")
+    filter_by = get_value_from_request('filter_by')
+    element_value = get_value_from_request(filter_by)
     try:
         return jsonify(
-            [
-                {
-                    element: data['_id'][element],
-                    "count": data["count"]
-                } for data in
-                aggregate_function(
-                    event_types[event_type],
-                    [
-                        filter_by_match(
-                            {
-                                **filter_by_country_ip_dest(country),
-                                **filter_by_date(date)
+            {
+                _['key']: _['doc_count'] for _ in elasticsearch_events.search(
+                index='network_events',
+                body={
+                    "query": {
+                        **filter_by_date(date)['query'],
+                        **filter_by_element(filter_by, element_value)['query']
+                    },
+                    "aggs": {
+                        "ips": {
+                            "terms": {
+                                "field": element
                             }
-                        ) if country and date else filter_by_match(
-                            filter_by_country_ip_dest(country)
-                        ) if country else filter_by_match(
-                            filter_by_date(date)
-                        ) if date else sort_by_count,
-                        group_by_elements[element],
-                        filter_by_skip(get_value_from_request("skip")),
-                        filter_by_limit(get_value_from_request("limit")),
-                        sort_by_count
-                    ]
-                )
-            ]
+                        }
+                    }
+                },
+                size=0)['aggregations']['ips']['buckets']
+            }
         ), 200
-    except Exception:
+    except Exception as _:
+        print(_)
         abort(500)
 
 

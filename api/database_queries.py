@@ -20,29 +20,34 @@ sort_by_count = {
 }
 
 
-def group_by(element_name, element):
+def filter_by_element(filter_by, element_value):
     return {
-        "$group":
-            {
-                "_id": {
-                    element_name: element
-                },
-                "count": {
-                    "$sum": 1
-                }
+        "query": {
+            "multi_match": {
+                "query": element_value,
+                "fields": ['*']
             }
+        }
+    } if filter_by and element_value else {
+        "query": {}
     }
 
 
-group_by_elements = {
-    "ip": group_by("ip", "$ip_dest"),
-    "country": group_by("country", "$country_ip_dest"),
-    "port": group_by("port", "$port_dest"),
-    "module_name": group_by("module_name", "$module_name"),
-    "username": group_by("username", "$username"),
-    "password": group_by("password", "$password"),
-    "machine_name": group_by("machine_name", "$machine_name")
-}
+group_by_elements = [
+    "ip_dest",
+    "ip_src",
+    "country_ip_src",
+    "country_ip_dest",
+    "port_dest",
+    "port_src",
+    "protocol",
+    "module_name",
+    "machine_name",
+    "username",
+    "password",
+    "is_directory",
+    "split_timeout"
+]
 
 event_types = {
     "all": "*",
@@ -67,6 +72,8 @@ def filter_by_date(date):
                     }
                 }
         }
+    } if date else {
+        "query": {}
     }
 
 
