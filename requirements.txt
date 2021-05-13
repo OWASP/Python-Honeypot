@@ -1,9 +1,9 @@
-setuptools==56.0.0
-pymongo==3.11.3
+setuptools==56.2.0
+pymongo==3.11.4
 netaddr==0.8.0
-flask==1.1.2
+flask==2.0.0
 terminable_thread==0.7.1
-watchdog==2.0.2
+watchdog==2.1.1
 pyshark==0.4.3
 oschmod==0.3.12
 argparse==1.4.0
