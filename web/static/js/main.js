@@ -11,11 +11,11 @@ window.chartColors = {
     blue: "rgb(54, 162, 235)",
     purple: "rgb(153, 102, 255)",
     grey: "rgb(201, 203, 207)",
-    cyan: "rgb(0, 255, 255"
+    cyan: "rgb(0, 255, 255)"
 };
 
 var colors_array = ["rgb(255, 0, 0)", "rgb(255, 0, 191)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)",
-    "rgb(191, 255, 0)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)", "rgb(0, 255, 255"]
+    "rgb(191, 255, 0)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)", "rgb(0, 255, 255)"]
 
 var color = Chart.helpers.color;
 var chartColors = window.chartColors;
