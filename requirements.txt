@@ -1,7 +1,7 @@
 setuptools==56.2.0
 pymongo==3.11.4
 netaddr==0.8.0
-flask==2.0.0
+flask==2.0.1
 terminable_thread==0.7.1
 watchdog==2.1.2
 pyshark==0.4.3
