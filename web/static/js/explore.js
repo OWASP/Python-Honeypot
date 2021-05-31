@@ -193,27 +193,29 @@ $.fn.dataTable.pipeline = function ( opts ) {
                     }
                 }
                 json = tmpj
-                index = Object.keys(json['data'][0])[settings.aLastSort[0].col]
-                order = settings.aLastSort[0].dir
-                if (order == "asc"){
-                    json['data'].sort(
-                    (a, b) => {
-                          if (a[index] < b[index])
-                            return -1;
-                          if (a[index] > b[index])
-                            return 1;
-                          return 0;
-                        })
+                if(json['data'].length > 0){
+                    index = Object.keys(json['data'][0])[settings.aLastSort[0].col]
+                    order = settings.aLastSort[0].dir
+                    if (order == "asc") {
+                        json['data'].sort(
+                            (a, b) => {
+                                if (a[index] < b[index])
+                                    return -1;
+                                if (a[index] > b[index])
+                                    return 1;
+                                return 0;
+                            })
 
-                } else {
-                    json['data'].sort(
-                    (a, b) => {
-                          if (a[index] > b[index])
-                            return -1;
-                          if (a[index] < b[index])
-                            return 1;
-                          return 0;
-                        })
+                    } else {
+                        json['data'].sort(
+                            (a, b) => {
+                                if (a[index] > b[index])
+                                    return -1;
+                                if (a[index] < b[index])
+                                    return 1;
+                                return 0;
+                            })
+                    }
                 }
                 return JSON.stringify( json );
               },
@@ -295,7 +297,8 @@ function get_event_data(api_endpoint, column_list, api_params) {
       processing: true,
       language:{
           loadingRecords: '&nbsp;',
-          processing: '<div class="spinner">Loading...</div>'
+          processing: '<div class="spinner">Loading...</div>',
+          sEmptyTable: '<div>No records are present for given request</div>'
       },
       oLanguage: {
         sStripClasses: "",
