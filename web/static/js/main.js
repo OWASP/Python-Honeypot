@@ -31,8 +31,8 @@ var top_values_to_plot = new Object();
 var date_wise_event_counts = new Object();
 /**
  * Function to get total event counts and set the Element value
- * @param {*} event_type 
- * @param {*} element_id 
+ * @param {*} event_type
+ * @param {*} element_id
  */
 function get_event_count(event_type, html_element_id){
     $.ajax({
@@ -54,8 +54,8 @@ function get_event_count(event_type, html_element_id){
 
 /**
  * Create object structure for the givent event type and element, if it doesn't already exist
- * @param {*} event_type 
- * @param {*} element 
+ * @param {*} event_type
+ * @param {*} element
  */
 function create_top_values_to_plot_structure(event_type, element){
     !(event_type in top_values_to_plot) ? top_values_to_plot[event_type] = new Object() : true;
@@ -68,29 +68,33 @@ function create_top_values_to_plot_structure(event_type, element){
 
 /**
  * Get top 10 element values in the given event type and plot them.
- * @param {*} event_type 
- * @param {*} element 
- * @param {*} html_element_id 
+ * @param {*} event_type
+ * @param {*} element
+ * @param {*} html_element_id
  */
 function get_top_ten_element_in_event(event_type, element, html_element_id){
     $.ajax({
         type: "GET",
-        url: "/api/events/count/groupby/"+event_type.toLowerCase()+"/"+element.toLowerCase(),
+        url: "/api/events/count/groupby/" + event_type.toLowerCase() + "/" + element.toLowerCase(),
         success: function(result,status,xhr){
             create_top_values_to_plot_structure(event_type, element);
-            for (var i = 0; i < result.length; i++) {
-                top_values_to_plot[event_type][element].keys.push(
-                    result[i][Object.keys(result[i])[1]]
-                );
-                top_values_to_plot[event_type][element].values.push(result[i][Object.keys(result[i])[0]]);
-                top_values_to_plot[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
+            const keys = Object.keys(result);
+            for (let i = 0; i < keys.length; i++) {
+                const index = top_values_to_plot[event_type][element].keys.indexOf(keys[i]);
+                if (index === -1) {
+                    top_values_to_plot[event_type][element].keys.push(keys[i]);
+                    top_values_to_plot[event_type][element].values.push(result[keys[i]]);
+                    top_values_to_plot[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
+                } else {
+                    top_values_to_plot[event_type][element].values[index] = result[keys[i]];
+                }
             }
-            var top_ten_graph_config = {
+            const top_ten_graph_config = {
                 data: {
                     datasets: [{
                         data: top_values_to_plot[event_type][element].values,
                         backgroundColor: top_values_to_plot[event_type][element].colors,
-                        label: 'Top Ten '+element+'s - '+event_type
+                        label: 'Top Ten ' + element + 's - ' + event_type
                     }],
                     labels: top_values_to_plot[event_type][element].keys
                 },
@@ -101,7 +105,7 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
                     },
                     title: {
                         display: true,
-                        text: 'Top Ten '+element+'s - '+event_type
+                        text: 'Top Ten ' + element + 's - ' + event_type
                     },
                     scale: {
                         ticks: {
@@ -116,7 +120,7 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
                 }
             };
 
-            var ctx = document.getElementById(html_element_id);
+            const ctx = document.getElementById(html_element_id);
             window.myPolarArea = Chart.PolarArea(ctx, top_ten_graph_config);
 
         },
@@ -132,7 +136,7 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
 
 /**
  * Plot date wise data to the graph
- * @param {*} event_type 
+ * @param {*} event_type
  */
 function plot_event_count_by_date(event_type){
 
@@ -332,13 +336,13 @@ function load_graphs() {
             // request network related events number
             get_event_count("pcap", "count_pcap_events");
             // request top ten ips in honeypot events
-            get_top_ten_element_in_event("Honeypot", "IP", "top_ten_ips_in_honeypot_events_graph");
+            get_top_ten_element_in_event("Honeypot", "Ip_dest", "top_ten_ips_in_honeypot_events_graph");
             // request top ten ips in network events
-            get_top_ten_element_in_event("Network", "IP", "top_ten_ips_in_network_events_graph");
+            get_top_ten_element_in_event("Network", "Ip_dest", "top_ten_ips_in_network_events_graph");
             // request top ten ports in honeypot events
-            get_top_ten_element_in_event("Honeypot", "Port", "top_ten_ports_in_honeypot_events_graph");
+            get_top_ten_element_in_event("Honeypot", "Port_dest", "top_ten_ports_in_honeypot_events_graph");
             // request top ten ports in network events
-            get_top_ten_element_in_event("Network", "Port", "top_ten_ports_in_network_events_graph");
+            get_top_ten_element_in_event("Network", "Port_dest", "top_ten_ports_in_network_events_graph");
             // 7 days ago config
             !("all" in date_wise_event_counts) ? date_wise_event_counts.all = new Object() : true;
             !("honeypot" in date_wise_event_counts) ? date_wise_event_counts.honeypot = new Object() : true;
