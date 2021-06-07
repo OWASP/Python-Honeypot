@@ -290,11 +290,16 @@ def groupby_element(event_type, element):
         return jsonify(
             {
                 _['key']: _['doc_count'] for _ in elasticsearch_events.search(
-                index='network_events',
+                index=event_types[event_type],
                 body={
                     "query": {
-                        **filter_by_date(date)['query'],
-                        **filter_by_element(filter_by, element_value)['query']
+                        "bool": {
+                            "must": list(
+                                filter(None, [
+                                    filter_by_date(date)['query'],
+                                    filter_by_element(filter_by, element_value)['query']
+                                ]))
+                        }
                     },
                     "aggs": {
                         "ips": {
