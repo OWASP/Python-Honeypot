@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 
 from flask import (Flask,
@@ -20,7 +19,8 @@ from api.database_queries import (sort_by_count,
                                   filter_by_regex,
                                   event_types,
                                   group_by_elements,
-                                  filter_by_element)
+                                  filter_by_element,
+                                  must_query)
 from api.utility import (aggregate_function,
                          all_mime_types,
                          fix_limit,
@@ -332,37 +332,35 @@ def get_events_data(event_type):
     filter = get_value_from_request("filter")
 
     try:
-        query = filter_by_date(date) if date else {}
-        query.update(filter_by_module_name(module_name) if module_name else {})
-        query.update(
-            {
-                key: filter_by_regex(fix_filter_query(filter)[key]) for key in fix_filter_query(filter)
-            } if filter else {}
-        )
+        query = must_query(filter_by_date(date)['query']) if date else must_query()
+        if module_name:
+            query['query']['bool']['must'].append(
+                filter_by_module_name(module_name))
+        if filter:
+            query['query']['bool']['filter'] = []
+            for key in fix_filter_query(filter):
+                query['query']['bool']['filter'].append(filter_by_regex(key, fix_filter_query(filter)[key]))
 
-        return jsonify(
-            {
-                "total": event_types[event_type].count(query),
-                "data": [
-                    i for i in
-                    event_types[event_type].find(
-                        query,
-                        {
-                            "_id": 0
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
+        return jsonify({
+            "total": int(
+                elasticsearch_events.count(
+                    index=event_types[event_type],
+                    body=query
+                )['count']),
+            "data": [
+                i['_source'] for i in elasticsearch_events.search(
+                    index=event_types[event_type],
+                    body=query,
+                    from_=fix_skip(
+                        get_value_from_request("skip")
+                    ),
+                    size=fix_limit(
+                        get_value_from_request("limit")
                     )
-                ]
-            }
-        ), 200
-    except Exception:
+                )['hits']['hits']
+            ]
+        }), 200
+    except Exception as _:
         abort(500)
 
 
