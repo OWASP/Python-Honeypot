@@ -117,7 +117,6 @@ class HoneypotEvent:
         date: Date and time of the event
         module_name: Module name ran on the port
         machine_name: Real machine name
-        event_type: Type of event
         country_ip_src: Country of source IP Address
         country_ip_dest: Country of destination IP Address
 
@@ -172,13 +171,13 @@ class CredentialEvent:
     Object to store Credential Event Parameters
 
     Attributes:
-        ip: Client ip used for connecting to the module
+        ip_src: Client ip used for connecting to the module
         module_name: Which module was accessed
         date: Date and time of the event
         username: Username tried for connecting to modules
         password: Password tried for connecting to modules
         machine_name: Real machine name
-        country: Country corresponding to the IP Address
+        country_ip_src: Country corresponding to the IP Address
     """
 
     def __init__(self, ip_src, module_name, date, username, password):
@@ -201,6 +200,7 @@ class EventData:
         date: Date and time of the event
         module_name: Module client accessed by the client
         data: Data which is obtained from the client
+        country_ip_src: Country corresponding to the IP Address
     """
 
     def __init__(self, ip, module_name, date, data):
