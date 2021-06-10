@@ -124,14 +124,3 @@ def filter_by_regex(field, regex):
             field: regex
         }
     }
-
-
-def must_query(*args):
-    return {
-        "query": {
-            "bool": {
-                "must":
-                    [*args]
-            }
-        }
-    }

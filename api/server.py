@@ -19,8 +19,7 @@ from api.database_queries import (sort_by_count,
                                   filter_by_regex,
                                   event_types,
                                   group_by_elements,
-                                  filter_by_element,
-                                  must_query)
+                                  filter_by_element)
 from api.utility import (aggregate_function,
                          all_mime_types,
                          fix_limit,
@@ -281,39 +280,42 @@ def groupby_element(event_type, element):
     Returns:
         JSON/Dict top ten element in event type
     """
-    abort(404) if (event_type not in event_types or element not in group_by_elements) else True
-
+    abort(404) if (
+            event_type not in event_types or element not in group_by_elements
+    ) else True
     date = get_value_from_request("date")
     filter_by = get_value_from_request('filter_by')
     element_value = get_value_from_request(filter_by)
+    conditions = [condition for condition in [
+        filter_by_date(date)['query'],
+        filter_by_element(filter_by, element_value)['query']
+    ] if condition]
+    query = {
+        "query": {
+            "bool": {
+                "must": conditions
+            }
+        },
+        "aggs": {
+            "ips": {
+                "terms": {
+                    "field": element
+                }
+            }
+        }
+    }
+
     try:
         return jsonify(
             {
-                _['key']: _['doc_count'] for _ in elasticsearch_events.search(
-                index=event_types[event_type],
-                body={
-                    "query": {
-                        "bool": {
-                            "must": list(
-                                filter(None, [
-                                    filter_by_date(date)['query'],
-                                    filter_by_element(filter_by, element_value)['query']
-                                ]))
-                        }
-                    },
-                    "aggs": {
-                        "ips": {
-                            "terms": {
-                                "field": element
-                            }
-                        }
-                    }
-                },
-                size=0)['aggregations']['ips']['buckets']
+                record["key"]: record["doc_count"]
+                for record in elasticsearch_events.search(
+                    index=event_types[event_type], body=query, size=0
+                )["aggregations"]["ips"]["buckets"]
             }
         ), 200
-    except Exception as _:
-        print(_)
+
+    except Exception:
         abort(500)
 
 
@@ -329,17 +331,29 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
-    filter = get_value_from_request("filter")
+    filter_by = get_value_from_request("filter")
 
     try:
-        query = must_query(filter_by_date(date)['query']) if date else must_query()
+        query = {
+            "query": {
+                "bool": {
+                    "must": [
+                        filter_by_date(date)['query']
+                    ] if date else [],
+                    "filter": []
+                }
+            }
+        }
         if module_name:
             query['query']['bool']['must'].append(
                 filter_by_module_name(module_name))
-        if filter:
-            query['query']['bool']['filter'] = []
-            for key in fix_filter_query(filter):
-                query['query']['bool']['filter'].append(filter_by_regex(key, fix_filter_query(filter)[key]))
+        if filter_by:
+            for key in fix_filter_query(filter_by):
+                filter_query = filter_by_regex(
+                    key,
+                    fix_filter_query(filter_by)[key]
+                )
+                query['query']['bool']['filter'].append(filter_query)
 
         return jsonify({
             "total": int(
@@ -348,7 +362,7 @@ def get_events_data(event_type):
                     body=query
                 )['count']),
             "data": [
-                i['_source'] for i in elasticsearch_events.search(
+                record['_source'] for record in elasticsearch_events.search(
                     index=event_types[event_type],
                     body=query,
                     from_=fix_skip(
