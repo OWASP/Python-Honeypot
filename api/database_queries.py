@@ -3,7 +3,7 @@
 
 """
 This file is to be used to store all the queries which are being used
-for querying mongodb using pymongo.
+for querying elasticsearch using elasticsearch client.
 
 Created this file because the queries are repeated over the URI's.
 """

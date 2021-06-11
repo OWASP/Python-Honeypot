@@ -67,7 +67,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
                                honeypot_events in _dict_ format
 
     Returns:
-        ObjectId(inserted_id)
+        None
     """
     if is_verbose_mode():
         verbose_info(
@@ -109,7 +109,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
                               network_events in _dict_ format
 
     Returns:
-        ObjectId(inserted_id)
+        None
     """
     if is_verbose_mode():
         verbose_info(
@@ -147,6 +147,13 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     Pushes all honeypot and network events collected in the
     honeypot_events_queue and network_events_queue to honeypot_events
     and network_events collection respectively
+
+    Args:
+        honeypot_events_queue: Multiprocessing queue which stores the list of
+                               honeypot_events in _dict_ format
+        network_events_queue: Multiprocessing queue which stores the list of
+                              network_events in _dict_ format
+
     """
 
     if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
@@ -170,6 +177,12 @@ def push_events_to_database_from_thread(honeypot_events_queue, network_events_qu
     """
     Thread function for inserting bulk events in a thread
 
+
+    Args:
+         honeypot_events_queue: Multiprocessing queue which stores the list of
+                               honeypot_events in _dict_ format
+         network_events_queue: Multiprocessing queue which stores the list of
+                              network_events in _dict_ format
     Returns:
         True/None
     """
