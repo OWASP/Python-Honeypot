@@ -275,18 +275,35 @@ function get_event_data(api_endpoint, column_list, api_params) {
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
-      buttons: [
-        {
-          extend: 'csv',
-          filename: function () { return get_export_fileName('csv'); },
-          className: "btn btn-info btn-sm"
-        },
-        {
-          extend: 'excel',
-          filename: function () { return get_export_fileName('excel'); },
-          className: "btn btn-info btn-sm"
-        }
-      ],
+        buttons: [
+            {
+                extend: 'csv',
+                filename: function () {
+                    return get_export_fileName('csv');
+                },
+                className: "btn btn-info btn-sm"
+            },
+            {
+                extend: 'excel',
+                filename: function () {
+                    return get_export_fileName('excel');
+                },
+                className: "btn btn-info btn-sm"
+            },
+
+            {
+                text: 'JSON',
+                action: function (e, dt, button, config) {
+                    const filename = get_export_fileName('json') + ".json"
+                    $.fn.dataTable.fileSave(
+                        new Blob([JSON.stringify(table.rows().data().toArray(), undefined, 2)], {
+                            type: 'application/json',
+                        }),
+                        filename
+                    );
+                }
+            }
+        ],
       columns: column_list,
       destroy: true,
       order: [[0, 'desc']],
