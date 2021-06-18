@@ -1,5 +1,5 @@
 # using phusion/baseimage as base image
-FROM ubuntu:latest
+FROM ubuntu:groovy-20210614
 
 # use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
