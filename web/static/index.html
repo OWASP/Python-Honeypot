@@ -26,6 +26,7 @@
     <!-- main.js used as general js file for index.html -->
     <script src="/js/main.js"></script>
     <script src="/js/explore.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- end of header header -->
 </head>
 
@@ -80,25 +81,39 @@
                 <!-- its using main.js to communicating with API -->
                 <canvas class="align-content-center text-center modal-dialog-centered" style="text-align:center"
                         id="past_week_events_graph"></canvas>
+                <button class="button" onclick="downloadChart('past_week_events_graph')" hidden=><img
+                        src="img/download-icon.png" width="40" height="40"> Download
+                </button>
+
+
             </div>
             <br>
             <div class="row">
                 <div class="col-md-6">
                     <canvas id="top_ten_ips_in_honeypot_events_graph" width="400" height="450">
                     </canvas>
+                    <button class="button" onclick="downloadChart('top_ten_ips_in_honeypot_events_graph')" hidden><img
+                            src="img/download-icon.png" width="40" height="40"></button>
                 </div>
                 <div class="col-md-6">
                     <canvas id="top_ten_ips_in_network_events_graph" width="400" height="450">
                     </canvas>
+                    <button class="button" onclick="downloadChart('top_ten_ips_in_network_events_graph')" hidden><img
+                            src="img/download-icon.png" width="40" height="40"></button>
                 </div>
                 <br>
                 <div class="col-md-6">
                     <canvas id="top_ten_ports_in_honeypot_events_graph" width="400" height="450">
                     </canvas>
+                    <button class="button" onclick="downloadChart('top_ten_ports_in_honeypot_events_graph')" hidden><img
+                            src="img/download-icon.png" width="40" height="40"></button>
                 </div>
                 <div class="col-md-6">
                     <canvas id="top_ten_ports_in_network_events_graph" width="400" height="450">
                     </canvas>
+                    <button class="button" onclick="downloadChart('top_ten_ports_in_network_events_graph')" hidden><img
+                            src="img/download-icon.png" width="40" height="40"></button>
+
                 </div>
             </div>
         </center>
