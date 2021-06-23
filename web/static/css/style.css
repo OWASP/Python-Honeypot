@@ -37,6 +37,12 @@ body {
     float: center;
 }
 
+#error-message-element{
+    text-align: center;
+    max-width: 80%;
+    margin: 0 auto;
+}
+
 div.material-table {
     padding: 20;
 }
