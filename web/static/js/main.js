@@ -31,8 +31,8 @@ var top_values_to_plot = new Object();
 var date_wise_event_counts = new Object();
 /**
  * Function to get total event counts and set the Element value
- * @param {*} event_type 
- * @param {*} element_id 
+ * @param {*} event_type
+ * @param {*} element_id
  */
 function get_event_count(event_type, html_element_id){
     $.ajax({
@@ -54,8 +54,8 @@ function get_event_count(event_type, html_element_id){
 
 /**
  * Create object structure for the givent event type and element, if it doesn't already exist
- * @param {*} event_type 
- * @param {*} element 
+ * @param {*} event_type
+ * @param {*} element
  */
 function create_top_values_to_plot_structure(event_type, element){
     !(event_type in top_values_to_plot) ? top_values_to_plot[event_type] = new Object() : true;
@@ -68,9 +68,9 @@ function create_top_values_to_plot_structure(event_type, element){
 
 /**
  * Get top 10 element values in the given event type and plot them.
- * @param {*} event_type 
- * @param {*} element 
- * @param {*} html_element_id 
+ * @param {*} event_type
+ * @param {*} element
+ * @param {*} html_element_id
  */
 function get_top_ten_element_in_event(event_type, element, html_element_id){
     $.ajax({
@@ -116,10 +116,11 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
                 }
             };
 
-            var ctx = document.getElementById(html_element_id);
+            const ctx = document.getElementById(html_element_id);
             window.myPolarArea = Chart.PolarArea(ctx, top_ten_graph_config);
-
-        },
+            const downloadButton = ctx.nextSibling.nextSibling;
+            downloadButton.hidden = false;
+},
         error: function (jqXHR, textStatus, errorThrown) {
             document.getElementById('error_msg').innerHTML = jqXHR.responseText;
             if (errorThrown == "BAD REQUEST") {
@@ -132,7 +133,7 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
 
 /**
  * Plot date wise data to the graph
- * @param {*} event_type 
+ * @param {*} event_type
  */
 function plot_event_count_by_date(event_type){
 
@@ -286,8 +287,10 @@ function plot_event_count_by_date(event_type){
                 document.getElementById("blink_loading_graph").hidden = true;
 
                 // place the graph in canvas
-                var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
+                const past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
                 window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
+                const downloadButton = document.getElementById('past_week_events_graph').nextSibling.nextSibling;
+                downloadButton.hidden = false;
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 document.getElementById('error_msg').innerHTML = jqXHR.responseText;
@@ -366,6 +369,22 @@ function load_graphs() {
 
         }
     }, 3000);
+}
+
+/**
+ * Function is used to convert canvas to image and download it
+ * @param canvasId
+ */
+function downloadChart(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    let downloadLink = document.createElement('a');
+    const filename = canvasId + ".png";
+    downloadLink.setAttribute('download', filename);
+    canvas.toBlob(function (blob) {
+        let url = URL.createObjectURL(blob);
+        downloadLink.setAttribute('href', url);
+        downloadLink.click();
+    });
 }
 
 function keep_update() {
