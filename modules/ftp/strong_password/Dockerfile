@@ -1,5 +1,5 @@
 # using phusion/baseimage as base image
-FROM ubuntu:latest
+FROM ubuntu:20.10
 
 # use baseimage-docker's init system.
 CMD ["/sbin/my_init"]
