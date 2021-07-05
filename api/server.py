@@ -31,6 +31,19 @@ from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
 from database import connector
+from flask_swagger import swagger
+from flask_swagger_ui import get_swaggerui_blueprint
+
+DOCS_URL = '/api/docs'
+API_URL = 'http://localhost:5000/docs-configuration'
+
+documentation_settings = get_swaggerui_blueprint(
+    DOCS_URL,
+    API_URL,
+    config={
+        'app_name': "Python Honeypot Api"
+    },
+)
 
 template_dir = os.path.join(
     os.path.join(
@@ -243,10 +256,37 @@ def get_static_files(path):
 @app.route("/api/events/count/<event_type>", methods=["GET"])
 def count_events(event_type):
     """
-    Get total number of events
-
-    Returns:
-        JSON/Dict number of all events
+    Get total number of events based on event type
+    ---
+    parameters:
+        - in: path
+          name: event_type
+          schema:
+            type: string
+          required: true
+          enum:
+            - all
+            - honeypot
+            - network
+            - credential
+            - file
+            - data
+            - pcap
+        - in: query
+          name: date
+          schema:
+            type: date
+          required: false
+          description: Date to filter records for particular day
+    responses:
+        '200':
+          description: Ok
+          examples:
+            application/json: { "count": 293879, "date": null}
+        '404':
+          description: Not Found
+          examples:
+            application/json: { "msg": "file/path not found!","status": "error"}
     """
     abort(404) if event_type not in event_types and event_type != "all" else event_type
 
@@ -404,9 +444,26 @@ def download_file():
 def all_module_names():
     """
     Get the list of modules
-
-    Returns:
-        JSON/List of the modules
+    ---
+    responses:
+        '200':
+          description: Ok
+          examples:
+            application/json:
+                [
+                    "ftp/strong_password",
+                    "ftp/weak_password",
+                    "http/basic_auth_strong_password",
+                    "http/basic_auth_weak_password",
+                    "ics/veeder_root_guardian_ast",
+                    "smtp/strong_password",
+                    "ssh/strong_password",
+                    "ssh/weak_password"
+                ]
+        '500':
+          description: Internal Server Error
+          examples:
+            application/json: { "msg": "file/path not found!", "status": "error" }
     """
     try:
         return jsonify(
@@ -414,6 +471,14 @@ def all_module_names():
         ), 200
     except Exception:
         abort(500)
+
+
+@app.route("/docs-configuration")
+def spec():
+    docs = swagger(app)
+    docs['info']['version'] = "1.0"
+    docs['info']['title'] = "Python Honeypot Api's"
+    return jsonify(docs)
 
 
 def start_api_server():
@@ -443,6 +508,8 @@ def start_api_server():
         "api_access_without_key": api_access_without_key,
         "language": "en"
     }
+    app.register_blueprint(documentation_settings)
+
     app.run(
         host=my_api_configuration["api_host"],
         port=my_api_configuration["api_port"],

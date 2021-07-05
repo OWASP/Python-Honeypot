@@ -7,3 +7,5 @@ watchdog==2.1.2
 pyshark==0.4.3
 oschmod==0.3.12
 argparse==1.4.0
+flask-swagger==0.2.14
+flask-swagger-ui==3.36.0
