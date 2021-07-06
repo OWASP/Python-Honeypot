@@ -82,7 +82,7 @@ def get_file(filename):
 
 def get_value_from_request(_key):
     """
-    get a value from GET, POST or CCOKIES
+    Get a value from GET, POST or COOKIES
 
     Args:
         _key: the value name to find
@@ -321,13 +321,56 @@ def count_events(event_type):
 @app.route("/api/events/count/groupby/<event_type>/<element>", methods=["GET"])
 def groupby_element(event_type, element):
     """
-    get top ten repeated "elements" as defined in database_queries
-    in "event type".
+    Get top ten repeated "elements" as defined in database_queries in "event_type"
+    ---
+    parameters:
+        - in: path
+          name: event_type
+          schema:
+            type: string
+          required: true
+          enum:
+            - honeypot
+            - network
+            - credential
+            - file
+            - data
+            - pcap
+        - in: path
+          name: element
+          schema:
+            type: string
+          required: true
+          enum:
+            - ip
+            - country
+            - port
+            - module_name
+            - username
+            - password
+            - machine_name
+        - in: query
+          name: date
+          schema:
+            type: date
+          required: false
+          description: Date to filter records for particular day
+        - in: query
+          name: country
+          schema:
+            type: string
+          required: false
+          description: used for filtering events by country
+    responses:
+        '200':
+          description: Ok
+          examples:
+              application/json: [{"count":1703,"country":"DE"}]
+        '404':
+          description: Not Found
+          examples:
+            application/json: { "msg": "file/path not found!", "status": "error"}
 
-    Eg. <API_URL>/api/events/count/groupby/honeypot/ip?date=2020-08-01
-
-    Returns:
-        JSON/Dict top ten element in event type
     """
     abort(404) if (event_type not in event_types or element not in group_by_elements) else True
 
@@ -368,10 +411,89 @@ def groupby_element(event_type, element):
 @app.route("/api/events/explore/<event_type>", methods=["GET"])
 def get_events_data(event_type):
     """
-    get events data
-
-    Returns:
-        an array contain event data
+    Get events data
+    ---
+    parameters:
+        - in: path
+          name: event_type
+          schema:
+            type: string
+          required: true
+          enum:
+            - honeypot
+            - network
+            - credential
+            - file
+            - data
+            - pcap
+        - in: query
+          name: date
+          schema:
+            type: date
+          required: false
+          description: Date to filter records for particular day
+        - in: query
+          name: module_name
+          schema:
+            type: string
+          required: false
+          enum:
+            - ftp/strong_password
+            - ftp/weak_password
+            - http/basic_auth_strong_password
+            - http/basic_auth_weak_password
+            - ics/veeder_root_guardian_ast
+            - smtp/strong_password
+            - ssh/strong_password
+            - ssh/weak_password
+          description: one of the module names supported by the framework
+        - in: query
+          name: filter
+          schema:
+            type: string
+          example: ip_dest=192.16.1.1&ip_src=192.168.0.*
+          description: filter on serverside by query (regex)
+          required: false
+        - in: query
+          name: skip
+          schema:
+            type: number
+          example: 0
+          description: skip the number of records from start
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: number
+          example: 100
+          description: number of records to fetch
+          required: false
+    responses:
+        '200':
+          description: Ok
+          examples:
+              application/json:
+                  {
+                    "data": [
+                        {
+                          "country_ip_dest": "US",
+                          "country_ip_src": "-",
+                          "date": "2021-06-15 16:39:54",
+                          "ip_dest": "142.250.183.131",
+                          "ip_src": "192.168.0.106",
+                          "machine_name": "stockholm_server_1",
+                          "module_name": "http/basic_auth_strong_password",
+                          "port_dest": 80,
+                          "port_src": 59984,
+                          "protocol": "TCP"
+                        }
+                    ],
+                    "total": 614
+                  }
+        '404':
+          description: Not Found
+          examples:
+            application/json: { "msg": "file/path not found!","status": "error"}
     """
     abort(404) if event_type not in event_types else event_type
 
@@ -418,6 +540,22 @@ def get_events_data(event_type):
 def download_file():
     """
     Download PCAP files
+    ---
+    parameters:
+        - in: query
+          name: md5
+          schema:
+            type: string
+          required: true
+          description: value of the PCAP file to download
+          example: 282e14c5b89ff2af63f4146fbd0a6c68
+    responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+          examples:
+            application/json: { "msg": "file/path not found!","status": "error"}
     """
     try:
         md5_value = get_value_from_request("md5")
@@ -475,6 +613,9 @@ def all_module_names():
 
 @app.route("/docs-configuration")
 def spec():
+    """
+    Get Api documentation in Open Api format
+    """
     docs = swagger(app)
     docs['info']['version'] = "1.0"
     docs['info']['title'] = "Python Honeypot Api's"
