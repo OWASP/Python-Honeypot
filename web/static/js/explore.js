@@ -297,8 +297,8 @@ function get_event_data(api_endpoint, column_list, api_params) {
       processing: true,
       language:{
           loadingRecords: '&nbsp;',
-          processing: '<div class="spinner">Loading...</div>',
-          sEmptyTable: '<div>No records are present for given request</div>'
+          processing: `<div class="spinner">${translations.loading}</div>`,
+          sEmptyTable: `<div>${translations.no_records_present_message}</div>`
       },
       oLanguage: {
         sStripClasses: "",
@@ -410,7 +410,7 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
       processing: true,
       language:{
           loadingRecords: '&nbsp;',
-          processing: '<div class="spinner">Loading...</div>'
+          processing: `<div class="spinner">${translations.loading}</div>`
       },
       oLanguage: {
         sStripClasses: "",

@@ -85,12 +85,14 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
                 top_values_to_plot[event_type][element].values.push(result[i][Object.keys(result[i])[0]]);
                 top_values_to_plot[event_type][element].colors.push(color(colors_array[i]).alpha(0.5).rgbString());
             }
+            console.log('top_ten_' + element.toLowerCase() + 's-' + event_type.toLowerCase())
+            console.log(translations)
             var top_ten_graph_config = {
                 data: {
                     datasets: [{
                         data: top_values_to_plot[event_type][element].values,
                         backgroundColor: top_values_to_plot[event_type][element].colors,
-                        label: 'Top Ten '+element+'s - '+event_type
+                        label: translations['top_ten_' + element.toLowerCase() + 's-' + event_type.toLowerCase()]
                     }],
                     labels: top_values_to_plot[event_type][element].keys
                 },
@@ -101,7 +103,7 @@ function get_top_ten_element_in_event(event_type, element, html_element_id){
                     },
                     title: {
                         display: true,
-                        text: 'Top Ten '+element+'s - '+event_type
+                        text: translations['top_ten_' + element.toLowerCase() + 's-' + event_type.toLowerCase()]
                     },
                     scale: {
                         ticks: {
@@ -150,7 +152,7 @@ function plot_event_count_by_date(event_type){
                     data: {
                         labels: week_dates_array,
                         datasets: [{
-                            label: 'All Events',
+                            label: translations.all_events,
                             backgroundColor: window.chartColors.red,
                             borderColor: window.chartColors.red,
                             data: [
@@ -164,7 +166,7 @@ function plot_event_count_by_date(event_type){
                             ],
                             fill: false,
                         }, {
-                            label: 'Honeypot Events',
+                            label: translations.honeypot_events,
                             fill: false,
                             backgroundColor: window.chartColors.blue,
                             borderColor: window.chartColors.blue,
@@ -178,7 +180,7 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.honeypot[week_dates_array[6]]
                             ],
                         }, {
-                            label: 'Network Events',
+                            label: translations.network_events,
                             fill: false,
                             backgroundColor: window.chartColors.yellow,
                             borderColor: window.chartColors.yellow,
@@ -191,8 +193,8 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.network[week_dates_array[5]],
                                 date_wise_event_counts.network[week_dates_array[6]]
                             ],
-                        },{
-                            label: 'Credential Events',
+                        }, {
+                            label: translations.credential_events,
                             fill: false,
                             backgroundColor: window.chartColors.purple,
                             borderColor: window.chartColors.purple,
@@ -205,8 +207,8 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.credential[week_dates_array[5]],
                                 date_wise_event_counts.credential[week_dates_array[6]]
                             ],
-                        },{
-                            label: 'File Events',
+                        }, {
+                            label: translations.file_events,
                             fill: false,
                             backgroundColor: window.chartColors.green,
                             borderColor: window.chartColors.green,
@@ -219,8 +221,8 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.file[week_dates_array[5]],
                                 date_wise_event_counts.file[week_dates_array[6]]
                             ],
-                        },{
-                            label: 'Data Events',
+                        }, {
+                            label: translations.data_events,
                             fill: false,
                             backgroundColor: window.chartColors.cyan,
                             borderColor: window.chartColors.cyan,
@@ -233,8 +235,8 @@ function plot_event_count_by_date(event_type){
                                 date_wise_event_counts.data[week_dates_array[5]],
                                 date_wise_event_counts.data[week_dates_array[6]]
                             ],
-                        },{
-                            label: 'PCAP Events',
+                        }, {
+                            label: translations.pcap_events,
                             fill: false,
                             backgroundColor: window.chartColors.orange,
                             borderColor: window.chartColors.orange,
@@ -366,6 +368,18 @@ function load_graphs() {
 
         }
     }, 3000);
+}
+
+/**
+ * Change the language based on User Input
+ */
+function changeLanguage() {
+    const menu = document.getElementById("language-menu")
+    const value = menu.options[menu.selectedIndex].value;
+    const param = new URLSearchParams(window.location.search).get("lang");
+    if (!(param != null && value === param)) {
+        location.replace(location.protocol + '//' + location.host + location.pathname + "?lang=" + value)
+    }
 }
 
 function keep_update() {

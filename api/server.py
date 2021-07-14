@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import json
 import os
 
 from flask import (Flask,
@@ -210,7 +210,13 @@ def index():
     Returns:
         rendered HTML page
     """
-    return render_template("index.html")
+    lang = get_value_from_request("lang")
+    languages = [language.replace(".json", "") for language in os.listdir("api/translations")]
+    if lang is None or lang not in languages:
+        lang = "en_US"
+    with open(f"api/translations/{lang}.json", encoding="utf-8") as f:
+        data = json.load(f)
+    return render_template("index.html", data=data, encoded_data=json.dumps(data))
 
 
 @app.route("/", defaults={"path": ""})
