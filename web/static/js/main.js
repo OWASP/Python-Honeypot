@@ -11,11 +11,11 @@ window.chartColors = {
     blue: "rgb(54, 162, 235)",
     purple: "rgb(153, 102, 255)",
     grey: "rgb(201, 203, 207)",
-    cyan: "rgb(0, 255, 255"
+    cyan: "rgb(0, 255, 255)"
 };
 
 var colors_array = ["rgb(255, 0, 0)", "rgb(255, 0, 191)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)",
-    "rgb(191, 255, 0)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)", "rgb(0, 255, 255"]
+    "rgb(191, 255, 0)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)", "rgb(0, 255, 255)"]
 
 var color = Chart.helpers.color;
 var chartColors = window.chartColors;
@@ -121,8 +121,9 @@ function get_top_ten_element_in_event(event_type, element, html_element_id) {
 
             const ctx = document.getElementById(html_element_id);
             window.myPolarArea = Chart.PolarArea(ctx, top_ten_graph_config);
-
-        },
+            const downloadButton = ctx.nextSibling.nextSibling;
+            downloadButton.hidden = false;
+},
         error: function (jqXHR, textStatus, errorThrown) {
             document.getElementById('error_msg').innerHTML = jqXHR.responseText;
             if (errorThrown == "BAD REQUEST") {
@@ -289,8 +290,10 @@ function plot_event_count_by_date(event_type) {
                 document.getElementById("blink_loading_graph").hidden = true;
 
                 // place the graph in canvas
-                var past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
+                const past_week_events_graph_config_ctx = document.getElementById('past_week_events_graph').getContext('2d');
                 window.myLine = new Chart(past_week_events_graph_config_ctx, past_week_events_graph_config);
+                const downloadButton = document.getElementById('past_week_events_graph').nextSibling.nextSibling;
+                downloadButton.hidden = false;
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 document.getElementById('error_msg').innerHTML = jqXHR.responseText;
@@ -368,6 +371,22 @@ function load_graphs() {
 
         }
     }, 3000);
+}
+
+/**
+ * Function is used to convert canvas to image and download it
+ * @param canvasId
+ */
+function downloadChart(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    let downloadLink = document.createElement('a');
+    const filename = canvasId + ".png";
+    downloadLink.setAttribute('download', filename);
+    canvas.toBlob(function (blob) {
+        let url = URL.createObjectURL(blob);
+        downloadLink.setAttribute('href', url);
+        downloadLink.click();
+    });
 }
 
 function keep_update() {

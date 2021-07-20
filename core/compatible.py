@@ -72,12 +72,10 @@ def check_for_requirements(start_api_server):
     # check external required modules
     api_config = api_configuration()
     try:
-        # todo: clean here
-        import elasticsearch
-        import netaddr
-        import flask
-        del netaddr
-        del flask
+        with open(os.path.join(os.getcwd(), 'requirements.txt'), 'r') as requirements:
+            for dependency in requirements:
+                dependency_name = dependency.split('=')[0]
+                __import__(dependency_name)
     except Exception:
         exit_failure("pip install -r requirements.txt")
     # check elasticsearch
