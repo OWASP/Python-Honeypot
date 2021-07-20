@@ -79,7 +79,6 @@ def check_for_requirements(start_api_server):
         exit_failure("pip install -r requirements.txt")
     # check mongodb
     try:
-        import pymongo
         connection = pymongo.MongoClient(
             api_config["api_database"],
             serverSelectionTimeoutMS=connection_timeout
