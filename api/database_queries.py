@@ -97,7 +97,9 @@ def filter_by_country_ip_dest(country):
 
 def filter_by_module_name(module_name):
     return {
-        "module_name": module_name
+        "match": {
+            "module_name": module_name
+        }
     }
 
 
@@ -116,7 +118,9 @@ def filter_by_match(match_query):
     }
 
 
-def filter_by_regex(regex):
+def filter_by_regex(field, regex):
     return {
-        "$regex": regex
+        "regexp": {
+            field: regex
+        }
     }

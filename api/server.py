@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 
 from flask import (Flask,
@@ -281,34 +280,42 @@ def groupby_element(event_type, element):
     Returns:
         JSON/Dict top ten element in event type
     """
-    abort(404) if (event_type not in event_types or element not in group_by_elements) else True
-
+    abort(404) if (
+            event_type not in event_types or element not in group_by_elements
+    ) else True
     date = get_value_from_request("date")
     filter_by = get_value_from_request('filter_by')
     element_value = get_value_from_request(filter_by)
+    conditions = [condition for condition in [
+        filter_by_date(date)['query'],
+        filter_by_element(filter_by, element_value)['query']
+    ] if condition]
+    query = {
+        "query": {
+            "bool": {
+                "must": conditions
+            }
+        },
+        "aggs": {
+            "ips": {
+                "terms": {
+                    "field": element
+                }
+            }
+        }
+    }
+
     try:
         return jsonify(
             {
-                _['key']: _['doc_count'] for _ in elasticsearch_events.search(
-                index='network_events',
-                body={
-                    "query": {
-                        **filter_by_date(date)['query'],
-                        **filter_by_element(filter_by, element_value)['query']
-                    },
-                    "aggs": {
-                        "ips": {
-                            "terms": {
-                                "field": element
-                            }
-                        }
-                    }
-                },
-                size=0)['aggregations']['ips']['buckets']
+                record["key"]: record["doc_count"]
+                for record in elasticsearch_events.search(
+                    index=event_types[event_type], body=query, size=0
+                )["aggregations"]["ips"]["buckets"]
             }
         ), 200
-    except Exception as _:
-        print(_)
+
+    except Exception:
         abort(500)
 
 
@@ -324,40 +331,50 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
-    filter = get_value_from_request("filter")
+    filter_by = get_value_from_request("filter")
 
     try:
-        query = filter_by_date(date) if date else {}
-        query.update(filter_by_module_name(module_name) if module_name else {})
-        query.update(
-            {
-                key: filter_by_regex(fix_filter_query(filter)[key]) for key in fix_filter_query(filter)
-            } if filter else {}
-        )
-
-        return jsonify(
-            {
-                "total": event_types[event_type].count(query),
-                "data": [
-                    i for i in
-                    event_types[event_type].find(
-                        query,
-                        {
-                            "_id": 0
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
+        query = {
+            "query": {
+                "bool": {
+                    "must": [
+                        filter_by_date(date)['query']
+                    ] if date else [],
+                    "filter": []
+                }
             }
-        ), 200
-    except Exception:
+        }
+        if module_name:
+            query['query']['bool']['must'].append(
+                filter_by_module_name(module_name))
+        if filter_by:
+            for key in fix_filter_query(filter_by):
+                filter_query = filter_by_regex(
+                    key,
+                    fix_filter_query(filter_by)[key]
+                )
+                query['query']['bool']['filter'].append(filter_query)
+
+        return jsonify({
+            "total": int(
+                elasticsearch_events.count(
+                    index=event_types[event_type],
+                    body=query
+                )['count']),
+            "data": [
+                record['_source'] for record in elasticsearch_events.search(
+                    index=event_types[event_type],
+                    body=query,
+                    from_=fix_skip(
+                        get_value_from_request("skip")
+                    ),
+                    size=fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )['hits']['hits']
+            ]
+        }), 200
+    except Exception as _:
         abort(500)
 
 
