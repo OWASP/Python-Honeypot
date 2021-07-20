@@ -245,6 +245,8 @@ def count_events(event_type):
     """
     Get total number of events
 
+    Eg. <API_URL>/api/events/count/honeypot/ip?date=2021-06-30
+
     Returns:
         JSON/Dict number of all events
     """
@@ -263,6 +265,21 @@ def count_events(event_type):
                     elasticsearch_events.count(index=event_types[event_type])['count']
                 ),
                 "date": date
+            } if event_type != "all" else {
+                "count": sum(
+                    [
+                        int(
+                            elasticsearch_events.count(
+                                index=event_types[event],
+                                body=filter_by_date(date)
+                            )['count']
+                            if date else
+                            elasticsearch_events.count(index=event_types[event])['count']
+                        )
+                        for event in event_types if event != "all"
+                    ]
+                ),
+                "date": date,
             }
         ), 200
     except Exception:
