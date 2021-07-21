@@ -9,24 +9,20 @@ from flask import (Flask,
                    render_template,
                    send_file)
 from flask import request as flask_request
-from api.database_queries import (sort_by_count,
-                                  filter_by_date,
-                                  filter_by_skip,
-                                  filter_by_limit,
-                                  filter_by_country_ip_dest,
-                                  filter_by_module_name,
-                                  filter_by_match,
-                                  filter_by_regex,
-                                  event_types,
-                                  group_by_elements,
-                                  filter_by_element)
-from api.utility import (aggregate_function,
-                         all_mime_types,
-                         fix_limit,
-                         fix_skip,
-                         fix_filter_query,
-                         msg_structure,
-                         root_dir)
+from api.database_queries import (
+    filter_by_date,
+    filter_by_module_name,
+    filter_by_regex,
+    event_types,
+    group_by_elements,
+    filter_by_element)
+from api.utility import (
+    all_mime_types,
+    fix_limit,
+    fix_skip,
+    fix_filter_query,
+    msg_structure,
+    root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
@@ -378,9 +374,7 @@ def groupby_element(event_type, element):
             application/json: { "msg": "file/path not found!", "status": "error"}
 
     """
-    abort(404) if (
-            event_type not in event_types or element not in group_by_elements
-    ) else True
+    abort(404) if (event_type not in event_types or element not in group_by_elements) else True
     date = get_value_from_request("date")
     filter_by = get_value_from_request('filter_by')
     element_value = get_value_from_request(filter_by)
@@ -406,13 +400,12 @@ def groupby_element(event_type, element):
     try:
         return jsonify(
             {
-                record["key"]: record["doc_count"]
-                for record in elasticsearch_events.search(
-                    index=event_types[event_type], body=query, size=0
-                )["aggregations"]["ips"]["buckets"]
+                record["key"]: record["doc_count"] for record in
+                elasticsearch_events.search(index=event_types[event_type],
+                                            body=query,
+                                            size=0)["aggregations"]["ips"]["buckets"]
             }
         ), 200
-
     except Exception:
         abort(500)
 
@@ -531,14 +524,24 @@ def get_events_data(event_type):
                     fix_filter_query(filter_by)[key]
                 )
                 query['query']['bool']['filter'].append(filter_query)
-
-        return jsonify({
-            "total": int(
-                elasticsearch_events.count(
-                    index=event_types[event_type],
-                    body=query
-                )['count']),
-            "data": [
+        records = []
+        if get_value_from_request("limit") == "infinite":
+            data = elasticsearch_events.search(
+                index=event_types[event_type],
+                body=query,
+                scroll="2m",
+                size=10000
+            )
+            scroll_id = data['_scroll_id']
+            scroll_size = len(data['hits']['hits'])
+            while scroll_size > 0:
+                for record in data['hits']['hits']:
+                    records.append(record['_source'])
+                data = elasticsearch_events.scroll(scroll_id=scroll_id, scroll='2m')
+                scroll_id = data['_scroll_id']
+                scroll_size = len(data['hits']['hits'])
+        else:
+            records = [
                 record['_source'] for record in elasticsearch_events.search(
                     index=event_types[event_type],
                     body=query,
@@ -550,8 +553,15 @@ def get_events_data(event_type):
                     )
                 )['hits']['hits']
             ]
+        return jsonify({
+            "total": int(
+                elasticsearch_events.count(
+                    index=event_types[event_type],
+                    body=query
+                )['count']),
+            "data": records
         }), 200
-    except Exception as _:
+    except Exception:
         abort(500)
 
 
