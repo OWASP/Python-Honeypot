@@ -121,7 +121,7 @@ class TestConnector(unittest.TestCase):
             data="Test Data"
         )
 
-        insert_to_events_data_collection(event_dwata)
+        insert_to_events_data_collection(event_data)
 
         # Find the record in the DB
         event_record_data = data_events.find_one(event_data.__dict__)
