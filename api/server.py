@@ -3,6 +3,7 @@
 import json
 import os
 
+import yaml
 from flask import (Flask,
                    Response,
                    abort,
@@ -211,11 +212,11 @@ def index():
         rendered HTML page
     """
     lang = get_value_from_request("lang")
-    languages = [language.replace(".json", "") for language in os.listdir("api/translations")]
+    languages = [language.replace(".yaml", "") for language in os.listdir("api/translations")]
     if lang is None or lang not in languages:
         lang = "en_US"
-    with open(f"api/translations/{lang}.json", encoding="utf-8") as f:
-        data = json.load(f)
+    with open(f"api/translations/{lang}.yaml", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
     return render_template("index.html", data=data, encoded_data=json.dumps(data))
 
 
