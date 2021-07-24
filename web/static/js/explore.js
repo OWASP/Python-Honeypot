@@ -535,39 +535,62 @@ function load_data(api_endpoint, api_params) {
  * Function called when "search" button is clicked in the "Log explorer" display
  */
 function search_database() {
-  var api_endpoint = "/api/events/explore/";
-  var api_params = {};
-  // Get event type and module name if data explorer
-  var event_type = $("select[name='event_type'] option:selected").val();
-  var module_name = $("select[name='module_names'] option:selected").val();
-  // Update end point
-  api_endpoint += event_type;
-  // Set the API parameters
-  api_params.event_type = event_type;
-  api_params.module_name = module_name;
-  // Get date range
-  var start_date = $("#start_date").val();
-  var end_date = $("#end_date").val();
-
-  if (start_date == "" || end_date == "") {
-    alert("Either Start Date or End date missing!");
-  }
-  else {
-    if (start_date <= end_date) {
-      // Date Range format Eg: 2020-09-10|2020-10-10
-      api_params.date = start_date + '|' + end_date
-      // Call API and load data to table
-      load_data(
-        api_endpoint,
-        api_params
-      );
+    let api_endpoint = "/api/events/explore/";
+    let api_params = {};
+    // Get event type and module name if data explorer
+    const event_type = $("select[name='event_type'] option:selected").val();
+    const module_name = $("select[name='module_names'] option:selected").val();
+    // Update end point
+    api_endpoint += event_type;
+    // Set the API parameters
+    api_params.event_type = event_type;
+    api_params.module_name = module_name;
+    // Get date range
+    const start_date = $("#start_date").val();
+    const end_date = $("#end_date").val();
+    if (event_type === "") {
+        displayErrorMessage("Please select an Event Type");
+    } else if (start_date === "" && end_date === "") {
+        displayErrorMessage("Please select Start date and End date.");
+    } else if (start_date === "") {
+        displayErrorMessage("Please select Start Date.");
+    } else if (end_date === "") {
+        displayErrorMessage("Please select End Date.");
+    } else {
+        if (start_date <= end_date) {
+            //Hide error message
+            hideErrorMessage();
+            // Date Range format Eg: 2020-09-10|2020-10-10
+            api_params.date = start_date + '|' + end_date
+            // Call API and load data to table
+            load_data(
+                api_endpoint,
+                api_params
+            );
+        } else {
+            displayErrorMessage("Start date is greater than End date!")
+        }
     }
-    else {
-      alert("Start date is greater than End date!")
-    }
-  }
 }
 
+/**
+ * Function is called to hide the Error Message element in Log Explorer
+ */
+function hideErrorMessage() {
+    const errorMessageElement = document.getElementById("error-message-element");
+    errorMessageElement.hidden = true;
+    errorMessageElement.innerText = "";
+}
+
+/**
+ * Function is called when there is an error in user input in Log Explorer
+ * @param message error message that is to be displayed
+ */
+function displayErrorMessage(message) {
+    const errorMessageElement = document.getElementById("error-message-element");
+    errorMessageElement.innerText = message;
+    errorMessageElement.hidden = false;
+}
 
 /**
  * Form update based on event type selected
