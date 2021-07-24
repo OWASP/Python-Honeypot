@@ -44,6 +44,8 @@
   "english": "English",
   "german": "German",
   "russian": "Russian",
+  "french": "French",
+  "spanish": "Spanish",
   "choose_language": "Choose Language",
   "no_records_present_message": "No records are present for given request"
 }

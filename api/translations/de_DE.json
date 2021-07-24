@@ -44,6 +44,8 @@
   "english": "Englisch - English",
   "german": "Deutsche - German",
   "russian": "Russisch- Russian",
-  "choose_language": "Sprache wählen\n - Choose Language",
+  "french": "Französisch - French",
+  "spanish": "Spanisch - Spanish",
+  "choose_language": "Sprache wählen - Choose Language",
   "no_records_present_message": "Für die angegebene Anfrage sind keine Datensätze vorhanden"
 }

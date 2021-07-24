@@ -44,6 +44,8 @@
   "english": "английский - English",
   "german": "Немецкий - German",
   "russian": "русский - Russian",
+  "french": "Французский - French",
+  "spanish": "испанский - Spanish",
   "choose_language": "Выберите язык - Choose Language",
   "no_records_present_message": "Для данного запроса нет записей"
 }
