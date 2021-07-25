@@ -12,7 +12,7 @@ import string
 import shutil
 import inspect
 import json
-
+import elasticsearch
 from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
 from shutil import which
