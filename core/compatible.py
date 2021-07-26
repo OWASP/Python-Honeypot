@@ -12,6 +12,7 @@ import string
 import shutil
 import inspect
 import json
+import elasticsearch
 
 from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
@@ -71,13 +72,17 @@ def check_for_requirements(start_api_server):
     from config import api_configuration
     # check external required modules
     api_config = api_configuration()
-    try:
-        with open(os.path.join(os.getcwd(), 'requirements.txt'), 'r') as requirements:
-            for dependency in requirements:
-                dependency_name = dependency.split('=')[0]
-                __import__(dependency_name)
-    except Exception:
-        exit_failure("pip install -r requirements.txt")
+    external_modules = open(os.path.join(os.getcwd(), 'requirements.txt'), 'r').read().split('\n')
+    for module_name in external_modules:
+        try:
+            __import__(
+                module_name.split('==')[0] if 'library_name=' not in module_name
+                else module_name.split('library_name=')[1].split()[0]
+            )
+        except Exception:
+            exit_failure(
+                "pip3 install -r requirements.txt ---> " + module_name + " not installed!"
+            )
     # check elasticsearch
     try:
         connection = elasticsearch.Elasticsearch(
