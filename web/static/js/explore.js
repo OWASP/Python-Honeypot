@@ -30,9 +30,9 @@ function load_module_options() {
 
 // Get the file name of the export file
 function get_export_fileName(file_type) {
-  var d = new Date();
-  var n = d.getTime();
-  return 'Honeypot-data-' + file_type + '-' + n;
+  const d = new Date();
+  const n = d.getTime();
+  return 'Honeypot-data-'  + n  + "." + file_type;
 }
 
 
@@ -252,6 +252,72 @@ $.fn.dataTable.Api.register( 'clearPipeline()', function () {
   } );
 } );
 
+
+/**
+ * Function fetches log data based on params specified by user and download data in specified fileType
+ * @param {*} api_endpoint : API endpoint URL
+ * @param {*} column_list : List of Columns for the selected event type
+ * @param {*} api_params  : GET parameters for the API call
+ * @param {*} fileType    : File Type ( Json, Excel, Csv)
+ */
+function downloadLogData(api_endpoint, column_list, api_params, fileType) {
+    $.ajax({
+        type: "GET",
+        url: api_endpoint,
+        data: {
+            ...api_params,
+            limit: 9999
+        },
+        success: function (result, status, xhr) {
+            const data = result.data
+            console.log(data.length)
+            switch (fileType) {
+                case "JSON": {
+                    const filename = get_export_fileName('json');
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, undefined, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", filename);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    break;
+                }
+                case "CSV": {
+                    let csvFileData = "";
+                    for (let column in column_list) {
+                        csvFileData += `"${column_list[column].data}"` + ",";
+                    }
+                    csvFileData += "\n"
+                    for (let index = 0; index < data.length; index++) {
+                        for (let column in column_list) {
+                            csvFileData += `"${data[index][column_list[column].data]}"` + ",";
+                        }
+                        csvFileData += "\n";
+                    }
+                    const filename = get_export_fileName('csv');
+                    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvFileData);
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", filename);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    break;
+                }
+                case "EXCEL": {
+                    const filename = get_export_fileName('xlsx');
+                    let ws = XLSX.utils.json_to_sheet(data);
+                    let wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, api_params['event_type'] + "_data");
+                    XLSX.writeFile(wb, filename);
+                    break;
+                }
+            }
+        }
+    });
+}
+
+
+
 /**
  * Call the API to get event data from the database
  * @param {*} api_endpoint : API endpoint URL
@@ -275,18 +341,27 @@ function get_event_data(api_endpoint, column_list, api_params) {
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
-      buttons: [
-        {
-          extend: 'csv',
-          filename: function () { return get_export_fileName('csv'); },
-          className: "btn btn-info btn-sm"
-        },
-        {
-          extend: 'excel',
-          filename: function () { return get_export_fileName('excel'); },
-          className: "btn btn-info btn-sm"
-        }
-      ],
+        buttons: [
+            {
+                text: 'CSV',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "CSV")
+                },
+            },
+            {
+                text: 'EXCEL',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "EXCEL")
+                }
+            },
+
+            {
+                text: 'JSON',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "JSON")
+                }
+            }
+        ],
       columns: column_list,
       destroy: true,
       order: [[0, 'desc']],
