@@ -36,7 +36,7 @@ class ModuleProcessor:
                     data = json.loads(data)
                     insert_to_credential_events_collection(
                         CredentialEvent(
-                            ip=data['ip'],
+                            ip_src=data['ip'],
                             username=data['username'],
                             password=data['password'],
                             module_name=data['module_name'],

@@ -115,7 +115,7 @@ class TestConnector(unittest.TestCase):
         Test the data insertion to the events_data collection
         """
         event_data = EventData(
-            ip="55.66.77.88",
+            ip_src="55.66.77.88",
             module_name="ics/veeder_root_guardian_ast",
             date=datetime.now(),
             data="Test Data"

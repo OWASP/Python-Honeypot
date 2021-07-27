@@ -58,6 +58,14 @@ def get_gateway_ip_addresses(configuration):
     return list(set(gateway_ips))
 
 
+def force_kill_tshark():
+    pid = os.popen('ps aux | grep tshark').readline().split()[1]
+    os.popen('kill -9 {} &> /dev/null'.format(pid)).read()
+    # wait to make sure tshark is gone!
+    time.sleep(1)
+    return
+
+
 def process_packet(packet, honeypot_events_queue, network_events_queue):
     """
     Callback function called from the apply_on_packets function.
@@ -217,6 +225,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             capture.apply_on_packets(packet_callback, timeout=timeout)
 
         except get_timeout_error() as e:
+            force_kill_tshark()
             # Catches the timeout error thrown by apply_on_packets
             insert_pcap_files_to_collection(
                 FileArchive(
@@ -227,6 +236,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             ) if store_pcap else e
 
         except KeyboardInterrupt as e:
+            force_kill_tshark()
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
@@ -237,6 +247,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             break
 
         except Exception as e:
+            force_kill_tshark()
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,

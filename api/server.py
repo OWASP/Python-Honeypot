@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import json
 import os
-
 import yaml
 from flask import (Flask,
                    Response,
@@ -11,27 +11,24 @@ from flask import (Flask,
                    render_template,
                    send_file)
 from flask import request as flask_request
-from api.database_queries import (sort_by_count,
-                                  filter_by_date,
-                                  filter_by_skip,
-                                  filter_by_limit,
-                                  filter_by_country_ip_dest,
-                                  filter_by_module_name,
-                                  filter_by_match,
-                                  filter_by_regex,
-                                  event_types,
-                                  group_by_elements)
-from api.utility import (aggregate_function,
-                         all_mime_types,
-                         fix_limit,
-                         fix_skip,
-                         fix_filter_query,
-                         msg_structure,
-                         root_dir)
+from api.database_queries import (
+    filter_by_date,
+    filter_by_module_name,
+    filter_by_regex,
+    event_types,
+    group_by_elements,
+    filter_by_element)
+from api.utility import (
+    all_mime_types,
+    fix_limit,
+    fix_skip,
+    fix_filter_query,
+    msg_structure,
+    root_dir)
 from config import api_configuration
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
-from database import connector
+from database.connector import elasticsearch_events
 from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
 
@@ -191,7 +188,7 @@ def error_500(error):
     del error
     return jsonify(
         msg_structure(status="error", msg="something went wrong!")
-    )
+    ), 500
 
 
 @app.before_request
@@ -295,30 +292,36 @@ def count_events(event_type):
           examples:
             application/json: { "msg": "file/path not found!","status": "error"}
     """
-    abort(404) if event_type not in event_types and event_type != "all" else event_type
+    abort(404) if event_type not in event_types else None
 
     date = get_value_from_request("date")
     try:
         return jsonify(
             {
-                "count": sum(
-                    [
-                        event_types[event_type].count_documents(
-                            {
-                                **filter_by_date(date)
-                            },
-                            allowDiskUse=True
-                        ) if date else event_types[event_type].estimated_document_count() for event_type in event_types
-                    ]
-                ) if event_type == "all" else int(
-                    event_types[event_type].count_documents(
-                        {
-                            **filter_by_date(date)
-                        },
-                        allowDiskUse=True
-                    ) if date else event_types[event_type].estimated_document_count()
+                "count": int(
+                    elasticsearch_events.count(
+                        index=event_types[event_type],
+                        body=filter_by_date(date)
+                    )['count']
+                    if date else
+                    elasticsearch_events.count(index=event_types[event_type])['count']
                 ),
                 "date": date
+            } if event_type != "all" else {
+                "count": sum(
+                    [
+                        int(
+                            elasticsearch_events.count(
+                                index=event_types[event],
+                                body=filter_by_date(date)
+                            )['count']
+                            if date else
+                            elasticsearch_events.count(index=event_types[event])['count']
+                        )
+                        for event in event_types if event != "all"
+                    ]
+                ),
+                "date": date,
             }
         ), 200
     except Exception:
@@ -380,36 +383,36 @@ def groupby_element(event_type, element):
 
     """
     abort(404) if (event_type not in event_types or element not in group_by_elements) else True
-
     date = get_value_from_request("date")
-    country = get_value_from_request("country")
+    filter_by = get_value_from_request('filter_by')
+    element_value = get_value_from_request(filter_by)
+    conditions = [condition for condition in [
+        filter_by_date(date)['query'],
+        filter_by_element(filter_by, element_value)['query']
+    ] if condition]
+    query = {
+        "query": {
+            "bool": {
+                "must": conditions
+            }
+        },
+        "aggs": {
+            "ips": {
+                "terms": {
+                    "field": element
+                }
+            }
+        }
+    }
+
     try:
         return jsonify(
-            [
-                {
-                    element: data['_id'][element],
-                    "count": data["count"]
-                } for data in
-                aggregate_function(
-                    event_types[event_type],
-                    [
-                        filter_by_match(
-                            {
-                                **filter_by_country_ip_dest(country),
-                                **filter_by_date(date)
-                            }
-                        ) if country and date else filter_by_match(
-                            filter_by_country_ip_dest(country)
-                        ) if country else filter_by_match(
-                            filter_by_date(date)
-                        ) if date else sort_by_count,
-                        group_by_elements[element],
-                        filter_by_skip(get_value_from_request("skip")),
-                        filter_by_limit(get_value_from_request("limit")),
-                        sort_by_count
-                    ]
-                )
-            ]
+            {
+                record["key"]: record["doc_count"] for record in
+                elasticsearch_events.search(index=event_types[event_type],
+                                            body=query,
+                                            size=0)["aggregations"]["ips"]["buckets"]
+            }
         ), 200
     except Exception:
         abort(500)
@@ -506,39 +509,66 @@ def get_events_data(event_type):
 
     module_name = get_value_from_request("module_name")
     date = get_value_from_request("date")
-    filter = get_value_from_request("filter")
+    filter_by = get_value_from_request("filter")
 
     try:
-        query = filter_by_date(date) if date else {}
-        query.update(filter_by_module_name(module_name) if module_name else {})
-        query.update(
-            {
-                key: filter_by_regex(fix_filter_query(filter)[key]) for key in fix_filter_query(filter)
-            } if filter else {}
-        )
-
-        return jsonify(
-            {
-                "total": event_types[event_type].count(query),
-                "data": [
-                    i for i in
-                    event_types[event_type].find(
-                        query,
-                        {
-                            "_id": 0
-                        }
-                    ).skip(
-                        fix_skip(
-                            get_value_from_request("skip")
-                        )
-                    ).limit(
-                        fix_limit(
-                            get_value_from_request("limit")
-                        )
-                    )
-                ]
+        query = {
+            "query": {
+                "bool": {
+                    "must": [
+                        filter_by_date(date)['query']
+                    ] if date else [],
+                    "filter": []
+                }
             }
-        ), 200
+        }
+        if module_name:
+            query['query']['bool']['must'].append(
+                filter_by_module_name(module_name))
+        if filter_by:
+            for key in fix_filter_query(filter_by):
+                filter_query = filter_by_regex(
+                    key,
+                    fix_filter_query(filter_by)[key]
+                )
+                query['query']['bool']['filter'].append(filter_query)
+        records = []
+        if get_value_from_request("limit") == "infinite":
+            data = elasticsearch_events.search(
+                index=event_types[event_type],
+                body=query,
+                scroll="2m",
+                size=10000
+            )
+            scroll_id = data['_scroll_id']
+            scroll_size = len(data['hits']['hits'])
+            while scroll_size > 0:
+                for record in data['hits']['hits']:
+                    records.append(record['_source'])
+                data = elasticsearch_events.scroll(scroll_id=scroll_id, scroll='2m')
+                scroll_id = data['_scroll_id']
+                scroll_size = len(data['hits']['hits'])
+        else:
+            records = [
+                record['_source'] for record in elasticsearch_events.search(
+                    index=event_types[event_type],
+                    body=query,
+                    from_=fix_skip(
+                        get_value_from_request("skip")
+                    ),
+                    size=fix_limit(
+                        get_value_from_request("limit")
+                    )
+                )['hits']['hits']
+            ]
+        return jsonify({
+            "total": int(
+                elasticsearch_events.count(
+                    index=event_types[event_type],
+                    body=query
+                )['count']),
+            "data": records
+        }), 200
     except Exception:
         abort(500)
 
@@ -568,7 +598,7 @@ def download_file():
         md5_value = get_value_from_request("md5")
         abort(404) if not md5_value else md5_value
 
-        fs = connector.ohp_file_archive_gridfs.find_one(
+        fs = elasticsearch_events(index='ohp_file_archive').find_one(
             {
                 "md5": md5_value
             }

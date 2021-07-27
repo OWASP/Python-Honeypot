@@ -24,10 +24,10 @@ def api_configuration():
         a JSON with API configuration
     """
     # DOCKER_ENV variable is set in the docker-compose file.
-    if os.environ.get('MONGODB_DOCKER_ENV') == "true":
-        db_url = "mongodb://mongodb:27017/"
+    if os.environ.get('ELASTICSEARCH_DOCKER_ENV') == "true":
+        db_url = "elasticsearch:9200"
     else:
-        db_url = "mongodb://127.0.0.1:27017/"
+        db_url = "127.0.0.1:9200"
 
     return {  # OWASP Honeypot API Default Configuration
         "api_host": "0.0.0.0",
@@ -47,10 +47,9 @@ def api_configuration():
             "enabled": False,
             "filename": "ohp_api_access.log"
         },
-        # mongodb://user:password@127.0.0.1:27017/
+        # http://127.0.0.1:9200/ # todo: add SSL support later
         "api_database": db_url,
-        "api_database_connection_timeout": 2000,  # miliseconds
-        "api_database_name": "ohp_events"
+        "api_database_http_auth": ('elastic', 'changeme')
     }
 
 

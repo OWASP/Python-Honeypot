@@ -4,8 +4,9 @@
 import inspect
 import os
 import time
-import pymongo
-import gridfs
+import elasticsearch
+import hashlib
+import binascii
 
 from multiprocessing import Queue
 
@@ -17,28 +18,22 @@ from database.datatypes import (CredentialEvent,
                                 EventData,
                                 NetworkEvent,
                                 FileEventsData,
-                                FileArchive)
+                                FileArchive,
+                                elastic_search_types)
 from lib.ip2location import IP2Location
+from api.database_queries import event_types
 
 api_config = api_configuration()
 network_config = network_configuration()
 
-# MongoDB Client
-client = pymongo.MongoClient(
+# Event index connections
+elasticsearch_events = elasticsearch.Elasticsearch(
     api_config["api_database"],
-    serverSelectionTimeoutMS=api_config["api_database_connection_timeout"]
+    http_auth=api_config["api_database_http_auth"],
 )
-database = client[api_config["api_database_name"]]
 
-# Event Collections connections
-credential_events = database.credential_events
-honeypot_events = database.honeypot_events
-network_events = database.network_events
-file_change_events = database.file_change_events
-data_events = database.data_events
-# Database for storing network traffic files
-ohp_file_archive = client.ohp_file_archive
-ohp_file_archive_gridfs = gridfs.GridFS(ohp_file_archive)
+event_types_elastic = event_types.copy()
+del event_types_elastic['all']
 
 # Event queues
 honeypot_events_queue = list()
@@ -53,6 +48,19 @@ IP2Location = IP2Location.IP2Location(
 )
 
 
+def create_indices():
+    """
+    Create indices in elasticsearch
+    """
+    for event_type in event_types_elastic:
+        elasticsearch_events.indices.create(
+            index=event_types_elastic[event_type],
+            body=elastic_search_types[event_type],
+            ignore=400
+        )
+    return
+
+
 # todo: write documentation about machine_name
 
 def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_events_queue: Queue):
@@ -65,7 +73,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
                                honeypot_events in _dict_ format
 
     Returns:
-        ObjectId(inserted_id)
+        None
     """
     if is_verbose_mode():
         verbose_info(
@@ -107,7 +115,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
                               network_events in _dict_ format
 
     Returns:
-        ObjectId(inserted_id)
+        None
     """
     if is_verbose_mode():
         verbose_info(
@@ -145,6 +153,13 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     Pushes all honeypot and network events collected in the
     honeypot_events_queue and network_events_queue to honeypot_events
     and network_events collection respectively
+
+    Args:
+        honeypot_events_queue: Multiprocessing queue which stores the list of
+                               honeypot_events in _dict_ format
+        network_events_queue: Multiprocessing queue which stores the list of
+                              network_events in _dict_ format
+
     """
 
     if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
@@ -154,12 +169,12 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     # Insert all honeypot events to database (honeypot_events collection)
     while not honeypot_events_queue.empty():
         new_event = honeypot_events_queue.get()
-        honeypot_events.insert_one(new_event)
+        elasticsearch_events.index(index='honeypot_events', body=new_event)
 
     # Insert all network events to database (network_events collection)
     while not network_events_queue.empty():
         new_event = network_events_queue.get()
-        network_events.insert_one(new_event)
+        elasticsearch_events.index(index='network_events', body=new_event)
 
     return
 
@@ -168,6 +183,12 @@ def push_events_to_database_from_thread(honeypot_events_queue, network_events_qu
     """
     Thread function for inserting bulk events in a thread
 
+
+    Args:
+         honeypot_events_queue: Multiprocessing queue which stores the list of
+                               honeypot_events in _dict_ format
+         network_events_queue: Multiprocessing queue which stores the list of
+                              network_events in _dict_ format
     Returns:
         True/None
     """
@@ -189,9 +210,9 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     Returns:
         inserted_id
     """
-    credential_event.country = byte_to_str(
+    credential_event.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
-            credential_event.ip
+            credential_event.ip_src
         )
     )
 
@@ -201,15 +222,14 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
         verbose_info(
             "Received honeypot credential event, ip_dest:{0}, username:{1}, "
             "password:{2}, module_name:{3}, machine_name:{4}".format(
-                credential_event.ip,
+                credential_event.ip_src,
                 credential_event.username,
                 credential_event.password,
                 credential_event.module_name,
                 credential_event.machine_name
             )
         )
-
-    return credential_events.insert_one(credential_event.__dict__).inserted_id
+    return elasticsearch_events.index(index='credential_events', body=credential_event.__dict__)
 
 
 def insert_to_file_change_events_collection(file_change_event_data: FileEventsData):
@@ -225,10 +245,10 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
         inserted_id
     """
     file_change_event_data.machine_name = network_config["real_machine_identifier_name"]
-    file_change_event_data.file_content = open(
+    file_change_event_data.file_content = binascii.b2a_base64(open(
         file_change_event_data.file_path,
         'rb'
-    ).read() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
+    ).read()).decode() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
 
     if is_verbose_mode():
         verbose_info(
@@ -240,7 +260,7 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
                 file_change_event_data.machine_name,
             )
         )
-    return file_change_events.insert_one(file_change_event_data.__dict__).inserted_id
+    return elasticsearch_events.index(index='file_change_events', body=file_change_event_data.__dict__)
 
 
 def insert_to_events_data_collection(event_data: EventData):
@@ -256,9 +276,9 @@ def insert_to_events_data_collection(event_data: EventData):
     """
     event_data.machine_name = network_config["real_machine_identifier_name"]
 
-    event_data.country = byte_to_str(
+    event_data.country_ip_src = byte_to_str(
         IP2Location.get_country_short(
-            event_data.ip
+            event_data.ip_src
         )
     )
 
@@ -266,14 +286,14 @@ def insert_to_events_data_collection(event_data: EventData):
         verbose_info(
             "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
             "machine_name:{2}, data:{3}".format(
-                event_data.ip,
+                event_data.ip_src,
                 event_data.module_name,
                 event_data.machine_name,
                 event_data.data
             )
         )
 
-    return data_events.insert_one(event_data.__dict__).inserted_id
+    return elasticsearch_events.index(index='data_events', body=event_data.__dict__)
 
 
 def insert_pcap_files_to_collection(file_archive: FileArchive):
@@ -295,10 +315,16 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
                 file_archive.date
             )
         )
-    return ohp_file_archive_gridfs.put(
-        open(file_archive.file_path, "rb"),
-        filename=os.path.split(file_archive.file_path)[1],
-        machine_name=network_configuration()["real_machine_identifier_name"],
-        date=file_archive.date,
-        splitTimeout=file_archive.split_timeout
+    file_content = binascii.b2a_base64(open(file_archive.file_path, "rb").read()).decode()
+    file_md5 = hashlib.md5(file_content.encode()).hexdigest()
+    return elasticsearch_events.index(
+        index='ohp_file_archive',
+        body={
+            "md5": file_md5,
+            "content": file_content,
+            "filename": os.path.split(file_archive.file_path)[1],
+            "machine_name": network_configuration()["real_machine_identifier_name"],
+            "date": file_archive.date,
+            "splitTimeout": file_archive.split_timeout
+        }
     )
