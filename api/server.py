@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import os
 from flask import (Flask,
                    Response,
@@ -222,7 +221,8 @@ def index():
     Returns:
         rendered HTML page
     """
-    return render_template("index.html", data=data, encoded_data=load_messages())
+    data = load_messages()
+    return render_template("index.html", data=data, encoded_data=data)
 
 
 @app.route("/", defaults={"path": ""})
