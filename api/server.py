@@ -29,7 +29,7 @@ from core.get_modules import load_all_modules
 from database.connector import elasticsearch_events
 from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
-from lib.messages import load_messages
+from core import load_messages
 
 
 DOCS_URL = '/api/docs'
