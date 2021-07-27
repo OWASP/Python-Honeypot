@@ -377,7 +377,7 @@ function load_graphs() {
 
 /**
  * Change the language based on User Input
- */ 
+ */
 function changeLanguage() {
     const menu = document.getElementById("language-menu")
     const value = menu.options[menu.selectedIndex].value;
