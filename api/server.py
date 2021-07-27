@@ -3,7 +3,6 @@
 
 import json
 import os
-import yaml
 from flask import (Flask,
                    Response,
                    abort,
@@ -31,6 +30,8 @@ from core.get_modules import load_all_modules
 from database.connector import elasticsearch_events
 from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
+from lib.messages import load_messages
+
 
 DOCS_URL = '/api/docs'
 API_URL = 'http://localhost:5000/docs-configuration'
@@ -221,13 +222,7 @@ def index():
     Returns:
         rendered HTML page
     """
-    lang = get_value_from_request("lang")
-    languages = [language.replace(".yaml", "") for language in os.listdir("api/translations")]
-    if lang is None or lang not in languages:
-        lang = "en_US"
-    with open(f"api/translations/{lang}.yaml", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-    return render_template("index.html", data=data, encoded_data=json.dumps(data))
+    return render_template("index.html", data=data, encoded_data=load_messages())
 
 
 @app.route("/", defaults={"path": ""})
