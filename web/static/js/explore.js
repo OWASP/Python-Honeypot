@@ -307,7 +307,7 @@ function downloadLogData(api_endpoint, column_list, api_params, fileType) {
                     const filename = get_export_fileName('xlsx');
                     let ws = XLSX.utils.json_to_sheet(data);
                     let wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "People");
+                    XLSX.utils.book_append_sheet(wb, ws, api_params['event_type'] + "_data");
                     XLSX.writeFile(wb, filename);
                     break;
                 }
