@@ -35,13 +35,6 @@ elasticsearch_events = elasticsearch.Elasticsearch(
 event_types_elastic = event_types.copy()
 del event_types_elastic['all']
 
-for event_type in event_types_elastic:
-    elasticsearch_events.indices.create(
-        index=event_types_elastic[event_type],
-        body=elastic_search_types[event_type],
-        ignore=400
-    )
-
 # Event queues
 honeypot_events_queue = list()
 network_events_queue = list()
@@ -53,6 +46,19 @@ IP2Location = IP2Location.IP2Location(
         ),
         "IP2LOCATION-LITE-DB1.BIN")
 )
+
+
+def create_indices():
+    """
+    Create indices in elasticsearch
+    """
+    for event_type in event_types_elastic:
+        elasticsearch_events.indices.create(
+            index=event_types_elastic[event_type],
+            body=elastic_search_types[event_type],
+            ignore=400
+        )
+    return
 
 
 # todo: write documentation about machine_name

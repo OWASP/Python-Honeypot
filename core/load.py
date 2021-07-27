@@ -24,7 +24,8 @@ from core.get_modules import (load_all_modules,
                               virtual_machine_names_to_container_names)
 from core.network import network_traffic_capture
 from database.connector import (push_events_queues_to_database,
-                                push_events_to_database_from_thread)
+                                push_events_to_database_from_thread,
+                                create_indices)
 
 # tmp dirs
 tmp_directories = []
@@ -739,6 +740,8 @@ def load_honeypot_engine():
         exit_success()
     # check for requirements before start
     check_for_requirements(argv_options.start_api_server)
+    # create indices before server start
+    create_indices()
     # check api server flag
     if argv_options.start_api_server:
         start_api_server()
