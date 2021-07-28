@@ -23,7 +23,9 @@ from api.utility import (
     fix_filter_query,
     msg_structure,
     root_dir)
-from config import api_configuration
+from config import (
+    api_configuration,
+    user_configuration)
 from core.alert import write_to_api_console
 from core.get_modules import load_all_modules
 from database.connector import elasticsearch_events
@@ -220,7 +222,7 @@ def index():
     Returns:
         rendered HTML page
     """
-    data = load_messages().get_translations(get_value_from_request("lang"))
+    data = load_messages().message_contents
     return render_template("index.html", data=data, encoded_data=data)
 
 
@@ -678,7 +680,7 @@ def start_api_server():
         "api_access_log": my_api_configuration["api_access_log"]["enabled"],
         "api_access_log_filename": my_api_configuration["api_access_log"]["filename"],
         "api_access_without_key": api_access_without_key,
-        "language": "en"
+        **user_configuration()
     }
     app.register_blueprint(documentation_settings)
 

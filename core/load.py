@@ -606,9 +606,7 @@ def update_language(argv_options):
     Args:
         argv_options
     """
-    if argv_options.language in load_messages.languages:
-        load_messages.language = argv_options.language
-    else:
+    if argv_options.language  not in load_messages().languages_list:
         exit_failure("Invalid language code. Available options are " + ", ".join(load_messages.languages))
 
 
