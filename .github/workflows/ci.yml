@@ -50,9 +50,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run API server via docker daemon
-        run: docker-compose up -d --build && sleep 60
-
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -65,6 +62,9 @@ jobs:
 
       - name: Lint with flake8
         run: flake8 --count --show-source --statistics .
+
+      - name: Run API server via docker daemon
+        run: sudo mkdir -p data/db && sudo chmod -R 1777 data/db && docker-compose up -d --build && sleep 60
 
       - name: Check API server logs
         run: docker logs python-honeypot_ohp_1
