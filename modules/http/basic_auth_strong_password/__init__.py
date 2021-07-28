@@ -47,7 +47,7 @@ class ModuleProcessor:
                         password = ":".join(authorization.split(":")[1:])
                         insert_to_credential_events_collection(
                             CredentialEvent(
-                                ip=ip,
+                                ip_src=ip,
                                 username=username,
                                 password=password,
                                 module_name="http/basic_auth_strong_password",

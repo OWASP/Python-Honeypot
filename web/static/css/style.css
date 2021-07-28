@@ -157,6 +157,14 @@ blink {
     animation: 2s linear infinite condemned_blink_effect;
 }
 
+
+.language-selector {
+    text-align: center;
+    max-width: 80%;
+    width: 300px;
+    margin: 1rem auto;
+}
+
 @-webkit-keyframes condemned_blink_effect {
     0% {
         visibility: hidden;

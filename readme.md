@@ -7,7 +7,7 @@ OWASP Honeypot is an open-source software in Python language which designed for 
 We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org). Please visit [Wiki](https://github.com/zdresearch/OWASP-Honeypot/wiki) page for more information.
 
 ### Live API
-We've setup a live API on a few servers in Stockholm area, you can use API calls and information without any limitation, the service is running on a tiny VPS, please do not send a lot of requests.
+We've set up a live API on a few servers in Stockholm area, you can use API calls and information without any limitation, the service is running on a tiny VPS, please do not send a lot of requests.
 
 * http://ohp-stockholm-live.z3r0d4y.com:5000/
 
@@ -17,7 +17,7 @@ ______
 
 ##### ***NO WARRANTY! USE WITH YOUR OWN RESPONSIBILITY!***
 
-##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
+##### ***DO NOT USE IT ON THE SAME SERVER(S)/NETWORK WHICH YOU'RE HAVING YOUR PRODUCT/INFORMATION/SENSIBLE DATA***
 
 * Running Example (I sent `ctrl + c` to close and remove honeypot service correctly!)
 
@@ -70,21 +70,27 @@ ______
 ### API Actions & WebUI
 
 * Please visit [API Actions](https://github.com/zdresearch/OWASP-Honeypot/wiki/API) in wiki page to find more information
-* Use `python ohp.py --start-api-server` to start API Server with [default configuration](https://github.com/zdresearch/OWASP-Honeypot/blob/master/config.py).
+* To run API Server with [default configuration](https://github.com/zdresearch/OWASP-Honeypot/blob/master/config.py) with _ElasticSearch_
+running on host, use the command given below :
+```sh
+  python ohp.py --start-api-server
+```
 
 #### Run Dockerized API
 
-* To run the API with _MongoDB_ running on the host, use the command given below:
+* To run the API with _ElasticSearch_ running on the host , use the command given below:
 
 ```sh
 docker-compose -f docker-compose-host.yml up
 ```
 
-* To run the API with _MongoDB_ also running on a docker container, use the following commands:
+* To run the API with _ElasticSearch_ also running on a docker container, use the following commands:
 
 ```sh
 docker-compose up
 ```
+
+#### Web Interface
 
 ![image_2018-07-17_01-48-26](https://user-images.githubusercontent.com/7676267/42784742-63f95a2e-8965-11e8-8d64-435f6182dcf2.png)
 
@@ -93,4 +99,4 @@ docker-compose up
 
 ## Contributing
 
-Pull requests are welcome! Feel free to [join us on Slack](https://owasp.slack.com) and discuss the project with the engineers on #owasp-python-honeypot. You are welcome to take any open issue in the tracker labeled 'help wanted' or 'good first issue'. See the [CONTRIBUTORS](https://github.com/zdresearch/OWASP-Honeypot/blob/master/CONTRIBUTING.md) file for details. Other issues are open for contribution as well, but may be less accessible or well defined in comparison to those that are explicitly labeled; you should consider reaching out to us if you are interested in implementing these tickets.
+Pull requests are welcome! Feel free to [join us on Slack](https://owasp.slack.com) and discuss the project with the engineers on `#owasp-python-honeypot` channel. You are welcome to take any open issue in the tracker labeled 'help wanted' or 'good first issue'. See the [CONTRIBUTION](https://github.com/zdresearch/OWASP-Honeypot/blob/master/CONTRIBUTING.md) file for details. Other issues are open for contribution as well, but may be less accessible or well-defined in comparison to those that are explicitly labeled; you should consider reaching out to us if you are interested in implementing these tickets.

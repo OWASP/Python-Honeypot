@@ -40,9 +40,11 @@ def terminate_thread(thread, verbose=True):
     Returns:
         True/None
     """
+    from core.messages import load_messages
     from core.alert import info
+    messages = load_messages().message_contents
     if verbose:
-        info("killing {0}".format(thread.name))
+        info(messages["killing_thread"].format(thread.name))
     if not thread.is_alive():
         return
 

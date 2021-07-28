@@ -26,6 +26,7 @@
     <!-- main.js used as general js file for index.html -->
     <script src="/js/main.js"></script>
     <script src="/js/explore.js"></script>
+    <script src="/js/xlsx.full.min.js"></script>
     <!-- end of header header -->
 </head>
 
@@ -36,11 +37,12 @@
     <ul class="navbar-nav">
         <li class="nav-item">
             <label class="log-explorer-label btn btn-outline-primary"
-                   onclick="get_layout('dashboard')">Dashboard</label>
+                   onclick="get_layout('dashboard')">{{ data.dashboard }}
+            </label>
         </li>
         <li class="nav-item">
-            <label class="log-explorer-label btn btn-outline-info" onclick="get_layout('log-explorer')">Log
-                Explorer</label>
+            <label class="log-explorer-label btn btn-outline-info"
+                   onclick="get_layout('log-explorer')">{{ data.explorer }}</label>
         </li>
     </ul>
 </nav>
@@ -49,31 +51,31 @@
     <div id="dashboard">
         <br>
         <!-- welcoming message, probably should replace with navbar later -->
-        <p class="text-center">Welcome to <b>OWASP Honeypot</b> WebUI</p>
+        <p class="text-center">{{ data.welcome }} <b>OWASP Honeypot</b> {{ data.ui }}</p>
         <center>
             <!-- body analytics-->
             <!-- using API (main.js) to show some analytics -->
             <!-- number of all events from the beginning -->
-            <small>Total Events: <b><a id="count_all_events">x</a></b></small>
+            <small>{{ data.total_events }}: <b><a id="count_all_events">x</a></b></small>
             <!-- number of all honeypot related events from the beginning -->
-            <small>Total Honeypot Events: <b><a id="count_honeypot_events">x</a></b></small>
+            <small>{{ data.total_honeypot_events }}: <b><a id="count_honeypot_events">x</a></b></small>
             <!-- number of all network related events from the beginning -->
-            <small>Total Network Events: <b><a id="count_network_events">x</a></b></small>
+            <small>{{ data.total_network_events }}: <b><a id="count_network_events">x</a></b></small>
             <!-- number of all credential related events from the beginning -->
-            <small>Total Credential Events: <b><a id="count_credential_events">x</a></b></small>
+            <small>{{ data.total_credential_events }}: <b><a id="count_credential_events">x</a></b></small>
             <!-- number of all file related events from the beginning -->
-            <small>Total File Events: <b><a id="count_file_events">x</a></b></small>
+            <small>{{ data.total_file_events }}: <b><a id="count_file_events">x</a></b></small>
             <!-- number of all data related events from the beginning -->
-            <small>Total Data Events: <b><a id="count_data_events">x</a></b></small>
+            <small>{{ data.total_data_events }}: <b><a id="count_data_events">x</a></b></small>
             <!-- number of all pcap related events from the beginning -->
-            <small>Total PCAP Events: <b><a id="count_pcap_events">x</a></b></small>
+            <small>{{ data.total_pcap_events }}: <b><a id="count_pcap_events">x</a></b></small>
 
 
             <div style="width:70%; text-align:center;">
                 <!-- graph takes 5 seconds to load, we need to wait all requests get responded before showing them -->
                 <blink id="blink_loading_graph">
                     <!-- this will disappear after graph appears -->
-                    <small>loading live graph, please wait a few seconds!</small>
+                    <small>{{ data.loading_info }}</small>
                 </blink>
                 <!-- graph will be locate in here and it shows 1-past week all events 2-honeypot events 3-network events -->
                 <!-- graph will get automatically updated if anything changes in network every 60 seconds -->
@@ -117,43 +119,44 @@
             </div>
         </center>
     </div>
-
     <div id="log-explorer" hidden=true>
         <div id="collapseOne" class="collapse show" data-parent="#accordion">
             <form>
                 <div class="form-row" id="log-explorer-params">
                     <div class="form-group col-md-6">
-                        <label for="event_type">Event Type: </label>
+                        <label for="event_type">{{ data.event_type }}: </label>
                         <select class="form-control" name="event_type" id="event_type" onchange="change_form()">
-                            <option selected value="">Choose...</option>
-                            <option value="honeypot">Honeypot Events</option>
-                            <option value="network">Network Events</option>
-                            <option value="credential">Credential Events</option>
-                            <option value="file">File Change Events</option>
-                            <option value="data">Data Events</option>
-                            <option value="pcap">PCAP Archive Files</option>
+                            <option selected value="">{{ data.choose }}</option>
+                            <option value="honeypot">{{ data.honeypot_events }}</option>
+                            <option value="network">{{ data.network_events }}</option>
+                            <option value="credential">{{ data.credential_events }}</option>
+                            <option value="file">{{ data.file_change_events }}</option>
+                            <option value="data">{{ data.data_events }}</option>
+                            <option value="pcap">{{ data.pcap_archive_files }}</option>
                         </select>
+
                     </div>
                     <div class="form-group col-md-6" id="module_list">
-                        <label for="">Module Name: </label>
+                        <label for="">{{ data.module_name }}: </label>
                         <select class="form-control" name="module_names" id="module_names" disabled=true>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="start_date">Start Date: </label>
+                        <label for="start_date">{{ data.start_date }}: </label>
                         <input type="date" class="form-control" id="start_date">
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="end_date">End Date: </label>
+                        <label for="end_date">{{ data.end_date }}: </label>
                         <input type="date" class="form-control" id="end_date">
                     </div>
                 </div>
                 <div class="alert alert-danger" id="error-message-element" role="alert" hidden>
                 </div>
                 <div class="form-group">
-                    <button type="button" class="btn btn-info btn-sm" onclick="search_database()">Search</button>
+                    <button type="button" class="btn btn-info btn-sm"
+                            onclick="search_database()">{{ data.search }}</button>
                 </div>
             </form>
         </div>
@@ -179,6 +182,20 @@
     <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
     <!-- end of footer -->
 </div>
+
+<script>
+    const translations = {{ encoded_data | safe}};
+    const param = new URLSearchParams(window.location.search).get("lang");
+    const menu = document.getElementById("language-menu")
+    for (let i = 0; i < menu.length; i++) {
+        if (menu.options[i].value === param) {
+            menu.value = param
+        }
+    }
+</script>
+<!-- main.js used as general js file for index.html -->
+<script src="/js/main.js"></script>
+<script src="/js/explore.js"></script>
 <br>
 <!-- end of body -->
 </body>

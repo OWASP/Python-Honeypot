@@ -1,0 +1,85 @@
+---
+explorer: Protokoll-Explorer
+dashboard: Instrumententafel
+event_type: Ereignistyp
+module_name: Modulname
+start_date: Anfangsdatum
+end_date: Endtermin
+search: Suche
+welcome: 'Willkommen zu '
+ui: WebUI
+top_ten_ip_dests-honeypot: Top Ten Ip_dest - Honeypot
+top_ten_ip_dests-network: Top Ten Ip_dest- Netzwerk
+top_ten_port_dests-honeypot: Top Ten Port_dest - Honeypot
+top_ten_port_dests-network: Top Ten Port_dest - Netzwerk
+top_ten_ips-honeypot: Top Ten Ip - Honeypot
+top_ten_ips-network: Top Ten Ip- Netzwerk
+top_ten_ports-honeypot: Top Ten Port - Honeypot
+top_ten_ports-network: Top Ten Port - Netzwerk
+total_events: Gesamte Ereignisse
+total_honeypot_events: Honeypot-Events insgesamt
+total_network_events: Netzwerkereignisse insgesamt
+total_credential_events: Anmeldedatenereignisse insgesamt
+total_file_events: Dateiereignisse insgesamt
+total_data_events: Gesamtdatenereignisse
+total_pcap_events: PCAP-Ereignisse insgesamt
+all_events: Alle Veranstaltungen
+honeypot_events: Honeypot-Events
+network_events: Netzwerkereignisse
+credential_events: Anmeldeinformationen
+file_events: Dateiereignisse
+data_events: Datenereignisse
+pcap_events: PCAP-Ereignisse
+graph_info: Ereignisdiagramm der vergangenen Woche (aktualisiert 30 Sekunden)
+file_change_events: Dateiänderungsereignisse
+pcap_archive_files: PCAP-Archivdateien
+choose: Wählen...
+loading: Wird geladen...
+loading_info: Live-Grafik wird geladen, bitte warten Sie ein paar Sekunden!
+event_type_error: Bitte wählen Sie einen Veranstaltungstyp
+date_not_selected_error: Bitte wählen Sie Startdatum und Enddatum.
+start_date_not_selected_error: Bitte wählen Sie Startdatum.
+end_date_not_selected_error: Bitte wählen Sie Enddatum.
+start_date_greater_error: Startdatum ist größer als Enddatum!
+english: Englisch - English
+german: Deutsche - German
+russian: Russisch- Russian
+french: Französisch - French
+spanish: Spanisch - Spanish
+choose_language: Sprache wählen - Choose Language
+no_records_present_message: Für die angegebene Anfrage sind keine Datensätze vorhanden
+script_must_run_as_root: Das Skript muss als Root ausgeführt werden!
+elasticsearch_not_found: Kann keine Verbindung zu Elasticsearch herstellen
+cannot_communicate_with_docker: Kann nicht mit Docker kommunizieren, bitte installieren und starten Sie den Docker-Dienst!
+install_tools: Bitte installieren Sie zuerst die erforderlichen Tools!
+interrupt_application: Unterbrechen der Anwendung, da der Netzwerkerfassungsprozess nicht aktiv ist!
+interrupted_by_user: Vom Benutzer unterbrochen, warten Sie bitte, um die Container zu stoppen und die Container und Bilder zu entfernen
+timeout_error: Der Timeout-Wert darf nicht kleiner als 1 Sekunde sein!
+no_module_selected_error: Kein Modul ausgewählt, bitte mindestens eines auswählen!
+all_modules_excluded_error: Sie können nicht alle Module ausschließen
+killing_capture_process: Killing Network Capture Prozess
+finished: fertig.
+start_message: OWASP Honeypot gestartet ...
+check_for_port_conflicts: Auf Konflikte in Ports prüfen
+submitting_events: Senden neuer Ereignisse an die Datenbank
+network_traffic_capture_start: network_traffic_capture-Prozess gestartet
+creating_ohp_internet: ohp_internet-Netzwerk erstellen
+ohp_internet_network: ohp_internet Netzwerk erstelltes Subnetz:{0} Gateway:{1}
+creating_ohp_no_internet: ohp_no_internet-Netzwerk erstellen
+ohp_no_internet_network: ohp_no_internet Netzwerk erstelltes Subnetz:{0} Gateway:{1}
+removing_image: Bild {0} erstellen
+creating_image: Bild erstellen {0}
+image_created: Bild {0} erstellt
+port_selected: Port {0} ausgewählt für {1}
+loading_modules: Lademodule {0}
+killing_thread: töten {0}
+module_not_available: Modul {0} ist nicht verfügbar
+unable_to_get_ip: IP-Adresse des Containers {0} kann nicht abgerufen werden
+network_capture_getting_stored: Die Netzwerkaufnahme wird gespeichert in {}
+selected_modules_started: 'Alle ausgewählten Module gestartet: {0}'
+received_honeypot_event: 'Honeypot-Ereignis empfangen, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Empfangenes Netzwerkereignis, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Empfangenes Honeypot-Anmeldedatenereignis, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Empfangenes Honeypot-Dateiänderungsereignis, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Empfangenes Honeypot-Datenereignis, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Empfangene Netzwerkdatenverkehrsdatei:{0}, Datum:{1}. Einfügen in das Dateiarchiv'

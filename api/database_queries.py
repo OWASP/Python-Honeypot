@@ -3,23 +3,16 @@
 
 """
 This file is to be used to store all the queries which are being used
-for querying mongodb using pymongo.
+for querying elasticsearch using elasticsearch client.
 
 Created this file because the queries are repeated over the URI's.
 """
-from bson.son import SON
 from api.utility import (fix_date,
                          fix_limit,
                          fix_skip)
-from database.connector import (honeypot_events,
-                                network_events,
-                                credential_events,
-                                file_change_events,
-                                data_events,
-                                ohp_file_archive)
 
 sort_by_count = {
-    "$sort": SON(
+    "$sort": (
         [
             ("count", -1)
         ]
@@ -27,46 +20,70 @@ sort_by_count = {
 }
 
 
-def group_by(element_name, element):
+def filter_by_element(filter_by, element_value):
     return {
-        "$group":
-            {
-                "_id": {
-                    element_name: element
-                },
-                "count": {
-                    "$sum": 1
-                }
+        "query": {
+            "multi_match": {
+                "query": element_value,
+                "fields": ['*']
             }
+        }
+    } if filter_by and element_value else {
+        "query": {}
     }
 
 
-group_by_elements = {
-    "ip": group_by("ip", "$ip_dest"),
-    "country": group_by("country", "$country_ip_dest"),
-    "port": group_by("port", "$port_dest"),
-    "module_name": group_by("module_name", "$module_name"),
-    "username": group_by("username", "$username"),
-    "password": group_by("password", "$password"),
-    "machine_name": group_by("machine_name", "$machine_name")
-}
+group_by_elements = [
+    "ip_dest",
+    "ip_src",
+    "country_ip_src",
+    "country_ip_dest",
+    "port_dest",
+    "port_src",
+    "protocol",
+    "module_name",
+    "machine_name",
+    "username",
+    "password",
+    "is_directory",
+    "split_timeout"
+]
 
 event_types = {
-    "honeypot": honeypot_events,
-    "network": network_events,
-    "credential": credential_events,
-    "file": file_change_events,
-    "data": data_events,
-    "pcap": ohp_file_archive.fs.files
+    "all": "*",
+    "honeypot": 'honeypot_events',
+    "network": 'network_events',
+    "credential": 'credential_events',
+    "file": 'file_change_events',
+    "data": 'data_events',
+    "pcap": 'ohp_file_archive'
 }
 
 
 def filter_by_date(date):
     date = fix_date(date)
     return {
-        "date": {
-            "$gte": date[0],
-            "$lte": date[1]
+        "query": {
+            "range":
+                {
+                    "date": {
+                        "gte": date[0],
+                        "lte": date[1]
+                    }
+                }
+        }
+    } if date else {
+        "query": {}
+    }
+
+
+def filter_by_fields(query, fields):
+    return {
+        'query': {
+            'simple_query_string': {
+                'query': query,
+                'fields': fields
+            }
         }
     }
 
@@ -91,7 +108,9 @@ def filter_by_country_ip_dest(country):
 
 def filter_by_module_name(module_name):
     return {
-        "module_name": module_name
+        "match": {
+            "module_name": module_name
+        }
     }
 
 
@@ -110,7 +129,9 @@ def filter_by_match(match_query):
     }
 
 
-def filter_by_regex(regex):
+def filter_by_regex(field, regex):
     return {
-        "$regex": regex
+        "regexp": {
+            field: regex
+        }
     }
