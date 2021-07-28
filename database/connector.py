@@ -297,8 +297,7 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
         file_id
     """
     verbose_info(
-        "Received network traffic file:{0}, date:{1}. "
-        "Inserting it in the File Archive".format(
+        messages["received_network_traffic_file"].format(
             file_archive.file_path,
             file_archive.date
         )
