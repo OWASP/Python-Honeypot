@@ -61,7 +61,6 @@ killing_capture_process: Убивает процесс захвата сети
 finished: законченный.
 start_message: OWASP Honeypot запущен ...
 check_for_port_conflicts: Проверка на конфликты в портах
-
 submitting_events: Отправка новых событий в базу данных
 network_traffic_capture_start: процесс network_traffic_capture запущен
 creating_ohp_internet: создание сети ohp_internet
