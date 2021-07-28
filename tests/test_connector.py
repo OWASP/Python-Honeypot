@@ -50,7 +50,6 @@ class TestConnector(unittest.TestCase):
         insert_to_network_events_queue(network_event, network_events_queue)
 
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
-        
 
         # Find the records in the DB
         honeypot_record = connector.elasticsearch_events.search(
@@ -93,7 +92,6 @@ class TestConnector(unittest.TestCase):
         )
 
         insert_to_credential_events_collection(credential_event)
-        
 
         # Find the record in the DB
         credential_record = connector.elasticsearch_events.search(
@@ -136,7 +134,7 @@ class TestConnector(unittest.TestCase):
 
         insert_to_events_data_collection(event_data)
         # wait for insert
-        
+
         # Find the record in the DB
         event_record_data = connector.elasticsearch_events.search(
             index='data_events',
