@@ -53,7 +53,7 @@ def get_gateway_ip_addresses(configuration):
             gateway_ips.append(gateway_ip)
         except IndexError:
             warn(
-                "unable to get container {0} IP address".format(
+                messages["unable_to_get_ip"].format(
                     container_name
                 )
             )
@@ -207,7 +207,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         if store_pcap:
             info(
-                "Network capture is getting stored in, {}".format(
+                messages["network_capture_getting_stored"].format(
                     output_file_path
                 )
             )

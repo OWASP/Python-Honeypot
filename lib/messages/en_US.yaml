@@ -73,3 +73,13 @@ image_created: image {0} created
 port_selected: port {0} selected for {1}
 loading_modules: loading modules {0}
 killing_thread: killing {0}
+module_not_available: module {0} is not available
+unable_to_get_ip: unable to get container {0} IP address
+network_capture_getting_stored: Network capture is getting stored in, {}
+selected_modules_started: 'All selected modules started: {0}'
+received_honeypot_event: 'Received honeypot event, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Received network event, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Received honeypot credential event, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Received honeypot file change event, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Received honeypot data event, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Received network traffic file:{0}, date:{1}. Inserting it in the File Archive'

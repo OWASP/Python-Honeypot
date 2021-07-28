@@ -76,9 +76,9 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
     Returns:
         None
     """
+
     verbose_info(
-        "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
-        "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
+        messages["received_honeypot_event"].format(
             honeypot_event.ip_dest,
             honeypot_event.port_dest,
             honeypot_event.ip_src,
@@ -117,9 +117,9 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     Returns:
         None
     """
+
     verbose_info(
-        "Received network event, ip_dest:{0}, port_dest:{1}, "
-        "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
+        messages["received_network_event"].format(
             network_event.ip_dest,
             network_event.port_dest,
             network_event.ip_src,
@@ -143,7 +143,6 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     )
 
     network_events_queue.put(network_event.__dict__)
-
     return
 
 
@@ -216,8 +215,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
     credential_event.machine_name = network_config["real_machine_identifier_name"]
 
     verbose_info(
-        "Received honeypot credential event, ip_dest:{0}, username:{1}, "
-        "password:{2}, module_name:{3}, machine_name:{4}".format(
+        messages["received_honeypot_credential_event"].format(
             credential_event.ip_src,
             credential_event.username,
             credential_event.password,
@@ -247,8 +245,7 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
     ).read()).decode() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
 
     verbose_info(
-        "Received honeypot file change event, file_path:{0}, status:{1}, "
-        "module_name:{2}, module_name:{3}, machine_name:{3}".format(
+        messages["received_honeypot_file_change_event"].format(
             file_change_event_data.file_path,
             file_change_event_data.status,
             file_change_event_data.module_name,
@@ -278,15 +275,13 @@ def insert_to_events_data_collection(event_data: EventData):
     )
 
     verbose_info(
-        "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
-        "machine_name:{2}, data:{3}".format(
+        messages["received_honeypot_data_event"].format(
             event_data.ip_src,
             event_data.module_name,
             event_data.machine_name,
             event_data.data
         )
     )
-
     return elasticsearch_events.index(index='data_events', body=event_data.__dict__)
 
 
@@ -302,8 +297,7 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
         file_id
     """
     verbose_info(
-        "Received network traffic file:{0}, date:{1}. "
-        "Inserting it in the File Archive".format(
+        messages["received_network_traffic_file"].format(
             file_archive.file_path,
             file_archive.date
         )

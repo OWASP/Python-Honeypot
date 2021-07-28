@@ -73,3 +73,13 @@ image_created: Bild {0} erstellt
 port_selected: Port {0} ausgewählt für {1}
 loading_modules: Lademodule {0}
 killing_thread: töten {0}
+module_not_available: Modul {0} ist nicht verfügbar
+unable_to_get_ip: IP-Adresse des Containers {0} kann nicht abgerufen werden
+network_capture_getting_stored: Die Netzwerkaufnahme wird gespeichert in {}
+selected_modules_started: 'Alle ausgewählten Module gestartet: {0}'
+received_honeypot_event: 'Honeypot-Ereignis empfangen, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Empfangenes Netzwerkereignis, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Empfangenes Honeypot-Anmeldedatenereignis, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Empfangenes Honeypot-Dateiänderungsereignis, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Empfangenes Honeypot-Datenereignis, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Empfangene Netzwerkdatenverkehrsdatei:{0}, Datum:{1}. Einfügen in das Dateiarchiv'

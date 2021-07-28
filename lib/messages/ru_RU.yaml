@@ -73,3 +73,13 @@ image_created: 'изображение {0} создано'
 port_selected: 'порт {0} выбран для {1}'
 loading_modules: 'загрузка модулей {0}'
 killing_thread: 'убийство {0}'
+module_not_available: модуль {0} недоступен
+unable_to_get_ip: невозможно получить IP-адрес контейнера {0}
+network_capture_getting_stored: Сетевой захват сохраняется в, {}
+selected_modules_started: 'Все выбранные модули запущены: {0}'
+received_honeypot_event: 'Получено событие Honeypot, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Получено сетевое событие, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Получено событие учетных данных Honeypot, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Получено событие изменения файла Honeypot, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Получено событие данных HoneyPot, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Получен файл сетевого трафика: {0}, дата: {1}. Вставка в файловый архив'
