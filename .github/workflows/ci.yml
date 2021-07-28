@@ -44,13 +44,13 @@ jobs:
         python-version: [3.9.4, 3.8.9]
 
     steps:
-      - name: Run API server via docker daemon
-        run: docker-compose up -d --build
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Run API server via docker daemon
+        run: docker-compose up -d --build
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
