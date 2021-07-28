@@ -1,0 +1,85 @@
+---
+explorer: Explorateur de journaux
+dashboard: Tableau de bord
+event_type: Type d'événement
+module_name: Nom du module
+start_date: Date de début
+end_date: Date de fin
+search: Rechercher
+welcome: 'Bienvenue à '
+ui: WebUI
+top_ten_ip_dests-honeypot: Top Ten Ip_dest - Honeypot
+top_ten_ip_dests-network: Top Ten Ip_dest- Réseau
+top_ten_port_dests-honeypot: Top Ten Port_dest - Honeypot
+top_ten_port_dests-network: Top Ten Port_dest - Réseau
+top_ten_ips-honeypot: Top Ten Ip - Honeypot
+top_ten_ips-network: Top Ten Ip- Réseau
+top_ten_ports-honeypot: Top Ten Port - Honeypot
+top_ten_ports-network: Top Ten Port - Réseau
+total_events: Nombre total d'événements
+total_honeypot_events: Total des événements Honeypot
+total_network_events: Nombre total d'événements réseau
+total_credential_events: Nombre total d'événements d'identification
+total_file_events: Nombre total d'événements de fichiers
+total_data_events: Nombre total d'événements de données
+total_pcap_events: Nombre total d'événements PPCE
+all_events: Tous les évènements
+honeypot_events: Événements de pot de miel
+network_events: Événements du réseau
+credential_events: Événements d'identification
+file_events: Événements de fichier
+data_events: Événements de données
+pcap_events: Événements du PPCE
+graph_info: Graphique des événements de la semaine passée (mise à jour 30 secondes)
+file_change_events: Événements de modification de fichier
+pcap_archive_files: Fichiers d'archives PCAP
+choose: Choisir...
+loading: Chargement...
+loading_info: loading live graph, please wait a few seconds!
+event_type_error: 'Veuillez sélectionner un type d''événement'
+date_not_selected_error: Veuillez sélectionner une date de début et une date de fin.
+start_date_not_selected_error: Veuillez sélectionner une date de début.
+end_date_not_selected_error: Veuillez sélectionner la date de fin.
+start_date_greater_error: La date de début est postérieure à la date de fin !
+english: Anglais - English
+german: Allemand - German
+russian: russe - Russian
+french: français - French
+spanish: Espanol - Spanish
+choose_language: Choisissez la langue
+no_records_present_message: Aucun enregistrement n'est présent pour une demande donnée
+script_must_run_as_root: Le script doit être exécuté en tant que root !
+elasticsearch_not_found: Impossible de se connecter à Elasticsearch
+cannot_communicate_with_docker: Impossible de communiquer avec Docker, installez et démarrez le service Docker.
+install_tools: Veuillez d'abord installer les outils requis !
+interrupt_application: Interruption de l'application car le processus de capture réseau n'est pas actif!
+interrupted_by_user: Interrompu par l'utilisateur, veuillez patienter pour arrêter les conteneurs et supprimer les conteneurs et les images
+timeout_error: La valeur du délai d'attente ne peut pas être inférieure à 1 seconde !
+no_module_selected_error: Aucun module sélectionné, veuillez en sélectionner un au moins !
+all_modules_excluded_error: Vous ne pouvez pas exclure tous les modules
+killing_capture_process: Tuer le processus de capture réseau
+finished: fini.
+start_message: OWASP Honeypot a commencé ...
+check_for_port_conflicts: Vérification des conflits dans les ports
+submitting_events: Soumission de nouveaux événements à la base de données
+network_traffic_capture_start: network_traffic_capture processus démarré
+creating_ohp_internet: création du réseau ohp_internet
+ohp_internet_network: ohp_internet réseau créé sous-réseau :{0} passerelle :{1}
+creating_ohp_no_internet: création d'un réseau ohp_no_internet
+ohp_no_internet_network: ohp_no_internet réseau créé sous-réseau :{0} passerelle :{1}
+removing_image: suppression de l'image {0}
+creating_image: création d'une image {0}
+image_created: image {0} créée
+port_selected: port {0} sélectionné pour {1}
+loading_modules: chargement des modules {0}
+killing_thread: tuer {0}
+module_not_available: le module {0} n'est pas disponible
+unable_to_get_ip: impossible d'obtenir l'adresse IP du conteneur {0}
+network_capture_getting_stored: La capture réseau est stockée dans, {}
+selected_modules_started: 'Tous les modules sélectionnés ont démarré: {0}'
+received_honeypot_event: 'Événement Honeypot reçu, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Événement réseau reçu, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: "Événement d'identification Honeypot reçu, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}"
+received_honeypot_file_change_event: 'Événement de changement de fichier Honeypot reçu, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Événement de données de pot de miel reçu, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: "Fichier de trafic réseau reçu :{0}, date :{1}. L'insérer dans l'archive de fichiers"

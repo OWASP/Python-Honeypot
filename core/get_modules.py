@@ -7,6 +7,9 @@ import modules
 
 from glob import glob
 from core.alert import warn
+from core.messages import load_messages
+
+messages = load_messages().message_contents
 
 
 def virtual_machine_names_to_container_names(configuration):
@@ -72,5 +75,5 @@ def load_all_modules():
             if module_name not in module_names:
                 module_names.append(module_name)
         else:
-            warn("module {0} is not available".format(module_name))
+            warn(messages["module_not_available"].format(module_name))
     return module_names

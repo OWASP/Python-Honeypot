@@ -1,0 +1,85 @@
+---
+explorer: Проводник журнала
+dashboard: Приборная панель
+event_type: Тип события
+module_name: Название модуля
+start_date: Дата начала
+end_date: Дата окончания
+search: Поиск
+welcome: Добро пожаловать в
+ui: WebUI
+top_ten_ip_dests-honeypot: Десять лучших Ip_dest - Honeypot
+top_ten_ip_dests-network: Десятка лучших Ip_dest- Network
+top_ten_port_dests-honeypot: Десятка лучших Port_dest - Honeypot
+top_ten_port_dests-network: Десятка лучших Port_dest - Network
+top_ten_ips-honeypot: Десять лучших Ip - Honeypot
+top_ten_ips-network: Десятка лучших Ip - Network
+top_ten_ports-honeypot: Десятка лучших Port - Honeypot
+top_ten_ports-network: Десятка лучших Port - Network
+total_events: Всего событий
+total_honeypot_events: Всего событий Honeypot
+total_network_events: Всего сетевых событий
+total_credential_events: Всего событий Credential
+total_file_events: Всего файловых событий
+total_data_events: Всего событий данных
+total_pcap_events: Всего событий PCAP
+all_events: Все События
+honeypot_events: Honeypot События
+network_events: Сетевые События
+credential_events: Credential События
+file_events: Файловые события
+data_events: События данных
+pcap_events: PCAP События
+graph_info: График событий прошлой недели (обновление 30 секунд)
+file_change_events: События изменения файла
+pcap_archive_files: Архив событий PCAP
+choose: Выбирать...
+loading: Загружается ...
+loading_info: загрузка графика в реальном времени, подождите несколько секунд!
+event_type_error: Пожалуйста, выберите тип мероприятия
+date_not_selected_error: Выберите дату начала и дату окончания.
+start_date_not_selected_error: Пожалуйста, выберите дату начала
+end_date_not_selected_error: Пожалуйста, выберите дату окончания
+start_date_greater_error: Дата начала больше даты окончания!
+english: английский - English
+german: Немецкий - German
+russian: русский - Russian
+french: Французский - French
+spanish: испанский - Spanish
+choose_language: Выберите язык - Choose Language
+no_records_present_message: Для данного запроса нет записей
+script_must_run_as_root: Скрипт должен запускаться от имени пользователя root!
+elasticsearch_not_found: Не удается подключиться к elasticsearch
+cannot_communicate_with_docker: Не удается связаться с Docker, установите и запустите службу Docker!
+install_tools: Пожалуйста, сначала установите необходимые инструменты!
+interrupt_application: Прерывание работы приложения из-за того, что процесс захвата сети не работает!
+interrupted_by_user: Прервано пользователем, дождитесь остановки контейнеров и удаления контейнеров и изображений.
+timeout_error: Значение тайм-аута не может быть меньше 1 секунды!
+no_module_selected_error: Модуль не выбран, выберите хотя бы один!
+all_modules_excluded_error: Вы не можете исключить все модули
+killing_capture_process: Убивает процесс захвата сети
+finished: законченный.
+start_message: OWASP Honeypot запущен ...
+check_for_port_conflicts: Проверка на конфликты в портах
+submitting_events: Отправка новых событий в базу данных
+network_traffic_capture_start: процесс network_traffic_capture запущен
+creating_ohp_internet: создание сети ohp_internet
+ohp_internet_network: 'ohp_internet сеть создана подсеть: {0} шлюз: {1}'
+creating_ohp_no_internet: создание сети ohp_no_internet
+ohp_no_internet_network: 'ohp_no_internet сеть создана подсеть: {0} шлюз: {1}'
+removing_image: 'удаление изображения {0}'
+creating_image: 'создание изображения {0}'
+image_created: 'изображение {0} создано'
+port_selected: 'порт {0} выбран для {1}'
+loading_modules: 'загрузка модулей {0}'
+killing_thread: 'убийство {0}'
+module_not_available: модуль {0} недоступен
+unable_to_get_ip: невозможно получить IP-адрес контейнера {0}
+network_capture_getting_stored: Сетевой захват сохраняется в, {}
+selected_modules_started: 'Все выбранные модули запущены: {0}'
+received_honeypot_event: 'Получено событие Honeypot, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Получено сетевое событие, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Получено событие учетных данных Honeypot, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Получено событие изменения файла Honeypot, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Получено событие данных HoneyPot, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Получен файл сетевого трафика: {0}, дата: {1}. Вставка в файловый архив'

@@ -12,7 +12,7 @@ from multiprocessing import Queue
 
 from config import api_configuration, network_configuration
 from core.alert import verbose_info
-from core.compatible import byte_to_str, is_verbose_mode
+from core.compatible import byte_to_str
 from database.datatypes import (CredentialEvent,
                                 HoneypotEvent,
                                 EventData,
@@ -22,10 +22,11 @@ from database.datatypes import (CredentialEvent,
                                 elastic_search_types)
 from lib.ip2location import IP2Location
 from api.database_queries import event_types
+from core.messages import load_messages
 
 api_config = api_configuration()
 network_config = network_configuration()
-
+messages = load_messages().message_contents
 # Event index connections
 elasticsearch_events = elasticsearch.Elasticsearch(
     api_config["api_database"],
@@ -75,18 +76,17 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
     Returns:
         None
     """
-    if is_verbose_mode():
-        verbose_info(
-            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
-                honeypot_event.ip_dest,
-                honeypot_event.port_dest,
-                honeypot_event.ip_src,
-                honeypot_event.port_src,
-                honeypot_event.module_name,
-                honeypot_event.machine_name
-            )
+
+    verbose_info(
+        messages["received_honeypot_event"].format(
+            honeypot_event.ip_dest,
+            honeypot_event.port_dest,
+            honeypot_event.ip_src,
+            honeypot_event.port_src,
+            honeypot_event.module_name,
+            honeypot_event.machine_name
         )
+    )
 
     # Get country of the source IP Address
     honeypot_event.country_ip_src = byte_to_str(
@@ -117,17 +117,16 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     Returns:
         None
     """
-    if is_verbose_mode():
-        verbose_info(
-            "Received network event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
-                network_event.ip_dest,
-                network_event.port_dest,
-                network_event.ip_src,
-                network_event.port_src,
-                network_event.machine_name
-            )
+
+    verbose_info(
+        messages["received_network_event"].format(
+            network_event.ip_dest,
+            network_event.port_dest,
+            network_event.ip_src,
+            network_event.port_src,
+            network_event.machine_name
         )
+    )
 
     # Get country of the source IP Address
     network_event.country_ip_src = byte_to_str(
@@ -144,7 +143,6 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     )
 
     network_events_queue.put(network_event.__dict__)
-
     return
 
 
@@ -162,10 +160,8 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
 
     """
 
-    if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
-            and (honeypot_events_queue or network_events_queue):
-        verbose_info("Submitting new events to database")
-
+    if honeypot_events_queue or network_events_queue:
+        verbose_info(messages["submitting_events"])
     # Insert all honeypot events to database (honeypot_events collection)
     while not honeypot_events_queue.empty():
         new_event = honeypot_events_queue.get()
@@ -218,17 +214,15 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
 
     credential_event.machine_name = network_config["real_machine_identifier_name"]
 
-    if is_verbose_mode():
-        verbose_info(
-            "Received honeypot credential event, ip_dest:{0}, username:{1}, "
-            "password:{2}, module_name:{3}, machine_name:{4}".format(
-                credential_event.ip_src,
-                credential_event.username,
-                credential_event.password,
-                credential_event.module_name,
-                credential_event.machine_name
-            )
+    verbose_info(
+        messages["received_honeypot_credential_event"].format(
+            credential_event.ip_src,
+            credential_event.username,
+            credential_event.password,
+            credential_event.module_name,
+            credential_event.machine_name
         )
+    )
     return elasticsearch_events.index(index='credential_events', body=credential_event.__dict__)
 
 
@@ -250,16 +244,14 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
         'rb'
     ).read()).decode() if not file_change_event_data.is_directory and file_change_event_data.status != "deleted" else ""
 
-    if is_verbose_mode():
-        verbose_info(
-            "Received honeypot file change event, file_path:{0}, status:{1}, "
-            "module_name:{2}, module_name:{3}, machine_name:{3}".format(
-                file_change_event_data.file_path,
-                file_change_event_data.status,
-                file_change_event_data.module_name,
-                file_change_event_data.machine_name,
-            )
+    verbose_info(
+        messages["received_honeypot_file_change_event"].format(
+            file_change_event_data.file_path,
+            file_change_event_data.status,
+            file_change_event_data.module_name,
+            file_change_event_data.machine_name,
         )
+    )
     return elasticsearch_events.index(index='file_change_events', body=file_change_event_data.__dict__)
 
 
@@ -282,17 +274,14 @@ def insert_to_events_data_collection(event_data: EventData):
         )
     )
 
-    if is_verbose_mode():
-        verbose_info(
-            "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
-            "machine_name:{2}, data:{3}".format(
-                event_data.ip_src,
-                event_data.module_name,
-                event_data.machine_name,
-                event_data.data
-            )
+    verbose_info(
+        messages["received_honeypot_data_event"].format(
+            event_data.ip_src,
+            event_data.module_name,
+            event_data.machine_name,
+            event_data.data
         )
-
+    )
     return elasticsearch_events.index(index='data_events', body=event_data.__dict__)
 
 
@@ -307,14 +296,12 @@ def insert_pcap_files_to_collection(file_archive: FileArchive):
     Returns:
         file_id
     """
-    if is_verbose_mode():
-        verbose_info(
-            "Received network traffic file:{0}, date:{1}. "
-            "Inserting it in the File Archive".format(
-                file_archive.file_path,
-                file_archive.date
-            )
+    verbose_info(
+        messages["received_network_traffic_file"].format(
+            file_archive.file_path,
+            file_archive.date
         )
+    )
     file_content = binascii.b2a_base64(open(file_archive.file_path, "rb").read()).decode()
     file_md5 = hashlib.md5(file_content.encode()).hexdigest()
     return elasticsearch_events.index(

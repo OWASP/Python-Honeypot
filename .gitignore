@@ -17,6 +17,7 @@ pcapfiles/*
 results.*
 *.DS_Store
 *.swp
+venv/*
 
 # codacy
 .coverage

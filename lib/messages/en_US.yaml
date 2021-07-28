@@ -1,0 +1,85 @@
+---
+explorer: Log Explorer
+dashboard: DashBoard
+event_type: Event Type
+module_name: Module Name
+start_date: Start Date
+end_date: End Date
+search: Search
+welcome: 'Welcome to '
+ui: WebUI
+top_ten_ip_dests-honeypot: Top Ten Ip_dest - Honeypot
+top_ten_ip_dests-network: Top Ten Ip_dest- Network
+top_ten_port_dests-honeypot: Top Ten Port_dest - Honeypot
+top_ten_port_dests-network: Top Ten Port_dest - Network
+top_ten_ips-honeypot: Top Ten Ip - Honeypot
+top_ten_ips-network: Top Ten Ip- Network
+top_ten_ports-honeypot: Top Ten Port - Honeypot
+top_ten_ports-network: Top Ten Port - Network
+total_events: Total Events
+total_honeypot_events: Total Honeypot Events
+total_network_events: Total Network Events
+total_credential_events: Total Credential Events
+total_file_events: Total File Events
+total_data_events: Total Data Events
+total_pcap_events: Total PCAP Events
+all_events: All Events
+honeypot_events: Honeypot Events
+network_events: Network Events
+credential_events: Credential Events
+file_events: File Events
+data_events: Data Events
+pcap_events: PCAP Events
+graph_info: Past Week Events Graph (update 30 seconds)
+file_change_events: File Change Events
+pcap_archive_files: PCAP Archive Files
+choose: Choose...
+loading: Loading...
+loading_info: loading live graph, please wait a few seconds!
+event_type_error: Please select an event type
+date_not_selected_error: Please select a start date and an end date.
+start_date_not_selected_error: Please select a start date.
+end_date_not_selected_error: Please select end date.
+start_date_greater_error: The start date is greater than the end date!
+english: English
+german: German
+russian: Russian
+french: French
+spanish: Spanish
+choose_language: Choose Language
+no_records_present_message: No records are present for given request
+script_must_run_as_root: The script must be run as root!
+elasticsearch_not_found: Cannot connect to elasticsearch
+cannot_communicate_with_docker: Cannot communicate with docker, please install and start the docker service!
+install_tools: Please install required tools first!
+interrupt_application: Interrupting the application because network capturing process is not alive!
+interrupted_by_user: Interrupted by user, please wait to stop the containers and remove the containers and images
+timeout_error: The timeout value cannot be less than 1 sec!
+no_module_selected_error: No module selected, please select one at least!
+all_modules_excluded_error: You cannot exclude all modules
+killing_capture_process: Killing network capture process
+finished: finished.
+start_message: OWASP Honeypot started ...
+check_for_port_conflicts: Checking for conflicts in ports
+submitting_events: Submitting new events to database
+network_traffic_capture_start: network_traffic_capture process started
+creating_ohp_internet: creating ohp_internet network
+ohp_internet_network: ohp_internet network created subnet:{0} gateway:{1}
+creating_ohp_no_internet: creating ohp_no_internet network
+ohp_no_internet_network: ohp_no_internet network created subnet:{0} gateway:{1}
+removing_image: removing image {0}
+creating_image: creating image {0}
+image_created: image {0} created
+port_selected: port {0} selected for {1}
+loading_modules: loading modules {0}
+killing_thread: killing {0}
+module_not_available: module {0} is not available
+unable_to_get_ip: unable to get container {0} IP address
+network_capture_getting_stored: Network capture is getting stored in, {}
+selected_modules_started: 'All selected modules started: {0}'
+received_honeypot_event: 'Received honeypot event, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}'
+received_network_event: 'Received network event, ip_dest:{0}, port_dest:{1}, ip_src:{2}, port_src:{3}, machine_name:{4}'
+received_honeypot_credential_event: 'Received honeypot credential event, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Received honeypot file change event, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Received honeypot data event, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Received network traffic file:{0}, date:{1}. Inserting it in the File Archive'

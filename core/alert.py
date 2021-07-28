@@ -5,6 +5,7 @@ import sys
 from core import color
 from core.log import get_logger
 from core.time_helper import now
+from core.compatible import is_verbose_mode
 
 logger = get_logger("ohp_core")
 
@@ -102,19 +103,20 @@ def verbose_info(content):
     Returns:
         None
     """
-    logger.info(content)
-    sys.stdout.buffer.write(
-        bytes(
-            color.color_cmd("cyan")
-            + "[v] [{0}] ".format(now())
-            + color.color_cmd("grey")
-            + content
-            + color.color_cmd("reset")
-            + "\n",
-            "utf8"
+    if is_verbose_mode():
+        logger.info(content)
+        sys.stdout.buffer.write(
+            bytes(
+                color.color_cmd("cyan")
+                + "[v] [{0}] ".format(now())
+                + color.color_cmd("grey")
+                + content
+                + color.color_cmd("reset")
+                + "\n",
+                "utf8"
+            )
         )
-    )
-    sys.stdout.flush()
+        sys.stdout.flush()
     return
 
 

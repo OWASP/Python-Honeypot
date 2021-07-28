@@ -1,0 +1,85 @@
+---
+explorer: Explorador de registros
+dashboard: Panel
+event_type: Tipo de evento
+module_name: Nombre del módulo
+start_date: Fecha de inicio
+end_date: Fecha final
+search: Búsqueda
+welcome: Bienvenido a
+ui: WebUI
+top_ten_ip_dests-honeypot: Top Ten Ip_dest - Honeypot
+top_ten_ip_dests-network: Top Ten Ip_dest- Network
+top_ten_port_dests-honeypot: Top Ten Port_dest - Honeypot
+top_ten_port_dests-network: Top Ten Port_dest - Network
+top_ten_ips-honeypot: Top Ten Ip - Honeypot
+top_ten_ips-network: Top Ten Ip- Network
+top_ten_ports-honeypot: Top Ten Port - Honeypot
+top_ten_ports-network: Top Ten Port - Network
+total_events: Eventos totales
+total_honeypot_events: Eventos totales de Honeypot
+total_network_events: Eventos de red totales
+total_credential_events: Eventos de credenciales totales
+total_file_events: Total de eventos de archivo
+total_data_events: Eventos de datos totales
+total_pcap_events: Eventos totales de PCAP
+all_events: Todos los eventos
+honeypot_events: Eventos de Honeypot
+network_events: Eventos de red
+credential_events: Eventos de credenciales
+file_events: Eventos de archivo
+data_events: Eventos de datos
+pcap_events: Eventos de PCAP
+graph_info: Gráfico de eventos de la semana pasada (actualización de 30 segundos)
+file_change_events: Eventos de cambio de archivo
+pcap_archive_files: Archivos de archivo PCAP
+choose: Escoger...
+loading: Cargando...
+loading_info: cargando el gráfico en vivo, ¡espere unos segundos!
+event_type_error: Seleccione un tipo de evento
+date_not_selected_error: Seleccione una fecha de inicio y una fecha de finalización.
+start_date_not_selected_error: Seleccione una fecha de inicio.
+end_date_not_selected_error: seleccione la fecha de finalización.
+start_date_greater_error: "¡La fecha de inicio es mayor que la fecha de finalización!"
+english: Inglés - English
+german: Alemán - German
+russian: Ruso - Russian
+french: Francés - French
+spanish: Español - Spanish
+choose_language: Elige lengua - Choose Language
+no_records_present_message: No hay registros presentes para una solicitud determinada
+script_must_run_as_root: ¡El script debe ejecutarse como root!
+elasticsearch_not_found: No se puede conectar a elasticsearch
+cannot_communicate_with_docker: No se puede comunicar con Docker, instale e inicie el servicio de Docker.
+install_tools: ¡Instale primero las herramientas necesarias!
+interrupt_application: ¡Interrumpir la aplicación porque el proceso de captura de red no está activo!
+interrupted_by_user: Interrumpido por el usuario, espere a detener los contenedores y retirar los contenedores y las imágenes.
+timeout_error: ¡El valor del tiempo de espera no puede ser inferior a 1 segundo!
+no_module_selected_error: Ningún módulo seleccionado, por favor seleccione al menos uno.
+all_modules_excluded_error: No puede excluir todos los módulos
+killing_capture_process: Terminado Matando el proceso de captura de la red
+finished: terminado.
+start_message: OWASP Honeypot comenzó ...
+check_for_port_conflicts: Compruebe si hay conflictos en los puertos
+submitting_events: Envío de nuevos eventos a la base de datos
+network_traffic_capture_start: proceso network_traffic_capture iniciado
+creating_ohp_internet: creando la red ohp_internet
+ohp_internet_network: 'subred creada por la red ohp_internet: {0} puerta de enlace: {1}'
+creating_ohp_no_internet: creando red ohp_no_internet
+ohp_no_internet_network: 'ohp_no_internet subred creada por la red: {0} puerta de enlace: {1}'
+removing_image: quitando imagen {0}
+creating_image: creando imagen {0}
+image_created: imagen {0} creada
+port_selected: puerto {0} seleccionado para {1}
+loading_modules: cargando módulos {0}
+killing_thread: matando a {0}
+module_not_available: el módulo {0} no está disponible
+unable_to_get_ip: no se puede obtener la dirección IP del contenedor {0}
+network_capture_getting_stored: La captura de red se almacena en, {}
+selected_modules_started: 'Todos los módulos seleccionados comenzaron: {0}'
+received_honeypot_event: 'Se recibió el evento de honeypot, ip_dest: {0}, port_dest: {1}, ip_src: {2}, port_src: {3}, module_name: {4}, machine_name: {5}'
+received_network_event: 'Evento de red recibido, ip_dest: {0}, port_dest: {1}, ip_src: {2}, port_src: {3}, machine_name: {4}'
+received_honeypot_credential_event: 'Recibido evento de credencial de honeypot, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Recibido evento de cambio de archivo honeypot, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Recibido evento de datos de honeypot, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Archivo de tráfico de red recibido: {0}, fecha: {1}. Insertarlo en el archivo de archivos'
