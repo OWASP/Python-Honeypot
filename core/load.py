@@ -13,6 +13,7 @@ from terminable_thread import Thread, threading
 from api.server import start_api_server
 from config import (docker_configuration, network_configuration,
                     user_configuration)
+from core import messages
 from core.alert import error, info
 from core.color import reset_cmd_color
 from core.compatible import (check_for_requirements, copy_dir_tree,
@@ -26,10 +27,13 @@ from core.network import network_traffic_capture
 from database.connector import (push_events_queues_to_database,
                                 push_events_to_database_from_thread,
                                 create_indices)
+from core.messages import load_messages
+
 
 # tmp dirs
 tmp_directories = []
 processor_threads = []
+messages = load_messages().message_contents
 
 
 def all_existing_networks():
@@ -749,7 +753,7 @@ def load_honeypot_engine():
 
     # Check if the script is running with sudo
     if not os.geteuid() == 0:
-        exit_failure("The script must be run as root!")
+        exit_failure(messages['script_must_run_as_root'])
     # Check timeout value if provided
     if argv_options.timeout_value < 1:
         exit_failure("The timeout value cannot be less than 1 sec!")

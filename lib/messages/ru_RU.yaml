@@ -48,4 +48,4 @@ french: Французский - French
 spanish: испанский - Spanish
 choose_language: Выберите язык - Choose Language
 no_records_present_message: Для данного запроса нет записей
-
+script_must_run_as_root: Скрипт должен запускаться от имени пользователя root!

@@ -48,4 +48,5 @@ french: French
 spanish: Spanish
 choose_language: Choose Language
 no_records_present_message: No records are present for given request
+script_must_run_as_root: The script must be run as root!
 
