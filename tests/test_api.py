@@ -79,7 +79,8 @@ class TestApi(unittest.TestCase):
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
-        response_port = requests.get(API_URL + "/api/events/count/groupby/honeypot/port_dest?country=US&date=2020-08-14")
+        response_port = requests.get(
+            API_URL + "/api/events/count/groupby/honeypot/port_dest?country=US&date=2020-08-14")
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
@@ -265,7 +266,8 @@ class TestApi(unittest.TestCase):
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
-        response_port = requests.get(API_URL + "/api/events/count/groupby/credential/ip_dest?country=US&date=2020-08-14")
+        response_port = requests.get(
+            API_URL + "/api/events/count/groupby/credential/ip_dest?country=US&date=2020-08-14")
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
@@ -281,7 +283,8 @@ class TestApi(unittest.TestCase):
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
-        response_port = requests.get(API_URL + "/api/events/count/groupby/credential/port_dest?country=US&date=2020-08-14")
+        response_port = requests.get(
+            API_URL + "/api/events/count/groupby/credential/port_dest?country=US&date=2020-08-14")
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
 
