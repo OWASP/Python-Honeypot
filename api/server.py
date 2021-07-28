@@ -596,10 +596,10 @@ def download_file():
         fs = elasticsearch_events.search(
             index='ohp_file_archive',
             body=filter_by_fields(md5_value, ['md5'])
-        )
+        )['hits']['hits'][0]['_source']
         return send_file(
-            io.BytesIO(binascii.a2b_base64(fs['hits']['hits'][0]['_source']['content'])),
-            attachment_filename=fs['hits']['hits'][0]['_source']['filename'],
+            io.BytesIO(binascii.a2b_base64(fs['content'])),
+            attachment_filename=fs['filename'],
             as_attachment=True,
             mimetype='application/cap'
         ), 200

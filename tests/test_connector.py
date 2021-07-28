@@ -55,11 +55,11 @@ class TestConnector(unittest.TestCase):
         honeypot_record = connector.elasticsearch_events.search(
             index='honeypot_events',
             body=filter_by_fields('11.22.33.44', ['ip_dest'])
-        )
+        )['hits']['hits'][0]['_source']
         network_record = connector.elasticsearch_events.search(
             index='network_events',
             body=filter_by_fields('13.14.15.16', ['ip_dest'])
-        )
+        )['hits']['hits'][0]['_source']
 
         # wait for queue to be empty
         time.sleep(5)
@@ -87,7 +87,7 @@ class TestConnector(unittest.TestCase):
         """
 
         credential_event = CredentialEvent(
-            ip="88.99.11.22",
+            ip_src="88.99.11.22",
             username="admin",
             password="password",
             module_name="http/basic_auth_weak_password",
@@ -97,9 +97,10 @@ class TestConnector(unittest.TestCase):
         insert_to_credential_events_collection(credential_event)
 
         # Find the record in the DB
-        credential_record = credential_events.find_one(
-            credential_event.__dict__
-        )
+        credential_record = connector.elasticsearch_events.search(
+            index='credential_events',
+            body=filter_by_fields('88.99.11.22', ['ip_src'])
+        )['hits']['hits'][0]['_source']
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(
@@ -118,7 +119,10 @@ class TestConnector(unittest.TestCase):
         )
 
         # Delete test events from the database
-        # credential_events.delete_one(credential_event.__dict__)
+        connector.elasticsearch_events.delete(
+            index='credential_events',
+            body=filter_by_fields('88.99.11.22', ['ip_src'])
+        )
 
     def test_insert_events_data(self):
         """
@@ -137,7 +141,7 @@ class TestConnector(unittest.TestCase):
         event_record_data = connector.elasticsearch_events.search(
             index='data_events',
             body=filter_by_fields('55.66.77.88', ['ip_src'])
-        )
+        )['hits']['hits'][0]['_source']
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip"], event_data.ip)
