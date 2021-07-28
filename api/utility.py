@@ -99,7 +99,8 @@ def all_mime_types():
         "audio/3gpp": "video",
         ".3g2": "video/3gpp2",
         "audio/3gpp2": "video",
-        ".7z": "application/x-7z-compressed"
+        ".7z": "application/x-7z-compressed",
+        ".pcap": "application/cap"
     }
 
 
