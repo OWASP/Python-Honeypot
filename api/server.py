@@ -31,7 +31,6 @@ from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
 from core.messages import load_messages
 
-
 DOCS_URL = '/api/docs'
 API_URL = 'http://localhost:5000/docs-configuration'
 
@@ -221,7 +220,7 @@ def index():
     Returns:
         rendered HTML page
     """
-    data = load_messages()
+    data = load_messages(get_value_from_request("lang"))
     return render_template("index.html", data=data, encoded_data=data)
 
 
