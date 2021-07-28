@@ -162,7 +162,7 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
     """
 
     if honeypot_events_queue or network_events_queue:
-        verbose_info("Submitting new events to database")
+        verbose_info(messages["submitting_events"])
     # Insert all honeypot events to database (honeypot_events collection)
     while not honeypot_events_queue.empty():
         new_event = honeypot_events_queue.get()
