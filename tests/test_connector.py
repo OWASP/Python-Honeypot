@@ -3,19 +3,17 @@ import time
 from datetime import datetime
 from multiprocessing import Queue
 
-from database.connector import (credential_events,
-                                data_events,
-                                honeypot_events,
-                                insert_to_credential_events_collection,
+from database import connector
+from database.connector import (insert_to_credential_events_collection,
                                 insert_to_events_data_collection,
                                 insert_to_honeypot_events_queue,
                                 insert_to_network_events_queue,
-                                network_events,
                                 push_events_queues_to_database)
 from database.datatypes import (CredentialEvent,
                                 EventData,
                                 HoneypotEvent,
                                 NetworkEvent)
+from api.database_queries import filter_by_fields
 
 
 class TestConnector(unittest.TestCase):
@@ -54,8 +52,14 @@ class TestConnector(unittest.TestCase):
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
 
         # Find the records in the DB
-        honeypot_record = honeypot_events.find_one(honeypot_event.__dict__)
-        network_record = network_events.find_one(network_event.__dict__)
+        honeypot_record = connector.elasticsearch_events.search(
+            index='honeypot_events',
+            body=filter_by_fields('11.22.33.44', ['ip_dest'])
+        )
+        network_record = connector.elasticsearch_events.search(
+            index='network_events',
+            body=filter_by_fields('13.14.15.16', ['ip_dest'])
+        )
 
         # wait for queue to be empty
         time.sleep(5)
@@ -68,8 +72,14 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(network_record["ip_dest"], network_event.ip_dest)
 
         # Delete test events from the database
-        honeypot_events.delete_one(honeypot_event.__dict__)
-        network_events.delete_one(network_event.__dict__)
+        connector.elasticsearch_events.delete(
+            index='honeypot_events',
+            body=filter_by_fields('11.22.33.44', ['ip_dest'])
+        )
+        connector.elasticsearch_events.delete(
+            index='network_events',
+            body=filter_by_fields('13.14.15.16', ['ip_dest'])
+        )
 
     def test_insert_to_credential_events(self):
         """
@@ -124,7 +134,10 @@ class TestConnector(unittest.TestCase):
         insert_to_events_data_collection(event_data)
 
         # Find the record in the DB
-        event_record_data = data_events.find_one(event_data.__dict__)
+        event_record_data = connector.elasticsearch_events.search(
+            index='data_events',
+            body=filter_by_fields('55.66.77.88', ['ip_src'])
+        )
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip"], event_data.ip)
@@ -133,7 +146,10 @@ class TestConnector(unittest.TestCase):
             event_data.data
         )
 
-        data_events.delete_one(event_data.__dict__)
+        connector.elasticsearch_events.delete(
+            index='data_events',
+            body=filter_by_fields('55.66.77.88', ['ip_src'])
+        )
 
 
 if __name__ == '__main__':
