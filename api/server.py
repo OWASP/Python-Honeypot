@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 
+import os
+import binascii
+import io
 from flask import (Flask,
                    Response,
                    abort,
@@ -11,6 +13,7 @@ from flask import (Flask,
 from flask import request as flask_request
 from api.database_queries import (
     filter_by_date,
+    filter_by_fields,
     filter_by_module_name,
     filter_by_regex,
     event_types,
@@ -590,20 +593,19 @@ def download_file():
         md5_value = get_value_from_request("md5")
         abort(404) if not md5_value else md5_value
 
-        fs = elasticsearch_events(index='ohp_file_archive').find_one(
-            {
-                "md5": md5_value
-            }
+        fs = elasticsearch_events.search(
+            index='ohp_file_archive',
+            body=filter_by_fields(md5_value, ['md5'])
         )
-
         return send_file(
-            fs,
-            attachment_filename=fs.filename,
+            io.BytesIO(binascii.a2b_base64(fs['hits']['hits'][0]['_source']['content'])),
+            attachment_filename=fs['hits']['hits'][0]['_source']['filename'],
             as_attachment=True,
-            mimetype=fs.content_type
+            mimetype='application/cap'
         ), 200
 
-    except Exception:
+    except Exception as e:
+        print(e)
         return abort(404)
 
 
