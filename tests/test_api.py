@@ -45,7 +45,7 @@ class TestApi(unittest.TestCase):
         response = requests.get(API_URL + "/api/events/count/data")
         self.assertGreaterEqual(response.json()["count"], 0)
         self.assertEqual(response.status_code, 200)
-
+ 
         response = requests.get(API_URL + "/api/events/count/data?date=2020-08-14")
         self.assertGreaterEqual(response.json()["count"], 0)
         self.assertEqual(response.status_code, 200)
@@ -147,7 +147,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(response_port.status_code, 200)
 
         response_port = requests.get(
-            API_URL + "/api/events/count/groupby/honeypot/country_ip_dest?country_ip_dest=US&date=2020-08-14"
+            API_URL + "/api/events/count/groupby/honeypot/country_ip_dest?country=US&date=2020-08-14"
         )
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)
@@ -248,7 +248,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(response_port.status_code, 200)
 
         response_port = requests.get(
-            API_URL + "/api/events/count/groupby/network/country_ip_dest?country_ip_dest=US&date=2020-08-14"
+            API_URL + "/api/events/count/groupby/network/country_ip_dest?country=US&date=2020-08-14"
         )
         self.assertGreaterEqual(len(response_port.json()), 0)
         self.assertEqual(response_port.status_code, 200)

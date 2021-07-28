@@ -13,7 +13,7 @@ protocol_table = {
     for name, num in vars(socket).items()
     if name.startswith("IPPROTO")
 }
-real_machine_ip_address = socket.gethostbyname(socket.gethostname())
+real_machine_ip_address = socket.gethostbyname('')
 
 
 def api_configuration():
