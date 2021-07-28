@@ -72,11 +72,11 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(network_record["ip_dest"], network_event.ip_dest)
 
         # Delete test events from the database
-        connector.elasticsearch_events.delete(
+        connector.elasticsearch_events.delete_by_query(
             index='honeypot_events',
             body=filter_by_fields('11.22.33.44', ['ip_dest'])
         )
-        connector.elasticsearch_events.delete(
+        connector.elasticsearch_events.delete_by_query(
             index='network_events',
             body=filter_by_fields('13.14.15.16', ['ip_dest'])
         )
@@ -104,8 +104,8 @@ class TestConnector(unittest.TestCase):
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(
-            credential_record["ip"],
-            credential_event.ip
+            credential_record["ip_src"],
+            credential_event.ip_src
         )
 
         self.assertEqual(
@@ -119,7 +119,7 @@ class TestConnector(unittest.TestCase):
         )
 
         # Delete test events from the database
-        connector.elasticsearch_events.delete(
+        connector.elasticsearch_events.delete_by_query(
             index='credential_events',
             body=filter_by_fields('88.99.11.22', ['ip_src'])
         )
@@ -129,14 +129,15 @@ class TestConnector(unittest.TestCase):
         Test the data insertion to the events_data collection
         """
         event_data = EventData(
-            ip_src="55.66.77.88",
+            ip="55.66.77.88",
             module_name="ics/veeder_root_guardian_ast",
-            date=datetime.now(),
-            data="Test Data"
+            date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            data={"content": "Test Data"}
         )
 
         insert_to_events_data_collection(event_data)
-
+        # wait for insert
+        time.sleep(3)
         # Find the record in the DB
         event_record_data = connector.elasticsearch_events.search(
             index='data_events',
@@ -144,13 +145,13 @@ class TestConnector(unittest.TestCase):
         )['hits']['hits'][0]['_source']
 
         # Compare the record found in the DB with the one pushed
-        self.assertEqual(event_record_data["ip"], event_data.ip)
+        self.assertEqual(event_record_data["ip_src"], event_data.ip_src)
         self.assertEqual(
             event_record_data["data"],
             event_data.data
         )
 
-        connector.elasticsearch_events.delete(
+        connector.elasticsearch_events.delete_by_query(
             index='data_events',
             body=filter_by_fields('55.66.77.88', ['ip_src'])
         )
