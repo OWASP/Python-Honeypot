@@ -77,6 +77,17 @@ def filter_by_date(date):
     }
 
 
+def filter_by_fields(query, fields):
+    return {
+        'query': {
+            'simple_query_string': {
+                'query': query,
+                'fields': fields
+            }
+        }
+    }
+
+
 def filter_by_skip(skip):
     return {
         "$skip": fix_skip(skip)
