@@ -713,12 +713,11 @@ def argv_parser():
     )
     # set language
     engineOpt.add_argument(
-        "-l",
         "--language",
         type=str,
         dest="language",
         default="en_US",
-        help="Set the default language."
+        help="Set the default language. {languages}".format(languages=load_messages().languages_list)
     )
     # test CI/ETC
     engineOpt.add_argument(
