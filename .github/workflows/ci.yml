@@ -70,7 +70,7 @@ jobs:
         run: docker logs python-honeypot_ohp_1
 
       - name: Test with pytest
-        run: docker exec python-honeypot_ohp_1 python3 -m pytest -rpP --reruns 5
+        run: docker exec python-honeypot_ohp_1 python3 -m pytest -rpP --reruns 5 --reruns-delay 3
 
       - name: Check API server logs
         run: docker-compose logs ohp
