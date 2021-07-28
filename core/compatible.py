@@ -68,7 +68,10 @@ def check_for_requirements(start_api_server):
     Returns:
         True if exist otherwise False
     """
+    # TODO : Fix the cyclic dependency later
     from config import api_configuration
+    from core.messages import load_messages
+    messages = load_messages().message_contents
     # check external required modules
     api_config = api_configuration()
     external_modules = open(os.path.join(os.getcwd(), 'requirements.txt'), 'r').read().split('\n')
@@ -90,7 +93,7 @@ def check_for_requirements(start_api_server):
         )
         connection.indices.get_alias("*")
     except Exception:
-        exit_failure("cannot connect to elasticsearch")
+        exit_failure(messages["elasticsearch_not_found"])
     # check if its honeypot server not api server
     if not start_api_server:
         # check docker
@@ -98,7 +101,7 @@ def check_for_requirements(start_api_server):
             subprocess.check_output(["docker", "--help"],
                                     stderr=subprocess.PIPE)
         except Exception:
-            exit_failure("cannot communicate with docker, please install and start the docker service!")
+            exit_failure(messages["cannot_communicate_with_docker"])
         # check for commandline requirements
         commands = {
             'tshark': which('tshark'),
@@ -109,8 +112,7 @@ def check_for_requirements(start_api_server):
         for command in commands:
             if commands[command] is None:
                 exit_failure(
-                    "please install required tools first!\n"
-                    "{0}".format(json.dumps(commands, indent=4))
+                    messages["install_tools"] + "{0}".format(json.dumps(commands, indent=4))
                 )
     return True
 

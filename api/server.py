@@ -220,7 +220,7 @@ def index():
     Returns:
         rendered HTML page
     """
-    data = load_messages().message_contents
+    data = load_messages().get_translations(get_value_from_request("lang"))
     return render_template("index.html", data=data, encoded_data=data)
 
 

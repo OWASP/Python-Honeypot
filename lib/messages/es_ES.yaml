@@ -48,4 +48,16 @@ french: Francés - French
 spanish: Español - Spanish
 choose_language: Elige lengua - Choose Language
 no_records_present_message: No hay registros presentes para una solicitud determinada
-
+script_must_run_as_root: ¡El script debe ejecutarse como root!
+elasticsearch_not_found: No se puede conectar a elasticsearch
+cannot_communicate_with_docker: No se puede comunicar con Docker, instale e inicie el servicio de Docker.
+install_tools: ¡Instale primero las herramientas necesarias!
+interrupt_application: ¡Interrumpir la aplicación porque el proceso de captura de red no está activo!
+interrupted_by_user: Interrumpido por el usuario, espere a detener los contenedores y retirar los contenedores y las imágenes.
+timeout_error: ¡El valor del tiempo de espera no puede ser inferior a 1 segundo!
+no_module_selected_error: Ningún módulo seleccionado, por favor seleccione al menos uno.
+all_modules_excluded_error: No puede excluir todos los módulos
+killing_capture_process: Terminado Matando el proceso de captura de la red
+finished: terminado.
+start_message: OWASP Honeypot comenzó ...
+check_for_port_conflicts: Compruebe si hay conflictos en los puertos

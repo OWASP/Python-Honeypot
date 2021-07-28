@@ -49,4 +49,15 @@ spanish: Spanish
 choose_language: Choose Language
 no_records_present_message: No records are present for given request
 script_must_run_as_root: The script must be run as root!
-
+elasticsearch_not_found: Cannot connect to elasticsearch
+cannot_communicate_with_docker: Cannot communicate with docker, please install and start the docker service!
+install_tools: Please install required tools first!
+interrupt_application: Interrupting the application because network capturing process is not alive!
+interrupted_by_user: Interrupted by user, please wait to stop the containers and remove the containers and images
+timeout_error: The timeout value cannot be less than 1 sec!
+no_module_selected_error: No module selected, please select one at least!
+all_modules_excluded_error: You cannot exclude all modules
+killing_capture_process : Killing network capture process
+finished: finished.
+start_message: OWASP Honeypot started ...
+check_for_port_conflicts: Checking for conflicts in ports

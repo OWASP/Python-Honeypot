@@ -624,13 +624,13 @@ function search_database() {
     const start_date = $("#start_date").val();
     const end_date = $("#end_date").val();
     if (event_type === "") {
-        displayErrorMessage("Please select an Event Type");
+        displayErrorMessage(translations.event_type_error);
     } else if (start_date === "" && end_date === "") {
-        displayErrorMessage("Please select Start date and End date.");
+        displayErrorMessage(translations.date_not_selected_error);
     } else if (start_date === "") {
-        displayErrorMessage("Please select Start Date.");
+        displayErrorMessage(translations.start_date_not_selected_error);
     } else if (end_date === "") {
-        displayErrorMessage("Please select End Date.");
+        displayErrorMessage(translations.end_date_not_selected_error);
     } else {
         if (start_date <= end_date) {
             //Hide error message
@@ -643,7 +643,7 @@ function search_database() {
                 api_params
             );
         } else {
-            displayErrorMessage("Start date is greater than End date!")
+            displayErrorMessage(translations.start_date_greater_error)
         }
     }
 }

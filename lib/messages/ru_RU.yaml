@@ -49,3 +49,15 @@ spanish: испанский - Spanish
 choose_language: Выберите язык - Choose Language
 no_records_present_message: Для данного запроса нет записей
 script_must_run_as_root: Скрипт должен запускаться от имени пользователя root!
+elasticsearch_not_found: Не удается подключиться к elasticsearch
+cannot_communicate_with_docker: Не удается связаться с Docker, установите и запустите службу Docker!
+install_tools: Пожалуйста, сначала установите необходимые инструменты!
+interrupt_application: Прерывание работы приложения из-за того, что процесс захвата сети не работает!
+interrupted_by_user: Прервано пользователем, дождитесь остановки контейнеров и удаления контейнеров и изображений.
+timeout_error: Значение тайм-аута не может быть меньше 1 секунды!
+no_module_selected_error: Модуль не выбран, выберите хотя бы один!
+all_modules_excluded_error: Вы не можете исключить все модули
+killing_capture_process: Убивает процесс захвата сети
+finished: законченный.
+start_message: OWASP Honeypot запущен ...
+check_for_port_conflicts: Проверка на конфликты в портах

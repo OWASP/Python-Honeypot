@@ -48,4 +48,16 @@ french: Französisch - French
 spanish: Spanisch - Spanish
 choose_language: Sprache wählen - Choose Language
 no_records_present_message: Für die angegebene Anfrage sind keine Datensätze vorhanden
-
+script_must_run_as_root: Das Skript muss als Root ausgeführt werden!
+elasticsearch_not_found: Kann keine Verbindung zu Elasticsearch herstellen
+cannot_communicate_with_docker: Kann nicht mit Docker kommunizieren, bitte installieren und starten Sie den Docker-Dienst!
+install_tools: Bitte installieren Sie zuerst die erforderlichen Tools!
+interrupt_application: Unterbrechen der Anwendung, da der Netzwerkerfassungsprozess nicht aktiv ist!
+interrupted_by_user: Vom Benutzer unterbrochen, warten Sie bitte, um die Container zu stoppen und die Container und Bilder zu entfernen
+timeout_error: Der Timeout-Wert darf nicht kleiner als 1 Sekunde sein!
+no_module_selected_error: Kein Modul ausgewählt, bitte mindestens eines auswählen!
+all_modules_excluded_error: Sie können nicht alle Module ausschließen
+killing_capture_process: Killing Network Capture Prozess
+finished: fertig.
+start_message: OWASP Honeypot gestartet ...
+check_for_port_conflicts: Auf Konflikte in Ports prüfen
