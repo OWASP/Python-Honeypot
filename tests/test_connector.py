@@ -50,6 +50,7 @@ class TestConnector(unittest.TestCase):
         insert_to_network_events_queue(network_event, network_events_queue)
 
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
+        
 
         # Find the records in the DB
         honeypot_record = connector.elasticsearch_events.search(
@@ -60,9 +61,6 @@ class TestConnector(unittest.TestCase):
             index='network_events',
             body=filter_by_fields('13.14.15.16', ['ip_dest'])
         )['hits']['hits'][0]['_source']
-
-        # wait for queue to be empty
-        time.sleep(5)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
@@ -95,6 +93,7 @@ class TestConnector(unittest.TestCase):
         )
 
         insert_to_credential_events_collection(credential_event)
+        
 
         # Find the record in the DB
         credential_record = connector.elasticsearch_events.search(
@@ -137,7 +136,7 @@ class TestConnector(unittest.TestCase):
 
         insert_to_events_data_collection(event_data)
         # wait for insert
-        time.sleep(3)
+        
         # Find the record in the DB
         event_record_data = connector.elasticsearch_events.search(
             index='data_events',
