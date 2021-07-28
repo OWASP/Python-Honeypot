@@ -78,8 +78,7 @@ def insert_to_honeypot_events_queue(honeypot_event: HoneypotEvent, honeypot_even
     """
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, module_name:{4}, machine_name:{5}".format(
+            messages["received_honeypot_event"].format(
                 honeypot_event.ip_dest,
                 honeypot_event.port_dest,
                 honeypot_event.ip_src,
@@ -120,8 +119,7 @@ def insert_to_network_events_queue(network_event: NetworkEvent, network_events_q
     """
     if is_verbose_mode():
         verbose_info(
-            "Received network event, ip_dest:{0}, port_dest:{1}, "
-            "ip_src:{2}, port_src:{3}, machine_name:{4}".format(
+            messages["received_network_event"].format(
                 network_event.ip_dest,
                 network_event.port_dest,
                 network_event.ip_src,
@@ -221,8 +219,7 @@ def insert_to_credential_events_collection(credential_event: CredentialEvent):
 
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot credential event, ip_dest:{0}, username:{1}, "
-            "password:{2}, module_name:{3}, machine_name:{4}".format(
+            messages["received_honeypot_credential_event"].format(
                 credential_event.ip_src,
                 credential_event.username,
                 credential_event.password,
@@ -253,8 +250,7 @@ def insert_to_file_change_events_collection(file_change_event_data: FileEventsDa
 
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot file change event, file_path:{0}, status:{1}, "
-            "module_name:{2}, module_name:{3}, machine_name:{3}".format(
+            messages["received_honeypot_file_change_event"].format(
                 file_change_event_data.file_path,
                 file_change_event_data.status,
                 file_change_event_data.module_name,
@@ -285,8 +281,7 @@ def insert_to_events_data_collection(event_data: EventData):
 
     if is_verbose_mode():
         verbose_info(
-            "Received honeypot data event, ip_dest:{0}, module_name:{1}, "
-            "machine_name:{2}, data:{3}".format(
+            messages["received_honeypot_data_event"].format(
                 event_data.ip_src,
                 event_data.module_name,
                 event_data.machine_name,

@@ -73,3 +73,13 @@ image_created: imagen {0} creada
 port_selected: puerto {0} seleccionado para {1}
 loading_modules: cargando módulos {0}
 killing_thread: matando a {0}
+module_not_available: el módulo {0} no está disponible
+unable_to_get_ip: no se puede obtener la dirección IP del contenedor {0}
+network_capture_getting_stored: La captura de red se almacena en, {}
+selected_modules_started: 'Todos los módulos seleccionados comenzaron: {0}'
+received_honeypot_event: 'Se recibió el evento de honeypot, ip_dest: {0}, port_dest: {1}, ip_src: {2}, port_src: {3}, module_name: {4}, machine_name: {5}'
+received_network_event: 'Evento de red recibido, ip_dest: {0}, port_dest: {1}, ip_src: {2}, port_src: {3}, machine_name: {4}'
+received_honeypot_credential_event: 'Recibido evento de credencial de honeypot, ip_dest:{0}, username:{1}, password:{2}, module_name:{3}, machine_name:{4}'
+received_honeypot_file_change_event: 'Recibido evento de cambio de archivo honeypot, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
+received_honeypot_data_event: 'Recibido evento de datos de honeypot, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
+received_network_traffic_file: 'Archivo de tráfico de red recibido: {0}, fecha: {1}. Insertarlo en el archivo de archivos'
