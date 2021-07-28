@@ -182,17 +182,7 @@
     <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
     <!-- end of footer -->
 </div>
-<div class="language-selector">
-    <select class="form-control" onchange="changeLanguage()"
-            id="language-menu" name="language-menu">
-        <option selected disabled>{{ data.choose_language }}</option>
-        <option value="en_US">{{ data.english }}</option>
-        <option value="de_DE">{{ data.german }}</option>
-        <option value="ru_RU">{{ data.russian }}</option>
-        <option value="fr_FR">{{ data.french }}</option>
-        <option value="es_ES">{{ data.spanish }}</option>
-    </select>
-</div>
+
 <script>
     const translations = {{ encoded_data | safe}};
     const param = new URLSearchParams(window.location.search).get("lang");

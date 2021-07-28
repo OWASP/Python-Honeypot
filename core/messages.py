@@ -17,7 +17,8 @@ class load_messages:
         self.languages_list = [
             language.split('.yaml')[0] for language in os.listdir("lib/messages") if ".yaml" in language
         ]
-        self.language = user_configuration()['language'] if user_configuration()['language'] in self.languages_list  else "en_US"
+        self.language = user_configuration()['language'] if user_configuration()[
+                                                                'language'] in self.languages_list else "en_US"
         self.message_contents = yaml.safe_load(
             open(
                 "lib/messages/{language}.yaml".format(language=self.language),

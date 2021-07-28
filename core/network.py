@@ -22,9 +22,11 @@ from database.connector import (insert_to_honeypot_events_queue,
 from database.datatypes import (HoneypotEvent,
                                 NetworkEvent,
                                 FileArchive)
+from core.messages import load_messages
 
 # honeypot ports
 honeypot_ports = dict()
+messages = load_messages().message_contents
 
 
 def get_gateway_ip_addresses(configuration):
@@ -140,7 +142,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
     Returns:
         True
     """
-    info("network_traffic_capture process started")
+    info(messages["network_traffic_capture_start"])
 
     for selected_module in configuration:
         port_number = configuration[selected_module]["real_machine_port_number"]

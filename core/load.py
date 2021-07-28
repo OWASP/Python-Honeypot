@@ -53,17 +53,17 @@ def create_ohp_networks():
         True
     """
     if "ohp_internet" not in all_existing_networks():
-        info("creating ohp_internet network")
+        info(messages["creating_ohp_internet"])
         os.popen("docker network create ohp_internet  --opt com.docker.network.bridge.enable_icc=true "
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
                  "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
                  "com.docker.network.driver.mtu=1500").read()
         network_json = json.loads(os.popen("docker network inspect ohp_internet").read())[
             0]["IPAM"]["Config"][0]
-        info("ohp_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
-                                                                          network_json["Gateway"]))
+        info(messages["ohp_internet_network"].format(network_json["Subnet"],
+                                                     network_json["Gateway"]))
     if "ohp_no_internet" not in all_existing_networks():
-        info("creating ohp_no_internet network")
+        info(messages["creating_ohp_no_internet"])
         os.popen("docker network create --attachable --internal ohp_no_internet  "
                  "--opt com.docker.network.bridge.enable_icc=true "
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
@@ -71,8 +71,8 @@ def create_ohp_networks():
                  "--opt com.docker.network.driver.mtu=1500").read()
         network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[
             0]["IPAM"]["Config"][0]
-        info("ohp_no_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
-                                                                             network_json["Gateway"]))
+        info(messages["ohp_no_internet_network"].format(network_json["Subnet"],
+                                                        network_json["Gateway"]))
     return True
 
 
@@ -199,7 +199,7 @@ def remove_old_images(configuration):
     """
     for image in all_existing_images():
         if image in get_image_name_of_selected_modules(configuration):
-            info("removing image {0}".format(image))
+            info(messages["removing image {0}"].format(image))
             os.popen("docker rmi {0}".format(image)).read()
     return True
 
@@ -235,7 +235,7 @@ def create_new_images(configuration):
             selected_module
         )
 
-        info("creating image {0}".format(image_name))
+        info(messages["creating_image"].format(image_name))
 
         # in case if verbose mode is enabled, we will be use os.system
         # instead of os.popen to show the outputs in case
@@ -248,7 +248,7 @@ def create_new_images(configuration):
             os.popen("docker build . -t {0}".format(image_name)).read()
 
         # created
-        info("image {0} created".format(image_name))
+        info(messages["image_created"].format(image_name))
 
         # go back to home directory
         os.chdir("../..")
@@ -513,7 +513,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                     duplicated_ports.append(
                         configuration[selected_module]["real_machine_port_number"])
                 if duplicated_ports.count(real_machine_port) == 1:
-                    info("port {0} selected for {1}".format(real_machine_port, module_name))
+                    info(messages["port_selected"].format(real_machine_port, module_name))
                     return real_machine_port
         except Exception:
             pass
@@ -606,8 +606,8 @@ def update_language(argv_options):
     Args:
         argv_options
     """
-    if argv_options.language  not in load_messages().languages_list:
-        exit_failure("Invalid language code. Available options are " + ", ".join(load_messages.languages))
+    if argv_options.language not in load_messages().languages_list:
+        exit_failure("Invalid language code. Available options are " + ", ".join(load_messages().languages_list))
 
 
 def argv_parser():
@@ -824,7 +824,7 @@ def load_honeypot_engine():
     # Set network configuration
     network_config = set_network_configuration(argv_options)
     info(messages["start_message"])
-    info("loading modules {0}".format(", ".join(selected_modules)))
+    info(messages["loading_modules"].format(", ".join(selected_modules)))
     # check for conflict in real machine ports and pick new ports
     info(messages["check_for_port_conflicts"])
     configuration = conflict_ports(configuration)

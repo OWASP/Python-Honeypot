@@ -61,3 +61,16 @@ killing_capture_process: Убивает процесс захвата сети
 finished: законченный.
 start_message: OWASP Honeypot запущен ...
 check_for_port_conflicts: Проверка на конфликты в портах
+
+submitting_events: Отправка новых событий в базу данных
+network_traffic_capture_start: процесс network_traffic_capture запущен
+creating_ohp_internet: создание сети ohp_internet
+ohp_internet_network: 'ohp_internet сеть создана подсеть: {0} шлюз: {1}'
+creating_ohp_no_internet: создание сети ohp_no_internet
+ohp_no_internet_network: 'ohp_no_internet сеть создана подсеть: {0} шлюз: {1}'
+removing_image: 'удаление изображения {0}'
+creating_image: 'создание изображения {0}'
+image_created: 'изображение {0} создано'
+port_selected: 'порт {0} выбран для {1}'
+loading_modules: 'загрузка модулей {0}'
+killing_thread: 'убийство {0}'

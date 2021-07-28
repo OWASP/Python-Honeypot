@@ -22,10 +22,11 @@ from database.datatypes import (CredentialEvent,
                                 elastic_search_types)
 from lib.ip2location import IP2Location
 from api.database_queries import event_types
+from core.messages import load_messages
 
 api_config = api_configuration()
 network_config = network_configuration()
-
+messages = load_messages().message_contents
 # Event index connections
 elasticsearch_events = elasticsearch.Elasticsearch(
     api_config["api_database"],
@@ -164,7 +165,7 @@ def push_events_queues_to_database(honeypot_events_queue, network_events_queue):
 
     if is_verbose_mode() and (honeypot_events_queue or network_events_queue) \
             and (honeypot_events_queue or network_events_queue):
-        verbose_info("Submitting new events to database")
+        verbose_info(messages["submitting_events"])
 
     # Insert all honeypot events to database (honeypot_events collection)
     while not honeypot_events_queue.empty():

@@ -57,7 +57,19 @@ interrupted_by_user: Interrupted by user, please wait to stop the containers and
 timeout_error: The timeout value cannot be less than 1 sec!
 no_module_selected_error: No module selected, please select one at least!
 all_modules_excluded_error: You cannot exclude all modules
-killing_capture_process : Killing network capture process
+killing_capture_process: Killing network capture process
 finished: finished.
 start_message: OWASP Honeypot started ...
 check_for_port_conflicts: Checking for conflicts in ports
+submitting_events: Submitting new events to database
+network_traffic_capture_start: network_traffic_capture process started
+creating_ohp_internet: creating ohp_internet network
+ohp_internet_network: ohp_internet network created subnet:{0} gateway:{1}
+creating_ohp_no_internet: creating ohp_no_internet network
+ohp_no_internet_network: ohp_no_internet network created subnet:{0} gateway:{1}
+removing_image: removing image {0}
+creating_image: creating image {0}
+image_created: image {0} created
+port_selected: port {0} selected for {1}
+loading_modules: loading modules {0}
+killing_thread: killing {0}

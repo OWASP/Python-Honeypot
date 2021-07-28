@@ -376,18 +376,6 @@ function load_graphs() {
 }
 
 /**
- * Change the language based on User Input
- */
-function changeLanguage() {
-    const menu = document.getElementById("language-menu")
-    const value = menu.options[menu.selectedIndex].value;
-    const param = new URLSearchParams(window.location.search).get("lang");
-    if (!(param != null && value === param)) {
-        location.replace(location.protocol + '//' + location.host + location.pathname + "?lang=" + value)
-    }
-}
-
-/** 
  * Function is used to convert canvas to image and download it
  * @param canvasId
  */
