@@ -44,6 +44,8 @@ jobs:
         python-version: [3.9.4, 3.8.9]
 
     steps:
+      - name: Run API server via docker daemon
+        run: docker-compose up -d --build
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -61,12 +63,6 @@ jobs:
 
       - name: Lint with flake8
         run: flake8 --count --show-source --statistics .
-
-      - name: Run API server via docker daemon
-        run: docker-compose up -d --build
-
-      - name: Wait for API server to load
-        run: sleep 30
 
       - name: Check API server logs
         run: docker logs python-honeypot_ohp_1
