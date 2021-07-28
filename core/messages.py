@@ -20,7 +20,7 @@ class load_messages:
         ]
         if "--language" in sys.argv and sys.argv[sys.argv.index('--language') + 1] in self.languages_list:
             self.language = sys.argv[sys.argv.index('--language') + 1]
-        elif user_configuration()['language'] in self.languages_list :
+        elif user_configuration()['language'] in self.languages_list:
             self.language = user_configuration()['language']
         else:
             self.language = "en_US"

@@ -61,3 +61,15 @@ killing_capture_process: Killing Network Capture Prozess
 finished: fertig.
 start_message: OWASP Honeypot gestartet ...
 check_for_port_conflicts: Auf Konflikte in Ports prüfen
+submitting_events: Senden neuer Ereignisse an die Datenbank
+network_traffic_capture_start: network_traffic_capture-Prozess gestartet
+creating_ohp_internet: ohp_internet-Netzwerk erstellen
+ohp_internet_network: ohp_internet Netzwerk erstelltes Subnetz:{0} Gateway:{1}
+creating_ohp_no_internet: ohp_no_internet-Netzwerk erstellen
+ohp_no_internet_network: ohp_no_internet Netzwerk erstelltes Subnetz:{0} Gateway:{1}
+removing_image: Bild {0} erstellen
+creating_image: Bild erstellen {0}
+image_created: Bild {0} erstellt
+port_selected: Port {0} ausgewählt für {1}
+loading_modules: Lademodule {0}
+killing_thread: töten {0}

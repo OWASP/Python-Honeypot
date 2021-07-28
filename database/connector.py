@@ -22,10 +22,11 @@ from database.datatypes import (CredentialEvent,
                                 elastic_search_types)
 from lib.ip2location import IP2Location
 from api.database_queries import event_types
+from core.messages import load_messages
 
 api_config = api_configuration()
 network_config = network_configuration()
-
+messages = load_messages().message_contents
 # Event index connections
 elasticsearch_events = elasticsearch.Elasticsearch(
     api_config["api_database"],
