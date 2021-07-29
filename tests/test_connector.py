@@ -1,3 +1,4 @@
+import time
 import unittest
 from datetime import datetime
 from multiprocessing import Queue
@@ -50,15 +51,22 @@ class TestConnector(unittest.TestCase):
 
         push_events_queues_to_database(honeypot_events_queue, network_events_queue)
 
-        # Find the records in the DB
-        honeypot_record = connector.elasticsearch_events.search(
+        time.sleep(1)
+
+        honeypot_records = connector.elasticsearch_events.search(
             index='honeypot_events',
             body=filter_by_fields('11.22.33.44', ['ip_dest'])
-        )['hits']['hits'][0]['_source']
-        network_record = connector.elasticsearch_events.search(
+        )['hits']['hits']
+        network_records = connector.elasticsearch_events.search(
             index='network_events',
             body=filter_by_fields('13.14.15.16', ['ip_dest'])
-        )['hits']['hits'][0]['_source']
+        )['hits']['hits']
+
+        self.assertEqual(len(honeypot_records), 1)
+        self.assertEqual(len(network_records), 1)
+        # Find the records in the DB
+        honeypot_record = honeypot_records[0]['_source']
+        network_record = network_records[0]['_source']
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
@@ -91,12 +99,15 @@ class TestConnector(unittest.TestCase):
         )
 
         insert_to_credential_events_collection(credential_event)
-
-        # Find the record in the DB
-        credential_record = connector.elasticsearch_events.search(
+        # wait for insert
+        time.sleep(1)
+        # Find the records in the DB
+        credential_events = connector.elasticsearch_events.search(
             index='credential_events',
             body=filter_by_fields('88.99.11.22', ['ip_src'])
-        )['hits']['hits'][0]['_source']
+        )['hits']['hits']
+        self.assertEqual(len(credential_events), 1)
+        credential_record = credential_events[0]['_source']
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(
@@ -133,20 +144,22 @@ class TestConnector(unittest.TestCase):
 
         insert_to_events_data_collection(event_data)
         # wait for insert
+        time.sleep(1)
 
-        # Find the record in the DB
-        event_record_data = connector.elasticsearch_events.search(
+        records = connector.elasticsearch_events.search(
             index='data_events',
             body=filter_by_fields('55.66.77.88', ['ip_src'])
-        )['hits']['hits'][0]['_source']
-
+        )['hits']['hits']
+        # Compare number of records present
+        self.assertEqual(len(records), 1)
+        # Find the record in the DB
+        event_record_data = records[0]['_source']
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip_src"], event_data.ip_src)
         self.assertEqual(
             event_record_data["data"],
             event_data.data
         )
-
         connector.elasticsearch_events.delete_by_query(
             index='data_events',
             body=filter_by_fields('55.66.77.88', ['ip_src'])
