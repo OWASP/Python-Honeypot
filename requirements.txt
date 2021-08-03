@@ -1,5 +1,5 @@
 setuptools==57.4.0
-elasticsearch==7.13.4
+elasticsearch==7.14.0
 netaddr==0.8.0
 flask==2.0.1
 terminable-thread==0.7.1 # library_name=terminable_thread
