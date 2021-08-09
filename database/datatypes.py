@@ -3,6 +3,107 @@
 
 from datetime import datetime
 
+elastic_search_types = {
+    "honeypot": {
+        'mappings': {
+            'properties': {
+                'ip_dest': {'type': 'ip'},
+                'port_dest': {'type': 'integer'},
+                'ip_src': {'type': 'ip'},
+                'port_src': {'type': 'integer'},
+                'protocol': {'type': 'keyword'},
+                'module_name': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'country_ip_src': {'type': 'keyword'},
+                'country_ip_dest': {'type': 'keyword'}
+            }
+        }
+    },
+    "network": {
+        'mappings': {
+            'properties': {
+                'ip_dest': {'type': 'ip'},
+                'port_dest': {'type': 'integer'},
+                'ip_src': {'type': 'ip'},
+                'port_src': {'type': 'integer'},
+                'protocol': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'country_ip_src': {'type': 'keyword'},
+                'country_ip_dest': {'type': 'keyword'}
+            }
+        }
+    },
+    "credential": {
+        'mappings': {
+            'properties': {
+                'ip_src': {'type': 'ip'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'username': {'type': 'keyword'},
+                'password': {'type': 'keyword'},
+                'machine_name': {'type': 'keyword'},
+                'country_ip_src': {'type': 'keyword'}
+            }
+        }
+    },
+    "data": {
+        'mappings': {
+            'properties': {
+                'ip_src': {'type': 'ip'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'data': {'type': 'nested'},
+                'machine_name': {'type': 'keyword'},
+                'country_ip_src': {'type': 'keyword'}
+            }
+        }
+    },
+    "file": {
+        'mappings': {
+            'properties': {
+                'file_path': {'type': 'text'},
+                'module_name': {'type': 'keyword'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'status': {'type': 'keyword'},
+                'is_directory': {'type': 'boolean'},
+                'machine_name': {'type': 'keyword'},
+                'file_content': {'type': 'binary'}
+            }
+        }
+    },
+    "pcap": {
+        'mappings': {
+            'properties': {
+                'file_path': {'type': 'text'},
+                'date': {
+                    'type': 'date',
+                    'format': 'yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis'
+                },
+                'split_timeout': {'type': 'long'},
+                'md5': {'type': 'keyword'},
+                'file_content': {'type': 'binary'}
+            }
+        }
+    }
+}
+
 
 class HoneypotEvent:
     """
@@ -16,7 +117,6 @@ class HoneypotEvent:
         date: Date and time of the event
         module_name: Module name ran on the port
         machine_name: Real machine name
-        event_type: Type of event
         country_ip_src: Country of source IP Address
         country_ip_dest: Country of destination IP Address
 
@@ -71,23 +171,23 @@ class CredentialEvent:
     Object to store Credential Event Parameters
 
     Attributes:
-        ip: Client ip used for connecting to the module
+        ip_src: Client ip used for connecting to the module
         module_name: Which module was accessed
         date: Date and time of the event
         username: Username tried for connecting to modules
         password: Password tried for connecting to modules
         machine_name: Real machine name
-        country: Country corresponding to the IP Address
+        country_ip_src: Country corresponding to the IP Address
     """
 
-    def __init__(self, ip, module_name, date, username, password):
-        self.ip = ip
+    def __init__(self, ip_src, module_name, date, username, password):
+        self.ip_src = ip_src
         self.module_name = module_name
         self.date = date
         self.username = username
         self.password = password
         self.machine_name = None
-        self.country = None
+        self.country_ip_src = None
 
 
 class EventData:
@@ -100,15 +200,16 @@ class EventData:
         date: Date and time of the event
         module_name: Module client accessed by the client
         data: Data which is obtained from the client
+        country_ip_src: Country corresponding to the IP Address
     """
 
     def __init__(self, ip, module_name, date, data):
-        self.ip = ip
+        self.ip_src = ip
         self.module_name = module_name
         self.date = date
         self.data = data
         self.machine_name = None
-        self.country = None
+        self.country_ip_src = None
 
 
 class FileEventsData:
@@ -149,3 +250,5 @@ class FileArchive:
         self.file_path = file_path
         self.date = date
         self.split_timeout = split_timeout
+        self.md5 = None
+        self.file_content = None

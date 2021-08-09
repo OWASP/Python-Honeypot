@@ -99,7 +99,8 @@ def all_mime_types():
         "audio/3gpp": "video",
         ".3g2": "video/3gpp2",
         "audio/3gpp2": "video",
-        ".7z": "application/x-7z-compressed"
+        ".7z": "application/x-7z-compressed",
+        ".pcap": "application/cap"
     }
 
 
@@ -165,6 +166,8 @@ def fix_limit(limit):
     """
     if limit:
         try:
+            if int(limit) > 10000:
+                return 10000
             return int(limit)
         except Exception:
             pass

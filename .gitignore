@@ -17,10 +17,11 @@ pcapfiles/*
 results.*
 *.DS_Store
 *.swp
+venv/*
 
 # codacy
 .coverage
 coverage.xml
 
 # docker compose
-data/*
+data/db

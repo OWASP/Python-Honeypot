@@ -30,9 +30,9 @@ function load_module_options() {
 
 // Get the file name of the export file
 function get_export_fileName(file_type) {
-  var d = new Date();
-  var n = d.getTime();
-  return 'Honeypot-data-' + file_type + '-' + n;
+  const d = new Date();
+  const n = d.getTime();
+  return 'Honeypot-data-'  + n  + "." + file_type;
 }
 
 
@@ -252,6 +252,72 @@ $.fn.dataTable.Api.register( 'clearPipeline()', function () {
   } );
 } );
 
+
+/**
+ * Function fetches log data based on params specified by user and download data in specified fileType
+ * @param {*} api_endpoint : API endpoint URL
+ * @param {*} column_list : List of Columns for the selected event type
+ * @param {*} api_params  : GET parameters for the API call
+ * @param {*} fileType    : File Type ( Json, Excel, Csv)
+ */
+function downloadLogData(api_endpoint, column_list, api_params, fileType) {
+    $.ajax({
+        type: "GET",
+        url: api_endpoint,
+        data: {
+            ...api_params,
+            limit: 9999
+        },
+        success: function (result, status, xhr) {
+            const data = result.data
+            console.log(data.length)
+            switch (fileType) {
+                case "JSON": {
+                    const filename = get_export_fileName('json');
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, undefined, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", filename);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    break;
+                }
+                case "CSV": {
+                    let csvFileData = "";
+                    for (let column in column_list) {
+                        csvFileData += `"${column_list[column].data}"` + ",";
+                    }
+                    csvFileData += "\n"
+                    for (let index = 0; index < data.length; index++) {
+                        for (let column in column_list) {
+                            csvFileData += `"${data[index][column_list[column].data]}"` + ",";
+                        }
+                        csvFileData += "\n";
+                    }
+                    const filename = get_export_fileName('csv');
+                    const dataStr = "data:text/csv;charset=utf-8," + encodeURIComponent(csvFileData);
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", filename);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    break;
+                }
+                case "EXCEL": {
+                    const filename = get_export_fileName('xlsx');
+                    let ws = XLSX.utils.json_to_sheet(data);
+                    let wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, api_params['event_type'] + "_data");
+                    XLSX.writeFile(wb, filename);
+                    break;
+                }
+            }
+        }
+    });
+}
+
+
+
 /**
  * Call the API to get event data from the database
  * @param {*} api_endpoint : API endpoint URL
@@ -275,18 +341,27 @@ function get_event_data(api_endpoint, column_list, api_params) {
       dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
         "<'row'<'col-sm-12'tr>>" +
         "<'row'<'col-sm-12 col-md-2'B><'col-sm-12 col-md-4'i><'col-sm-12 col-md-6'p>>",
-      buttons: [
-        {
-          extend: 'csv',
-          filename: function () { return get_export_fileName('csv'); },
-          className: "btn btn-info btn-sm"
-        },
-        {
-          extend: 'excel',
-          filename: function () { return get_export_fileName('excel'); },
-          className: "btn btn-info btn-sm"
-        }
-      ],
+        buttons: [
+            {
+                text: 'CSV',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "CSV")
+                },
+            },
+            {
+                text: 'EXCEL',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "EXCEL")
+                }
+            },
+
+            {
+                text: 'JSON',
+                action: function (e, dt, button, config) {
+                    downloadLogData(api_endpoint, column_list, api_params, "JSON")
+                }
+            }
+        ],
       columns: column_list,
       destroy: true,
       order: [[0, 'desc']],
@@ -297,8 +372,8 @@ function get_event_data(api_endpoint, column_list, api_params) {
       processing: true,
       language:{
           loadingRecords: '&nbsp;',
-          processing: '<div class="spinner">Loading...</div>',
-          sEmptyTable: '<div>No records are present for given request</div>'
+          processing: `<div class="spinner">${translations.loading}</div>`,
+          sEmptyTable: `<div>${translations.no_records_present_message}</div>`
       },
       oLanguage: {
         sStripClasses: "",
@@ -410,7 +485,7 @@ function get_pcap_file_data(api_endpoint, column_list, api_params) {
       processing: true,
       language:{
           loadingRecords: '&nbsp;',
-          processing: '<div class="spinner">Loading...</div>'
+          processing: `<div class="spinner">${translations.loading}</div>`
       },
       oLanguage: {
         sStripClasses: "",
@@ -535,39 +610,62 @@ function load_data(api_endpoint, api_params) {
  * Function called when "search" button is clicked in the "Log explorer" display
  */
 function search_database() {
-  var api_endpoint = "/api/events/explore/";
-  var api_params = {};
-  // Get event type and module name if data explorer
-  var event_type = $("select[name='event_type'] option:selected").val();
-  var module_name = $("select[name='module_names'] option:selected").val();
-  // Update end point
-  api_endpoint += event_type;
-  // Set the API parameters
-  api_params.event_type = event_type;
-  api_params.module_name = module_name;
-  // Get date range
-  var start_date = $("#start_date").val();
-  var end_date = $("#end_date").val();
-
-  if (start_date == "" || end_date == "") {
-    alert("Either Start Date or End date missing!");
-  }
-  else {
-    if (start_date <= end_date) {
-      // Date Range format Eg: 2020-09-10|2020-10-10
-      api_params.date = start_date + '|' + end_date
-      // Call API and load data to table
-      load_data(
-        api_endpoint,
-        api_params
-      );
+    let api_endpoint = "/api/events/explore/";
+    let api_params = {};
+    // Get event type and module name if data explorer
+    const event_type = $("select[name='event_type'] option:selected").val();
+    const module_name = $("select[name='module_names'] option:selected").val();
+    // Update end point
+    api_endpoint += event_type;
+    // Set the API parameters
+    api_params.event_type = event_type;
+    api_params.module_name = module_name;
+    // Get date range
+    const start_date = $("#start_date").val();
+    const end_date = $("#end_date").val();
+    if (event_type === "") {
+        displayErrorMessage(translations.event_type_error);
+    } else if (start_date === "" && end_date === "") {
+        displayErrorMessage(translations.date_not_selected_error);
+    } else if (start_date === "") {
+        displayErrorMessage(translations.start_date_not_selected_error);
+    } else if (end_date === "") {
+        displayErrorMessage(translations.end_date_not_selected_error);
+    } else {
+        if (start_date <= end_date) {
+            //Hide error message
+            hideErrorMessage();
+            // Date Range format Eg: 2020-09-10|2020-10-10
+            api_params.date = start_date + '|' + end_date
+            // Call API and load data to table
+            load_data(
+                api_endpoint,
+                api_params
+            );
+        } else {
+            displayErrorMessage(translations.start_date_greater_error)
+        }
     }
-    else {
-      alert("Start date is greater than End date!")
-    }
-  }
 }
 
+/**
+ * Function is called to hide the Error Message element in Log Explorer
+ */
+function hideErrorMessage() {
+    const errorMessageElement = document.getElementById("error-message-element");
+    errorMessageElement.hidden = true;
+    errorMessageElement.innerText = "";
+}
+
+/**
+ * Function is called when there is an error in user input in Log Explorer
+ * @param message error message that is to be displayed
+ */
+function displayErrorMessage(message) {
+    const errorMessageElement = document.getElementById("error-message-element");
+    errorMessageElement.innerText = message;
+    errorMessageElement.hidden = false;
+}
 
 /**
  * Form update based on event type selected

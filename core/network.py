@@ -22,9 +22,11 @@ from database.connector import (insert_to_honeypot_events_queue,
 from database.datatypes import (HoneypotEvent,
                                 NetworkEvent,
                                 FileArchive)
+from core.messages import load_messages
 
 # honeypot ports
 honeypot_ports = dict()
+messages = load_messages().message_contents
 
 
 def get_gateway_ip_addresses(configuration):
@@ -51,11 +53,19 @@ def get_gateway_ip_addresses(configuration):
             gateway_ips.append(gateway_ip)
         except IndexError:
             warn(
-                "unable to get container {0} IP address".format(
+                messages["unable_to_get_ip"].format(
                     container_name
                 )
             )
     return list(set(gateway_ips))
+
+
+def force_kill_tshark():
+    pid = os.popen('ps aux | grep tshark').readline().split()[1]
+    os.popen('kill -9 {} &> /dev/null'.format(pid)).read()
+    # wait to make sure tshark is gone!
+    time.sleep(1)
+    return
 
 
 def process_packet(packet, honeypot_events_queue, network_events_queue):
@@ -132,7 +142,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
     Returns:
         True
     """
-    info("network_traffic_capture process started")
+    info(messages["network_traffic_capture_start"])
 
     for selected_module in configuration:
         port_number = configuration[selected_module]["real_machine_port_number"]
@@ -197,7 +207,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
 
         if store_pcap:
             info(
-                "Network capture is getting stored in, {}".format(
+                messages["network_capture_getting_stored"].format(
                     output_file_path
                 )
             )
@@ -217,6 +227,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             capture.apply_on_packets(packet_callback, timeout=timeout)
 
         except get_timeout_error() as e:
+            force_kill_tshark()
             # Catches the timeout error thrown by apply_on_packets
             insert_pcap_files_to_collection(
                 FileArchive(
@@ -227,6 +238,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             ) if store_pcap else e
 
         except KeyboardInterrupt as e:
+            force_kill_tshark()
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,
@@ -237,6 +249,7 @@ def network_traffic_capture(configuration, honeypot_events_queue, network_events
             break
 
         except Exception as e:
+            force_kill_tshark()
             insert_pcap_files_to_collection(
                 FileArchive(
                     output_file_path,

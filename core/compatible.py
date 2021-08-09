@@ -11,9 +11,11 @@ import random
 import string
 import shutil
 import inspect
-
+import json
+import elasticsearch
 from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
+from shutil import which
 
 
 def logo():
@@ -66,27 +68,32 @@ def check_for_requirements(start_api_server):
     Returns:
         True if exist otherwise False
     """
+    # TODO : Fix the cyclic dependency later
     from config import api_configuration
+    from core.messages import load_messages
+    messages = load_messages().message_contents
     # check external required modules
     api_config = api_configuration()
-    connection_timeout = api_config["api_database_connection_timeout"]
+    external_modules = open(os.path.join(os.getcwd(), 'requirements.txt'), 'r').read().split('\n')
+    for module_name in external_modules:
+        try:
+            __import__(
+                module_name.split('==')[0] if 'library_name=' not in module_name
+                else module_name.split('library_name=')[1].split()[0]
+            )
+        except Exception:
+            exit_failure(
+                "pip3 install -r requirements.txt ---> " + module_name + " not installed!"
+            )
+    # check elasticsearch
     try:
-        import pymongo
-        import netaddr
-        import flask
-        del netaddr
-        del flask
-    except Exception:
-        exit_failure("pip install -r requirements.txt")
-    # check mongodb
-    try:
-        connection = pymongo.MongoClient(
+        connection = elasticsearch.Elasticsearch(
             api_config["api_database"],
-            serverSelectionTimeoutMS=connection_timeout
+            http_auth=api_config["api_database"]
         )
-        connection.list_database_names()
+        connection.indices.get_alias("*")
     except Exception:
-        exit_failure("cannot connect to mongodb")
+        exit_failure(messages["elasticsearch_not_found"])
     # check if its honeypot server not api server
     if not start_api_server:
         # check docker
@@ -94,18 +101,19 @@ def check_for_requirements(start_api_server):
             subprocess.check_output(["docker", "--help"],
                                     stderr=subprocess.PIPE)
         except Exception:
-            exit_failure("cannot communicate with docker, please install and start the docker service!")
-        # check tshark
-        try:
-            subprocess.check_output(
-                [
-                    "tshark",
-                    "--help"
-                ],
-                stderr=subprocess.PIPE
-            )
-        except Exception:
-            exit_failure("please install tshark first!")
+            exit_failure(messages["cannot_communicate_with_docker"])
+        # check for commandline requirements
+        commands = {
+            'tshark': which('tshark'),
+            'ps': which('ps'),
+            'grep': which('grep'),
+            'kill': which('kill')
+        }
+        for command in commands:
+            if commands[command] is None:
+                exit_failure(
+                    messages["install_tools"] + "{0}".format(json.dumps(commands, indent=4))
+                )
     return True
 
 

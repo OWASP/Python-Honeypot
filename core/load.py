@@ -24,11 +24,14 @@ from core.get_modules import (load_all_modules,
                               virtual_machine_names_to_container_names)
 from core.network import network_traffic_capture
 from database.connector import (push_events_queues_to_database,
-                                push_events_to_database_from_thread)
+                                push_events_to_database_from_thread,
+                                create_indices)
+from core.messages import load_messages
 
 # tmp dirs
 tmp_directories = []
 processor_threads = []
+messages = load_messages().message_contents
 
 
 def all_existing_networks():
@@ -50,17 +53,17 @@ def create_ohp_networks():
         True
     """
     if "ohp_internet" not in all_existing_networks():
-        info("creating ohp_internet network")
+        info(messages["creating_ohp_internet"])
         os.popen("docker network create ohp_internet  --opt com.docker.network.bridge.enable_icc=true "
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
                  "--opt com.docker.network.bridge.host_binding_ipv4=0.0.0.0 --opt "
                  "com.docker.network.driver.mtu=1500").read()
         network_json = json.loads(os.popen("docker network inspect ohp_internet").read())[
             0]["IPAM"]["Config"][0]
-        info("ohp_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
-                                                                          network_json["Gateway"]))
+        info(messages["ohp_internet_network"].format(network_json["Subnet"],
+                                                     network_json["Gateway"]))
     if "ohp_no_internet" not in all_existing_networks():
-        info("creating ohp_no_internet network")
+        info(messages["creating_ohp_no_internet"])
         os.popen("docker network create --attachable --internal ohp_no_internet  "
                  "--opt com.docker.network.bridge.enable_icc=true "
                  "--opt com.docker.network.bridge.enable_ip_masquerade=true "
@@ -68,8 +71,8 @@ def create_ohp_networks():
                  "--opt com.docker.network.driver.mtu=1500").read()
         network_json = json.loads(os.popen("docker network inspect ohp_no_internet").read())[
             0]["IPAM"]["Config"][0]
-        info("ohp_no_internet network created subnet:{0} gateway:{1}".format(network_json["Subnet"],
-                                                                             network_json["Gateway"]))
+        info(messages["ohp_no_internet_network"].format(network_json["Subnet"],
+                                                        network_json["Gateway"]))
     return True
 
 
@@ -196,7 +199,7 @@ def remove_old_images(configuration):
     """
     for image in all_existing_images():
         if image in get_image_name_of_selected_modules(configuration):
-            info("removing image {0}".format(image))
+            info(messages["removing_image"].format(image))
             os.popen("docker rmi {0}".format(image)).read()
     return True
 
@@ -232,7 +235,7 @@ def create_new_images(configuration):
             selected_module
         )
 
-        info("creating image {0}".format(image_name))
+        info(messages["creating_image"].format(image_name))
 
         # in case if verbose mode is enabled, we will be use os.system
         # instead of os.popen to show the outputs in case
@@ -245,7 +248,7 @@ def create_new_images(configuration):
             os.popen("docker build . -t {0}".format(image_name)).read()
 
         # created
-        info("image {0} created".format(image_name))
+        info(messages["image_created"].format(image_name))
 
         # go back to home directory
         os.chdir("../..")
@@ -358,7 +361,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error("Interrupting the application because network capturing process is not alive!")
+                return error(messages["interrupt_application"])
             if containers_are_unhealthy(configuration):
                 return error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
@@ -369,7 +372,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 break
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
-            info("interrupted by user, please wait to stop the containers and remove the containers and images")
+            info(messages["interrupted_by_user"])
             break
     return True
 
@@ -510,7 +513,7 @@ def reserve_tcp_port(real_machine_port, module_name, configuration):
                     duplicated_ports.append(
                         configuration[selected_module]["real_machine_port_number"])
                 if duplicated_ports.count(real_machine_port) == 1:
-                    info("port {0} selected for {1}".format(real_machine_port, module_name))
+                    info(messages["port_selected"].format(real_machine_port, module_name))
                     return real_machine_port
         except Exception:
             pass
@@ -594,6 +597,17 @@ def set_network_configuration(argv_options):
     network_config["split_pcap_file_timeout"] = argv_options.timeout_value
 
     return network_config
+
+
+def update_language(argv_options):
+    """
+    Update language for messages
+
+    Args:
+        argv_options
+    """
+    if argv_options.language not in load_messages().languages_list:
+        exit_failure("Invalid language code. Available options are " + ", ".join(load_messages().languages_list))
 
 
 def argv_parser():
@@ -697,6 +711,14 @@ def argv_parser():
         default=False,
         help="disable colors in CLI"
     )
+    # set language
+    engineOpt.add_argument(
+        "--language",
+        type=str,
+        dest="language",
+        default="en_US",
+        help="Set the default language. {languages}".format(languages=load_messages().languages_list)
+    )
     # test CI/ETC
     engineOpt.add_argument(
         "--test",
@@ -714,6 +736,7 @@ def argv_parser():
         dest="show_help_menu",
         help="print this help menu"
     )
+
     return parser, parser.parse_args()
 
 
@@ -730,6 +753,9 @@ def load_honeypot_engine():
     # parse argv
     parser, argv_options = argv_parser()
 
+    # check the language
+    if argv_options.language:
+        update_language(argv_options)
     #########################################
     # argv rules apply
     #########################################
@@ -739,6 +765,8 @@ def load_honeypot_engine():
         exit_success()
     # check for requirements before start
     check_for_requirements(argv_options.start_api_server)
+    # create indices before server start
+    create_indices()
     # check api server flag
     if argv_options.start_api_server:
         start_api_server()
@@ -746,10 +774,10 @@ def load_honeypot_engine():
 
     # Check if the script is running with sudo
     if not os.geteuid() == 0:
-        exit_failure("The script must be run as root!")
+        exit_failure(messages['script_must_run_as_root'])
     # Check timeout value if provided
     if argv_options.timeout_value < 1:
-        exit_failure("The timeout value cannot be less than 1 sec!")
+        exit_failure(messages["timeout_error"])
 
     # check selected modules
     if argv_options.selected_modules:
@@ -760,7 +788,7 @@ def load_honeypot_engine():
             selected_modules.remove("")
         # if selected modules are zero
         if not len(selected_modules):
-            exit_failure("no module selected, please select one at least!")
+            exit_failure(messages["no_module_selected_error"])
         # if module not found
         for module in selected_modules:
             if module not in load_all_modules():
@@ -769,7 +797,7 @@ def load_honeypot_engine():
     if argv_options.excluded_modules:
         excluded_modules = list(set(argv_options.excluded_modules.rsplit(",")))
         if "all" in excluded_modules:
-            exit_failure("you cannot exclude all modules")
+            exit_failure(messages["all_modules_excluded_error"])
         if "" in excluded_modules:
             excluded_modules.remove("")
         # remove excluded modules
@@ -783,7 +811,7 @@ def load_honeypot_engine():
                 pass
         # if selected modules are zero
         if not len(selected_modules):
-            exit_failure("no module selected, please select one at least!")
+            exit_failure(messages["no_module_selected_error"])
     virtual_machine_container_reset_factory_time_seconds = argv_options. \
         virtual_machine_container_reset_factory_time_seconds
     run_as_test = argv_options.run_as_test
@@ -794,10 +822,10 @@ def load_honeypot_engine():
     configuration = honeypot_configuration_builder(selected_modules)
     # Set network configuration
     network_config = set_network_configuration(argv_options)
-    info("OWASP Honeypot started ...")
-    info("loading modules {0}".format(", ".join(selected_modules)))
+    info(messages["start_message"])
+    info(messages["loading_modules"].format(", ".join(selected_modules)))
     # check for conflict in real machine ports and pick new ports
-    info("checking for conflicts in ports")
+    info(messages["check_for_port_conflicts"])
     configuration = conflict_ports(configuration)
     # stop old containers (in case they are not stopped)
     stop_containers(configuration)
@@ -829,7 +857,7 @@ def load_honeypot_engine():
     )
     network_traffic_capture_process.start()
     info(
-        "all selected modules started: {0}".format(
+        messages["selected_modules_started"].format(
             ", ".join(
                 selected_modules
             )
@@ -854,7 +882,7 @@ def load_honeypot_engine():
         run_as_test
     )
     # killed the network traffic capture process by ctrl + c... waiting to end.
-    info("killing network capture process")
+    info(messages["killing_capture_process"])
     if run_as_test:
         network_traffic_capture_process.terminate()
     # without ci it will be terminate after a few seconds, it needs to kill the tshark and update pcap file collection
@@ -875,7 +903,7 @@ def load_honeypot_engine():
     # kill all missed threads
     for thread in threading.enumerate()[1:]:
         terminate_thread(thread, False)
-    info("finished.")
+    info(messages["finished"])
     # reset cmd/terminal color
     reset_cmd_color()
     return exit_flag
