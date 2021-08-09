@@ -185,13 +185,6 @@
 
 <script>
     const translations = {{ encoded_data | safe}};
-    const param = new URLSearchParams(window.location.search).get("lang");
-    const menu = document.getElementById("language-menu")
-    for (let i = 0; i < menu.length; i++) {
-        if (menu.options[i].value === param) {
-            menu.value = param
-        }
-    }
 </script>
 <!-- main.js used as general js file for index.html -->
 <script src="/js/main.js"></script>
