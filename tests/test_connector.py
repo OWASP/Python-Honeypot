@@ -62,11 +62,12 @@ class TestConnector(unittest.TestCase):
             body=filter_by_fields('13.14.15.16', ['ip_dest'])
         )['hits']['hits']
 
-        self.assertEqual(len(honeypot_records), 1)
-        self.assertEqual(len(network_records), 1)
         # Find the records in the DB
         honeypot_record = honeypot_records[0]['_source']
         network_record = network_records[0]['_source']
+
+        self.assertGreater(len(honeypot_records), 0)
+        self.assertGreater(len(network_records), 0)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(honeypot_record["ip_src"], honeypot_event.ip_src)
@@ -76,13 +77,13 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(network_record["ip_dest"], network_event.ip_dest)
 
         # Delete test events from the database
-        connector.elasticsearch_events.delete_by_query(
+        connector.elasticsearch_events.delete(
             index='honeypot_events',
-            body=filter_by_fields('11.22.33.44', ['ip_dest'])
+            id=honeypot_records[0]["_id"]
         )
-        connector.elasticsearch_events.delete_by_query(
+        connector.elasticsearch_events.delete(
             index='network_events',
-            body=filter_by_fields('13.14.15.16', ['ip_dest'])
+            id=network_records[0]["_id"]
         )
 
     def test_insert_to_credential_events(self):
@@ -106,8 +107,9 @@ class TestConnector(unittest.TestCase):
             index='credential_events',
             body=filter_by_fields('88.99.11.22', ['ip_src'])
         )['hits']['hits']
-        self.assertEqual(len(credential_events), 1)
         credential_record = credential_events[0]['_source']
+
+        self.assertGreater(len(credential_events), 0)
 
         # Compare the record found in the DB with the one pushed
         self.assertEqual(
@@ -126,9 +128,9 @@ class TestConnector(unittest.TestCase):
         )
 
         # Delete test events from the database
-        connector.elasticsearch_events.delete_by_query(
+        connector.elasticsearch_events.delete(
             index='credential_events',
-            body=filter_by_fields('88.99.11.22', ['ip_src'])
+            id=credential_events[0]["_id"]
         )
 
     def test_insert_events_data(self):
@@ -146,23 +148,24 @@ class TestConnector(unittest.TestCase):
         # wait for insert
         time.sleep(1)
 
-        records = connector.elasticsearch_events.search(
+        # Find the records in the DB
+        event_records = connector.elasticsearch_events.search(
             index='data_events',
             body=filter_by_fields('55.66.77.88', ['ip_src'])
         )['hits']['hits']
-        # Compare number of records present
-        self.assertEqual(len(records), 1)
-        # Find the record in the DB
-        event_record_data = records[0]['_source']
+
+        self.assertGreater(len(event_records), 0)
+
+        event_record_data = event_records[0]['_source']
         # Compare the record found in the DB with the one pushed
         self.assertEqual(event_record_data["ip_src"], event_data.ip_src)
         self.assertEqual(
             event_record_data["data"],
             event_data.data
         )
-        connector.elasticsearch_events.delete_by_query(
+        connector.elasticsearch_events.delete(
             index='data_events',
-            body=filter_by_fields('55.66.77.88', ['ip_src'])
+            id=event_records[0]["_id"]
         )
 
 
