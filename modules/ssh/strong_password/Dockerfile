@@ -1,5 +1,5 @@
 # using phusion/baseimage as base image
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 # update and install openssh + python
 COPY files/requirements-apt-get.txt files/requirements-pip3.txt ./
