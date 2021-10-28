@@ -30,6 +30,7 @@ from config import (
     api_configuration,
     user_configuration)
 from core.alert import write_to_api_console
+from core.exit_helper import exit_failure
 from core.get_modules import load_all_modules
 from database.connector import elasticsearch_events
 from flask_swagger import swagger
@@ -686,10 +687,13 @@ def start_api_server():
     }
     app.register_blueprint(documentation_settings)
 
-    app.run(
-        host=my_api_configuration["api_host"],
-        port=my_api_configuration["api_port"],
-        debug=my_api_configuration["api_debug_mode"],
-        threaded=True
-    )
+    try:
+        app.run(
+            host=my_api_configuration["api_host"],
+            port=my_api_configuration["api_port"],
+            debug=my_api_configuration["api_debug_mode"],
+            threaded=True
+        )
+    except Exception as e:
+        exit_failure(str(e))
     return True
