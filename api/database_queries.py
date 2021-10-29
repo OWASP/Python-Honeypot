@@ -7,9 +7,7 @@ for querying elasticsearch using elasticsearch client.
 
 Created this file because the queries are repeated over the URI's.
 """
-from api.utility import (fix_date,
-                         fix_limit,
-                         fix_skip)
+from api.utility import fix_date
 
 sort_by_count = {
     "$sort": (
@@ -88,44 +86,11 @@ def filter_by_fields(query, fields):
     }
 
 
-def filter_by_skip(skip):
-    return {
-        "$skip": fix_skip(skip)
-    }
-
-
-def filter_by_limit(limit):
-    return {
-        "$limit": fix_limit(limit)
-    }
-
-
-def filter_by_country_ip_dest(country):
-    return {
-        "country_ip_dest": country
-    }
-
-
 def filter_by_module_name(module_name):
     return {
         "match": {
             "module_name": module_name
         }
-    }
-
-
-# todo: not used?
-def filter_by_exclude_unknown_country():
-    return {
-        "country_ip_dest": {
-            "$gt": "-"
-        }
-    }
-
-
-def filter_by_match(match_query):
-    return {
-        "$match": match_query
     }
 
 
