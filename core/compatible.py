@@ -89,7 +89,7 @@ def check_for_requirements(start_api_server):
     try:
         connection = elasticsearch.Elasticsearch(
             api_config["api_database"],
-            http_auth=api_config["api_database"]
+            http_auth=api_config["api_database_http_auth"]
         )
         connection.indices.get_alias("*")
     except Exception:
