@@ -5,7 +5,7 @@ import os
 import socket
 
 from core.time_helper import hours
-from core.compatible import generate_token
+from core.token import generate_token
 
 # Protocol number to protocol string table
 protocol_table = {
@@ -18,7 +18,7 @@ real_machine_ip_address = socket.gethostbyname(socket.gethostname())
 
 def api_configuration():
     """
-    API Config (could be modify by user)
+    API Config (could be modified by user)
 
     Returns:
         a JSON with API configuration
@@ -64,7 +64,7 @@ def network_configuration():
         "store_network_captured_files": False,
         "real_machine_ip_address": real_machine_ip_address,
         "ignore_real_machine_ip_address": True,  # or if you want to simulate from local network, save as False
-        "ignore_virtual_machine_ip_addresses": True,  # or if you want simulate from local network, save as False
+        "ignore_virtual_machine_ip_addresses": True,  # or if you want to simulate from local network, save as False
         "real_machine_identifier_name": "stockholm_server_1",  # can be anything e.g. real_machine_ip_address, name, etc
         "ignore_real_machine_ip_addresses": list(
             {

@@ -3,7 +3,6 @@
 
 import sys
 import ctypes
-
 from core.color import reset_cmd_color
 
 
@@ -22,8 +21,9 @@ def exit_failure(msg):
     Args:
         msg: the error message
     """
-    # TODO : Fix the cyclic dependency later
     from core.alert import error
+
+    # TODO : Fix the cyclic dependency later
     error(msg)
     reset_cmd_color()
     sys.exit(1)
