@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
-from core.compatible import generate_token
+from core.token import generate_token
 import os
 import binascii
 import json

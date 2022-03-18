@@ -4,7 +4,7 @@
 import time
 import os
 import json
-from core.compatible import generate_token
+from core.token import generate_token
 from database.connector import insert_to_credential_events_collection
 from database.datatypes import CredentialEvent
 
