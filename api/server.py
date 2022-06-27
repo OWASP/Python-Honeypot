@@ -11,6 +11,8 @@ from flask import (Flask,
                    render_template,
                    send_file)
 from flask import request as flask_request
+from prometheus_flask_exporter import PrometheusMetrics
+
 from api.database_queries import (
     filter_by_date,
     filter_by_fields,
@@ -61,6 +63,11 @@ app = Flask(
     __name__,
     template_folder=template_dir
 )
+metrics = PrometheusMetrics(app)
+
+metrics.info('app_info', 'OWASP Honeypot is an open-source software in Python language which designed '
+                         'for creating honeypot and honeynet in an easy and secure way', version='1.0.0')
+
 app.config.from_object(
     __name__
 )
