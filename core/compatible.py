@@ -13,19 +13,10 @@ import shutil
 import inspect
 import json
 import elasticsearch
-from core.color import reset_cmd_color
 from core.exit_helper import exit_failure
 from shutil import which
-
-
-def logo():
-    """
-    OWASP HoneyPot Logo
-    """
-    # TODO : Fix the cyclic dependency later
-    from core.alert import write_to_api_console
-    write_to_api_console(open('.owasp_honeypot').read())
-    reset_cmd_color()
+from config import api_configuration
+from core.messages import load_messages
 
 
 def version():
@@ -36,16 +27,6 @@ def version():
         integer version of python (2 or 3)
     """
     return int(sys.version_info[0])
-
-
-def os_name():
-    """
-    OS name
-
-    Returns:
-        OS name in string
-    """
-    return sys.platform
 
 
 def get_timeout_error():
@@ -68,9 +49,6 @@ def check_for_requirements(start_api_server):
     Returns:
         True if exist otherwise False
     """
-    # TODO : Fix the cyclic dependency later
-    from config import api_configuration
-    from core.messages import load_messages
     messages = load_messages().message_contents
     # check external required modules
     api_config = api_configuration()
@@ -192,19 +170,6 @@ def get_module_dir_path(module):
     return os.path.dirname(
         inspect.getfile(module)
     )
-
-
-def generate_token(length=32):
-    """
-    generate token using hex chars
-
-    Args:
-        length: length of token - default 32
-
-    Returns:
-        token string
-    """
-    return "".join(random.choice("0123456789abcdef") for _ in range(length))
 
 
 def byte_to_str(data):

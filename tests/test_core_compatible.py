@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import patch
 import sys
-from core.compatible import (byte_to_str, is_verbose_mode, generate_token)
+from core.compatible import (byte_to_str, is_verbose_mode)
+from core.token import generate_token
 
 
 class TestCoreAlert(unittest.TestCase):
