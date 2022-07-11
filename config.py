@@ -105,3 +105,18 @@ def user_configuration():
         "default_selected_modules": "all",  # or select one or multiple (e.g. ftp/strong_password,ssh/strong_password)
         "default_excluded_modules": None  # or any module name separated with comma
     }
+
+
+def sentry_configuration() -> dict:
+    """
+        sentry configuration
+
+    Returns:
+        JSON/Dict sentry configuration
+    """
+    return {
+        "sentry_monitoring": False,
+        "sentry_dsn_url": "",
+        # Enter your Sentry Project URL here,
+        "sentry_trace_rate": 1  # Enter Trace Rate Here.
+    }
