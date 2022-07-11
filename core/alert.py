@@ -3,7 +3,7 @@
 
 import sys
 import traceback
-from core import color
+from core.color import color_cmd
 from core.log import get_logger
 from core.time_helper import now
 from core.compatible import is_verbose_mode
@@ -37,11 +37,11 @@ def info(content):
     """
     sys.stdout.buffer.write(
         bytes(
-            color.color_cmd("yellow")
+            color_cmd("yellow")
             + "[+] [{0}] ".format(now())
-            + color.color_cmd("green")
+            + color_cmd("green")
             + content
-            + color.color_cmd("reset")
+            + color_cmd("reset")
             + "\n",
             "utf8"
         )
@@ -80,11 +80,11 @@ def warn(content):
     logger.warning(content)
     sys.stdout.buffer.write(
         bytes(
-            color.color_cmd("blue")
+            color_cmd("blue")
             + "[!] [{0}] ".format(now())
-            + color.color_cmd("yellow")
+            + color_cmd("yellow")
             + content
-            + color.color_cmd("reset")
+            + color_cmd("reset")
             + "\n",
             "utf8")
     )
@@ -108,11 +108,11 @@ def verbose_info(content):
         logger.info(content)
         sys.stdout.buffer.write(
             bytes(
-                color.color_cmd("cyan")
+                color_cmd("cyan")
                 + "[v] [{0}] ".format(now())
-                + color.color_cmd("grey")
+                + color_cmd("grey")
                 + content
-                + color.color_cmd("reset")
+                + color_cmd("reset")
                 + "\n",
                 "utf8"
             )
@@ -133,10 +133,10 @@ def error(content):
     """
     logger.error(content)
     sys.stdout.buffer.write(
-        (color.color_cmd("red")
+        (color_cmd("red")
          + "[X] [{0}] ".format(now())
-         + color.color_cmd("yellow")
-         + content + color.color_cmd("reset")
+         + color_cmd("yellow")
+         + content + color_cmd("reset")
          + "\n"
          ).encode("utf8")
     )

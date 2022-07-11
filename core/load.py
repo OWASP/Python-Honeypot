@@ -17,7 +17,8 @@ from core.alert import error, info
 from core.color import reset_cmd_color
 from core.compatible import (check_for_requirements, copy_dir_tree,
                              get_module_dir_path, is_verbose_mode,
-                             logo, make_tmp_thread_dir, mkdir)
+                             make_tmp_thread_dir, mkdir)
+from core.logo import logo
 from core.exit_helper import exit_failure, exit_success, terminate_thread
 from core.get_modules import (load_all_modules,
                               virtual_machine_name_to_container_name,
