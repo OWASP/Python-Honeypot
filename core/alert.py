@@ -143,11 +143,11 @@ def error(content):
 
     if "--v" in sys.argv or "--very-verbose" in sys.argv:
         sys.stdout.buffer.write(
-            (color.color_cmd("red")
+            (color_cmd("red")
              + "[X] [{0}] ".format(now())
-             + color.color_cmd("yellow")
+             + color_cmd("yellow")
              + "Command entered by the user: "
-             + color.color_cmd("green")
+             + color_cmd("green")
              + "python " + " ".join(sys.argv)
              + "\n"
              ).encode("utf8")
@@ -155,24 +155,24 @@ def error(content):
 
     if "---v" in sys.argv or "--extreme-verbose" in sys.argv:
         sys.stdout.buffer.write(
-            (color.color_cmd("red")
+            (color_cmd("red")
              + "[X] [{0}] ".format(now())
-             + color.color_cmd("yellow")
+             + color_cmd("yellow")
              + "Command entered by the user: "
-             + color.color_cmd("green")
+             + color_cmd("green")
              + "python " + " ".join(sys.argv)
              + "\n"
              ).encode("utf8")
         )
         sys.stdout.buffer.write(
-            (color.color_cmd("red")
+            (color_cmd("red")
              + "[X] [{0}] ".format(now())
              + "Stack Trace \n"
              ).encode("utf8")
         )
         for line in traceback.format_stack():
             sys.stdout.buffer.write(
-                (color.color_cmd("red")
+                (color_cmd("red")
 
                  + line
                  ).encode("utf8")
