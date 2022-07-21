@@ -116,7 +116,13 @@ def sentry_configuration() -> dict:
     """
     return {
         "sentry_monitoring": False,
+        # Enter your Sentry Project URL here.
         "sentry_dsn_url": "",
-        # Enter your Sentry Project URL here,
-        "sentry_trace_rate": 1  # Enter Trace Rate Here.
+        # Enter Trace Rate Here.
+        "sentry_trace_rate": 1
+        # Set sentry_trace_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # sentry_trace_rate is ratio of errors being
+        # reported to the number of issues which arise.
+
     }
