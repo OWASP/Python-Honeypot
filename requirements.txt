@@ -10,3 +10,4 @@ argparse==1.4.0
 PyYAML==5.4.1 # library_name=yaml
 flask-swagger==0.2.14 # library_name=flask_swagger
 flask-swagger-ui==3.36.0 # library_name=flask_swagger_ui
+prometheus-flask-exporter==0.19.0 # library_name=prometheus_flask_exporter
