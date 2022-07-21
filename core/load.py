@@ -363,6 +363,13 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
             if not new_network_events_thread.is_alive():
                 return error(messages["interrupt_application"])
             if containers_are_unhealthy(configuration):
+                if is_verbose_mode():
+                    for container in containers_are_unhealthy(configuration):
+                        os.system(
+                            "docker logs {0}".format(
+                                container
+                            )
+                        )
                 return error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
