@@ -77,7 +77,7 @@ jobs:
         run: docker-compose logs ohp
 
       - name: Run modules test
-        run: sudo python3 ohp.py -m all --test --store-pcap
+        run: sudo python3 ohp.py -m all --test --store-pcap --verbose
 
       - name: Kill API Server
         run: docker-compose down
