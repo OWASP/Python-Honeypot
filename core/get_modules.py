@@ -77,3 +77,30 @@ def load_all_modules():
         else:
             warn(messages["module_not_available"].format(module_name))
     return module_names
+
+
+def load_all_modules_docker_names():
+    """
+        load all available modules names
+
+        Returns:
+            an array of all module names used while creating docker containers
+        """
+    module_names = []
+    module_basepath = os.path.dirname(inspect.getfile(modules))
+    path_pattern = module_basepath + '/*/*/__init__.py'
+
+    for module in glob(path_pattern):
+
+        module_dir = os.path.split(module)[0]
+        sub_module_name = os.path.split(module_dir)[1]
+        category_name = os.path.split(os.path.split(module_dir)[0])[1]
+        module_name = category_name + '/' + sub_module_name
+        dockerfile_path = os.path.join(module_dir, "Dockerfile")
+
+        if os.path.exists(dockerfile_path):
+            if module_name not in module_names:
+                module_names.append('ohp_' + category_name + 'server_' + sub_module_name)
+        else:
+            warn(messages["module_not_available"].format(module_name))
+    return module_names

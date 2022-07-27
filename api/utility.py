@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import json
 import os
+
+from core.get_modules import load_all_modules_docker_names
 
 
 def msg_structure(status="", msg=""):
@@ -232,3 +234,23 @@ def aggregate_function(data_connection, agr_query):
             allowDiskUse=True
         )
     )
+
+
+def get_running_modules_details():
+    """
+    Get all running modules details
+    Returns:
+        list of details of running modules
+
+    """
+    module_details = []
+    delimiter = "}"
+    data = os.popen("docker ps --format '{{json .}}'").read().replace("\n", "").split(delimiter)
+    if len(data) > 1 and data[-1] == "":
+        data = data[:-1]
+    for str_module_data in data:
+        module_data = json.loads(str_module_data + delimiter)
+        if module_data["Names"] in load_all_modules_docker_names():
+            module_details.append(module_data)
+
+    return module_details

@@ -25,7 +25,7 @@ from api.utility import (
     fix_skip,
     fix_filter_query,
     msg_structure,
-    root_dir)
+    root_dir, get_running_modules_details)
 from config import (
     api_configuration,
     user_configuration)
@@ -644,6 +644,47 @@ def all_module_names():
             load_all_modules()
         ), 200
     except Exception:
+        abort(500)
+
+
+@app.route("/api/core/running/modules", methods=["GET"])
+def all_running_module_details():
+    """
+    Get the list of details of all running module details
+    ---
+    responses:
+        '200':
+          description: Ok
+          examples:
+            application/json:
+                [
+                   {
+                      "Command":"\"/bin/sh -c 'service\u2026\"",
+                      "CreatedAt":"2022-07-27 21:49:43 +0530 IST",
+                      "ID":"b5760a5cc113",
+                      "Image":"ohp_ftpserver_weak_password",
+                      "LocalVolumes":"0",
+                      "Mounts":"/host_mnt/User\u2026",
+                      "Names":"ohp_ftpserver_weak_password",
+                      "Networks":"ohp_internet",
+                      "Ports":"0.0.0.0:21->21/tcp",
+                      "RunningFor":"About an hour ago",
+                      "Size":"3B (virtual 293MB)",
+                      "State":"running",
+                      "Status":"Up About an hour"
+                   }
+                ]
+        '500':
+          description: Internal Server Error
+          examples:
+            application/json: { "msg": "file/path not found!", "status": "error" }
+    """
+    try:
+        return jsonify(
+            get_running_modules_details()
+        ), 200
+    except Exception as e:
+        print(e)
         abort(500)
 
 
