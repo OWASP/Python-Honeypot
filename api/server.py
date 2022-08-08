@@ -683,8 +683,7 @@ def all_running_module_details():
         return jsonify(
             get_running_modules_details()
         ), 200
-    except Exception as e:
-        print(e)
+    except Exception:
         abort(500)
 
 

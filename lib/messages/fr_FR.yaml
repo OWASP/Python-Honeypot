@@ -83,3 +83,7 @@ received_honeypot_credential_event: "Événement d'identification Honeypot reçu
 received_honeypot_file_change_event: 'Événement de changement de fichier Honeypot reçu, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
 received_honeypot_data_event: 'Événement de données de pot de miel reçu, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
 received_network_traffic_file: "Fichier de trafic réseau reçu :{0}, date :{1}. L'insérer dans l'archive de fichiers"
+running_module: Modules en cours d'exécution
+running_modules_message: Détails des modules en cours d'exécution (processus de capture réseau)
+no_modules_running_message: Aucun module n'est en cours d'exécution actuellement
+modules_api_error_message: Il y a une erreur lors du chargement des modules en cours d'exécution. Veuillez réessayer plus tard.

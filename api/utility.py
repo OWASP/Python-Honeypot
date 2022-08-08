@@ -248,6 +248,8 @@ def get_running_modules_details():
     data = os.popen("docker ps --format '{{json .}}'").read().replace("\n", "").split(delimiter)
     if len(data) > 1 and data[-1] == "":
         data = data[:-1]
+    else:
+        data = []
     for str_module_data in data:
         module_data = json.loads(str_module_data + delimiter)
         if module_data["Names"] in load_all_modules_docker_names():

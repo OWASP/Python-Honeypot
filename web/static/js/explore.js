@@ -650,6 +650,17 @@ function displayErrorMessage(message) {
 }
 
 /**
+ * Function is called when there is an error in Modules Display
+ * @param message error message that is to be displayed
+ */
+function displayErrorMessageForModules(message, html_element_id) {
+    const errorMessageElement = document.getElementById("error-message-element-modules");
+    document.getElementById(html_element_id).hidden = true;
+    errorMessageElement.innerText = message;
+    errorMessageElement.hidden = false;
+}
+
+/**
  * Form update based on event type selected
  */
 function change_form() {
@@ -674,6 +685,7 @@ function get_layout(layout_type) {
     document.getElementById("dashboard").hidden = (layout_type !== "dashboard");
     document.getElementById("log-explorer").hidden = (layout_type !== "log-explorer");
     document.getElementById("log-explorer-table").hidden = (layout_type !== "log-explorer");
+    document.getElementById("running-module-explorer").hidden = (layout_type !== "running-module-explorer");
 }
 
 load_module_options();
