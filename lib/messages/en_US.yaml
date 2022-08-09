@@ -87,3 +87,4 @@ running_module: Running Modules
 running_modules_message: Details of Running Modules (Network Capture Process)
 no_modules_running_message: No modules are running currently
 modules_api_error_message: There is some error while loading running modules. Please try again later.
+export_module_heading: Export Running Module Details

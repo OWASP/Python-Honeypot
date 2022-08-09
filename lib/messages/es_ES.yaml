@@ -87,3 +87,4 @@ running_module: Módulos en ejecución
 running_modules_message: Detalles de los módulos en ejecución (proceso de captura de red)
 no_modules_running_message: No hay módulos en ejecución actualmente
 modules_api_error_message: Hay algún error al cargar módulos en ejecución. Por favor, inténtelo de nuevo más tarde.
+export_module_heading: Exportar detalles del módulo en ejecución

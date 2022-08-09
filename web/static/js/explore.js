@@ -655,6 +655,11 @@ function displayErrorMessage(message) {
  */
 function displayErrorMessageForModules(message, html_element_id) {
     const errorMessageElement = document.getElementById("error-message-element-modules");
+    document.getElementById("download-module-report").hidden = true;
+    document.getElementById("download-module-report-csv").hidden = true;
+    document.getElementById("download-module-report-json").hidden = true;
+    document.getElementById("download-module-report-excel").hidden = true;
+    document.getElementById("export_module_heading").hidden = true;
     document.getElementById(html_element_id).hidden = true;
     errorMessageElement.innerText = message;
     errorMessageElement.hidden = false;

@@ -87,3 +87,4 @@ running_module: Laufende Module
 running_modules_message: Details zu laufenden Modulen (Netzwerkerfassungsprozess)
 no_modules_running_message: Derzeit laufen keine Module
 modules_api_error_message: Beim Laden laufender Module ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.
+export_module_heading: Export Running Module Details
