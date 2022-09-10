@@ -363,15 +363,16 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
                 error(messages["interrupt_application"])
-                return True
-
+                new_network_events_thread.terminate()
+                break
             if containers_are_unhealthy(configuration):
                 error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
-                return True
+                new_network_events_thread.terminate()
+                break
             if run_as_test:
                 break
         except KeyboardInterrupt:
@@ -887,9 +888,6 @@ def load_honeypot_engine():
     )
     # killed the network traffic capture process by ctrl + c... waiting to end.
     info(messages["killing_capture_process"])
-    if exit_flag:
-        # Terminate the network capture process
-        network_traffic_capture_process.terminate()
     if run_as_test:
         network_traffic_capture_process.terminate()
     # without ci it will be terminate after a few seconds, it needs to kill the tshark and update pcap file collection
