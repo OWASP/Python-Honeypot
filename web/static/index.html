@@ -25,6 +25,7 @@
     <script src="/js/bootstrap.min.js"></script>
     <!-- main.js used as general js file for index.html -->
     <script src="/js/main.js"></script>
+    <script src="/js/modules.js"></script>
     <script src="/js/explore.js"></script>
     <script src="/js/xlsx.full.min.js"></script>
     <!-- end of header header -->
@@ -43,6 +44,10 @@
         <li class="nav-item">
             <label class="log-explorer-label btn btn-outline-info"
                    onclick="get_layout('log-explorer')">{{ data.explorer }}</label>
+        </li>
+        <li class="nav-item">
+            <label class="log-explorer-label btn btn-outline-primary"
+                   onclick="get_layout('running-module-explorer')">{{ data.running_module }}</label>
         </li>
     </ul>
 </nav>
@@ -160,37 +165,75 @@
                 </div>
             </form>
         </div>
-    </div>
-</div>
-
-<div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden="true">
-    <div class="container">
-        <div class="card material-table">
-            <table id="datatable" class="table striped responsive" style="float:center">
-            </table>
+        <div id="log-explorer-table" class="row" style="margin-left:100px; margin-right:100px;" hidden="true">
+            <div class="container">
+                <div class="card material-table">
+                    <table id="datatable" class="table striped responsive" style="float:center">
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    <div id="running-module-explorer" hidden=true>
+        <div id="module-container">
 
-<!-- end of analytics-->
-<div class="align-content-center text-center">
-    <!-- footer -->
-    <!-- OWASP Logo -->
-    <a class="" href="/"><img am-TopLogo alt="SECUREVIEW" src="/img/owasp.png" class="img-responsive"></a><br>
-    <!-- Links -->
-    <a href="https://www.owasp.org">OWASP Honeypot</a> -
-    <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
-    <!-- end of footer -->
-</div>
+            <h1 style="text-align: center; font-size: 24px">{{ data.running_modules_message }}</h1>
+            <table id="running-module-details">
 
-<script>
-    const translations = {{ encoded_data | safe}};
-</script>
-<!-- main.js used as general js file for index.html -->
-<script src="/js/main.js"></script>
-<script src="/js/explore.js"></script>
-<br>
-<!-- end of body -->
+            </table>
+        </div>
+        <div class="alert alert-danger" id="error-message-element-modules" role="alert" hidden>
+
+        </div>
+        <h1 style="text-align: center; font-size: 24px; margin-top: 1rem"
+            id="export_module_heading">{{ data.export_module_heading }}</h1>
+        <div style="display: flex; justify-content: space-around; width: 100%">
+            <button class="button" onclick="download_module_report_as_pdf('module-container')"
+                    id="download-module-report"
+                    hidden><img
+                    src="img/pdf.png" width="40" height="40"> Export
+            </button>
+            <button class="button" onclick="download_module_report_as_csv()"
+                    id="download-module-report-csv"
+                    hidden><img
+                    src="img/csv.png" width="40" height="40"> Export
+            </button>
+
+            <button class="button" onclick="download_module_report_as_json('running-module-details')"
+                    id="download-module-report-json"
+                    hidden><img
+                    src="img/json.png" width="40" height="40"> Export
+            </button>
+
+            <button class="button" onclick="download_module_report_as_excel('running-module-details')"
+                    id="download-module-report-excel"
+                    hidden><img
+                    src="img/excel.jpg" width="40" height="40"> Export
+            </button>
+        </div>
+    </div>
+
+
+    <!-- end of analytics-->
+    <div class="align-content-center text-center" id="footer">
+        <!-- footer -->
+        <!-- OWASP Logo -->
+        <a class="" href="/"><img am-TopLogo alt="SECUREVIEW" src="/img/owasp.png" class="img-responsive"></a><br>
+        <!-- Links -->
+        <a href="https://www.owasp.org">OWASP Honeypot</a> -
+        <a href="https://github.com/zdresearch/OWASP-Honeypot">GitHub</a>
+        <!-- end of footer -->
+    </div>
+
+    <script>
+        const translations = {{ encoded_data | safe}};
+    </script>
+    <!-- main.js used as general js file for index.html -->
+    <script src="/js/main.js"></script>
+    <script src="/js/explore.js"></script>
+    <br>
+    <!-- end of body -->
+</div>
 </body>
 
 </html>

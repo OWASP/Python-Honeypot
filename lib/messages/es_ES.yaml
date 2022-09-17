@@ -83,3 +83,8 @@ received_honeypot_credential_event: 'Recibido evento de credencial de honeypot, 
 received_honeypot_file_change_event: 'Recibido evento de cambio de archivo honeypot, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
 received_honeypot_data_event: 'Recibido evento de datos de honeypot, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
 received_network_traffic_file: 'Archivo de tráfico de red recibido: {0}, fecha: {1}. Insertarlo en el archivo de archivos'
+running_module: Módulos en ejecución
+running_modules_message: Detalles de los módulos en ejecución (proceso de captura de red)
+no_modules_running_message: No hay módulos en ejecución actualmente
+modules_api_error_message: Hay algún error al cargar módulos en ejecución. Por favor, inténtelo de nuevo más tarde.
+export_module_heading: Exportar detalles del módulo en ejecución

@@ -83,3 +83,8 @@ received_honeypot_credential_event: 'Received honeypot credential event, ip_dest
 received_honeypot_file_change_event: 'Received honeypot file change event, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
 received_honeypot_data_event: 'Received honeypot data event, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
 received_network_traffic_file: 'Received network traffic file:{0}, date:{1}. Inserting it in the File Archive'
+running_module: Running Modules
+running_modules_message: Details of Running Modules (Network Capture Process)
+no_modules_running_message: No modules are running currently
+modules_api_error_message: There is some error while loading running modules. Please try again later.
+export_module_heading: Export Running Module Details

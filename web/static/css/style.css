@@ -37,7 +37,7 @@ body {
     float: center;
 }
 
-#error-message-element{
+#error-message-element, #error-message-element-modules {
     text-align: center;
     max-width: 80%;
     margin: 0 auto;
@@ -201,4 +201,11 @@ blink {
 
 .button:hover {
     transform: scale(1.05);
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
 }

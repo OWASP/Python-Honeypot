@@ -83,3 +83,8 @@ received_honeypot_credential_event: 'Empfangenes Honeypot-Anmeldedatenereignis, 
 received_honeypot_file_change_event: 'Empfangenes Honeypot-Dateiänderungsereignis, file_path:{0}, status:{1}, module_name:{2}, module_name:{3}, machine_name:{3}'
 received_honeypot_data_event: 'Empfangenes Honeypot-Datenereignis, ip_dest:{0}, module_name:{1}, machine_name:{2}, data:{3}'
 received_network_traffic_file: 'Empfangene Netzwerkdatenverkehrsdatei:{0}, Datum:{1}. Einfügen in das Dateiarchiv'
+running_module: Laufende Module
+running_modules_message: Details zu laufenden Modulen (Netzwerkerfassungsprozess)
+no_modules_running_message: Derzeit laufen keine Module
+modules_api_error_message: Beim Laden laufender Module ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.
+export_module_heading: Export Running Module Details

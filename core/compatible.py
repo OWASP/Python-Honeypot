@@ -70,7 +70,8 @@ def check_for_requirements(start_api_server):
             http_auth=api_config["api_database_http_auth"]
         )
         connection.indices.get_alias("*")
-    except Exception:
+    except Exception as e:
+        print(e)
         exit_failure(messages["elasticsearch_not_found"])
     # check if its honeypot server not api server
     if not start_api_server:
