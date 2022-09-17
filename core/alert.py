@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import traceback
 from core.color import color_cmd
 from core.log import get_logger
 from core.time_helper import now
@@ -139,6 +140,44 @@ def error(content):
          + "\n"
          ).encode("utf8")
     )
+
+    if "--v" in sys.argv or "--very-verbose" in sys.argv:
+        sys.stdout.buffer.write(
+            (color_cmd("red")
+             + "[X] [{0}] ".format(now())
+             + color_cmd("yellow")
+             + "Command entered by the user: "
+             + color_cmd("green")
+             + "python " + " ".join(sys.argv)
+             + "\n"
+             ).encode("utf8")
+        )
+
+    if "---v" in sys.argv or "--extreme-verbose" in sys.argv:
+        sys.stdout.buffer.write(
+            (color_cmd("red")
+             + "[X] [{0}] ".format(now())
+             + color_cmd("yellow")
+             + "Command entered by the user: "
+             + color_cmd("green")
+             + "python " + " ".join(sys.argv)
+             + "\n"
+             ).encode("utf8")
+        )
+        sys.stdout.buffer.write(
+            (color_cmd("red")
+             + "[X] [{0}] ".format(now())
+             + "Stack Trace \n"
+             ).encode("utf8")
+        )
+        for line in traceback.format_stack():
+            sys.stdout.buffer.write(
+                (color_cmd("red")
+
+                 + line
+                 ).encode("utf8")
+            )
+
     sys.stdout.flush()
     return
 
