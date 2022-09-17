@@ -362,13 +362,17 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error(messages["interrupt_application"])
+                error(messages["interrupt_application"])
+                new_network_events_thread.terminate()
+                break
             if containers_are_unhealthy(configuration):
-                return error(
+                error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
+                new_network_events_thread.terminate()
+                break
             if run_as_test:
                 break
         except KeyboardInterrupt:
