@@ -37,9 +37,10 @@ from flask_swagger import swagger
 from flask_swagger_ui import get_swaggerui_blueprint
 from core.messages import load_messages
 
+config = api_configuration()
 DOCS_URL = '/api/docs'
-API_URL = 'http://localhost:5000/docs-configuration'
-
+API_URL = 'http://{}:{}/docs-configuration'.format(config["api_host"],
+                                                   config["api_port"])
 documentation_settings = get_swaggerui_blueprint(
     DOCS_URL,
     API_URL,
