@@ -378,6 +378,7 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
         except KeyboardInterrupt:
             # break and return for stopping and removing containers/images
             info(messages["interrupted_by_user"])
+            new_network_events_thread.terminate()
             break
     return True
 
