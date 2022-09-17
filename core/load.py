@@ -704,6 +704,24 @@ def argv_parser():
         default=False,
         help="enable verbose mode"
     )
+    # enable very verbose mode (debug mode)
+    engineOpt.add_argument(
+        "--v",
+        "--very-verbose",
+        action="store_true",
+        dest="very_verbose_mode",
+        default=False,
+        help="enable very verbose mode"
+    )
+    # enable extreme verbose mode (debug mode)
+    engineOpt.add_argument(
+        "---v",
+        "--extreme-verbose",
+        action="store_true",
+        dest="extreme_verbose_mode",
+        default=False,
+        help="enable extreme verbose mode"
+    )
     # disable color CLI
     engineOpt.add_argument(
         "--disable-colors",
