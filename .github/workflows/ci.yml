@@ -42,9 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9.4, 3.8.9]
+        python-version: [ 3.9.4, 3.8.9 ]
 
     steps:
+
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -71,10 +72,13 @@ jobs:
         run: docker logs python-honeypot_ohp_1
 
       - name: Test with pytest
-        run: docker exec python-honeypot_ohp_1 python3 -m pytest -rpP --reruns 5 --reruns-delay 3
+        run: docker exec python-honeypot_ohp_1 python3 -m pytest -c tests/pytest.ini -rpP --reruns 5 --reruns-delay 3
 
       - name: Check API server logs
         run: docker-compose logs ohp
+
+      - name: Run modules test (graceful shutting of modules)
+        run: sudo python3 -m pytest tests/test_module_shutting.py tests/test_module_killing.py -s
 
       - name: Run modules test
         run: sudo python3 ohp.py -m all --test --store-pcap
