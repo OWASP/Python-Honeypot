@@ -362,13 +362,17 @@ def wait_until_interrupt(virtual_machine_container_reset_factory_time_seconds, c
                 # start containers based on selected modules
                 start_containers(configuration)
             if not new_network_events_thread.is_alive():
-                return error(messages["interrupt_application"])
+                error(messages["interrupt_application"])
+                new_network_events_thread.terminate()
+                break
             if containers_are_unhealthy(configuration):
-                return error(
+                error(
                     "Interrupting the application because \"{0}\" container(s) is(are) not alive!".format(
                         ", ".join(containers_are_unhealthy(configuration))
                     )
                 )
+                new_network_events_thread.terminate()
+                break
             if run_as_test:
                 break
         except KeyboardInterrupt:
@@ -703,6 +707,24 @@ def argv_parser():
         dest="verbose_mode",
         default=False,
         help="enable verbose mode"
+    )
+    # enable very verbose mode (debug mode)
+    engineOpt.add_argument(
+        "--v",
+        "--very-verbose",
+        action="store_true",
+        dest="very_verbose_mode",
+        default=False,
+        help="enable very verbose mode"
+    )
+    # enable extreme verbose mode (debug mode)
+    engineOpt.add_argument(
+        "---v",
+        "--extreme-verbose",
+        action="store_true",
+        dest="extreme_verbose_mode",
+        default=False,
+        help="enable extreme verbose mode"
     )
     # disable color CLI
     engineOpt.add_argument(

@@ -105,3 +105,24 @@ def user_configuration():
         "default_selected_modules": "all",  # or select one or multiple (e.g. ftp/strong_password,ssh/strong_password)
         "default_excluded_modules": None  # or any module name separated with comma
     }
+
+
+def sentry_configuration() -> dict:
+    """
+        sentry configuration
+
+    Returns:
+        JSON/Dict sentry configuration
+    """
+    return {
+        "sentry_monitoring": False,
+        # Enter your Sentry Project URL here.
+        "sentry_dsn_url": "",
+        # Enter Trace Rate Here.
+        "sentry_trace_rate": 1
+        # Set sentry_trace_rate to 1.0 to capture 100%
+        # of transactions for performance monitoring.
+        # sentry_trace_rate is ratio of errors being
+        # reported to the number of issues which arise.
+
+    }
