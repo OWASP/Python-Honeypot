@@ -6,11 +6,7 @@ OWASP Honeypot is an open-source software in Python language which designed for 
 
 We appreciate any contribution, ideas, feedback. feel free to contact us by creating an issue or send me email directly [ali.razmjoo@owasp.org](mailto:ali.razmjoo@owasp.org). Please visit [Wiki](https://github.com/zdresearch/OWASP-Honeypot/wiki) page for more information.
 
-### Live API
-We've set up a live API on a few servers in Stockholm area, you can use API calls and information without any limitation, the service is running on a tiny VPS, please do not send a lot of requests.
-
-* http://ohp-stockholm-live.z3r0d4y.com:5000/
-
+* **Read More**: https://www.secologist.com/open-source-projects
 ______
 
 ##### ***WE ARE IN RESEARCH AND DEVELOP PHASE, EXPECT ERRORS!***
