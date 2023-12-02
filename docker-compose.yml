@@ -1,6 +1,7 @@
 version: '3'
 
 services:
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
     container_name: "elasticsearch"
@@ -8,7 +9,7 @@ services:
       - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
       - discovery.type=single-node
       - xpack.security.enabled=false # note: you must secure your elasticsearch otherwise everyone can access it
-                                     # you also need to add the credentials to config.py
+      # you also need to add the credentials to config.py
     ports:
       - 9200:9200
     volumes:
@@ -35,10 +36,28 @@ services:
     image: grafana/grafana:latest-ubuntu
     container_name: "grafana"
     volumes:
+      - ./data/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./data/grafana/dashboard.json:/var/lib/grafana/dashboards/dashboard.json
       - ./data/grafana:/var/lib/grafana:Z
+
     ports:
       - 3000:3000
     links:
       - elasticsearch
     depends_on:
       - elasticsearch
+
+
+  prometheus:
+    image: prom/prometheus:v2.26.0
+    container_name: "prometheus"
+    volumes:
+      - ./data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    links:
+      - ohp
+    depends_on:
+      - ohp
+
+
